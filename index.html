@@ -96,6 +96,32 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .addQForm input{width:100%; padding:10px 12px; border-radius:8px; border:1.5px solid #dcd4c0; font-family:'Tajawal'; margin-bottom:10px; font-size:.9rem;}
   .addQForm label{font-size:.82rem; font-weight:700; color:var(--navy); display:block; margin-bottom:4px;}
 
+  /* chatbot */
+  #chatFab{
+    position:fixed; bottom:22px; left:22px; z-index:150; width:58px; height:58px; border-radius:50%;
+    background:var(--gold); color:var(--navy-deep); border:none; font-size:1.5rem; cursor:pointer;
+    box-shadow:0 6px 18px rgba(0,0,0,.25); display:flex; align-items:center; justify-content:center;
+  }
+  #chatPanel{
+    position:fixed; bottom:90px; left:22px; z-index:150; width:340px; max-width:calc(100vw - 40px);
+    height:460px; max-height:70vh; background:#fff; border-radius:18px; box-shadow:0 10px 40px rgba(0,0,0,.3);
+    display:none; flex-direction:column; overflow:hidden;
+  }
+  #chatPanel.show{display:flex;}
+  .chatHead{background:var(--navy); color:#fff; padding:14px 18px; display:flex; justify-content:space-between; align-items:center;}
+  .chatHead strong{font-size:.95rem;}
+  .chatHead span{font-size:.75rem; color:var(--gold-light); display:block;}
+  .chatHead button{background:none; border:none; color:#fff; font-size:1.2rem; cursor:pointer;}
+  .chatBody{flex:1; overflow-y:auto; padding:14px; background:#faf7ef;}
+  .chatMsg{max-width:82%; padding:9px 13px; border-radius:12px; margin-bottom:10px; font-size:.86rem; line-height:1.6;}
+  .chatMsg.bot{background:#fff; border:1px solid #e8e0cd; margin-inline-end:auto; border-start-start-radius:2px;}
+  .chatMsg.user{background:var(--gold); color:var(--navy-deep); margin-inline-start:auto; border-start-end-radius:2px; font-weight:700;}
+  .chatChips{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;}
+  .chatChip{background:#fff; border:1.5px solid var(--gold); color:var(--navy); border-radius:20px; padding:6px 12px; font-size:.78rem; cursor:pointer;}
+  .chatInputRow{display:flex; gap:8px; padding:12px; border-top:1px solid #eee; background:#fff;}
+  .chatInputRow input{flex:1; padding:10px 12px; border-radius:10px; border:1.5px solid #dcd4c0; font-family:'Tajawal'; font-size:.85rem;}
+  .chatInputRow button{background:var(--teal); color:#fff; border:none; border-radius:10px; padding:0 16px; font-weight:700; cursor:pointer;}
+
   /* Hero */
   .hero{
     background:linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
@@ -446,6 +472,19 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <div class="field"><label>كلمة المرور</label><input id="inAdminPass" type="password" placeholder="••••••••"></div>
     <div id="adminLoginError" style="color:var(--maroon); font-size:.85rem; margin-bottom:10px; display:none;"></div>
     <button class="btn btn-gold" style="width:100%" onclick="adminLogin()">دخول</button>
+  </div>
+</div>
+
+<button id="chatFab" title="اسأل رفيق">💬</button>
+<div id="chatPanel">
+  <div class="chatHead">
+    <div><strong>رفيق 🧭</strong><span>مساعدك بمفاهيم المنهج</span></div>
+    <button onclick="closeChat()">✕</button>
+  </div>
+  <div class="chatBody" id="chatBody"></div>
+  <div class="chatInputRow">
+    <input id="chatInput" placeholder="اسأل عن أي مفهوم بالمنهج..." onkeydown="if(event.key==='Enter') sendChat();">
+    <button onclick="sendChat()">إرسال</button>
   </div>
 </div>
 
@@ -922,6 +961,137 @@ async function deleteQuestion(id){
   await sb.from('questions').delete().eq('id', id);
   loadQuestionsAdmin();
   loadQuestions();
+}
+
+// ---------- رفيق: بوت مساعد بمفاهيم المنهج (مبني على معرفة، مجاني بالكامل، بدون أي API) ----------
+const KNOWLEDGE_BASE = [
+  {k:["طقس","مناخ","فرق"], a:"الطقس هو حالة الجو المؤقتة اليومية، أما المناخ فهو متوسط حالة الجو بمنطقة معينة على مدى سنوات طويلة."},
+  {k:["عناصر المناخ"], a:"عناصر المناخ أربعة: الحرارة، الضغط الجوي، الرياح، والرطوبة والتكاثف."},
+  {k:["اشعاع شمسي","إشعاع شمسي"], a:"الإشعاع الشمسي هو مقدار الأشعة الشمسية الساقطة على مساحة معينة، وهو المصدر الرئيس للحرارة على سطح الأرض."},
+  {k:["مناطق حرارية","المنطقة الحارة"], a:"سطح الأرض مقسّم لـ4 مناطق حرارية: الحارة (0-30°)، المعتدلة الدافئة (30-40°)، المعتدلة الباردة (40-66.5°)، والباردة القطبية (66.5-90°)."},
+  {k:["ضغط جوي"], a:"الضغط الجوي هو وزن عمود من الهواء على مساحة ما من سطح الأرض. له علاقة عكسية مع الحرارة والارتفاع — كل ما ارتفعنا، قلّ الضغط."},
+  {k:["انواع الرياح","أنواع الرياح"], a:"الرياح 4 أنواع: الدائمة (تهب طوال العام)، الموسمية (تتغير باختلاف الفصل)، المحلية (زي الكوس بقطر)، واليومية (نسيم البر والبحر)."},
+  {k:["كوس"], a:"الكوس رياح محلية حارة رطبة تهب على دولة قطر بفصلي الربيع والصيف، محمّلة بالأتربة والغبار."},
+  {k:["رطوبة","تكاثف"], a:"الرطوبة هي بخار الماء بالهواء، والتكاثف يحدث لما يتحول بخار الماء لحالة سائلة أو صلبة. من مظاهره: الضباب، الندى، السحب، والتساقط."},
+  {k:["عوامل مؤثرة في المناخ","عوامل المناخ"], a:"3 عوامل تؤثر بالمناخ: الموقع بالنسبة لدوائر العرض، الارتفاع عن سطح البحر، وتوزيع اليابس والماء."},
+  {k:["اقليم مناخي","إقليم مناخي"], a:"الإقليم المناخي هو منطقة متشابهة بخصائصها المناخية (حرارة، أمطار، رياح، رطوبة) ومتميزة عن الأقاليم المجاورة."},
+  {k:["اقاليم مناخية","أقاليم العالم"], a:"8 أقاليم مناخية رئيسة: الاستوائي، المداري، الصحراوي (قطر ضمنه)، البحر المتوسط، الصيني، غرب أوروبا، اللورانسي، والقطبي البارد."},
+  {k:["اقليم قطر","مناخ قطر"], a:"دولة قطر تقع ضمن الإقليم المناخي الصحراوي — صيف حار جاف، وشتاء أمطاره نادرة."},
+
+  {k:["حضارة","تعريف الحضارة"], a:"الحضارة هي كل ما أنتجه العقل الإنساني من مظاهر مادية (مباني، أدوات) أو معنوية (ثقافة، عادات، فنون)."},
+  {k:["بلاد الرافدين"], a:"بلاد الرافدين هي المنطقة الواقعة بين نهري دجلة والفرات، في جمهورية العراق حالياً."},
+  {k:["عوامل قيام حضارة الرافدين"], a:"3 عوامل: الموقع الجغرافي (وسط صحاري)، نهرا دجلة والفرات (خصوبة وماء)، والهجرات البشرية من الجزيرة العربية."},
+  {k:["سومريون"], a:"السومريون أول الشعوب اللي سكنت بلاد الرافدين (4000 ق.م)، عاصمتهم أور، أشهر ملوكهم أورنمو."},
+  {k:["حمورابي","قانون حمورابي"], a:"حمورابي أشهر ملوك الدولة البابلية الأولى، اشتهر بتشريعاته وقوانينه اللي نُقشت على مسلة حجرية — من أقدم القوانين المكتشفة بالعالم."},
+  {k:["اشوريون","آشوريون"], a:"الآشوريون هاجروا من الجزيرة العربية واستقروا شمال بلاد الرافدين، أشهر ملوكهم آشور بانيبال، سقطت دولتهم على يد الكلدانيين."},
+  {k:["كلدانيون"], a:"الكلدانيون أسسوا الدولة البابلية الثانية (627 ق.م)، أشهر ملوكهم نبوخذ نصر، سقطت دولتهم على يد الفرس بقيادة قورش."},
+  {k:["كتابة مسمارية"], a:"الكتابة المسمارية نظام كتابة استخدمه سكان بلاد الرافدين على ألواح طينية، سُميت كذا لأنها تُكتب بأداة تشبه المسمار. السومريون أول من عرفها."},
+  {k:["حدائق بابل"], a:"حدائق بابل المعلقة من أبرز إنجازات الدولة البابلية بمجال الزراعة — حدائق مزروعة على شكل مدرّجات جبلية."},
+  {k:["بوابة عشتار"], a:"بوابة عشتار أضخم بوابات مدينة بابل، بناها نبوخذ نصر عام 575 ق.م، مزخرفة برسوم حيوانات، وموجودة حالياً بمتحف برلين."},
+
+  {k:["دستور","تعريف الدستور"], a:"الدستور هو مجموعة القواعد الأساسية اللي تحدد شكل الدولة، ونظام الحكم فيها، والسلطات العامة بها."},
+  {k:["اركان الدولة","أركان الدولة"], a:"للدولة 3 أركان رئيسة: السلطة، الشعب، والإقليم."},
+  {k:["مجلس الشورى"], a:"مجلس الشورى يمثل السلطة التشريعية بدولة قطر، عدد أعضائه لا يقل عن 45 عضواً، مدته 4 سنوات، ويختص بتشريع القوانين وإقرار الموازنة والرقابة على السلطة التنفيذية."},
+  {k:["سلطة تنفيذية"], a:"السلطة التنفيذية يتولاها الأمير بمعاونة مجلس الوزراء، وتختص برسم السياسة العامة، المصادقة على القوانين، وإدارة شؤون الدولة."},
+  {k:["سلطة قضائية"], a:"السلطة القضائية مستقلة تماماً، تتولاها المحاكم، وتختص بالفصل بالمنازعات. المجلس الأعلى للقضاء تأسس عام 1999 لضمان استقلاليتها."},
+  {k:["انواع المحاكم","أنواع المحاكم"], a:"3 درجات للمحاكم بقطر: المحكمة الابتدائية، ثم محكمة الاستئناف، ثم محكمة التمييز."},
+  {k:["فصل السلطات"], a:"مبدأ الفصل بين السلطات (المادة 60 بالدستور) يعني فصل السلطات الثلاث مع تعاونها، هدفه منع الاستبداد بالسلطة ومنع فرض القرارات من جهة واحدة."},
+
+  {k:["تركز سكاني"], a:"التركز السكاني هو وجود نسبة كبيرة من السكان بمناطق جغرافية معينة دون غيرها."},
+  {k:["تخلخل سكاني"], a:"التخلخل السكاني هو قلة أو ندرة وجود السكان بمناطق جغرافية معينة."},
+  {k:["عوامل طبيعية سكان"], a:"3 عوامل طبيعية تؤثر بتوزيع السكان: التضاريس (السهول الأفضل)، المناخ (الحرارة والأمطار)، والثروات المعدنية ومصادر الطاقة."},
+  {k:["عوامل بشرية سكان"], a:"3 عوامل بشرية تؤثر بتوزيع السكان: الأنشطة الاقتصادية (خصوصاً الصناعة)، النقل والمواصلات، والحروب والمشكلات السياسية."},
+  {k:["مسيعيد"], a:"مسيعيد مدينة صناعية بدولة قطر، نشأت بسبب اكتشاف النفط والغاز، وتجذب السكان لتوفر فرص العمل فيها."},
+
+  {k:["نشاة الخلافة العباسية","نشأة الدولة العباسية"], a:"الدولة العباسية قامت بعد ثورة على الدولة الأموية من منطقة خراسان، وانتصرت بمعركة الزاب الكبير سنة 132هـ، وصار أبو العباس أول خليفة عباسي."},
+  {k:["ابو جعفر المنصور","أبو جعفر المنصور"], a:"أبو جعفر المنصور ثاني الخلفاء العباسيين، يُلقّب بالمؤسس الحقيقي للدولة — ثبّت أركانها، أنشأ جهازاً إدارياً محكماً، وبنى مدينة بغداد سنة 145هـ."},
+  {k:["هارون الرشيد"], a:"هارون الرشيد خامس الخلفاء العباسيين وأشهرهم، عصره يُعتبر أزهى عصور الدولة، أنشأ مكتبة بيت الحكمة الشهيرة ببغداد."},
+  {k:["مأمون","المأمون"], a:"المأمون سابع الخلفاء العباسيين، اشتهر عصره بالنهضة العلمية — بنى مراصد فلكية ونشّط حركة الترجمة، حتى كان يدفع للمترجم وزن الكتاب ذهباً!"},
+  {k:["بيت الحكمة"], a:"بيت الحكمة مكتبة ضخمة أنشأها هارون الرشيد ببغداد، ضمّت مؤلفات وكتب علمية نادرة، وأصبحت بعهد المأمون أكبر مركز علمي وثقافي بالعالم."},
+  {k:["فتح عمورية"], a:"فتح عمورية معركة قادها الخليفة المعتصم بالله عام 223هـ، سببها استغاثة امرأة مسلمة أسيرة، فقادها المعتصم بنفسه وفتح المدينة."},
+  {k:["سقوط الدولة العباسية"], a:"سقطت الدولة العباسية عام 656هـ على يد المغول اللي دخلوا بغداد، بعد عصر طويل من الضعف والتفكك والانقسام لدويلات مستقلة."},
+
+  {k:["امن وطني","الأمن الوطني"], a:"الأمن الوطني هو قدرة الدولة على حماية أراضيها وشعبها من أي عدوان خارجي، والتصدي للمشاكل الداخلية، وترسيخ الولاء والانتماء للوطن."},
+  {k:["ابعاد الامن","أبعاد الأمن الوطني"], a:"4 أبعاد للأمن الوطني: العسكري، السياسي، الاقتصادي، والاجتماعي (وضمنه الأمن السيبراني)."},
+  {k:["امن سيبراني","الأمن السيبراني"], a:"الأمن السيبراني حماية البيانات والأنظمة الإلكترونية من الاختراق، وقطر وضعت له استراتيجية وطنية خاصة."},
+  {k:["مقومات الامن"], a:"4 مقومات للأمن الوطني: استقرار النظام السياسي، ترسيخ الديمقراطية وتكافؤ الفرص، التوافق مع الأمن العالمي، وتطوير أجهزة الأمن."},
+  {k:["وزارة الدفاع"], a:"وزارة الدفاع القطرية تؤمّن حدود الدولة وتنظّم الخدمة الوطنية، وتضم القوات البرية والبحرية والجوية."},
+  {k:["فزعة","الفزعة","النجدة"], a:"شرطة النجدة (الفزعة) إدارة تابعة لوزارة الداخلية، مهمتها الاستجابة السريعة لحفظ أمن المجتمع."},
+  {k:["وزارة الداخلية"], a:"وزارة الداخلية القطرية تضم عدة إدارات: النجدة (الفزعة)، المرور، الدفاع المدني، مكافحة المخدرات، وأمن السواحل والحدود."},
+
+  {k:["نظام النقاط","كيف اجمع نقاط"], a:"تكسب نقاط بالإجابة الصحيحة على أسئلة المراجعة (+10 نقاط، +1 طاقة لكل إجابة صح). النقاط تتحول لطاقة تستخدمها باللعبة الترفيهية."},
+  {k:["كيف اسجل","تسجيل دخول"], a:"اضغط زر 'دخول الطالب' بأعلى الصفحة، اكتب اسمك وصفك، وابدأ فوراً."},
+];
+
+function normalizeArabic(text){
+  return (text || "")
+    .replace(/[\u064B-\u0652\u0670\u0640]/g, "") // إزالة التشكيل والتطويل
+    .replace(/[إأآا]/g, "ا")
+    .replace(/ى/g, "ي")
+    .replace(/ة/g, "ه")
+    .trim();
+}
+
+function matchKnowledge(query){
+  const q = normalizeArabic(query);
+  let best = null, bestScore = 0;
+  KNOWLEDGE_BASE.forEach(entry=>{
+    let score = 0;
+    entry.k.forEach(kw=>{
+      if(q.includes(normalizeArabic(kw))) score += kw.length; // كلمات أطول = تطابق أدق
+    });
+    if(score > bestScore){ bestScore = score; best = entry; }
+  });
+  return bestScore > 0 ? best.a : null;
+}
+
+function addChatMsg(sender, html){
+  const body = document.getElementById('chatBody');
+  const div = document.createElement('div');
+  div.className = 'chatMsg ' + sender;
+  div.innerHTML = html;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+let chatOpened = false;
+function openChat(){
+  document.getElementById('chatPanel').classList.add('show');
+  if(!chatOpened){
+    chatOpened = true;
+    addChatMsg('bot', 'هلا! أنا رفيق 🧭، اسألني عن أي مفهوم بمنهج الدراسات الاجتماعية وبساعدك أفهمه.');
+    const chips = ['وش أنواع الرياح؟','من هو حمورابي؟','كم بعد للأمن الوطني؟','وش الفرق بين الطقس والمناخ؟'];
+    const chipsHtml = '<div class="chatChips">' + chips.map(c=>`<button class="chatChip" onclick="askChip('${c}')">${c}</button>`).join('') + '</div>';
+    document.getElementById('chatBody').insertAdjacentHTML('beforeend', chipsHtml);
+  }
+}
+function closeChat(){
+  document.getElementById('chatPanel').classList.remove('show');
+}
+document.getElementById('chatFab').addEventListener('click', ()=>{
+  const panel = document.getElementById('chatPanel');
+  panel.classList.contains('show') ? closeChat() : openChat();
+});
+
+function askChip(text){
+  document.getElementById('chatInput').value = text;
+  sendChat();
+}
+
+function sendChat(){
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if(!text) return;
+  addChatMsg('user', text);
+  input.value = '';
+  setTimeout(()=>{
+    const answer = matchKnowledge(text);
+    if(answer){
+      addChatMsg('bot', answer);
+    } else {
+      addChatMsg('bot', 'ما لقيت جواب دقيق لسؤالك 🤔 جرّب تسأل بكلمات مختلفة، أو راجع قسم «المنهج» بالموقع.');
+    }
+  }, 350);
 }
 
 // ---------- mobile nav ----------
