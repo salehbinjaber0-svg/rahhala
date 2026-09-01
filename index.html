@@ -475,10 +475,30 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   </div>
 </div>
 
-<button id="chatFab" title="اسأل رفيق">💬</button>
+<button id="chatFab" title="اسأل المنقذ">
+  <svg viewBox="0 0 100 100" width="34" height="34">
+    <path d="M16,50 Q16,14 50,12 Q84,14 84,50 L80,88 Q65,98 50,98 Q35,98 20,88 Z" fill="#FFFFFF"/>
+    <ellipse cx="50" cy="27" rx="30" ry="7" fill="none" stroke="#1c2b30" stroke-width="4.5"/>
+    <ellipse cx="50" cy="62" rx="21" ry="23" fill="#E8B98A"/>
+    <circle cx="41" cy="60" r="3" fill="#1c2b30"/>
+    <circle cx="59" cy="60" r="3" fill="#1c2b30"/>
+    <path d="M41,71 Q50,78 59,71" fill="none" stroke="#1c2b30" stroke-width="3" stroke-linecap="round"/>
+  </svg>
+</button>
 <div id="chatPanel">
   <div class="chatHead">
-    <div><strong>رفيق 🧭</strong><span>مساعدك بمفاهيم المنهج</span></div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <svg viewBox="0 0 100 100" width="34" height="34" style="flex-shrink:0;">
+        <circle cx="50" cy="50" r="48" fill="#C9A15E"/>
+        <path d="M16,50 Q16,14 50,12 Q84,14 84,50 L80,88 Q65,98 50,98 Q35,98 20,88 Z" fill="#FFFFFF"/>
+        <ellipse cx="50" cy="27" rx="30" ry="7" fill="none" stroke="#1c2b30" stroke-width="4.5"/>
+        <ellipse cx="50" cy="62" rx="21" ry="23" fill="#E8B98A"/>
+        <circle cx="41" cy="60" r="3" fill="#1c2b30"/>
+        <circle cx="59" cy="60" r="3" fill="#1c2b30"/>
+        <path d="M41,71 Q50,78 59,71" fill="none" stroke="#1c2b30" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <div><strong>المنقذ</strong><span>مساعدك بمفاهيم المنهج</span></div>
+    </div>
     <button onclick="closeChat()">✕</button>
   </div>
   <div class="chatBody" id="chatBody"></div>
@@ -963,7 +983,7 @@ async function deleteQuestion(id){
   loadQuestions();
 }
 
-// ---------- رفيق: بوت مساعد بمفاهيم المنهج (مبني على معرفة، مجاني بالكامل، بدون أي API) ----------
+// ---------- المنقذ: بوت مساعد بمفاهيم المنهج (مبني على معرفة، مجاني بالكامل، بدون أي API) ----------
 const KNOWLEDGE_BASE = [
   {k:["طقس","مناخ","فرق"], a:"الطقس هو حالة الجو المؤقتة اليومية، أما المناخ فهو متوسط حالة الجو بمنطقة معينة على مدى سنوات طويلة."},
   {k:["عناصر المناخ"], a:"عناصر المناخ أربعة: الحرارة، الضغط الجوي، الرياح، والرطوبة والتكاثف."},
@@ -1059,7 +1079,7 @@ function openChat(){
   document.getElementById('chatPanel').classList.add('show');
   if(!chatOpened){
     chatOpened = true;
-    addChatMsg('bot', 'هلا! أنا رفيق 🧭، اسألني عن أي مفهوم بمنهج الدراسات الاجتماعية وبساعدك أفهمه.');
+    addChatMsg('bot', 'هلا! أنا المنقذ، اسألني عن أي مفهوم بمنهج الدراسات الاجتماعية وبساعدك أفهمه.');
     const chips = ['وش أنواع الرياح؟','من هو حمورابي؟','كم بعد للأمن الوطني؟','وش الفرق بين الطقس والمناخ؟'];
     const chipsHtml = '<div class="chatChips">' + chips.map(c=>`<button class="chatChip" onclick="askChip('${c}')">${c}</button>`).join('') + '</div>';
     document.getElementById('chatBody').insertAdjacentHTML('beforeend', chipsHtml);
