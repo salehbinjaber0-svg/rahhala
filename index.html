@@ -63,7 +63,38 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     background:var(--gold); color:var(--navy-deep); padding:7px 16px; border-radius:30px;
     font-weight:700; font-size:.85rem; cursor:pointer; border:none;
   }
+  #adminChip{
+    background:transparent; color:var(--gold-light); border:1.5px solid rgba(201,161,94,.4);
+    width:36px; height:36px; border-radius:50%; font-size:1rem; cursor:pointer; margin-inline-start:8px;
+  }
+  #adminChip.active{background:var(--teal); border-color:var(--teal); color:#fff;}
   .menuBtn{display:none; background:none; border:none; color:var(--cream); font-size:1.6rem; cursor:pointer;}
+
+  /* admin panel */
+  #adminPanel{display:none;}
+  #adminPanel.show{display:block;}
+  .adminTabs{display:flex; gap:10px; margin-bottom:20px;}
+  .adminTab{padding:9px 18px; border-radius:30px; border:2px solid var(--navy); background:transparent; color:var(--navy); font-weight:700; font-size:.88rem; cursor:pointer;}
+  .adminTab.active{background:var(--navy); color:var(--gold-light);}
+  .adminPanelBody{display:none;}
+  .adminPanelBody.active{display:block;}
+  .pendingRow{
+    display:flex; align-items:center; gap:12px; background:#fff; border:1px solid #e8e0cd;
+    border-radius:12px; padding:14px 18px; margin-bottom:10px;
+  }
+  .pendingRow .info{flex:1;}
+  .pendingRow .info strong{display:block; color:var(--navy);}
+  .pendingRow .info span{font-size:.82rem; color:#7a8a8e;}
+  .miniBtn{padding:8px 16px; border-radius:8px; border:none; font-weight:700; font-size:.85rem; cursor:pointer;}
+  .miniBtn.approve{background:var(--teal); color:#fff;}
+  .miniBtn.reject{background:var(--maroon); color:#fff;}
+  .qRow{background:#fff; border:1px solid #e8e0cd; border-radius:12px; padding:16px 18px; margin-bottom:10px;}
+  .qRow .qtext{font-weight:700; color:var(--navy); margin-bottom:6px;}
+  .qRow .qchoices{font-size:.85rem; color:#5c6a6e; margin-bottom:8px;}
+  .qRow .qchoices .correctChoice{color:var(--teal); font-weight:700;}
+  .addQForm{background:#fff; border:1px solid #e8e0cd; border-radius:12px; padding:20px; margin-bottom:24px;}
+  .addQForm input{width:100%; padding:10px 12px; border-radius:8px; border:1.5px solid #dcd4c0; font-family:'Tajawal'; margin-bottom:10px; font-size:.9rem;}
+  .addQForm label{font-size:.82rem; font-weight:700; color:var(--navy); display:block; margin-bottom:4px;}
 
   /* Hero */
   .hero{
@@ -219,6 +250,9 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   ⚠️ تعذر الاتصال بقاعدة البيانات لحفظ نقاطك. تأكد من اتصالك بالإنترنت، وإذا استمرت المشكلة جرّب إعادة تحميل الصفحة.
   <button onclick="location.reload()">إعادة المحاولة</button>
 </div>
+<div id="pendingNotice" style="display:none; background:var(--gold); color:var(--navy-deep); text-align:center; padding:10px 20px; font-size:.88rem; font-weight:700;">
+  🕐 حسابك بانتظار موافقة المعلم — تقدر تلعب وتجمع نقاط عادي، بس ما راح تظهر بلوحة الصدارة العامة لحد ما يوافق عليك.
+</div>
 
 <header>
   <div class="wrap">
@@ -235,6 +269,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <a href="#about">عن المعلم</a>
     </nav>
     <button id="userChip">دخول الطالب</button>
+    <button id="adminChip" title="دخول المعلم">🔒</button>
     <button class="menuBtn" id="menuBtn">☰</button>
   </div>
 </header>
@@ -353,6 +388,42 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   </div>
 </section>
 
+<section id="adminPanel">
+  <div class="wrap">
+    <h2>لوحة المعلم</h2>
+    <p class="lead">مرحباً بك — من هنا توافق على الطلاب الجدد وتدير بنك الأسئلة مباشرة.</p>
+    <div class="adminTabs">
+      <button class="adminTab active" data-tab="pending">🕐 طلاب بانتظار الموافقة (<span id="pendingCount">0</span>)</button>
+      <button class="adminTab" data-tab="questions">📝 إدارة الأسئلة</button>
+    </div>
+
+    <div class="adminPanelBody active" id="tab-pending">
+      <div id="pendingList"></div>
+    </div>
+
+    <div class="adminPanelBody" id="tab-questions">
+      <div class="addQForm">
+        <label>نص السؤال</label>
+        <input id="newQText" placeholder="مثال: ما عاصمة الدولة العباسية؟">
+        <label>الخيار الأول</label>
+        <input id="newQC0" placeholder="خيار 1">
+        <label>الخيار الثاني</label>
+        <input id="newQC1" placeholder="خيار 2">
+        <label>الخيار الثالث</label>
+        <input id="newQC2" placeholder="خيار 3">
+        <label>رقم الخيار الصحيح (0 أو 1 أو 2)</label>
+        <input id="newQCorrect" placeholder="0" type="number" min="0" max="2">
+        <label>الوحدة (اختياري)</label>
+        <input id="newQUnit" placeholder="مثال: الوحدة 1">
+        <button class="btn btn-gold" onclick="addQuestion()">➕ إضافة السؤال</button>
+      </div>
+      <div id="questionsList"></div>
+    </div>
+
+    <button class="btn btn-outline" style="margin-top:20px; color:var(--navy); border-color:var(--navy);" onclick="adminLogout()">تسجيل خروج المعلم</button>
+  </div>
+</section>
+
 <footer>
   <div class="wrap">منصة <strong>رحّالة</strong> — نسخة أولية تجريبية · قابلة للتوسعة بالمزيد من الوحدات والألعاب</div>
 </footer>
@@ -364,6 +435,17 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <div class="field"><label>الاسم</label><input id="inName" placeholder="مثال: سالم"></div>
     <div class="field"><label>الصف / الشعبة</label><input id="inClass" placeholder="مثال: 7-2"></div>
     <button class="btn btn-gold" style="width:100%" onclick="login()">ابدأ</button>
+  </div>
+</div>
+
+<div class="modalBg" id="adminLoginModal">
+  <div class="modal">
+    <h3>دخول المعلم</h3>
+    <p class="sub">هذا الدخول مخصص للمعلم فقط — يحتاج بريد وكلمة مرور حقيقيين</p>
+    <div class="field"><label>البريد الإلكتروني</label><input id="inAdminEmail" type="email" placeholder="you@example.com"></div>
+    <div class="field"><label>كلمة المرور</label><input id="inAdminPass" type="password" placeholder="••••••••"></div>
+    <div id="adminLoginError" style="color:var(--maroon); font-size:.85rem; margin-bottom:10px; display:none;"></div>
+    <button class="btn btn-gold" style="width:100%" onclick="adminLogin()">دخول</button>
   </div>
 </div>
 
@@ -392,44 +474,17 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       حتى لو لعبوا كلهم بنفس اللحظة — الموقع جاهز لعدد كبير يلعب بالتوازي.
    ============================================================ */
 
-// ---------- data: أسئلة المراجعة (مستخرجة من كتاب الدراسات الاجتماعية للصف السابع - الفصل الأول، الوحدات 1-6) ----------
-const QUESTIONS = [
-  // الوحدة 1 - الأرض من حولي
-  {q:"ما مصدر الحرارة الرئيس على سطح الأرض؟", c:["الإشعاع الشمسي","القمر","البراكين"], a:0},
-  {q:"الرياح المحلية التي تهب على دولة قطر تُسمى؟", c:["المسترال","الكوس","الطوز"], a:1},
-  {q:"تنخفض درجة الحرارة درجة مئوية واحدة كلما ارتفعنا عن سطح البحر بمقدار؟", c:["100 متر","150 متراً","200 متر"], a:1},
-  {q:"دولة قطر تقع ضمن أي إقليم مناخي؟", c:["الاستوائي","الصحراوي","القطبي البارد"], a:1},
-  {q:"أي الأقاليم المناخية يمتد بين دائرتي عرض 0° و8°؟", c:["الصحراوي","الاستوائي","الصيني"], a:1},
-  // الوحدة 2 - حضارة بلاد الرافدين
-  {q:"من هي أول الشعوب التي سكنت بلاد الرافدين؟", c:["الأكاديون","السومريون","الآشوريون"], a:1},
-  {q:"أي ملوك بلاد الرافدين ثبّت دعائم دولته بالتشريعات والقوانين؟", c:["سرجون الأول","حمورابي","نبوخذ نصر"], a:1},
-  {q:"بلاد الرافدين تقع بين أي نهرين؟", c:["النيل والفرات","دجلة والفرات","دجلة والنيل"], a:1},
-  {q:"على أي مادة كتب سكان بلاد الرافدين وثائقهم الرسمية؟", c:["ألواح خشبية","ألواح طينية","ألواح معدنية"], a:1},
-  {q:"ما اسم نظام الكتابة الذي عرفه سكان بلاد الرافدين؟", c:["الكتابة الهيروغليفية","الكتابة المسمارية","الكتابة الأبجدية"], a:1},
-  // الوحدة 3 - السلطات الدستورية
-  {q:"مجلس الشورى في دولة قطر يمثل السلطة؟", c:["القضائية","التشريعية","التنفيذية"], a:1},
-  {q:"عدد أعضاء مجلس الشورى القطري لا يقل عن؟", c:["35 عضواً","45 عضواً","55 عضواً"], a:1},
-  {q:"من يتولى السلطة التنفيذية في قطر بمعاونة مجلس الوزراء؟", c:["رئيس الوزراء","الأمير","مجلس الشورى"], a:1},
-  {q:"متى تأسس المجلس الأعلى للقضاء في دولة قطر؟", c:["1995م","1999م","2003م"], a:1},
-  {q:"ما الهدف من مبدأ الفصل بين السلطات؟", c:["تقسيم الشعب","منع الاستبداد بالسلطة","زيادة عدد الوزراء"], a:1},
-  // الوحدة 4 - التوزيع الجغرافي للسكان
-  {q:"أي قارات العالم الأكثر سكاناً؟", c:["إفريقيا","آسيا","أوروبا"], a:1},
-  {q:"أي أنواع السطح الأفضل للتركز السكاني؟", c:["الجبال","السهول","الهضاب"], a:1},
-  {q:"مسيعيد في دولة قطر مثال على مدينة؟", c:["زراعية","صناعية","سياحية"], a:1},
-  {q:"أي الحرف التالية لا تحتاج أعداداً كبيرة من السكان؟", c:["الزراعة","الرعي","الصيد"], a:1},
-  // الوحدة 5 - الخلافة العباسية
-  {q:"من هو أول خلفاء الدولة العباسية؟", c:["أبو جعفر المنصور","أبو العباس","هارون الرشيد"], a:1},
-  {q:"من الخليفة الذي بنى مدينة بغداد عاصمة للدولة العباسية؟", c:["هارون الرشيد","أبو جعفر المنصور","المأمون"], a:1},
-  {q:"من أنشأ مكتبة 'بيت الحكمة' الشهيرة في بغداد؟", c:["المأمون","هارون الرشيد","المعتصم بالله"], a:1},
-  {q:"في عهد أي خليفة عباسي تم فتح مدينة عمورية؟", c:["هارون الرشيد","المعتصم بالله","المأمون"], a:1},
-  {q:"على يد من سقطت الدولة العباسية عام 656هـ؟", c:["الصليبيون","المغول","الفرس"], a:1},
-  // الوحدة 6 - الأمن الوطني
-  {q:"أي أبعاد الأمن الوطني يهتم بالاستغلال الأمثل للموارد؟", c:["الأمن العسكري","الأمن الاقتصادي","الأمن الاجتماعي"], a:1},
-  {q:"كم عدد أبعاد الأمن الوطني في دولة قطر؟", c:["3 أبعاد","4 أبعاد","5 أبعاد"], a:1},
-  {q:"ما اسم الإدارة المسؤولة عن الاستجابة السريعة لحفظ أمن المجتمع؟", c:["إدارة المرور","شرطة النجدة (الفزعة)","الدفاع المدني"], a:1},
-  {q:"أي وزارة قطرية تشرف على القوات البرية والبحرية والجوية؟", c:["وزارة الداخلية","وزارة الدفاع","وزارة الخارجية"], a:1},
-];
+// ---------- data: أسئلة المراجعة (تُحمّل الآن من قاعدة البيانات — قابلة للتعديل من لوحة المعلم مباشرة) ----------
+let QUESTIONS = []; // تُملأ بعد نجاح الاتصال، عبر loadQuestions()
 let qIndex = 0;
+
+async function loadQuestions(){
+  if(!requireDb()) return;
+  const { data, error } = await supaCall(() => sb.from('questions').select('*').order('id', {ascending:true}));
+  if(error){ console.error('تعذر تحميل الأسئلة:', error); return; }
+  QUESTIONS = (data || []).map(r => ({ id:r.id, q:r.q, c:r.choices, a:r.correct_index }));
+  renderQuestion(); // نعيد عرض السؤال الأول بعد التحميل
+}
 
 // ---------- Supabase (SDK مضمّنة بالملف نفسه — تحدّث كل بضع ثوانٍ بدل اتصال مستمر، عشان يشتغل خلف جدران الحماية الصارمة) ----------
 const SUPABASE_URL = "https://zvhhovkdbsilcplozfbm.supabase.co";
@@ -439,6 +494,7 @@ let sb = null;
 let dbReady = false;
 let state = null; // current user state
 let pollTimer = null;
+let isAdmin = false;
 
 function showConnError(){
   document.getElementById('connBanner').style.display = 'block';
@@ -453,6 +509,8 @@ function initSupabase(){
     dbReady = true;
     document.getElementById('connBanner').style.display = 'none';
     restoreSession();
+    loadQuestions();
+    checkAdminSession();
     startPolling();
   } catch(err){
     console.error('تعذر تهيئة Supabase:', err);
@@ -491,7 +549,7 @@ function currentKey(){
 function rowToState(row){
   return {
     name: row.name, cls: row.cls, points: row.points, energy: row.energy,
-    badges: row.badges || [], gamesPlayed: row.games_played || 0
+    badges: row.badges || [], gamesPlayed: row.games_played || 0, status: row.status || 'pending'
   };
 }
 
@@ -520,9 +578,9 @@ async function login(){
   if(data){
     state = rowToState(data);
   } else {
-    state = {name, cls, points:0, energy:0, badges:[], gamesPlayed:0};
+    state = {name, cls, points:0, energy:0, badges:[], gamesPlayed:0, status:'pending'};
     await supaCall(() => sb.from('students').insert({
-      key, name, cls, points:0, energy:0, badges:[], games_played:0
+      key, name, cls, points:0, energy:0, badges:[], games_played:0, status:'pending'
     }));
   }
   localStorage.setItem("rahhala_current", key);
@@ -534,6 +592,8 @@ async function login(){
 function updateChip(){
   const chip = document.getElementById('userChip');
   chip.textContent = state ? `${state.name} · ${state.points} نقطة` : 'دخول الطالب';
+  const notice = document.getElementById('pendingNotice');
+  if(notice) notice.style.display = (state && state.status === 'pending') ? 'block' : 'none';
 }
 
 async function restoreSession(){
@@ -565,6 +625,11 @@ document.querySelectorAll('.gtab').forEach(btn=>{
 
 // ---------- quiz ----------
 function renderQuestion(){
+  if(QUESTIONS.length === 0){
+    document.getElementById('quizQuestion').textContent = 'جاري تحميل الأسئلة من قاعدة البيانات...';
+    document.getElementById('quizChoices').innerHTML = '';
+    return;
+  }
   const item = QUESTIONS[qIndex % QUESTIONS.length];
   document.getElementById('quizQuestion').textContent = item.q;
   const box = document.getElementById('quizChoices');
@@ -648,7 +713,7 @@ function shoot(dir){
 // ---------- leaderboard (تحدّث كل بضع ثوانٍ — مشتركة بين كل الطلاب والأجهزة) ----------
 async function refreshLeaderboard(){
   if(!requireDb()) return;
-  const { data, error } = await supaCall(() => sb.from('students').select('*').order('points', {ascending:false}).limit(10), 2, 500);
+  const { data, error } = await supaCall(() => sb.from('students').select('*').eq('status','approved').order('points', {ascending:false}).limit(10), 2, 500);
   if(error){ console.error('تعذر تحميل لوحة الصدارة:', error); return; }
   const body = document.getElementById('leaderboardBody');
   body.innerHTML = '';
@@ -666,7 +731,7 @@ async function refreshLeaderboard(){
 // ---------- class challenge (تجميع نقاط كل صف، تحدّث دوري) ----------
 async function refreshClassChallenge(){
   if(!requireDb()) return;
-  const { data, error } = await supaCall(() => sb.from('students').select('cls, points'), 2, 500);
+  const { data, error } = await supaCall(() => sb.from('students').select('cls, points').eq('status','approved'), 2, 500);
   if(error){ console.error('تعذر تحميل تحدي الصفوف:', error); return; }
   const totals = {};
   (data || []).forEach(r=>{
@@ -717,6 +782,146 @@ function startPolling(){
     refreshClassChallenge();
     refreshMyState();
   }, 5000);
+}
+
+// ---------- admin (لوحة المعلم — منفصلة تماماً عن نظام دخول الطلاب) ----------
+function openAdminLogin(){ document.getElementById('adminLoginModal').classList.add('show'); }
+function closeAdminLogin(){ document.getElementById('adminLoginModal').classList.remove('show'); document.getElementById('adminLoginError').style.display='none'; }
+
+async function checkAdminSession(){
+  if(!requireDb()) return;
+  const { data } = await sb.auth.getSession();
+  if(data && data.session){
+    setAdminActive(true);
+  }
+}
+
+async function adminLogin(){
+  if(!requireDb()) return;
+  const email = document.getElementById('inAdminEmail').value.trim();
+  const pass = document.getElementById('inAdminPass').value;
+  const errBox = document.getElementById('adminLoginError');
+  errBox.style.display = 'none';
+  if(!email || !pass){ errBox.textContent = 'الرجاء إدخال البريد وكلمة المرور'; errBox.style.display='block'; return; }
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if(error){
+    errBox.textContent = 'بيانات الدخول غير صحيحة';
+    errBox.style.display = 'block';
+    return;
+  }
+  closeAdminLogin();
+  setAdminActive(true);
+}
+
+async function adminLogout(){
+  if(sb) await sb.auth.signOut();
+  setAdminActive(false);
+}
+
+function setAdminActive(active){
+  isAdmin = active;
+  document.getElementById('adminChip').classList.toggle('active', active);
+  document.getElementById('adminPanel').classList.toggle('show', active);
+  if(active){
+    loadPendingStudents();
+    loadQuestionsAdmin();
+    document.getElementById('adminPanel').scrollIntoView({behavior:'smooth'});
+  }
+}
+
+document.getElementById('adminChip').addEventListener('click', ()=>{
+  if(isAdmin){
+    document.getElementById('adminPanel').scrollIntoView({behavior:'smooth'});
+  } else {
+    openAdminLogin();
+  }
+});
+
+// تبويبات لوحة المعلم
+document.querySelectorAll('.adminTab').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.adminTab').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.adminPanelBody').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ---------- قسم الطلاب بانتظار الموافقة ----------
+async function loadPendingStudents(){
+  if(!isAdmin || !requireDb()) return;
+  const { data, error } = await sb.from('students').select('*').eq('status','pending').order('name');
+  const list = document.getElementById('pendingList');
+  const countEl = document.getElementById('pendingCount');
+  if(error){ list.innerHTML = '<p style="color:#8a8a8a;">تعذر تحميل القائمة.</p>'; return; }
+  countEl.textContent = (data || []).length;
+  if(!data || data.length === 0){
+    list.innerHTML = '<p style="color:#8a8a8a;">لا يوجد طلاب بانتظار الموافقة حالياً.</p>';
+    return;
+  }
+  list.innerHTML = '';
+  data.forEach(r=>{
+    const row = document.createElement('div');
+    row.className = 'pendingRow';
+    row.innerHTML = `
+      <div class="info"><strong>${r.name}</strong><span>الصف ${r.cls} · ${r.points} نقطة</span></div>
+      <button class="miniBtn approve" onclick="approveStudent('${r.key}')">✅ موافقة</button>
+      <button class="miniBtn reject" onclick="rejectStudent('${r.key}')">❌ رفض</button>`;
+    list.appendChild(row);
+  });
+}
+async function approveStudent(key){
+  await sb.from('students').update({status:'approved'}).eq('key', key);
+  loadPendingStudents();
+  refreshLeaderboard();
+  refreshClassChallenge();
+}
+async function rejectStudent(key){
+  await sb.from('students').update({status:'rejected'}).eq('key', key);
+  loadPendingStudents();
+}
+
+// ---------- قسم إدارة الأسئلة ----------
+async function loadQuestionsAdmin(){
+  if(!isAdmin || !requireDb()) return;
+  const { data, error } = await sb.from('questions').select('*').order('id', {ascending:true});
+  const list = document.getElementById('questionsList');
+  if(error){ list.innerHTML = '<p style="color:#8a8a8a;">تعذر تحميل الأسئلة.</p>'; return; }
+  list.innerHTML = '';
+  (data || []).forEach(r=>{
+    const row = document.createElement('div');
+    row.className = 'qRow';
+    const choicesHtml = r.choices.map((c,i)=> i===r.correct_index ? `<span class="correctChoice">${c} ✓</span>` : c).join(' · ');
+    row.innerHTML = `
+      <div class="qtext">${r.q}</div>
+      <div class="qchoices">${choicesHtml}</div>
+      <button class="miniBtn reject" onclick="deleteQuestion(${r.id})">🗑️ حذف</button>`;
+    list.appendChild(row);
+  });
+}
+async function addQuestion(){
+  if(!isAdmin || !requireDb()) return;
+  const q = document.getElementById('newQText').value.trim();
+  const c0 = document.getElementById('newQC0').value.trim();
+  const c1 = document.getElementById('newQC1').value.trim();
+  const c2 = document.getElementById('newQC2').value.trim();
+  const correct = parseInt(document.getElementById('newQCorrect').value, 10);
+  const unit = document.getElementById('newQUnit').value.trim();
+  if(!q || !c0 || !c1 || !c2 || isNaN(correct) || correct < 0 || correct > 2){
+    alert('الرجاء تعبئة السؤال والخيارات الثلاثة، ورقم صحيح (0-2) للإجابة الصحيحة');
+    return;
+  }
+  const { error } = await sb.from('questions').insert({ q, choices:[c0,c1,c2], correct_index:correct, unit });
+  if(error){ alert('تعذر إضافة السؤال: ' + error.message); return; }
+  ['newQText','newQC0','newQC1','newQC2','newQCorrect','newQUnit'].forEach(id=> document.getElementById(id).value = '');
+  loadQuestionsAdmin();
+  loadQuestions(); // نحدّث بنك أسئلة اللعبة نفسها فوراً
+}
+async function deleteQuestion(id){
+  if(!isAdmin) return;
+  await sb.from('questions').delete().eq('id', id);
+  loadQuestionsAdmin();
+  loadQuestions();
 }
 
 // ---------- mobile nav ----------
