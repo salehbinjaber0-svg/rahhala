@@ -76,6 +76,17 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   }
   .badge.show{display:flex;}
 
+  #lastUpdateBar{
+    display:none; background:var(--teal); color:#fff; text-align:center; padding:9px 20px;
+    font-size:.82rem; position:relative;
+  }
+  #lastUpdateBar.show{display:block;}
+  #lastUpdateBar button{
+    position:absolute; left:16px; top:50%; transform:translateY(-50%); background:none; border:none;
+    color:#fff; font-size:.9rem; cursor:pointer; opacity:.8;
+  }
+  #lastUpdateBar button:hover{opacity:1;}
+
   #topPendingBar{
     display:none; background:var(--gold-light); border-bottom:2px solid var(--gold);
     position:sticky; top:64px; z-index:49;
@@ -338,6 +349,11 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <button class="menuBtn" id="menuBtn">☰</button>
   </div>
 </header>
+
+<div id="lastUpdateBar">
+  🆕 آخر تحديث للموقع: <span id="lastUpdateText">...</span>
+  <button onclick="dismissUpdateBar()" title="إغلاق">✕</button>
+</div>
 
 <div id="topPendingBar">
   <div class="wrap topPendingInner">
@@ -1325,9 +1341,26 @@ document.getElementById('menuBtn').addEventListener('click', ()=>{
   document.getElementById('mainNav').classList.toggle('show');
 });
 
+// ---------- شريط "آخر تحديث" — يقرأ الوقت الفعلي لآخر نشر على GitHub تلقائياً، بدون أي تحديث يدوي ----------
+function dismissUpdateBar(){
+  document.getElementById('lastUpdateBar').classList.remove('show');
+  localStorage.setItem('rahhala_seen_update', document.lastModified);
+}
+function initUpdateBar(){
+  const lm = new Date(document.lastModified);
+  const dateStr = lm.toLocaleDateString('ar-QA', {year:'numeric', month:'long', day:'numeric'});
+  const timeStr = lm.toLocaleTimeString('ar-QA', {hour:'2-digit', minute:'2-digit'});
+  document.getElementById('lastUpdateText').textContent = dateStr + ' — ' + timeStr;
+  // يظهر بس لو المستخدم ما شافه قبل لنفس نسخة التحديث (كل تحديث جديد يرجّع يظهر تلقائياً)
+  if(localStorage.getItem('rahhala_seen_update') !== document.lastModified){
+    document.getElementById('lastUpdateBar').classList.add('show');
+  }
+}
+
 // ---------- init ----------
 renderQuestion();
 renderEnergy();
+initUpdateBar();
 initSupabase(); // restoreSession + تحديث دوري للوحة الصدارة وتحدي الصفوف ونقاطي بعد النجاح
 </script>
 
