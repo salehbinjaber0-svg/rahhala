@@ -1907,7 +1907,7 @@ function matchKnowledge(query){
   const deep = searchCurriculumDeep(qTokens);
   if(deep){
     lastTopic = { a: deep.text, extra: null };
-    return { text: `📖 من الوحدة ${deep.unit} — ${deep.lessonTitle}:\n"${deep.text}"\n📄 صفحة ${deep.pages} بالكتاب`, chips: [] };
+    return { text: `"${deep.text}"\n📄 صفحة ${deep.pages} بالكتاب`, chips: [] };
   }
 
   // ما فيه تطابق كامل — نقترح أقرب المواضيع بدل ما نسكت
