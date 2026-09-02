@@ -1083,10 +1083,12 @@ function closeUnit(){
 
 document.getElementById('curriculumDropBtn').addEventListener('click', (e)=>{
   e.stopPropagation();
+  document.getElementById('enrichDropBtn').closest('.navDrop').classList.remove('open'); // سكّر القائمة الثانية أول
   document.getElementById('curriculumDropBtn').closest('.navDrop').classList.toggle('open');
 });
 document.getElementById('enrichDropBtn').addEventListener('click', (e)=>{
   e.stopPropagation();
+  document.getElementById('curriculumDropBtn').closest('.navDrop').classList.remove('open'); // سكّر القائمة الأولى أول
   document.getElementById('enrichDropBtn').closest('.navDrop').classList.toggle('open');
 });
 document.addEventListener('click', (e)=>{
