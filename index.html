@@ -495,7 +495,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
         <input id="newQCorrect" placeholder="0" type="number" min="0" max="2">
         <label>الوحدة (اختياري)</label>
         <input id="newQUnit" placeholder="مثال: الوحدة 1">
-        <button class="btn btn-gold" onclick="addQuestion()">➕ إضافة السؤال</button>
+        <button class="btn btn-gold" onclick="addQuestion(this)">➕ إضافة السؤال</button>
       </div>
       <div id="questionsList"></div>
     </div>
@@ -515,7 +515,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <p class="sub">أدخل اسمك وصفك لتبدأ بجمع النقاط</p>
     <div class="field"><label>الاسم</label><input id="inName" placeholder="مثال: سالم"></div>
     <div class="field"><label>الصف / الشعبة</label><input id="inClass" placeholder="مثال: 7-2"></div>
-    <button class="btn btn-gold" style="width:100%" onclick="login()">ابدأ</button>
+    <button class="btn btn-gold" style="width:100%" onclick="login(this)">ابدأ</button>
   </div>
 </div>
 
@@ -527,7 +527,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <div class="field"><label>البريد الإلكتروني</label><input id="inAdminEmail" type="email" placeholder="you@example.com"></div>
     <div class="field"><label>كلمة المرور</label><input id="inAdminPass" type="password" placeholder="••••••••"></div>
     <div id="adminLoginError" style="color:var(--maroon); font-size:.85rem; margin-bottom:10px; display:none;"></div>
-    <button class="btn btn-gold" style="width:100%" onclick="adminLogin()">دخول</button>
+    <button class="btn btn-gold" style="width:100%" onclick="adminLogin(this)">دخول</button>
   </div>
 </div>
 
@@ -628,6 +628,23 @@ function showToast(message, type='info'){
   }, 2800);
 }
 
+// مؤشر "جاري التنفيذ" موحّد لأي زر يشغّل عملية — يعطّل الزر ويغيّر نصه لحد ما تخلص العملية
+function setBtnLoading(btn, loading, loadingText){
+  if(!btn) return;
+  if(loading){
+    if(btn.dataset.originalText === undefined) btn.dataset.originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '⏳ ' + (loadingText || 'جاري التنفيذ...');
+    btn.style.opacity = '.65';
+    btn.style.cursor = 'wait';
+  } else {
+    btn.disabled = false;
+    if(btn.dataset.originalText !== undefined) btn.textContent = btn.dataset.originalText;
+    btn.style.opacity = '';
+    btn.style.cursor = '';
+  }
+}
+
 function initSupabase(){
   try{
     if(typeof supabase === 'undefined'){
@@ -698,14 +715,18 @@ document.getElementById('loginModal').addEventListener('click', (e)=>{
   if(e.target.id === 'loginModal') closeLogin();
 });
 
-async function login(){
+async function login(btn){
   if(!requireDb()) return;
   const name = document.getElementById('inName').value.trim();
   const cls = document.getElementById('inClass').value.trim();
   if(!name || !cls){ showToast('الرجاء إدخال الاسم والصف', 'error'); return; }
+  setBtnLoading(btn, true, 'جاري الدخول...');
   const key = makeKey(name, cls);
   const { data, error } = await supaCall(() => sb.from('students').select('*').eq('key', key).maybeSingle());
-  if(error){ console.error(error); showConnError(); showToast('تعذر تسجيل الدخول، تأكد من اتصالك بالإنترنت', 'error'); return; }
+  if(error){
+    console.error(error); showConnError(); showToast('تعذر تسجيل الدخول، تأكد من اتصالك بالإنترنت', 'error');
+    setBtnLoading(btn, false); return;
+  }
   if(data){
     state = rowToState(data);
   } else {
@@ -715,6 +736,7 @@ async function login(){
     }));
   }
   localStorage.setItem("rahhala_current", key);
+  setBtnLoading(btn, false);
   closeLogin();
   updateChip();
   renderEnergy();
@@ -944,14 +966,16 @@ async function checkAdminSession(){
   }
 }
 
-async function adminLogin(){
+async function adminLogin(btn){
   if(!requireDb()) return;
   const email = document.getElementById('inAdminEmail').value.trim();
   const pass = document.getElementById('inAdminPass').value;
   const errBox = document.getElementById('adminLoginError');
   errBox.style.display = 'none';
   if(!email || !pass){ errBox.textContent = 'الرجاء إدخال البريد وكلمة المرور'; errBox.style.display='block'; return; }
+  setBtnLoading(btn, true, 'جاري الدخول...');
   const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  setBtnLoading(btn, false);
   if(error){
     errBox.textContent = 'بيانات الدخول غير صحيحة';
     errBox.style.display = 'block';
@@ -993,8 +1017,8 @@ function renderPendingPill(r){
   return `
     <div class="pendingPill">
       <span class="pname">${r.name}</span><span class="pcls">${r.cls}</span>
-      <button class="pApprove" title="موافقة" onclick="approveStudent('${r.key}')">✅</button>
-      <button class="pReject" title="رفض" onclick="rejectStudent('${r.key}')">❌</button>
+      <button class="pApprove" title="موافقة" onclick="approveStudent('${r.key}', this)">✅</button>
+      <button class="pReject" title="رفض" onclick="rejectStudent('${r.key}', this)">❌</button>
     </div>`;
 }
 
@@ -1013,15 +1037,19 @@ async function loadPendingStudents(){
   topBar.classList.toggle('show', n > 0); // الشريط يظهر تلقائياً بس لو فيه طلاب فعلاً بانتظار الموافقة
   topList.innerHTML = n > 0 ? data.map(renderPendingPill).join('') : '';
 }
-async function approveStudent(key){
+async function approveStudent(key, btn){
+  if(btn){ btn.disabled = true; btn.textContent = '⏳'; btn.style.opacity='.6'; }
   await sb.from('students').update({status:'approved'}).eq('key', key);
   loadPendingStudents();
   refreshLeaderboard();
   refreshClassChallenge();
+  showToast('✅ تمت الموافقة على الطالب', 'success');
 }
-async function rejectStudent(key){
+async function rejectStudent(key, btn){
+  if(btn){ btn.disabled = true; btn.textContent = '⏳'; btn.style.opacity='.6'; }
   await sb.from('students').update({status:'rejected'}).eq('key', key);
   loadPendingStudents();
+  showToast('🚫 تم رفض الطالب', 'info');
 }
 
 // ---------- قسم إدارة الأسئلة ----------
@@ -1038,11 +1066,11 @@ async function loadQuestionsAdmin(){
     row.innerHTML = `
       <div class="qtext">${r.q}</div>
       <div class="qchoices">${choicesHtml}</div>
-      <button class="miniBtn reject" onclick="deleteQuestion(${r.id})">🗑️ حذف</button>`;
+      <button class="miniBtn reject" onclick="deleteQuestion(${r.id}, this)">🗑️ حذف</button>`;
     list.appendChild(row);
   });
 }
-async function addQuestion(){
+async function addQuestion(btn){
   if(!isAdmin || !requireDb()) return;
   const q = document.getElementById('newQText').value.trim();
   const c0 = document.getElementById('newQC0').value.trim();
@@ -1051,20 +1079,25 @@ async function addQuestion(){
   const correct = parseInt(document.getElementById('newQCorrect').value, 10);
   const unit = document.getElementById('newQUnit').value.trim();
   if(!q || !c0 || !c1 || !c2 || isNaN(correct) || correct < 0 || correct > 2){
-    alert('الرجاء تعبئة السؤال والخيارات الثلاثة، ورقم صحيح (0-2) للإجابة الصحيحة');
+    showToast('الرجاء تعبئة السؤال والخيارات، ورقم صحيح (0-2) للإجابة الصحيحة', 'error');
     return;
   }
+  setBtnLoading(btn, true, 'جاري الحفظ...');
   const { error } = await sb.from('questions').insert({ q, choices:[c0,c1,c2], correct_index:correct, unit });
-  if(error){ alert('تعذر إضافة السؤال: ' + error.message); return; }
+  setBtnLoading(btn, false);
+  if(error){ showToast('تعذر إضافة السؤال: ' + error.message, 'error'); return; }
   ['newQText','newQC0','newQC1','newQC2','newQCorrect','newQUnit'].forEach(id=> document.getElementById(id).value = '');
   loadQuestionsAdmin();
   loadQuestions(); // نحدّث بنك أسئلة اللعبة نفسها فوراً
+  showToast('✅ تمت إضافة السؤال بنجاح', 'success');
 }
-async function deleteQuestion(id){
+async function deleteQuestion(id, btn){
   if(!isAdmin) return;
+  if(btn){ btn.disabled = true; btn.textContent = '⏳ جاري الحذف...'; btn.style.opacity='.6'; }
   await sb.from('questions').delete().eq('id', id);
   loadQuestionsAdmin();
   loadQuestions();
+  showToast('🗑️ تم حذف السؤال', 'info');
 }
 
 // ---------- المنقذ: بوت مساعد بمفاهيم المنهج (مبني على معرفة شاملة لكل الفصل الأول، مجاني بالكامل، بدون أي API) ----------
