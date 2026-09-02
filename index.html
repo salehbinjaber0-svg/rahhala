@@ -239,7 +239,12 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     align-items:center; justify-content:center; padding:20px;
   }
   .modalBg.show{display:flex;}
-  .modal{background:#fff; border-radius:16px; padding:30px; width:100%; max-width:380px;}
+  .modal{background:#fff; border-radius:16px; padding:30px; width:100%; max-width:380px; position:relative;}
+  .modalClose{
+    position:absolute; top:14px; left:14px; background:none; border:none; font-size:1.2rem;
+    color:#8a8a8a; cursor:pointer; width:30px; height:30px; border-radius:50%; line-height:1;
+  }
+  .modalClose:hover{background:#f2eee0; color:var(--navy);}
   .modal h3{color:var(--navy); margin-bottom:6px;}
   .modal p.sub{color:#6b7a7e; font-size:.88rem; margin-bottom:20px;}
   .field{margin-bottom:14px;}
@@ -456,6 +461,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 <div class="modalBg" id="loginModal">
   <div class="modal">
+    <button class="modalClose" onclick="closeLogin()" title="إلغاء">✕</button>
     <h3>دخول الطالب</h3>
     <p class="sub">أدخل اسمك وصفك لتبدأ بجمع النقاط</p>
     <div class="field"><label>الاسم</label><input id="inName" placeholder="مثال: سالم"></div>
@@ -466,6 +472,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 <div class="modalBg" id="adminLoginModal">
   <div class="modal">
+    <button class="modalClose" onclick="closeAdminLogin()" title="إلغاء">✕</button>
     <h3>دخول المعلم</h3>
     <p class="sub">هذا الدخول مخصص للمعلم فقط — يحتاج بريد وكلمة مرور حقيقيين</p>
     <div class="field"><label>البريد الإلكتروني</label><input id="inAdminEmail" type="email" placeholder="you@example.com"></div>
@@ -625,6 +632,9 @@ async function persist(){
 // ---------- auth ----------
 function openLogin(){ document.getElementById('loginModal').classList.add('show'); }
 function closeLogin(){ document.getElementById('loginModal').classList.remove('show'); }
+document.getElementById('loginModal').addEventListener('click', (e)=>{
+  if(e.target.id === 'loginModal') closeLogin();
+});
 
 async function login(){
   if(!requireDb()) return;
@@ -846,6 +856,9 @@ function startPolling(){
 // ---------- admin (لوحة المعلم — منفصلة تماماً عن نظام دخول الطلاب) ----------
 function openAdminLogin(){ document.getElementById('adminLoginModal').classList.add('show'); }
 function closeAdminLogin(){ document.getElementById('adminLoginModal').classList.remove('show'); document.getElementById('adminLoginError').style.display='none'; }
+document.getElementById('adminLoginModal').addEventListener('click', (e)=>{
+  if(e.target.id === 'adminLoginModal') closeAdminLogin();
+});
 
 async function checkAdminSession(){
   if(!requireDb()) return;
