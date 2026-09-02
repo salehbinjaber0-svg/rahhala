@@ -103,20 +103,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   /* admin panel */
   #adminPanel{display:none;}
   #adminPanel.show{display:block;}
-  .adminTabs{display:flex; gap:10px; margin-bottom:20px;}
-  .adminTab{padding:9px 18px; border-radius:30px; border:2px solid var(--navy); background:transparent; color:var(--navy); font-weight:700; font-size:.88rem; cursor:pointer;}
-  .adminTab.active{background:var(--navy); color:var(--gold-light);}
-  .adminPanelBody{display:none;}
-  .adminPanelBody.active{display:block;}
-  .pendingRow{
-    display:flex; align-items:center; gap:12px; background:#fff; border:1px solid #e8e0cd;
-    border-radius:12px; padding:14px 18px; margin-bottom:10px;
-  }
-  .pendingRow .info{flex:1;}
-  .pendingRow .info strong{display:block; color:var(--navy);}
-  .pendingRow .info span{font-size:.82rem; color:#7a8a8e;}
   .miniBtn{padding:8px 16px; border-radius:8px; border:none; font-weight:700; font-size:.85rem; cursor:pointer;}
-  .miniBtn.approve{background:var(--teal); color:#fff;}
   .miniBtn.reject{background:var(--maroon); color:#fff;}
   .qRow{background:#fff; border:1px solid #e8e0cd; border-radius:12px; padding:16px 18px; margin-bottom:10px;}
   .qRow .qtext{font-weight:700; color:var(--navy); margin-bottom:6px;}
@@ -476,17 +463,9 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 <section id="adminPanel">
   <div class="wrap">
     <h2>لوحة المعلم</h2>
-    <p class="lead">مرحباً بك — من هنا توافق على الطلاب الجدد وتدير بنك الأسئلة مباشرة.</p>
-    <div class="adminTabs">
-      <button class="adminTab active" data-tab="pending">🕐 طلاب بانتظار الموافقة (<span id="pendingCount">0</span>)</button>
-      <button class="adminTab" data-tab="questions">📝 إدارة الأسئلة</button>
-    </div>
+    <p class="lead">مرحباً بك — إدارة بنك الأسئلة مباشرة (الموافقة على الطلاب تظهر بالشريط أعلى الصفحة).</p>
 
-    <div class="adminPanelBody active" id="tab-pending">
-      <div id="pendingList"></div>
-    </div>
-
-    <div class="adminPanelBody" id="tab-questions">
+    <div id="tab-questions">
       <div class="addQForm">
         <label>نص السؤال</label>
         <input id="newQText" placeholder="مثال: ما عاصمة الدولة العباسية؟">
@@ -993,25 +972,7 @@ document.getElementById('adminChip').addEventListener('click', ()=>{
   }
 });
 
-// تبويبات لوحة المعلم
-document.querySelectorAll('.adminTab').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    document.querySelectorAll('.adminTab').forEach(b=>b.classList.remove('active'));
-    document.querySelectorAll('.adminPanelBody').forEach(p=>p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
-  });
-});
-
-// ---------- قسم الطلاب بانتظار الموافقة ----------
-function renderPendingRow(r){
-  return `
-    <div class="pendingRow">
-      <div class="info"><strong>${r.name}</strong><span>الصف ${r.cls} · ${r.points} نقطة</span></div>
-      <button class="miniBtn approve" onclick="approveStudent('${r.key}')">✅ موافقة</button>
-      <button class="miniBtn reject" onclick="rejectStudent('${r.key}')">❌ رفض</button>
-    </div>`;
-}
+// ---------- قسم الطلاب بانتظار الموافقة (يُعرض حصراً بالشريط الثابت أعلى الصفحة) ----------
 function renderPendingPill(r){
   return `
     <div class="pendingPill">
@@ -1024,29 +985,17 @@ function renderPendingPill(r){
 async function loadPendingStudents(){
   if(!isAdmin || !requireDb()) return;
   const { data, error } = await sb.from('students').select('*').eq('status','pending').order('name');
-  const list = document.getElementById('pendingList');
   const topBar = document.getElementById('topPendingBar');
   const topList = document.getElementById('topPendingList');
   const topCount = document.getElementById('topPendingCount');
-  const countEl = document.getElementById('pendingCount');
   const badge = document.getElementById('pendingBadge');
-  if(error){
-    list.innerHTML = '<p style="color:#8a8a8a;">تعذر تحميل القائمة.</p>';
-    return;
-  }
+  if(error){ console.error('تعذر تحميل الطلاب بانتظار الموافقة:', error); return; }
   const n = (data || []).length;
-  countEl.textContent = n;
   badge.textContent = n;
   badge.classList.toggle('show', n > 0);
   topCount.textContent = n;
   topBar.classList.toggle('show', n > 0); // الشريط يظهر تلقائياً بس لو فيه طلاب فعلاً بانتظار الموافقة
-  if(n === 0){
-    list.innerHTML = '<p style="color:#8a8a8a;">لا يوجد طلاب بانتظار الموافقة حالياً.</p>';
-    topList.innerHTML = '';
-    return;
-  }
-  list.innerHTML = data.map(renderPendingRow).join('');
-  topList.innerHTML = data.map(renderPendingPill).join('');
+  topList.innerHTML = n > 0 ? data.map(renderPendingPill).join('') : '';
 }
 async function approveStudent(key){
   await sb.from('students').update({status:'approved'}).eq('key', key);
