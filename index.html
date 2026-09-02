@@ -56,9 +56,29 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   header .wrap{display:flex; align-items:center; justify-content:space-between; padding:14px 20px;}
   .brand{display:flex; align-items:center; gap:10px; font-size:1.5rem;}
   .brand span.sub{font-family:'Tajawal'; font-size:.7rem; color:var(--gold-light); display:block; font-weight:400;}
-  nav{display:flex; gap:22px; font-size:.95rem;}
+  nav{display:flex; gap:22px; font-size:.95rem; align-items:center;}
   nav a{opacity:.85; padding:6px 2px; border-bottom:2px solid transparent; transition:.2s;}
   nav a:hover{opacity:1; border-color:var(--gold);}
+
+  .navDrop{position:relative;}
+  .navDropBtn{
+    background:none; border:none; color:var(--cream); font-family:'Tajawal'; font-size:.95rem;
+    opacity:.85; cursor:pointer; padding:6px 2px; display:flex; align-items:center; gap:4px;
+  }
+  .navDropBtn:hover{opacity:1;}
+  .navDropBtn .caret{font-size:.7rem; transition:.2s;}
+  .navDrop.open .navDropBtn .caret{transform:rotate(180deg);}
+  .navDropMenu{
+    display:none; position:absolute; top:36px; right:0; background:#fff; border-radius:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,.25); padding:8px; min-width:220px; z-index:120;
+  }
+  .navDrop.open .navDropMenu{display:block;}
+  .navDropMenu a{
+    display:block; padding:10px 14px; border-radius:8px; color:var(--navy); font-size:.88rem;
+    border-bottom:none; opacity:1; text-align:right;
+  }
+  .navDropMenu a:hover{background:var(--cream); border-color:transparent;}
+
   #userChip{
     background:var(--gold); color:var(--navy-deep); padding:7px 16px; border-radius:30px;
     font-weight:700; font-size:.85rem; cursor:pointer; border:none;
@@ -191,6 +211,22 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     width:34px; height:34px; border-radius:50%; background:var(--navy); color:var(--gold);
     font-family:'Aref Ruqaa'; font-size:1.1rem; margin-bottom:12px;
   }
+
+  /* unit detail view */
+  #unitView{display:none;}
+  #unitView.show{display:block;}
+  .backLink{display:inline-block; margin-bottom:20px; color:var(--teal); font-weight:700; font-size:.9rem;}
+  .unitHead{margin-bottom:28px;}
+  .unitHead .tag{color:var(--gold); font-family:'Aref Ruqaa'; font-size:1.1rem;}
+  .unitHead h2{margin:6px 0 8px;}
+  .unitHead .fw{color:#5c6a6e; font-size:.88rem; line-height:1.9;}
+  .lessonBlock{
+    background:#fff; border:1px solid #e8e0cd; border-radius:16px; padding:24px; margin-bottom:20px;
+  }
+  .lessonBlock h3{color:var(--navy); font-size:1.15rem; margin-bottom:14px; border-bottom:2px solid var(--cream); padding-bottom:10px;}
+  .lessonBlock ul{padding-inline-start:22px; margin:0;}
+  .lessonBlock li{margin-bottom:10px; font-size:.92rem; color:#3a4548; line-height:1.8;}
+  .lessonBlock li strong{color:var(--navy);}
 
   section.alt{background:#fff;}
 
@@ -337,7 +373,17 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <div>رحّالة<span class="sub">دراسات اجتماعية · الصف السابع</span></div>
     </div>
     <nav id="mainNav">
-      <a href="#curriculum">المنهج</a>
+      <div class="navDrop">
+        <button class="navDropBtn" id="curriculumDropBtn" type="button">المنهج <span class="caret">▾</span></button>
+        <div class="navDropMenu" id="curriculumDropMenu">
+          <a href="#" onclick="openUnit(1); return false;">١ · الأرض من حولي</a>
+          <a href="#" onclick="openUnit(2); return false;">٢ · حضارة بلاد الرافدين</a>
+          <a href="#" onclick="openUnit(3); return false;">٣ · السلطات الدستورية</a>
+          <a href="#" onclick="openUnit(4); return false;">٤ · التوزيع الجغرافي للسكان</a>
+          <a href="#" onclick="openUnit(5); return false;">٥ · الخلافة العباسية</a>
+          <a href="#" onclick="openUnit(6); return false;">٦ · الأمن الوطني</a>
+        </div>
+      </div>
       <a href="#enrichment">مصادر إثرائية</a>
       <a href="#games">الألعاب</a>
       <a href="#classchallenge">تحدي الصفوف</a>
@@ -384,18 +430,10 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   </div>
 </section>
 
-<section id="curriculum" class="eyebrow-free">
+<section id="unitView" class="eyebrow-free">
   <div class="wrap">
-    <h2>منهج الصف السابع — الفصل الأول</h2>
-    <p class="lead">6 وحدات، 12 درساً، مطابقة تماماً للكتاب المعتمد.</p>
-    <div class="grid">
-      <div class="card"><div class="unit-num">١</div><h3>الأرض من حولي</h3><p>عناصر المناخ والعوامل المؤثرة فيه · الأقاليم المناخية</p></div>
-      <div class="card"><div class="unit-num">٢</div><h3>حضارة بلاد الرافدين</h3><p>حضارات بلاد الرافدين وعوامل قيامها · مظاهر حضارات بلاد الرافدين</p></div>
-      <div class="card"><div class="unit-num">٣</div><h3>السلطات الدستورية</h3><p>السلطة التشريعية والتنفيذية في قطر · السلطة القضائية في قطر</p></div>
-      <div class="card"><div class="unit-num">٤</div><h3>التوزيع الجغرافي للسكان</h3><p>العوامل الطبيعية المؤثرة · العوامل البشرية المؤثرة</p></div>
-      <div class="card"><div class="unit-num">٥</div><h3>الخلافة العباسية</h3><p>نشأتها وأهم خلفائها · فتوحاتها ونهايتها</p></div>
-      <div class="card"><div class="unit-num">٦</div><h3>الأمن الوطني</h3><p>الأمن الوطني وأبعاده · مقومات الأمن الوطني ومؤسساته</p></div>
-    </div>
+    <a href="#" onclick="closeUnit(); return false;" class="backLink">→ رجوع للرئيسية</a>
+    <div id="unitViewContent"></div>
   </div>
 </section>
 
@@ -588,6 +626,143 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
    ٦. كل طالب يكتب فقط لمستنده الخاص بقاعدة البيانات، فما فيه أي تعارض بين الطلاب
       حتى لو لعبوا كلهم بنفس اللحظة — الموقع جاهز لعدد كبير يلعب بالتوازي.
    ============================================================ */
+
+// ---------- بيانات المنهج الكاملة (6 وحدات، 12 درساً) — مصدرها تحليل الكتاب المعتمد مباشرة ----------
+const UNITS_DATA = {
+  1: { title:"الأرض من حولي", subject:"جغرافيا", pages:"11–33",
+    fw:"المفاهيم: طقس، مناخ، إشعاع شمسي، ضغط جوي، رطوبة، تساقط، رياح، إقليم مناخي",
+    lessons:[
+      {title:"الدرس الأول: عناصر المناخ والعوامل المؤثرة فيه", points:[
+        "<strong>عناصر المناخ الأربعة:</strong> الحرارة، الضغط الجوي، الرياح، الرطوبة والتكاثف",
+        "<strong>الحرارة:</strong> مصدرها الإشعاع الشمسي، و4 مناطق حرارية (الحارة، المعتدلة الدافئة، المعتدلة الباردة، الباردة القطبية)",
+        "<strong>الضغط الجوي:</strong> وزن عمود الهواء، علاقة عكسية مع الحرارة والارتفاع",
+        "<strong>أنواع الرياح:</strong> دائمة، موسمية، محلية (كالكوس بقطر)، ويومية",
+        "<strong>العوامل المؤثرة بالمناخ:</strong> الموقع من دوائر العرض، الارتفاع عن سطح البحر (تنخفض الحرارة 1° كل 150م)، توزيع اليابس والماء"
+      ]},
+      {title:"الدرس الثاني: الأقاليم المناخية", points:[
+        "<strong>تعريف الإقليم المناخي:</strong> منطقة متشابهة الخصائص المناخية ومتميزة عن جاراتها",
+        "<strong>8 أقاليم رئيسة:</strong> الاستوائي، المداري، الصحراوي (قطر ضمنه)، البحر المتوسط، الصيني، غرب أوروبا، اللورانسي، القطبي البارد",
+        "كل إقليم له خصائص حرارة وأمطار مميزة حسب موقعه من خطوط العرض"
+      ]}
+    ]},
+  2: { title:"حضارة بلاد الرافدين", subject:"تاريخ", pages:"37–58",
+    fw:"المفاهيم: حضارة، بلاد الرافدين، الكتابة المسمارية، قانون حمورابي، بوابة عشتار",
+    lessons:[
+      {title:"الدرس الأول: حضارات بلاد الرافدين وعوامل قيامها", points:[
+        "<strong>تعريف الحضارة:</strong> كل ما أنتجه العقل الإنساني من مظاهر مادية ومعنوية",
+        "<strong>عوامل القيام:</strong> الموقع الجغرافي، نهرا دجلة والفرات، الهجرات البشرية",
+        "<strong>5 دول تاريخية:</strong> السومريون (أول الشعوب) ← الأكاديون (سرجون الأول) ← البابليون الأولى (حمورابي) ← الآشوريون (آشور بانيبال) ← الكلدانيون (نبوخذ نصر)"
+      ]},
+      {title:"الدرس الثاني: مظاهر حضارات بلاد الرافدين", points:[
+        "<strong>سياسياً:</strong> حكم ملكي وراثي، <strong>قانونياً:</strong> قانون حمورابي المنقوش على مسلة",
+        "<strong>اقتصادياً:</strong> زراعة (حدائق بابل المعلقة)، صناعة، تجارة",
+        "<strong>فكرياً:</strong> الكتابة المسمارية على ألواح طينية، رياضيات، فلك",
+        "<strong>فنياً:</strong> بوابة عشتار، الثور المجنح، المسلات"
+      ]}
+    ]},
+  3: { title:"السلطات الدستورية", subject:"مواطَنة", pages:"63–79",
+    fw:"المفاهيم: الدستور، السلطة، الإقليم، السلطة التشريعية/التنفيذية/القضائية",
+    lessons:[
+      {title:"الدرس الأول: السلطة التشريعية والتنفيذية في قطر", points:[
+        "<strong>أركان الدولة الثلاثة:</strong> السلطة، الشعب، الإقليم",
+        "<strong>السلطة التشريعية = مجلس الشورى:</strong> لا يقل عن 45 عضواً، مدته 4 سنوات (المادة 77)",
+        "اختصاصاته: تشريع القوانين، إقرار الموازنة، الرقابة على التنفيذية",
+        "<strong>السلطة التنفيذية:</strong> الأمير بمعاونة مجلس الوزراء (المادة 62)"
+      ]},
+      {title:"الدرس الثاني: السلطة القضائية في قطر", points:[
+        "مستقلة تماماً (المادتان 130-131)، القضاة لا سلطان عليهم إلا القانون",
+        "<strong>المجلس الأعلى للقضاء:</strong> تأسس 1999 لضمان الاستقلالية",
+        "<strong>3 درجات محاكم:</strong> ابتدائية ← استئناف ← تمييز",
+        "<strong>مبدأ فصل السلطات (المادة 60):</strong> فصل مع تعاون، لمنع الاستبداد بالسلطة"
+      ]}
+    ]},
+  4: { title:"التوزيع الجغرافي للسكان", subject:"جغرافيا", pages:"83–100",
+    fw:"المفاهيم: توزيع سكاني، عوامل طبيعية، عوامل بشرية، تركز سكاني، تخلخل سكاني",
+    lessons:[
+      {title:"الدرس الأول: العوامل الطبيعية المؤثرة", points:[
+        "<strong>التركز السكاني</strong> = نسبة كبيرة بمنطقة معينة، <strong>التخلخل</strong> = عكسه",
+        "آسيا أكثر القارات سكاناً، تليها إفريقيا",
+        "<strong>3 عوامل طبيعية:</strong> التضاريس (السهول أفضل)، المناخ (الحرارة والأمطار)، الثروات المعدنية"
+      ]},
+      {title:"الدرس الثاني: العوامل البشرية المؤثرة", points:[
+        "<strong>3 عوامل بشرية:</strong> الأنشطة الاقتصادية (الصناعة تجذب الأكثر)، النقل والمواصلات، الحروب والمشكلات السياسية",
+        "مثال قطري: مسيعيد ورأس لفان مدن صناعية جذبت السكان",
+        "الحروب تسبب هجرة قسرية، مثال فلسطين 1948"
+      ]}
+    ]},
+  5: { title:"الخلافة العباسية", subject:"تاريخ", pages:"106–123",
+    fw:"المفاهيم: الخلافة، بيت الحكمة، الثغور، العواصم، المغول",
+    lessons:[
+      {title:"الدرس الأول: نشأتها وأهم خلفائها", points:[
+        "قامت بعد معركة الزاب الكبير 132هـ، أول خليفة أبو العباس",
+        "<strong>أبو جعفر المنصور:</strong> المؤسس الحقيقي، بنى بغداد 145هـ",
+        "<strong>هارون الرشيد:</strong> أشهرهم، أنشأ بيت الحكمة",
+        "<strong>المأمون:</strong> نهضة علمية، حركة ترجمة نشطة، مراصد فلكية"
+      ]},
+      {title:"الدرس الثاني: فتوحاتها ونهايتها", points:[
+        "<strong>فتح عمورية 223هـ</strong> بقيادة المعتصم بالله",
+        "<strong>أسباب السقوط الخمسة:</strong> خلفاء ضعفاء، عناصر غير مخلصة بالجيش، اتساع الدولة، إهمال الاقتصاد، الأطماع الخارجية",
+        "سقطت 656هـ على يد المغول اللي دخلوا بغداد"
+      ]}
+    ]},
+  6: { title:"الأمن الوطني", subject:"مواطَنة", pages:"128–142",
+    fw:"المفاهيم: الأمن الوطني، الأمن العسكري/الاقتصادي/السياسي/السيبراني، الفزعة",
+    lessons:[
+      {title:"الدرس الأول: الأمن الوطني وأبعاده", points:[
+        "تعريف: قدرة الدولة على حماية أراضيها وشعبها وترسيخ الولاء للوطن",
+        "<strong>4 أبعاد:</strong> عسكري، سياسي، اقتصادي، اجتماعي (وضمنه السيبراني)"
+      ]},
+      {title:"الدرس الثاني: مقومات الأمن الوطني ومؤسساته", points:[
+        "<strong>4 مقومات:</strong> استقرار النظام السياسي، الديمقراطية وتكافؤ الفرص، التوافق العالمي، تطوير الأجهزة",
+        "<strong>وزارة الدفاع:</strong> قوات برية/بحرية/جوية، <strong>وزارة الداخلية:</strong> النجدة (الفزعة)، المرور، الدفاع المدني، مكافحة المخدرات، أمن السواحل",
+        "دور المواطن: الالتفاف حول القيادة، دعم الاقتصاد الوطني، عدم تداول الشائعات"
+      ]}
+    ]}
+};
+
+function openUnit(n){
+  const u = UNITS_DATA[n];
+  if(!u) return;
+  const lessonsHtml = u.lessons.map(l => `
+    <div class="lessonBlock">
+      <h3>${l.title}</h3>
+      <ul>${l.points.map(p=>`<li>${p}</li>`).join('')}</ul>
+    </div>`).join('');
+  document.getElementById('unitViewContent').innerHTML = `
+    <div class="unitHead">
+      <div class="tag">الوحدة ${n} · ${u.subject}</div>
+      <h2>${u.title}</h2>
+      <div class="fw">${u.fw}</div>
+    </div>
+    ${lessonsHtml}`;
+  document.querySelectorAll('section').forEach(s=>{ if(s.id !== 'unitView') s.style.display='none'; });
+  document.getElementById('unitView').classList.add('show');
+  document.querySelector('header').style.display = '';
+  location.hash = 'unit-' + n;
+  window.scrollTo({top:0, behavior:'instant'});
+  document.getElementById('curriculumDropMenu').parentElement.classList.remove('open');
+  document.getElementById('mainNav').classList.remove('show');
+}
+function closeUnit(){
+  document.querySelectorAll('section').forEach(s=>{ s.style.display=''; });
+  document.getElementById('unitView').classList.remove('show');
+  history.pushState('', document.title, window.location.pathname + window.location.search);
+  window.scrollTo({top:0, behavior:'instant'});
+}
+
+document.getElementById('curriculumDropBtn').addEventListener('click', (e)=>{
+  e.stopPropagation();
+  document.getElementById('curriculumDropBtn').closest('.navDrop').classList.toggle('open');
+});
+document.addEventListener('click', (e)=>{
+  const drop = document.getElementById('curriculumDropBtn').closest('.navDrop');
+  if(drop.classList.contains('open') && !drop.contains(e.target)) drop.classList.remove('open');
+});
+// دخول مباشر برابط يحتوي #unit-3 مثلاً
+(function(){
+  const m = location.hash.match(/^#unit-(\d)$/);
+  if(m) openUnit(parseInt(m[1], 10));
+})();
 
 // ---------- data: أسئلة المراجعة (تُحمّل الآن من قاعدة البيانات — قابلة للتعديل من لوحة المعلم مباشرة) ----------
 let QUESTIONS = []; // تُملأ بعد نجاح الاتصال، عبر loadQuestions()
