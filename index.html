@@ -891,6 +891,9 @@ function startPolling(){
     refreshLeaderboard();
     refreshClassChallenge();
     refreshMyState();
+    if(isAdmin){
+      loadPendingStudents(); // يحدّث قائمة الطلاب بانتظار الموافقة تلقائياً، حتى لو سجّل طالب بعد ما فتحت اللوحة
+    }
   }, 5000);
 }
 
