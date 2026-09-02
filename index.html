@@ -255,6 +255,21 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .field input:focus{outline:none; border-color:var(--gold);}
 
   /* connection banner */
+  /* toast notifications */
+  #toastBox{
+    position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:300;
+    display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none;
+  }
+  .toast{
+    padding:12px 22px; border-radius:30px; font-size:.88rem; font-weight:700; color:#fff;
+    box-shadow:0 6px 20px rgba(0,0,0,.25); opacity:0; transform:translateY(-14px);
+    transition:opacity .3s, transform .3s; white-space:nowrap;
+  }
+  .toast.show{opacity:1; transform:translateY(0);}
+  .toast.success{background:var(--teal);}
+  .toast.error{background:var(--maroon);}
+  .toast.info{background:var(--navy);}
+
   #connBanner{
     display:none; background:#7a3030; color:#fff; text-align:center; padding:12px 20px;
     font-size:.9rem; position:sticky; top:0; z-index:200;
@@ -276,6 +291,8 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 </style>
 </head>
 <body>
+
+<div id="toastBox"></div>
 
 <div id="connBanner">
   ⚠️ تعذر الاتصال بقاعدة البيانات لحفظ نقاطك. تأكد من اتصالك بالإنترنت، وإذا استمرت المشكلة جرّب إعادة تحميل الصفحة.
@@ -566,6 +583,19 @@ function showConnError(){
   document.getElementById('connBanner').style.display = 'block';
 }
 
+function showToast(message, type='info'){
+  const box = document.getElementById('toastBox');
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = message;
+  box.appendChild(el);
+  requestAnimationFrame(()=> el.classList.add('show'));
+  setTimeout(()=>{
+    el.classList.remove('show');
+    setTimeout(()=> el.remove(), 350);
+  }, 2800);
+}
+
 function initSupabase(){
   try{
     if(typeof supabase === 'undefined'){
@@ -640,10 +670,10 @@ async function login(){
   if(!requireDb()) return;
   const name = document.getElementById('inName').value.trim();
   const cls = document.getElementById('inClass').value.trim();
-  if(!name || !cls){ alert('الرجاء إدخال الاسم والصف'); return; }
+  if(!name || !cls){ showToast('الرجاء إدخال الاسم والصف', 'error'); return; }
   const key = makeKey(name, cls);
   const { data, error } = await supaCall(() => sb.from('students').select('*').eq('key', key).maybeSingle());
-  if(error){ console.error(error); showConnError(); return; }
+  if(error){ console.error(error); showConnError(); showToast('تعذر تسجيل الدخول، تأكد من اتصالك بالإنترنت', 'error'); return; }
   if(data){
     state = rowToState(data);
   } else {
@@ -656,6 +686,16 @@ async function login(){
   closeLogin();
   updateChip();
   renderEnergy();
+  showToast('✅ تم تسجيل الدخول بنجاح، أهلاً ' + state.name + '!', 'success');
+}
+
+function studentLogout(){
+  if(!confirm('تسجيل الخروج؟ نقاطك محفوظة وتقدر ترجع بنفس الاسم والصف.')) return;
+  state = null;
+  localStorage.removeItem("rahhala_current");
+  updateChip();
+  renderEnergy();
+  showToast('👋 تم تسجيل الخروج بنجاح', 'success');
 }
 
 function updateChip(){
@@ -680,6 +720,7 @@ async function restoreSession(){
 
 document.getElementById('userChip').addEventListener('click', ()=>{
   if(!state) openLogin();
+  else studentLogout();
 });
 
 // ---------- tabs ----------
@@ -879,15 +920,18 @@ async function adminLogin(){
   if(error){
     errBox.textContent = 'بيانات الدخول غير صحيحة';
     errBox.style.display = 'block';
+    showToast('❌ فشل تسجيل الدخول — تأكد من البريد وكلمة المرور', 'error');
     return;
   }
   closeAdminLogin();
   setAdminActive(true);
+  showToast('✅ تم تسجيل دخول المعلم بنجاح', 'success');
 }
 
 async function adminLogout(){
   if(sb) await sb.auth.signOut();
   setAdminActive(false);
+  showToast('👋 تم تسجيل خروج المعلم بنجاح', 'success');
 }
 
 function setAdminActive(active){
