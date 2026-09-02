@@ -411,7 +411,17 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
           <a href="#" onclick="openUnit(6); return false;">٦ · الأمن الوطني</a>
         </div>
       </div>
-      <a href="#enrichment">مصادر إثرائية</a>
+      <div class="navDrop">
+        <button class="navDropBtn" id="enrichDropBtn" type="button">مصادر إثرائية <span class="caret">▾</span></button>
+        <div class="navDropMenu" id="enrichDropMenu">
+          <a href="#" onclick="openEnrichment(1); return false;">١ · الأرض من حولي</a>
+          <a href="#" onclick="openEnrichment(2); return false;">٢ · حضارة بلاد الرافدين</a>
+          <a href="#" onclick="openEnrichment(3); return false;">٣ · السلطات الدستورية</a>
+          <a href="#" onclick="openEnrichment(4); return false;">٤ · التوزيع الجغرافي للسكان</a>
+          <a href="#" onclick="openEnrichment(5); return false;">٥ · الخلافة العباسية</a>
+          <a href="#" onclick="openEnrichment(6); return false;">٦ · الأمن الوطني</a>
+        </div>
+      </div>
       <a href="#games">الألعاب</a>
       <a href="#classchallenge">تحدي الصفوف</a>
       <a href="#leaderboard">لوحة الصدارة</a>
@@ -465,15 +475,10 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   </div>
 </section>
 
-<section id="enrichment" class="alt">
+<section id="enrichView" class="alt">
   <div class="wrap">
-    <h2>مصادر إثرائية</h2>
-    <p class="lead">فيديوهات وملخصات وخرائط ذهنية تدعم الفهم خارج وقت الحصة.</p>
-    <div class="grid">
-      <div class="card"><h3>📹 مقاطع مرئية</h3><p>شروحات قصيرة لأهم أفكار كل وحدة.</p></div>
-      <div class="card"><h3>🗺️ خرائط ذهنية</h3><p>تلخيص بصري لربط المفاهيم ببعضها.</p></div>
-      <div class="card"><h3>📄 أوراق عمل</h3><p>تدريبات إضافية للمراجعة الذاتية.</p></div>
-    </div>
+    <a href="#" onclick="closeUnit(); return false;" class="backLink">→ رجوع للرئيسية</a>
+    <div id="enrichViewContent"></div>
   </div>
 </section>
 
@@ -1024,15 +1029,54 @@ function openUnit(n){
     ${lessonsHtml}`;
   document.querySelectorAll('section').forEach(s=>{ if(s.id !== 'unitView') s.style.display='none'; });
   document.getElementById('unitView').classList.add('show');
+  document.getElementById('enrichView').classList.remove('show');
   document.querySelector('header').style.display = '';
   location.hash = 'unit-' + n;
   window.scrollTo({top:0, behavior:'instant'});
   document.getElementById('curriculumDropMenu').parentElement.classList.remove('open');
   document.getElementById('mainNav').classList.remove('show');
 }
+
+// مصادر إثرائية مقترحة لكل وحدة (قوالب جاهزة — تُستبدل لاحقاً بروابط فيديو وملفات حقيقية)
+const ENRICH_DATA = {
+  1: { topics:["الفرق بين الطقس والمناخ","أنواع الرياح الأربعة","الأقاليم المناخية الثمانية"] },
+  2: { topics:["الدول الخمس لبلاد الرافدين","قانون حمورابي والكتابة المسمارية","عجائب حضارة الرافدين (حدائق بابل، بوابة عشتار)"] },
+  3: { topics:["مجلس الشورى واختصاصاته","السلطة التنفيذية والقضائية","مبدأ الفصل بين السلطات"] },
+  4: { topics:["العوامل الطبيعية للتوزيع السكاني","العوامل البشرية للتوزيع السكاني","خريطة كثافة السكان بقطر"] },
+  5: { topics:["خلفاء العصر العباسي الأول","بيت الحكمة وحركة الترجمة","أسباب سقوط الدولة العباسية"] },
+  6: { topics:["أبعاد الأمن الوطني الأربعة","مؤسسات الأمن الوطني بقطر","دور المواطن بالحفاظ على الأمن"] },
+};
+
+function openEnrichment(n){
+  const u = UNITS_DATA[n];
+  const e = ENRICH_DATA[n];
+  if(!u || !e) return;
+  const cardsHtml = e.topics.map(t => `
+    <div class="card">
+      <h3>📹 ${t}</h3>
+      <p>مقطع مرئي قصير + خريطة ذهنية + ورقة عمل تدعم هذا الموضوع (تُضاف قريباً).</p>
+    </div>`).join('');
+  document.getElementById('enrichViewContent').innerHTML = `
+    <div class="unitHead">
+      <div class="tag">مصادر إثرائية · الوحدة ${n}</div>
+      <h2>${u.title}</h2>
+      <div class="fw">فيديوهات وملخصات وخرائط ذهنية تدعم فهم هذي الوحدة خارج وقت الحصة.</div>
+    </div>
+    <div class="grid">${cardsHtml}</div>`;
+  document.querySelectorAll('section').forEach(s=>{ if(s.id !== 'enrichView') s.style.display='none'; });
+  document.getElementById('enrichView').classList.add('show');
+  document.getElementById('unitView').classList.remove('show');
+  document.querySelector('header').style.display = '';
+  location.hash = 'enrich-' + n;
+  window.scrollTo({top:0, behavior:'instant'});
+  document.getElementById('enrichDropMenu').parentElement.classList.remove('open');
+  document.getElementById('mainNav').classList.remove('show');
+}
+
 function closeUnit(){
   document.querySelectorAll('section').forEach(s=>{ s.style.display=''; });
   document.getElementById('unitView').classList.remove('show');
+  document.getElementById('enrichView').classList.remove('show');
   history.pushState('', document.title, window.location.pathname + window.location.search);
   window.scrollTo({top:0, behavior:'instant'});
 }
@@ -1041,14 +1085,22 @@ document.getElementById('curriculumDropBtn').addEventListener('click', (e)=>{
   e.stopPropagation();
   document.getElementById('curriculumDropBtn').closest('.navDrop').classList.toggle('open');
 });
-document.addEventListener('click', (e)=>{
-  const drop = document.getElementById('curriculumDropBtn').closest('.navDrop');
-  if(drop.classList.contains('open') && !drop.contains(e.target)) drop.classList.remove('open');
+document.getElementById('enrichDropBtn').addEventListener('click', (e)=>{
+  e.stopPropagation();
+  document.getElementById('enrichDropBtn').closest('.navDrop').classList.toggle('open');
 });
-// دخول مباشر برابط يحتوي #unit-3 مثلاً
+document.addEventListener('click', (e)=>{
+  const drop1 = document.getElementById('curriculumDropBtn').closest('.navDrop');
+  if(drop1.classList.contains('open') && !drop1.contains(e.target)) drop1.classList.remove('open');
+  const drop2 = document.getElementById('enrichDropBtn').closest('.navDrop');
+  if(drop2.classList.contains('open') && !drop2.contains(e.target)) drop2.classList.remove('open');
+});
+// دخول مباشر برابط يحتوي #unit-3 أو #enrich-3 مثلاً
 (function(){
-  const m = location.hash.match(/^#unit-(\d)$/);
-  if(m) openUnit(parseInt(m[1], 10));
+  const mu = location.hash.match(/^#unit-(\d)$/);
+  if(mu) openUnit(parseInt(mu[1], 10));
+  const me = location.hash.match(/^#enrich-(\d)$/);
+  if(me) openEnrichment(parseInt(me[1], 10));
 })();
 
 // ---------- data: أسئلة المراجعة (تُحمّل الآن من قاعدة البيانات — قابلة للتعديل من لوحة المعلم مباشرة) ----------
