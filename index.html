@@ -89,6 +89,13 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     position:relative;
   }
   #adminChip.active{background:var(--teal); border-color:var(--teal); color:#fff;}
+  #adminLogoutTop{
+    display:none; background:transparent; color:var(--gold-light); border:1.5px solid rgba(122,48,48,.5);
+    border-radius:20px; padding:6px 14px; font-size:.78rem; font-family:'Tajawal'; font-weight:700;
+    cursor:pointer; margin-inline-start:8px;
+  }
+  #adminLogoutTop.show{display:inline-block;}
+  #adminLogoutTop:hover{background:var(--maroon); border-color:var(--maroon); color:#fff;}
   .badge{
     display:none; position:absolute; top:-6px; left:-6px; background:var(--maroon); color:#fff;
     font-size:.65rem; font-weight:700; min-width:18px; height:18px; border-radius:50%;
@@ -392,6 +399,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     </nav>
     <button id="userChip">دخول الطالب</button>
     <button id="adminChip" title="دخول المعلم">🔒<span id="pendingBadge" class="badge">0</span></button>
+    <button id="adminLogoutTop" onclick="adminLogout(this)">خروج المعلم</button>
     <button class="menuBtn" id="menuBtn">☰</button>
   </div>
 </header>
@@ -537,8 +545,6 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       </div>
       <div id="questionsList"></div>
     </div>
-
-    <button class="btn btn-outline" style="margin-top:20px; color:var(--navy); border-color:var(--navy);" onclick="adminLogout()">تسجيل خروج المعلم</button>
   </div>
 </section>
 
@@ -1162,9 +1168,11 @@ async function adminLogin(btn){
   showToast('✅ تم تسجيل دخول المعلم بنجاح', 'success');
 }
 
-async function adminLogout(){
+async function adminLogout(btn){
+  setBtnLoading(btn, true, 'جاري تسجيل الخروج...');
   if(sb) await sb.auth.signOut();
   setAdminActive(false);
+  setBtnLoading(btn, false);
   showToast('👋 تم تسجيل خروج المعلم بنجاح', 'success');
 }
 
@@ -1172,6 +1180,7 @@ function setAdminActive(active){
   isAdmin = active;
   document.getElementById('adminChip').classList.toggle('active', active);
   document.getElementById('adminPanel').classList.toggle('show', active);
+  document.getElementById('adminLogoutTop').classList.toggle('show', active);
   if(active){
     loadPendingStudents();
     loadQuestionsAdmin();
