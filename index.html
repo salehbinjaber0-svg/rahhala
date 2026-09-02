@@ -75,17 +75,29 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     align-items:center; justify-content:center; border:2px solid var(--navy);
   }
   .badge.show{display:flex;}
-  #quickPendingDrop{
-    display:none; position:absolute; top:44px; left:0; width:290px; max-width:80vw;
-    background:#fff; border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,.25); z-index:200;
-    padding:14px; text-align:right;
+
+  #topPendingBar{
+    display:none; background:var(--gold-light); border-bottom:2px solid var(--gold);
+    position:sticky; top:64px; z-index:49;
   }
-  #quickPendingDrop.show{display:block;}
-  .qpHead{font-weight:700; color:var(--navy); font-size:.9rem; margin-bottom:10px;}
-  #quickPendingList .pendingRow{padding:10px 12px; margin-bottom:6px;}
-  #quickPendingList .info strong{font-size:.88rem;}
-  #quickPendingList .info span{font-size:.75rem;}
-  .qpFullLink{display:block; text-align:center; margin-top:8px; font-size:.8rem; color:var(--teal); font-weight:700;}
+  #topPendingBar.show{display:block;}
+  .topPendingInner{
+    padding:10px 20px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  }
+  .topPendingInner strong{color:var(--navy-deep); font-size:.85rem; white-space:nowrap;}
+  #topPendingList{display:flex; gap:8px; flex-wrap:wrap; flex:1;}
+  .pendingPill{
+    display:flex; align-items:center; gap:8px; background:#fff; border-radius:20px;
+    padding:5px 6px 5px 12px; font-size:.82rem; box-shadow:0 1px 3px rgba(0,0,0,.1);
+  }
+  .pendingPill .pname{font-weight:700; color:var(--navy);}
+  .pendingPill .pcls{color:#8a8a8a; font-size:.75rem;}
+  .pendingPill button{
+    border:none; border-radius:50%; width:24px; height:24px; cursor:pointer; font-size:.75rem;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .pendingPill .pApprove{background:var(--teal); color:#fff;}
+  .pendingPill .pReject{background:var(--maroon); color:#fff;}
   .menuBtn{display:none; background:none; border:none; color:var(--cream); font-size:1.6rem; cursor:pointer;}
 
   /* admin panel */
@@ -335,17 +347,17 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <a href="#about">عن المعلم</a>
     </nav>
     <button id="userChip">دخول الطالب</button>
-    <div style="position:relative;">
-      <button id="adminChip" title="دخول المعلم">🔒<span id="pendingBadge" class="badge">0</span></button>
-      <div id="quickPendingDrop">
-        <div class="qpHead">🕐 طلاب بانتظار الموافقة</div>
-        <div id="quickPendingList"></div>
-        <a href="#adminPanel" class="qpFullLink" onclick="document.getElementById('adminPanel').scrollIntoView({behavior:'smooth'}); document.getElementById('quickPendingDrop').classList.remove('show');">فتح لوحة المعلم الكاملة ←</a>
-      </div>
-    </div>
+    <button id="adminChip" title="دخول المعلم">🔒<span id="pendingBadge" class="badge">0</span></button>
     <button class="menuBtn" id="menuBtn">☰</button>
   </div>
 </header>
+
+<div id="topPendingBar">
+  <div class="wrap topPendingInner">
+    <strong>🕐 بانتظار الموافقة (<span id="topPendingCount">0</span>):</strong>
+    <div id="topPendingList"></div>
+  </div>
+</div>
 
 <section class="hero">
   <div class="wrap">
@@ -973,18 +985,11 @@ function setAdminActive(active){
   }
 }
 
-document.getElementById('adminChip').addEventListener('click', (e)=>{
-  e.stopPropagation();
+document.getElementById('adminChip').addEventListener('click', ()=>{
   if(isAdmin){
-    document.getElementById('quickPendingDrop').classList.toggle('show');
+    document.getElementById('adminPanel').scrollIntoView({behavior:'smooth'});
   } else {
     openAdminLogin();
-  }
-});
-document.addEventListener('click', (e)=>{
-  const drop = document.getElementById('quickPendingDrop');
-  if(drop.classList.contains('show') && !drop.contains(e.target) && e.target.id !== 'adminChip'){
-    drop.classList.remove('show');
   }
 });
 
@@ -1007,30 +1012,41 @@ function renderPendingRow(r){
       <button class="miniBtn reject" onclick="rejectStudent('${r.key}')">❌ رفض</button>
     </div>`;
 }
+function renderPendingPill(r){
+  return `
+    <div class="pendingPill">
+      <span class="pname">${r.name}</span><span class="pcls">${r.cls}</span>
+      <button class="pApprove" title="موافقة" onclick="approveStudent('${r.key}')">✅</button>
+      <button class="pReject" title="رفض" onclick="rejectStudent('${r.key}')">❌</button>
+    </div>`;
+}
 
 async function loadPendingStudents(){
   if(!isAdmin || !requireDb()) return;
   const { data, error } = await sb.from('students').select('*').eq('status','pending').order('name');
   const list = document.getElementById('pendingList');
-  const quickList = document.getElementById('quickPendingList');
+  const topBar = document.getElementById('topPendingBar');
+  const topList = document.getElementById('topPendingList');
+  const topCount = document.getElementById('topPendingCount');
   const countEl = document.getElementById('pendingCount');
   const badge = document.getElementById('pendingBadge');
   if(error){
     list.innerHTML = '<p style="color:#8a8a8a;">تعذر تحميل القائمة.</p>';
-    quickList.innerHTML = '<p style="color:#8a8a8a; font-size:.82rem;">تعذر تحميل القائمة.</p>';
     return;
   }
   const n = (data || []).length;
   countEl.textContent = n;
   badge.textContent = n;
   badge.classList.toggle('show', n > 0);
+  topCount.textContent = n;
+  topBar.classList.toggle('show', n > 0); // الشريط يظهر تلقائياً بس لو فيه طلاب فعلاً بانتظار الموافقة
   if(n === 0){
     list.innerHTML = '<p style="color:#8a8a8a;">لا يوجد طلاب بانتظار الموافقة حالياً.</p>';
-    quickList.innerHTML = '<p style="color:#8a8a8a; font-size:.82rem;">لا يوجد طلاب بانتظار الموافقة حالياً.</p>';
+    topList.innerHTML = '';
     return;
   }
   list.innerHTML = data.map(renderPendingRow).join('');
-  quickList.innerHTML = data.map(renderPendingRow).join('');
+  topList.innerHTML = data.map(renderPendingPill).join('');
 }
 async function approveStudent(key){
   await sb.from('students').update({status:'approved'}).eq('key', key);
