@@ -326,7 +326,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
   /* modal */
   .modalBg{
-    display:none; position:fixed; inset:0; background:rgba(10,32,41,.7); z-index:100;
+    display:none; position:fixed; inset:0; background:rgba(10,32,41,.7); z-index:250;
     align-items:center; justify-content:center; padding:20px;
   }
   .modalBg.show{display:flex;}
@@ -1225,7 +1225,10 @@ async function persist(){
 }
 
 // ---------- auth ----------
-function openLogin(){ document.getElementById('loginModal').classList.add('show'); }
+function openLogin(){
+  document.getElementById('adminLoginModal').classList.remove('show'); // سكّر نافذة المعلم أول لو كانت مفتوحة
+  document.getElementById('loginModal').classList.add('show');
+}
 function closeLogin(){ document.getElementById('loginModal').classList.remove('show'); }
 document.getElementById('loginModal').addEventListener('click', (e)=>{
   if(e.target.id === 'loginModal') closeLogin();
@@ -1468,7 +1471,10 @@ function startPolling(){
 }
 
 // ---------- admin (لوحة المعلم — منفصلة تماماً عن نظام دخول الطلاب) ----------
-function openAdminLogin(){ document.getElementById('adminLoginModal').classList.add('show'); }
+function openAdminLogin(){
+  document.getElementById('loginModal').classList.remove('show'); // سكّر نافذة الطالب أول لو كانت مفتوحة
+  document.getElementById('adminLoginModal').classList.add('show');
+}
 function closeAdminLogin(){ document.getElementById('adminLoginModal').classList.remove('show'); document.getElementById('adminLoginError').style.display='none'; }
 document.getElementById('adminLoginModal').addEventListener('click', (e)=>{
   if(e.target.id === 'adminLoginModal') closeAdminLogin();
