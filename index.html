@@ -66,8 +66,26 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   #adminChip{
     background:transparent; color:var(--gold-light); border:1.5px solid rgba(201,161,94,.4);
     width:36px; height:36px; border-radius:50%; font-size:1rem; cursor:pointer; margin-inline-start:8px;
+    position:relative;
   }
   #adminChip.active{background:var(--teal); border-color:var(--teal); color:#fff;}
+  .badge{
+    display:none; position:absolute; top:-6px; left:-6px; background:var(--maroon); color:#fff;
+    font-size:.65rem; font-weight:700; min-width:18px; height:18px; border-radius:50%;
+    align-items:center; justify-content:center; border:2px solid var(--navy);
+  }
+  .badge.show{display:flex;}
+  #quickPendingDrop{
+    display:none; position:absolute; top:44px; left:0; width:290px; max-width:80vw;
+    background:#fff; border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,.25); z-index:200;
+    padding:14px; text-align:right;
+  }
+  #quickPendingDrop.show{display:block;}
+  .qpHead{font-weight:700; color:var(--navy); font-size:.9rem; margin-bottom:10px;}
+  #quickPendingList .pendingRow{padding:10px 12px; margin-bottom:6px;}
+  #quickPendingList .info strong{font-size:.88rem;}
+  #quickPendingList .info span{font-size:.75rem;}
+  .qpFullLink{display:block; text-align:center; margin-top:8px; font-size:.8rem; color:var(--teal); font-weight:700;}
   .menuBtn{display:none; background:none; border:none; color:var(--cream); font-size:1.6rem; cursor:pointer;}
 
   /* admin panel */
@@ -317,7 +335,14 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <a href="#about">عن المعلم</a>
     </nav>
     <button id="userChip">دخول الطالب</button>
-    <button id="adminChip" title="دخول المعلم">🔒</button>
+    <div style="position:relative;">
+      <button id="adminChip" title="دخول المعلم">🔒<span id="pendingBadge" class="badge">0</span></button>
+      <div id="quickPendingDrop">
+        <div class="qpHead">🕐 طلاب بانتظار الموافقة</div>
+        <div id="quickPendingList"></div>
+        <a href="#adminPanel" class="qpFullLink" onclick="document.getElementById('adminPanel').scrollIntoView({behavior:'smooth'}); document.getElementById('quickPendingDrop').classList.remove('show');">فتح لوحة المعلم الكاملة ←</a>
+      </div>
+    </div>
     <button class="menuBtn" id="menuBtn">☰</button>
   </div>
 </header>
@@ -948,11 +973,18 @@ function setAdminActive(active){
   }
 }
 
-document.getElementById('adminChip').addEventListener('click', ()=>{
+document.getElementById('adminChip').addEventListener('click', (e)=>{
+  e.stopPropagation();
   if(isAdmin){
-    document.getElementById('adminPanel').scrollIntoView({behavior:'smooth'});
+    document.getElementById('quickPendingDrop').classList.toggle('show');
   } else {
     openAdminLogin();
+  }
+});
+document.addEventListener('click', (e)=>{
+  const drop = document.getElementById('quickPendingDrop');
+  if(drop.classList.contains('show') && !drop.contains(e.target) && e.target.id !== 'adminChip'){
+    drop.classList.remove('show');
   }
 });
 
@@ -967,27 +999,38 @@ document.querySelectorAll('.adminTab').forEach(btn=>{
 });
 
 // ---------- قسم الطلاب بانتظار الموافقة ----------
+function renderPendingRow(r){
+  return `
+    <div class="pendingRow">
+      <div class="info"><strong>${r.name}</strong><span>الصف ${r.cls} · ${r.points} نقطة</span></div>
+      <button class="miniBtn approve" onclick="approveStudent('${r.key}')">✅ موافقة</button>
+      <button class="miniBtn reject" onclick="rejectStudent('${r.key}')">❌ رفض</button>
+    </div>`;
+}
+
 async function loadPendingStudents(){
   if(!isAdmin || !requireDb()) return;
   const { data, error } = await sb.from('students').select('*').eq('status','pending').order('name');
   const list = document.getElementById('pendingList');
+  const quickList = document.getElementById('quickPendingList');
   const countEl = document.getElementById('pendingCount');
-  if(error){ list.innerHTML = '<p style="color:#8a8a8a;">تعذر تحميل القائمة.</p>'; return; }
-  countEl.textContent = (data || []).length;
-  if(!data || data.length === 0){
-    list.innerHTML = '<p style="color:#8a8a8a;">لا يوجد طلاب بانتظار الموافقة حالياً.</p>';
+  const badge = document.getElementById('pendingBadge');
+  if(error){
+    list.innerHTML = '<p style="color:#8a8a8a;">تعذر تحميل القائمة.</p>';
+    quickList.innerHTML = '<p style="color:#8a8a8a; font-size:.82rem;">تعذر تحميل القائمة.</p>';
     return;
   }
-  list.innerHTML = '';
-  data.forEach(r=>{
-    const row = document.createElement('div');
-    row.className = 'pendingRow';
-    row.innerHTML = `
-      <div class="info"><strong>${r.name}</strong><span>الصف ${r.cls} · ${r.points} نقطة</span></div>
-      <button class="miniBtn approve" onclick="approveStudent('${r.key}')">✅ موافقة</button>
-      <button class="miniBtn reject" onclick="rejectStudent('${r.key}')">❌ رفض</button>`;
-    list.appendChild(row);
-  });
+  const n = (data || []).length;
+  countEl.textContent = n;
+  badge.textContent = n;
+  badge.classList.toggle('show', n > 0);
+  if(n === 0){
+    list.innerHTML = '<p style="color:#8a8a8a;">لا يوجد طلاب بانتظار الموافقة حالياً.</p>';
+    quickList.innerHTML = '<p style="color:#8a8a8a; font-size:.82rem;">لا يوجد طلاب بانتظار الموافقة حالياً.</p>';
+    return;
+  }
+  list.innerHTML = data.map(renderPendingRow).join('');
+  quickList.innerHTML = data.map(renderPendingRow).join('');
 }
 async function approveStudent(key){
   await sb.from('students').update({status:'approved'}).eq('key', key);
