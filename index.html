@@ -174,6 +174,13 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .chatMsg.bot{background:#fff; border:1px solid #e8e0cd; margin-inline-end:auto; border-start-start-radius:2px;}
   .chatMsg.user{background:var(--gold); color:var(--navy-deep); margin-inline-start:auto; border-start-end-radius:2px; font-weight:700;}
   .chatChips{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;}
+  .typingRow{display:flex; align-items:center; gap:6px; padding:9px 13px; background:#fff; border:1px solid #e8e0cd; border-radius:12px; margin-bottom:10px; width:fit-content;}
+  .typingRow span{font-size:.78rem; color:#8a8a8a;}
+  .typingDots{display:flex; gap:3px;}
+  .typingDots i{width:6px; height:6px; border-radius:50%; background:var(--gold); display:inline-block; animation:typingBounce 1s infinite ease-in-out;}
+  .typingDots i:nth-child(2){animation-delay:.15s;}
+  .typingDots i:nth-child(3){animation-delay:.3s;}
+  @keyframes typingBounce{0%,60%,100%{transform:translateY(0); opacity:.5;} 30%{transform:translateY(-4px); opacity:1;}}
   .chatChip{background:#fff; border:1.5px solid var(--gold); color:var(--navy); border-radius:20px; padding:6px 12px; font-size:.78rem; cursor:pointer;}
   .chatInputRow{display:flex; gap:8px; padding:12px; border-top:1px solid #eee; background:#fff;}
   .chatInputRow input{flex:1; padding:10px 12px; border-radius:10px; border:1.5px solid #dcd4c0; font-family:'Tajawal'; font-size:.85rem;}
@@ -1758,6 +1765,43 @@ function findShortQueryMatch(qTokens){
   return uniqueEntries.length === 1 ? uniqueEntries[0] : null; // متنازع عليه بين أكثر من مفهوم؟ ما نخمّن
 }
 
+// ---------- بحث عميق داخل نص صفحات الوحدات الكامل (نفس محتوى الكتاب المعروض بقسم المنهج) ----------
+let CURRICULUM_CORPUS = null;
+function buildCurriculumCorpus(){
+  const corpus = [];
+  Object.keys(UNITS_DATA).forEach(unitNum=>{
+    const u = UNITS_DATA[unitNum];
+    u.lessons.forEach(lesson=>{
+      const chunks = lesson.html.match(/<(p|li)[^>]*>([\s\S]*?)<\/\1>/g) || [];
+      chunks.forEach(chunk=>{
+        const text = chunk.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        if(text.length > 20 && text.length < 500){
+          corpus.push({ unit: unitNum, unitTitle: u.title, lessonTitle: lesson.title, text, tokens: tokenize(text) });
+        }
+      });
+    });
+  });
+  return corpus;
+}
+function searchCurriculumDeep(qTokens){
+  if(!CURRICULUM_CORPUS) CURRICULUM_CORPUS = buildCurriculumCorpus();
+  const meaningfulTokens = qTokens.filter(t => t.length >= 3); // نتجاهل كلمات الربط القصيرة (عن، في، من...) اللي ما تحمل معنى بحثي
+  if(meaningfulTokens.length === 0) return null;
+  let best = null, bestScore = 0;
+  CURRICULUM_CORPUS.forEach(chunk=>{
+    let score = 0;
+    meaningfulTokens.forEach(qt=>{
+      if(chunk.tokens.some(ct => wordsClose(ct, qt))) score++;
+    });
+    if(score > bestScore){ bestScore = score; best = chunk; }
+  });
+  // لازم يطابق كل كلمات السؤال المهمة (أو كلها إذا سؤال قصير) عشان نثق بالنتيجة
+  if(best && bestScore >= meaningfulTokens.length){
+    return best;
+  }
+  return null;
+}
+
 let lastTopic = null; // آخر مفهوم فهمه المنقذ، عشان يفهم أسئلة المتابعة القصيرة
 
 function matchKnowledge(query){
@@ -1791,6 +1835,13 @@ function matchKnowledge(query){
       lastTopic = shortMatch;
       return { text: shortMatch.a, chips: [] };
     }
+  }
+
+  // ما لقينا شي بقاعدة المعرفة المختصرة — ندوّر داخل نص صفحات الوحدات الكامل (كل تفاصيل الكتاب)
+  const deep = searchCurriculumDeep(qTokens);
+  if(deep){
+    lastTopic = { a: deep.text, extra: null };
+    return { text: `📖 من الوحدة ${deep.unit} — ${deep.lessonTitle}:\n"${deep.text}"`, chips: [] };
   }
 
   // ما فيه تطابق كامل — نقترح أقرب المواضيع بدل ما نسكت
@@ -1835,16 +1886,32 @@ function askChip(text){
   sendChat();
 }
 
+function showTyping(){
+  const body = document.getElementById('chatBody');
+  const div = document.createElement('div');
+  div.className = 'typingRow';
+  div.id = 'typingIndicator';
+  div.innerHTML = '<span>جاري البحث</span><div class="typingDots"><i></i><i></i><i></i></div>';
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+function hideTyping(){
+  const el = document.getElementById('typingIndicator');
+  if(el) el.remove();
+}
+
 function sendChat(){
   const input = document.getElementById('chatInput');
   const text = input.value.trim();
   if(!text) return;
   addChatMsg('user', text);
   input.value = '';
+  showTyping();
   setTimeout(()=>{
     const result = matchKnowledge(text);
+    hideTyping();
     if(result){
-      addChatMsg('bot', result.text);
+      addChatMsg('bot', result.text.replace(/\n/g, '<br>'));
       if(result.chips && result.chips.length){
         const chipsHtml = '<div class="chatChips">' + result.chips.map(c=>`<button class="chatChip" onclick="askChip('${c}')">${c}</button>`).join('') + '</div>';
         document.getElementById('chatBody').insertAdjacentHTML('beforeend', chipsHtml);
@@ -1853,7 +1920,7 @@ function sendChat(){
     } else {
       addChatMsg('bot', 'ما لقيت جواب دقيق لسؤالك 🤔 جرّب تسأل بكلمات مختلفة، أو راجع قسم «المنهج» بالموقع.');
     }
-  }, 350);
+  }, 450);
 }
 
 // ---------- mobile nav ----------
