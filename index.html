@@ -412,7 +412,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 <header>
   <div class="wrap">
-    <div class="brand">
+    <div class="brand" onclick="goHome()" style="cursor:pointer;" title="الرجوع للصفحة الرئيسية">
       🧭
       <div>رحّالة<span class="sub">دراسات اجتماعية · الصف السابع</span></div>
     </div>
@@ -1105,6 +1105,13 @@ function closeUnit(){
   document.getElementById('enrichView').classList.remove('show');
   history.pushState('', document.title, window.location.pathname + window.location.search);
   window.scrollTo({top:0, behavior:'instant'});
+}
+
+// يرجّع لأول الصفحة الرئيسية من أي مكان بالموقع — يُستخدم عند الضغط على شعار "رحّالة"
+function goHome(){
+  closeUnit();
+  document.getElementById('mainNav').classList.remove('show'); // يسكّر قائمة الجوال لو كانت مفتوحة
+  document.querySelectorAll('.navDrop').forEach(d=>d.classList.remove('open')); // يسكّر أي قائمة منسدلة مفتوحة
 }
 
 document.getElementById('curriculumDropBtn').addEventListener('click', (e)=>{
