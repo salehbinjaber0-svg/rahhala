@@ -141,6 +141,11 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   /* admin panel */
   #adminPanel{display:none;}
   #adminPanel.show{display:block;}
+  .adminTabs{display:flex; gap:10px; margin-bottom:20px;}
+  .adminTab{padding:9px 18px; border-radius:30px; border:2px solid var(--navy); background:transparent; color:var(--navy); font-weight:700; font-size:.88rem; cursor:pointer;}
+  .adminTab.active{background:var(--navy); color:var(--gold-light);}
+  .adminPanelBody{display:none;}
+  .adminPanelBody.active{display:block;}
   .miniBtn{padding:8px 16px; border-radius:8px; border:none; font-weight:700; font-size:.85rem; cursor:pointer;}
   .miniBtn.reject{background:var(--maroon); color:#fff;}
   .qRow{background:#fff; border:1px solid #e8e0cd; border-radius:12px; padding:16px 18px; margin-bottom:10px;}
@@ -150,6 +155,18 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .addQForm{background:#fff; border:1px solid #e8e0cd; border-radius:12px; padding:20px; margin-bottom:24px;}
   .addQForm input{width:100%; padding:10px 12px; border-radius:8px; border:1.5px solid #dcd4c0; font-family:'Tajawal'; margin-bottom:10px; font-size:.9rem;}
   .addQForm label{font-size:.82rem; font-weight:700; color:var(--navy); display:block; margin-bottom:4px;}
+
+  .studentRow{background:#fff; border:1px solid #e8e0cd; border-radius:12px; padding:16px 18px; margin-bottom:10px;}
+  .studentRow .srTop{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:10px;}
+  .studentRow .srInfo strong{color:var(--navy); font-size:1rem;}
+  .studentRow .srInfo span{font-size:.8rem; color:#7a8a8e; display:block; margin-top:2px;}
+  .srBadge{padding:3px 10px; border-radius:20px; font-size:.72rem; font-weight:700;}
+  .srBadge.active{background:var(--teal); color:#fff;}
+  .srBadge.away{background:#e8e0cd; color:#7a8a8e;}
+  .studentRow .srActions{display:flex; gap:8px; align-items:center;}
+  .noteInput{flex:1; padding:8px 10px; border-radius:8px; border:1.5px solid #dcd4c0; font-family:'Tajawal'; font-size:.82rem;}
+  .kickBtn{background:var(--maroon); color:#fff; border:none; border-radius:8px; padding:8px 14px; font-size:.8rem; font-weight:700; cursor:pointer;}
+  .saveNoteBtn{background:var(--teal); color:#fff; border:none; border-radius:8px; padding:8px 12px; font-size:.8rem; cursor:pointer;}
 
   /* chatbot */
   #chatFab{
@@ -550,9 +567,18 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 <section id="adminPanel">
   <div class="wrap">
     <h2>لوحة المعلم</h2>
-    <p class="lead">مرحباً بك — إدارة بنك الأسئلة مباشرة (الموافقة على الطلاب تظهر بالشريط أعلى الصفحة).</p>
+    <p class="lead">مرحباً بك — تابع نشاط الطلاب وأدر بنك الأسئلة (الموافقة على الطلاب الجدد تظهر بالشريط أعلى الصفحة).</p>
 
-    <div id="tab-questions">
+    <div class="adminTabs">
+      <button class="adminTab active" data-tab="students">👥 الطلاب (<span id="activeCount">0</span> نشط الآن)</button>
+      <button class="adminTab" data-tab="questions">📝 إدارة الأسئلة</button>
+    </div>
+
+    <div class="adminPanelBody active" id="tab-students">
+      <div id="studentsList"></div>
+    </div>
+
+    <div class="adminPanelBody" id="tab-questions">
       <div class="addQForm">
         <label>نص السؤال</label>
         <input id="newQText" placeholder="مثال: ما عاصمة الدولة العباسية؟">
@@ -1210,7 +1236,8 @@ function currentKey(){
 function rowToState(row){
   return {
     name: row.name, cls: row.cls, points: row.points, energy: row.energy,
-    badges: row.badges || [], gamesPlayed: row.games_played || 0, status: row.status || 'pending'
+    badges: row.badges || [], gamesPlayed: row.games_played || 0, status: row.status || 'pending',
+    kicked: row.kicked || false
   };
 }
 
@@ -1445,7 +1472,7 @@ async function refreshClassChallenge(){
   });
 }
 
-// يبقي نقاط الطالب متزامنة لو فتح الموقع من جهازين
+// يبقي نقاط الطالب متزامنة لو فتح الموقع من جهازين + يفحص إذا طرده المعلم + نبضة نشاط (آخر ظهور ووقت الاستخدام)
 async function refreshMyState(){
   if(!state || !requireDb()) return;
   const { data, error } = await supaCall(() => sb.from('students').select('*').eq('key', currentKey()).maybeSingle(), 2, 500);
@@ -1453,6 +1480,20 @@ async function refreshMyState(){
     state = rowToState(data);
     updateChip();
     renderEnergy();
+    if(state.kicked){
+      showToast('🚫 تم إنهاء جلستك من قبل المعلم', 'error');
+      await sb.from('students').update({kicked:false}).eq('key', currentKey()); // نصفّر العلم عشان الحساب يشتغل عادي لو رجع سجّل دخول
+      state = null;
+      localStorage.removeItem('rahhala_current');
+      updateChip();
+      renderEnergy();
+      return;
+    }
+    // نبضة نشاط بسيطة — تحدّث آخر ظهور وتزيد الوقت الكلي 5 ثوانٍ (بنفس دورة الاستطلاع)
+    sb.from('students').update({
+      last_seen: new Date().toISOString(),
+      total_seconds: (data.total_seconds || 0) + 5
+    }).eq('key', currentKey());
   }
 }
 
@@ -1466,6 +1507,7 @@ function startPolling(){
     refreshMyState();
     if(isAdmin){
       loadPendingStudents(); // يحدّث قائمة الطلاب بانتظار الموافقة تلقائياً، حتى لو سجّل طالب بعد ما فتحت اللوحة
+      loadStudentsList(); // يحدّث حالة النشاط والوقت تلقائياً (يتجنّب مسح الكتابة أثناء إضافة ملاحظة)
     }
   }, 5000);
 }
@@ -1525,6 +1567,7 @@ function setAdminActive(active){
   if(active){
     loadPendingStudents();
     loadQuestionsAdmin();
+    loadStudentsList();
     document.getElementById('adminPanel').scrollIntoView({behavior:'smooth'});
   }
 }
@@ -1535,6 +1578,16 @@ document.getElementById('adminChip').addEventListener('click', ()=>{
   } else {
     openAdminLogin();
   }
+});
+
+// تبويبات لوحة المعلم
+document.querySelectorAll('.adminTab').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.adminTab').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.adminPanelBody').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+  });
 });
 
 // ---------- قسم الطلاب بانتظار الموافقة (يُعرض حصراً بالشريط الثابت أعلى الصفحة) ----------
@@ -1575,6 +1628,83 @@ async function rejectStudent(key, btn){
   await sb.from('students').update({status:'rejected'}).eq('key', key);
   loadPendingStudents();
   showToast('🚫 تم رفض الطالب', 'info');
+}
+
+// ---------- قسم متابعة الطلاب (نشاط لحظي، وقت الاستخدام، ملاحظات، طرد) ----------
+const ACTIVE_THRESHOLD_SEC = 30; // نعتبر الطالب "نشط الآن" لو آخر ظهور له أقل من 30 ثانية
+
+function formatDuration(sec){
+  sec = sec || 0;
+  if(sec < 60) return sec + ' ث';
+  const m = Math.floor(sec/60);
+  if(m < 60) return m + ' د';
+  const h = Math.floor(m/60);
+  return h + 'س ' + (m%60) + 'د';
+}
+function formatLastSeen(iso){
+  if(!iso) return 'غير معروف';
+  const diff = Math.floor((Date.now() - new Date(iso).getTime())/1000);
+  if(diff < ACTIVE_THRESHOLD_SEC) return 'نشط الآن';
+  if(diff < 60) return 'قبل ' + diff + ' ثانية';
+  if(diff < 3600) return 'قبل ' + Math.floor(diff/60) + ' دقيقة';
+  return 'قبل ' + Math.floor(diff/3600) + ' ساعة';
+}
+
+function renderStudentRow(r){
+  const diff = r.last_seen ? (Date.now() - new Date(r.last_seen).getTime())/1000 : 9999;
+  const isActive = diff < ACTIVE_THRESHOLD_SEC;
+  const noteVal = (r.admin_note || '').replace(/"/g,'&quot;');
+  return `
+    <div class="studentRow">
+      <div class="srTop">
+        <div class="srInfo">
+          <strong>${r.name}</strong> — ${r.cls}
+          <span>${r.points} نقطة · وقت الاستخدام: ${formatDuration(r.total_seconds)} · ${formatLastSeen(r.last_seen)}</span>
+        </div>
+        <div class="srActions">
+          <span class="srBadge ${isActive?'active':'away'}">${isActive?'🟢 نشط الآن':'⚪ غير متصل'}</span>
+          <button class="kickBtn" onclick="kickStudent('${r.key}', this)">🚫 طرد</button>
+        </div>
+      </div>
+      <div class="srActions">
+        <input class="noteInput" id="note-${r.key}" placeholder="أضف ملاحظة عن هذا الطالب..." value="${noteVal}">
+        <button class="saveNoteBtn" onclick="saveNote('${r.key}', this)">💾 حفظ</button>
+      </div>
+    </div>`;
+}
+
+async function loadStudentsList(){
+  if(!isAdmin || !requireDb()) return;
+  // ما نحدّث القائمة لو المعلم يكتب بحقل ملاحظة حالياً — يمنع مسح الكتابة أثناء التحديث التلقائي
+  if(document.activeElement && document.activeElement.classList && document.activeElement.classList.contains('noteInput')) return;
+  const { data, error } = await sb.from('students').select('*').neq('status','rejected').order('last_seen', {ascending:false});
+  const list = document.getElementById('studentsList');
+  const countEl = document.getElementById('activeCount');
+  if(error){ list.innerHTML = '<p style="color:#8a8a8a;">تعذر تحميل قائمة الطلاب.</p>'; return; }
+  const activeNow = (data||[]).filter(r => r.last_seen && (Date.now() - new Date(r.last_seen).getTime())/1000 < ACTIVE_THRESHOLD_SEC).length;
+  countEl.textContent = activeNow;
+  if(!data || data.length === 0){
+    list.innerHTML = '<p style="color:#8a8a8a;">لا يوجد طلاب مسجّلين بعد.</p>';
+    return;
+  }
+  list.innerHTML = data.map(renderStudentRow).join('');
+}
+
+async function kickStudent(key, btn){
+  if(!confirm('تأكيد طرد هذا الطالب؟ راح تنتهي جلسته فوراً (يقدر يرجع يسجّل دخول من جديد لاحقاً).')) return;
+  if(btn){ btn.disabled = true; btn.textContent = '⏳'; }
+  await sb.from('students').update({kicked:true}).eq('key', key);
+  showToast('🚫 تم طرد الطالب من الجلسة الحالية', 'info');
+  loadStudentsList();
+}
+
+async function saveNote(key, btn){
+  const input = document.getElementById('note-'+key);
+  const note = input.value.trim();
+  setBtnLoading(btn, true, 'جاري الحفظ');
+  await sb.from('students').update({admin_note: note}).eq('key', key);
+  setBtnLoading(btn, false);
+  showToast('✅ تم حفظ الملاحظة', 'success');
 }
 
 // ---------- قسم إدارة الأسئلة ----------
