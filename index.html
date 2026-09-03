@@ -83,6 +83,12 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     background:var(--gold); color:var(--navy-deep); padding:7px 16px; border-radius:30px;
     font-weight:700; font-size:.85rem; cursor:pointer; border:none;
   }
+  #badgesRow{gap:4px; align-items:center; margin-inline-start:6px;}
+  .badgeIcon{
+    font-size:1.15rem; cursor:default; animation:badgePop .4s ease-out;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.3));
+  }
+  @keyframes badgePop{0%{transform:scale(0);} 70%{transform:scale(1.25);} 100%{transform:scale(1);}}
   #adminChip{
     background:transparent; color:var(--gold-light); border:1.5px solid rgba(201,161,94,.4);
     width:36px; height:36px; border-radius:50%; font-size:1rem; cursor:pointer; margin-inline-start:8px;
@@ -445,6 +451,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <a href="#about">عن المعلم</a>
     </nav>
     <button id="userChip">دخول الطالب</button>
+    <div id="badgesRow" style="display:none;"></div>
     <button id="adminChip" title="دخول المعلم">🔒<span id="pendingBadge" class="badge">0</span></button>
     <button id="adminLogoutTop" onclick="adminLogout(this)">خروج المعلم</button>
     <button class="menuBtn" id="menuBtn">☰</button>
@@ -1248,6 +1255,77 @@ function rowToState(row){
   };
 }
 
+// ---------- مؤثرات صوتية (Web Audio API مباشرة — بدون أي ملفات صوت خارجية) ----------
+function playSound(type){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const now = ctx.currentTime;
+    const tone = (freq, start, dur, wave, vol)=>{
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = freq; o.type = wave;
+      g.gain.setValueAtTime(vol, now + start);
+      g.gain.exponentialRampToValueAtTime(0.001, now + start + dur);
+      o.start(now + start); o.stop(now + start + dur);
+    };
+    if(type === 'correct'){
+      [523, 659, 784].forEach((f,i)=> tone(f, i*0.08, 0.22, 'sine', 0.15));
+    } else if(type === 'wrong'){
+      tone(180, 0, 0.3, 'sawtooth', 0.12);
+    } else if(type === 'badge'){
+      [523, 659, 784, 1047].forEach((f,i)=> tone(f, i*0.1, 0.28, 'triangle', 0.16));
+    }
+  } catch(e){ /* الصوت اختياري — لو المتصفح ما يدعمه، ما نوقف أي وظيفة أساسية */ }
+}
+
+// ---------- نظام الشارات (Badges) — مبني على النقاط وعدد مرات اللعب الفعليين ----------
+const BADGE_DEFS = [
+  {id:'first_points', icon:'🌟', name:'أول خطوة',   desc:'حصلت على أول نقاط لك',      check: s => s.points >= 10},
+  {id:'century',      icon:'💯', name:'المئوية',     desc:'وصلت لـ100 نقطة',           check: s => s.points >= 100},
+  {id:'veteran',      icon:'🎖️', name:'المخضرم',     desc:'وصلت لـ250 نقطة',           check: s => s.points >= 250},
+  {id:'legend',       icon:'👑', name:'الأسطورة',    desc:'وصلت لـ500 نقطة',           check: s => s.points >= 500},
+  {id:'striker',      icon:'⚽', name:'هدّاف',       desc:'لعبت 5 مرات باللعبة الترفيهية', check: s => (s.gamesPlayed||0) >= 5},
+  {id:'allstar',      icon:'🔥', name:'نجم الملعب',  desc:'لعبت 15 مرة باللعبة الترفيهية', check: s => (s.gamesPlayed||0) >= 15},
+];
+
+function checkBadges(){
+  if(!state) return [];
+  if(!Array.isArray(state.badges)) state.badges = [];
+  const newly = [];
+  BADGE_DEFS.forEach(b=>{
+    if(!state.badges.includes(b.id) && b.check(state)){
+      state.badges.push(b.id);
+      newly.push(b);
+    }
+  });
+  if(newly.length) renderBadges();
+  return newly;
+}
+
+function celebrateBadges(newly){
+  newly.forEach((b, i)=>{
+    setTimeout(()=>{
+      showToast(`🎉 شارة جديدة: ${b.icon} ${b.name}!`, 'success');
+      playSound('badge');
+    }, i * 700);
+  });
+}
+
+function renderBadges(){
+  const row = document.getElementById('badgesRow');
+  if(!row) return;
+  if(!state || !state.badges || state.badges.length === 0){
+    row.style.display = 'none';
+    return;
+  }
+  row.style.display = 'flex';
+  row.innerHTML = state.badges.map(id=>{
+    const b = BADGE_DEFS.find(x=>x.id===id);
+    if(!b) return '';
+    return `<span class="badgeIcon" title="${b.name}: ${b.desc}">${b.icon}</span>`;
+  }).join('');
+}
+
 async function persist(){
   if(!state || !requireDb()) return;
   const { error } = await supaCall(() => sb.from('students').upsert({
@@ -1310,6 +1388,7 @@ function updateChip(){
   chip.textContent = state ? `${state.name} · ${state.points} نقطة` : 'دخول الطالب';
   const notice = document.getElementById('pendingNotice');
   if(notice) notice.style.display = (state && state.status === 'pending') ? 'block' : 'none';
+  renderBadges();
 }
 
 async function restoreSession(){
@@ -1370,13 +1449,17 @@ function answer(i, correctIdx, btn, box){
     fb.style.color = '#6fd3b8';
     state.points += 10;
     state.energy += 1;
+    playSound('correct');
   } else {
     btn.classList.add('wrong');
     box.children[correctIdx].classList.add('correct');
     fb.textContent = '❌ حاول مرة أخرى في السؤال القادم';
     fb.style.color = '#e39b9b';
+    playSound('wrong');
   }
+  const newly = checkBadges();
   persist();
+  if(newly.length) celebrateBadges(newly);
   qIndex++;
   setTimeout(renderQuestion, 1400);
 }
@@ -1406,6 +1489,7 @@ function shoot(dir){
     return;
   }
   state.energy -= 1;
+  state.gamesPlayed = (state.gamesPlayed || 0) + 1; // كان ناقص — العداد ما كان يتحدّث أبداً
   const ball = document.getElementById('ball');
   const targets = {left:'20%', center:'50%', right:'80%'};
   ball.style.left = targets[dir];
@@ -1417,13 +1501,17 @@ function shoot(dir){
       fb.textContent = '⚽ هدف! +5 نقاط';
       fb.style.color = '#6fd3b8';
       state.points += 5;
+      playSound('correct');
     } else {
       fb.textContent = '🧤 تصدى الحارس لها! حاول مرة ثانية';
       fb.style.color = '#e39b9b';
+      playSound('wrong');
     }
     ball.style.left = '50%';
     ball.style.bottom = '14px';
+    const newly = checkBadges();
     persist();
+    if(newly.length) celebrateBadges(newly);
   }, 500);
 }
 
