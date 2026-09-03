@@ -280,6 +280,43 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
   section.alt{background:#fff;}
 
+  /* class display mode — للعرض على شاشة/بروجكتر بالحصة */
+  #classDisplayView{
+    display:none; position:fixed; inset:0; z-index:400; background:var(--navy-deep);
+    color:#fff; overflow-y:auto;
+  }
+  #classDisplayView.show{display:block;}
+  #cdExit{
+    position:fixed; top:20px; left:20px; background:rgba(255,255,255,.1); color:#fff;
+    border:1.5px solid rgba(255,255,255,.3); border-radius:30px; padding:10px 20px;
+    font-size:.9rem; cursor:pointer; z-index:401;
+  }
+  #cdExit:hover{background:rgba(255,255,255,.2);}
+  .cdWrap{max-width:1000px; margin:0 auto; padding:100px 30px 60px; text-align:center;}
+  .cdCounter{color:var(--gold-light); font-size:1.1rem; margin-bottom:24px; font-weight:700;}
+  .cdQuestion{
+    font-family:'Aref Ruqaa'; font-size:clamp(1.8rem, 4vw, 3rem); line-height:1.5;
+    margin-bottom:50px; color:#fff;
+  }
+  .cdChoices{display:flex; flex-direction:column; gap:18px; margin-bottom:50px;}
+  .cdChoice{
+    background:rgba(255,255,255,.08); border:2px solid rgba(255,255,255,.2); border-radius:16px;
+    padding:22px 30px; font-size:clamp(1.2rem, 2.4vw, 1.7rem); text-align:right;
+    display:flex; align-items:center; gap:18px; transition:.3s;
+  }
+  .cdChoice .cdLetter{
+    background:var(--gold); color:var(--navy-deep); width:44px; height:44px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;
+  }
+  .cdChoice.revealCorrect{background:rgba(31,111,92,.5); border-color:var(--teal);}
+  .cdControls{display:flex; justify-content:center; gap:14px; flex-wrap:wrap;}
+  .cdBtn{
+    background:rgba(255,255,255,.12); color:#fff; border:1.5px solid rgba(255,255,255,.3);
+    border-radius:12px; padding:14px 26px; font-size:1rem; font-weight:700; cursor:pointer; font-family:'Tajawal';
+  }
+  .cdBtn:hover{background:rgba(255,255,255,.22);}
+  .cdBtn.gold{background:var(--gold); color:var(--navy-deep); border-color:var(--gold);}
+
   /* Games */
   .gameArea{
     background:var(--navy); color:var(--cream); border-radius:20px; padding:36px;
@@ -506,6 +543,21 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   </div>
 </section>
 
+<section id="classDisplayView">
+  <button id="cdExit" onclick="closeClassDisplay()">✕ خروج من وضع العرض</button>
+  <div class="cdWrap">
+    <div class="cdCounter" id="cdCounter">سؤال 1 من 1</div>
+    <div class="cdQuestion" id="cdQuestion">...</div>
+    <div class="cdChoices" id="cdChoices"></div>
+    <div class="cdControls">
+      <button class="cdBtn" onclick="cdPrev()">→ السابق</button>
+      <button class="cdBtn gold" onclick="cdReveal()">🔍 إظهار الإجابة</button>
+      <button class="cdBtn" onclick="cdRandom()">🎲 عشوائي</button>
+      <button class="cdBtn" onclick="cdNext()">التالي ←</button>
+    </div>
+  </div>
+</section>
+
 <section id="games">
   <div class="wrap">
     <h2>الألعاب</h2>
@@ -575,6 +627,8 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   <div class="wrap">
     <h2>لوحة المعلم</h2>
     <p class="lead">مرحباً بك — تابع نشاط الطلاب وأدر بنك الأسئلة (الموافقة على الطلاب الجدد تظهر بالشريط أعلى الصفحة).</p>
+
+    <button class="btn btn-gold" style="margin-bottom:24px;" onclick="openClassDisplay()">🖥️ ابدأ وضع العرض الجماعي للحصة</button>
 
     <div class="adminTabs">
       <button class="adminTab active" data-tab="students">👥 الطلاب (<span id="activeCount">0</span> نشط الآن)</button>
@@ -1119,6 +1173,50 @@ function goHome(){
   closeUnit();
   document.getElementById('mainNav').classList.remove('show'); // يسكّر قائمة الجوال لو كانت مفتوحة
   document.querySelectorAll('.navDrop').forEach(d=>d.classList.remove('open')); // يسكّر أي قائمة منسدلة مفتوحة
+}
+
+// ---------- وضع العرض الجماعي — للاستخدام داخل الحصة على شاشة/بروجكتر، بدون أجهزة للطلاب ----------
+let cdIndex = 0;
+const CD_LETTERS = ['أ', 'ب', 'ج'];
+
+function openClassDisplay(){
+  if(!isAdmin){ showToast('هذا الوضع مخصص للمعلم فقط', 'error'); return; }
+  if(!QUESTIONS || QUESTIONS.length === 0){ showToast('بنك الأسئلة لسا ما تحمّل، انتظر لحظة وجرّب مرة ثانية', 'error'); return; }
+  cdIndex = 0;
+  renderCdQuestion();
+  document.getElementById('classDisplayView').classList.add('show');
+  window.scrollTo({top:0, behavior:'instant'});
+}
+function closeClassDisplay(){
+  document.getElementById('classDisplayView').classList.remove('show');
+}
+function renderCdQuestion(){
+  const item = QUESTIONS[cdIndex];
+  document.getElementById('cdCounter').textContent = `سؤال ${cdIndex + 1} من ${QUESTIONS.length}`;
+  document.getElementById('cdQuestion').textContent = item.q;
+  document.getElementById('cdChoices').innerHTML = item.c.map((choice, i)=> `
+    <div class="cdChoice" data-idx="${i}">
+      <span class="cdLetter">${CD_LETTERS[i]}</span><span>${choice}</span>
+    </div>`).join('');
+}
+function cdNext(){
+  cdIndex = (cdIndex + 1) % QUESTIONS.length;
+  renderCdQuestion();
+}
+function cdPrev(){
+  cdIndex = (cdIndex - 1 + QUESTIONS.length) % QUESTIONS.length;
+  renderCdQuestion();
+}
+function cdRandom(){
+  cdIndex = Math.floor(Math.random() * QUESTIONS.length);
+  renderCdQuestion();
+}
+function cdReveal(){
+  const item = QUESTIONS[cdIndex];
+  document.querySelectorAll('.cdChoice').forEach(el=>{
+    if(parseInt(el.dataset.idx, 10) === item.a) el.classList.add('revealCorrect');
+  });
+  playSound('correct');
 }
 
 document.getElementById('curriculumDropBtn').addEventListener('click', (e)=>{
@@ -2170,6 +2268,12 @@ function closeChat(){
 document.addEventListener('keydown', (e)=>{
   if(e.key === 'Escape' && document.getElementById('chatPanel').classList.contains('show')){
     closeChat();
+  }
+  if(document.getElementById('classDisplayView').classList.contains('show')){
+    if(e.key === 'Escape') closeClassDisplay();
+    else if(e.key === 'ArrowRight') cdPrev();  // يمين بالعربي = رجوع بصرياً
+    else if(e.key === 'ArrowLeft') cdNext();   // يسار بالعربي = تقدم بصرياً
+    else if(e.key === ' '){ e.preventDefault(); cdReveal(); }
   }
 });
 document.getElementById('chatFab').addEventListener('click', ()=>{
