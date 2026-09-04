@@ -388,6 +388,24 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .energyDot{width:14px; height:14px; border-radius:3px; background:rgba(255,255,255,.15);}
   .energyDot.filled{background:var(--gold);}
 
+  #matchGrid{
+    display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; max-width:420px; margin:0 auto;
+  }
+  .matchCard{
+    aspect-ratio:1; border-radius:12px; cursor:pointer; position:relative; perspective:600px;
+  }
+  .matchCard .mFace{
+    position:absolute; inset:0; border-radius:12px; display:flex; align-items:center; justify-content:center;
+    text-align:center; padding:8px; font-size:.78rem; font-weight:700; backface-visibility:hidden;
+    transition:transform .4s; box-shadow:0 2px 6px rgba(0,0,0,.15);
+  }
+  .matchCard .mBack{background:var(--navy); color:var(--gold); font-size:1.4rem;}
+  .matchCard .mFront{background:#fff; color:var(--navy); border:2px solid var(--gold); transform:rotateY(180deg);}
+  .matchCard.flipped .mBack{transform:rotateY(180deg);}
+  .matchCard.flipped .mFront{transform:rotateY(0deg);}
+  .matchCard.matched .mFront{background:#eaf4f1; border-color:var(--teal); color:var(--teal);}
+  .matchCard.matched{cursor:default;}
+
   #pitch{
     background:linear-gradient(180deg,#2c7a4b,#1f5c39); border-radius:14px; height:220px; position:relative;
     overflow:hidden; margin-bottom:16px; cursor:pointer;
@@ -621,6 +639,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <div class="gameTabs">
         <button class="gtab active" data-panel="quiz">🧠 مراجعة سريعة</button>
         <button class="gtab" data-panel="fun">⚽ ركلات الترجيح</button>
+        <button class="gtab" data-panel="match">🃏 لعبة المطابقة</button>
       </div>
 
       <div id="energyBar">⚡ طاقتك: <span id="energyDots"></span> (<span id="energyNum">0</span>)</div>
@@ -644,6 +663,15 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
           <button class="btn btn-outline" onclick="shoot('right')">يمين ▶</button>
         </div>
         <p id="funFeedback" style="text-align:center; margin-top:12px; font-weight:700;"></p>
+      </div>
+
+      <div class="panel" id="panel-match">
+        <p style="text-align:center; color:#5c6a6e; margin-bottom:14px;">اقلب بطاقتين — لو طابقت المصطلح مع تعريفه الصحيح تربح! (تكلّف طاقة وحدة لكل جولة جديدة)</p>
+        <div id="matchStatus" style="text-align:center; font-weight:700; margin-bottom:14px;"></div>
+        <div id="matchGrid"></div>
+        <div style="text-align:center; margin-top:16px;">
+          <button class="btn btn-gold" onclick="startMatchGame()">🔄 جولة جديدة</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1805,6 +1833,103 @@ function shoot(dir){
     persist();
     if(newly.length) celebrateBadges(newly);
   }, 500);
+}
+
+// ---------- لعبة المطابقة (مصطلح مع تعريفه) — من نفس محتوى المنهج الحقيقي ----------
+const MATCH_PAIRS = [
+  {term:'حمورابي', def:'أشهر ملوك الدولة البابلية الأولى، اشتهر بقوانينه'},
+  {term:'الإشعاع الشمسي', def:'مقدار الأشعة الشمسية الساقطة على مساحة معينة'},
+  {term:'مجلس الشورى', def:'يمثل السلطة التشريعية بدولة قطر'},
+  {term:'المعتصم بالله', def:'الخليفة اللي فتح مدينة عمورية'},
+  {term:'الكتابة المسمارية', def:'كتابة على ألواح طينية عرفها سكان الرافدين'},
+  {term:'الفزعة', def:'شرطة النجدة، الاستجابة السريعة لحفظ أمن المجتمع'},
+];
+
+let matchCards = [];
+let matchFlipped = [];
+let matchMatchedCount = 0;
+let matchBusy = false;
+
+function shuffleArray(arr){
+  const a = [...arr];
+  for(let i=a.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startMatchGame(){
+  if(!state){ openLogin(); return; }
+  if(state.energy <= 0){
+    document.getElementById('matchStatus').textContent = '⚡ ما عندك طاقة كافية — جاوب أسئلة المراجعة لتكسب طاقة!';
+    return;
+  }
+  state.energy -= 1;
+  renderEnergy();
+
+  const pairs = shuffleArray(MATCH_PAIRS).slice(0, 6);
+  let cards = [];
+  pairs.forEach((p, i)=>{
+    cards.push({pairId:i, text:p.term, isTerm:true, flipped:false, matched:false});
+    cards.push({pairId:i, text:p.def, isTerm:false, flipped:false, matched:false});
+  });
+  matchCards = shuffleArray(cards);
+  matchFlipped = [];
+  matchMatchedCount = 0;
+  matchBusy = false;
+  document.getElementById('matchStatus').textContent = `🎯 ${pairs.length} أزواج — دورك تلاقيهم!`;
+  renderMatchGrid();
+  persist();
+}
+
+function renderMatchGrid(){
+  const grid = document.getElementById('matchGrid');
+  grid.innerHTML = matchCards.map((c, i)=> `
+    <div class="matchCard ${c.flipped?'flipped':''} ${c.matched?'matched':''}" onclick="flipMatchCard(${i})">
+      <div class="mFace mBack">🃏</div>
+      <div class="mFace mFront">${c.text}</div>
+    </div>`).join('');
+}
+
+function flipMatchCard(i){
+  if(matchBusy || !matchCards.length) return;
+  const card = matchCards[i];
+  if(card.flipped || card.matched) return;
+  card.flipped = true;
+  matchFlipped.push(i);
+  renderMatchGrid();
+
+  if(matchFlipped.length === 2){
+    matchBusy = true;
+    const [i1, i2] = matchFlipped;
+    const c1 = matchCards[i1], c2 = matchCards[i2];
+    const isMatch = (c1.pairId === c2.pairId) && (c1.isTerm !== c2.isTerm);
+    setTimeout(()=>{
+      if(isMatch){
+        c1.matched = true; c2.matched = true;
+        matchMatchedCount++;
+        playSound('correct');
+      } else {
+        c1.flipped = false; c2.flipped = false;
+        playSound('wrong');
+      }
+      matchFlipped = [];
+      matchBusy = false;
+      renderMatchGrid();
+      if(isMatch && matchMatchedCount === matchCards.length/2){
+        finishMatchGame();
+      }
+    }, isMatch ? 500 : 900);
+  }
+}
+
+function finishMatchGame(){
+  state.points += 15;
+  document.getElementById('matchStatus').textContent = '🎉 ممتاز! طابقت كل الأزواج! +15 نقطة';
+  const newly = checkBadges();
+  persist();
+  if(newly.length) celebrateBadges(newly);
 }
 
 // ---------- leaderboard (تحدّث كل بضع ثوانٍ — مشتركة بين كل الطلاب والأجهزة) ----------
