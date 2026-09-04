@@ -78,6 +78,8 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     border-bottom:none; opacity:1; text-align:right;
   }
   .navDropMenu a:hover{background:var(--cream); border-color:transparent;}
+  .enrichMenu{border-top:3px solid var(--gold);}
+  .enrichMenu a:hover{background:#faf3e3;}
 
   #userChip{
     background:var(--gold); color:var(--navy-deep); padding:7px 16px; border-radius:30px;
@@ -161,6 +163,25 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .addQForm{background:#fff; border:1px solid #e8e0cd; border-radius:12px; padding:20px; margin-bottom:24px;}
   .addQForm input{width:100%; padding:10px 12px; border-radius:8px; border:1.5px solid #dcd4c0; font-family:'Tajawal'; margin-bottom:10px; font-size:.9rem;}
   .addQForm label{font-size:.82rem; font-weight:700; color:var(--navy); display:block; margin-bottom:4px;}
+
+  .rosterClassBar{display:flex; gap:10px; margin-bottom:20px;}
+  .rosterClassBtn{
+    padding:10px 22px; border-radius:30px; border:2px solid var(--navy); background:transparent;
+    color:var(--navy); font-weight:700; font-size:.9rem; cursor:pointer; font-family:'Tajawal';
+  }
+  .rosterClassBtn.active{background:var(--navy); color:var(--gold-light);}
+  .rosterRow{
+    background:#fff; border:1px solid #e8e0cd; border-radius:12px; padding:14px 18px;
+    display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; flex-wrap:wrap;
+  }
+  .rosterRow .rName{font-weight:700; color:var(--navy); font-size:.95rem; min-width:120px;}
+  .rosterStats{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+  .rStat{display:flex; align-items:center; gap:6px; font-size:.85rem; font-weight:700; padding:6px 12px; border-radius:20px;}
+  .rStat.points{background:#eaf4f1; color:var(--teal);}
+  .rStat.warnOk{background:#eaf4f1; color:var(--teal);}
+  .rStat.warnBad{background:#fbe9e9; color:var(--maroon);}
+  .rStat button{border:none; background:none; cursor:pointer; font-size:1rem; padding:0 2px;}
+  .rDelete{background:none; border:none; color:#b0a898; cursor:pointer; font-size:1rem;}
 
   .studentRow{background:#fff; border:1px solid #e8e0cd; border-radius:12px; padding:16px 18px; margin-bottom:10px;}
   .studentRow .srTop{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:10px;}
@@ -473,13 +494,13 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       </div>
       <div class="navDrop">
         <button class="navDropBtn" id="enrichDropBtn" type="button">مصادر إثرائية <span class="caret">▾</span></button>
-        <div class="navDropMenu" id="enrichDropMenu">
-          <a href="#" onclick="openEnrichment(1); return false;">١ · الأرض من حولي</a>
-          <a href="#" onclick="openEnrichment(2); return false;">٢ · حضارة بلاد الرافدين</a>
-          <a href="#" onclick="openEnrichment(3); return false;">٣ · السلطات الدستورية</a>
-          <a href="#" onclick="openEnrichment(4); return false;">٤ · التوزيع الجغرافي للسكان</a>
-          <a href="#" onclick="openEnrichment(5); return false;">٥ · الخلافة العباسية</a>
-          <a href="#" onclick="openEnrichment(6); return false;">٦ · الأمن الوطني</a>
+        <div class="navDropMenu enrichMenu" id="enrichDropMenu">
+          <a href="#" onclick="openEnrichment(1); return false;">🎥 وحدة ١ · الأرض من حولي</a>
+          <a href="#" onclick="openEnrichment(2); return false;">🎥 وحدة ٢ · حضارة بلاد الرافدين</a>
+          <a href="#" onclick="openEnrichment(3); return false;">🎥 وحدة ٣ · السلطات الدستورية</a>
+          <a href="#" onclick="openEnrichment(4); return false;">🎥 وحدة ٤ · التوزيع الجغرافي للسكان</a>
+          <a href="#" onclick="openEnrichment(5); return false;">🎥 وحدة ٥ · الخلافة العباسية</a>
+          <a href="#" onclick="openEnrichment(6); return false;">🎥 وحدة ٦ · الأمن الوطني</a>
         </div>
       </div>
       <a href="#games">الألعاب</a>
@@ -633,6 +654,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <div class="adminTabs">
       <button class="adminTab active" data-tab="students">👥 الطلاب (<span id="activeCount">0</span> نشط الآن)</button>
       <button class="adminTab" data-tab="questions">📝 إدارة الأسئلة</button>
+      <button class="adminTab" data-tab="roster">📋 متابعة الحصة</button>
     </div>
 
     <div class="adminPanelBody active" id="tab-students">
@@ -656,6 +678,23 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
         <button class="btn btn-gold" onclick="addQuestion(this)">➕ إضافة السؤال</button>
       </div>
       <div id="questionsList"></div>
+    </div>
+
+    <div class="adminPanelBody" id="tab-roster">
+      <p class="lead" style="margin-bottom:16px;">قائمة خاصة فيك بس — نقاط مشاركة وتنبيهات سلوك، منفصلة تماماً عن نقاط الأسئلة، للاستخدام داخل الحصة.</p>
+      <div class="rosterClassBar">
+        <button class="rosterClassBtn active" data-cls="7-1" onclick="switchRosterClass('7-1', this)">سابع 1</button>
+        <button class="rosterClassBtn" data-cls="7-2" onclick="switchRosterClass('7-2', this)">سابع 2</button>
+        <button class="rosterClassBtn" data-cls="7-3" onclick="switchRosterClass('7-3', this)">سابع 3</button>
+      </div>
+      <div class="addQForm" style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+        <div style="flex:1; min-width:180px;">
+          <label>اسم طالب جديد بهذا الصف</label>
+          <input id="newRosterName" placeholder="مثال: محمد أحمد" style="margin-bottom:0;">
+        </div>
+        <button class="btn btn-gold" onclick="addRosterStudent(this)" style="height:44px;">➕ إضافة</button>
+      </div>
+      <div id="rosterList"></div>
     </div>
   </div>
 </section>
@@ -1761,6 +1800,7 @@ function setAdminActive(active){
     loadPendingStudents();
     loadQuestionsAdmin();
     loadStudentsList();
+    loadRoster();
     document.getElementById('adminPanel').scrollIntoView({behavior:'smooth'});
   }
 }
@@ -1898,6 +1938,70 @@ async function saveNote(key, btn){
   await sb.from('students').update({admin_note: note}).eq('key', key);
   setBtnLoading(btn, false);
   showToast('✅ تم حفظ الملاحظة', 'success');
+}
+
+// ---------- قسم متابعة الحصة (خاص بالمعلم فقط — منفصل تماماً عن نقاط الأسئلة) ----------
+let currentRosterCls = '7-1';
+
+function switchRosterClass(cls, btn){
+  currentRosterCls = cls;
+  document.querySelectorAll('.rosterClassBtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  loadRoster();
+}
+
+function renderRosterRow(r){
+  const warnClass = r.warnings > 0 ? 'warnBad' : 'warnOk';
+  const warnLabel = r.warnings > 0 ? `⚠️ ${r.warnings} تنبيه` : '✅ لا يوجد تنبيه';
+  return `
+    <div class="rosterRow">
+      <div class="rName">${r.student_name}</div>
+      <div class="rosterStats">
+        <div class="rStat points">⭐ ${r.participation_points} <button onclick="addParticipationPoint(${r.id}, this)" title="أضف نقطة مشاركة">➕</button></div>
+        <div class="rStat ${warnClass}">${warnLabel} <button onclick="addWarning(${r.id}, this)" title="أضف تنبيه">➕</button></div>
+        <button class="rDelete" onclick="deleteRosterStudent(${r.id})" title="حذف الطالب من القائمة">🗑️</button>
+      </div>
+    </div>`;
+}
+
+async function loadRoster(){
+  if(!isAdmin || !requireDb()) return;
+  const { data, error } = await sb.from('class_roster').select('*').eq('cls', currentRosterCls).order('student_name');
+  const list = document.getElementById('rosterList');
+  if(error){ list.innerHTML = '<p style="color:#8a8a8a;">تعذر تحميل القائمة.</p>'; return; }
+  if(!data || data.length === 0){
+    list.innerHTML = '<p style="color:#8a8a8a; margin-top:16px;">لا يوجد طلاب مضافين لهذا الصف بعد — أضف أول طالب من الأعلى.</p>';
+    return;
+  }
+  list.innerHTML = data.map(renderRosterRow).join('');
+}
+async function addRosterStudent(btn){
+  const input = document.getElementById('newRosterName');
+  const name = input.value.trim();
+  if(!name){ showToast('اكتب اسم الطالب أول', 'error'); return; }
+  setBtnLoading(btn, true, 'جاري الإضافة');
+  const { error } = await sb.from('class_roster').insert({cls: currentRosterCls, student_name: name});
+  setBtnLoading(btn, false);
+  if(error){ showToast('تعذر الإضافة: ' + error.message, 'error'); return; }
+  input.value = '';
+  loadRoster();
+}
+async function addParticipationPoint(id, btn){
+  if(btn){ btn.disabled = true; }
+  const { data } = await sb.from('class_roster').select('participation_points').eq('id', id).maybeSingle();
+  await sb.from('class_roster').update({participation_points: (data?.participation_points || 0) + 1}).eq('id', id);
+  loadRoster();
+}
+async function addWarning(id, btn){
+  if(btn){ btn.disabled = true; }
+  const { data } = await sb.from('class_roster').select('warnings').eq('id', id).maybeSingle();
+  await sb.from('class_roster').update({warnings: (data?.warnings || 0) + 1}).eq('id', id);
+  loadRoster();
+}
+async function deleteRosterStudent(id){
+  if(!confirm('حذف هذا الطالب من قائمة المتابعة؟ (نقاطه وتنبيهاته بتنحذف نهائياً)')) return;
+  await sb.from('class_roster').delete().eq('id', id);
+  loadRoster();
 }
 
 // ---------- قسم إدارة الأسئلة ----------
