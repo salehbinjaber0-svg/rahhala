@@ -304,10 +304,10 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
   /* تقرير الأداء الأسبوعي */
   .reportActions{display:flex; gap:10px; margin:20px 0; flex-wrap:wrap;}
-  .repSection{background:#fff; border:1px solid #e8e0cd; border-radius:16px; padding:24px; margin-bottom:20px;}
+  .repSection{background:#fff; border:1px solid #e8e0cd; border-radius:16px; padding:24px; margin-bottom:20px; overflow-x:auto;}
   .repSection h3{color:var(--navy); margin-bottom:16px; font-size:1.1rem;}
-  .repTable{width:100%; border-collapse:collapse; font-size:.9rem;}
-  .repTable th{text-align:right; padding:10px 12px; background:var(--cream); color:var(--navy); font-weight:700;}
+  .repTable{width:100%; min-width:420px; border-collapse:collapse; font-size:.9rem;}
+  .repTable th{text-align:right; padding:10px 12px; background:var(--cream); color:var(--navy); font-weight:700; white-space:nowrap;}
   .repTable td{padding:10px 12px; border-bottom:1px solid #eee;}
   .repStatsRow{display:flex; gap:16px; flex-wrap:wrap; margin-bottom:20px;}
   .repStatCard{background:var(--navy); color:#fff; border-radius:14px; padding:20px 26px; text-align:center; flex:1; min-width:140px;}
@@ -449,7 +449,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   /* connection banner */
   /* toast notifications */
   #toastBox{
-    position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:300;
+    position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:500;
     display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none;
   }
   .toast{
@@ -1318,6 +1318,12 @@ async function buildReport(){
     sb.from('students').select('key', {count:'exact', head:true}).eq('status','pending'),
   ]);
 
+  // نتحقق من كل استعلام لحاله — لو جدول answer_log مثلاً ناقص (ما شُغّل كوده بعد)، نوضح هذا بدل تقرير فاضي بصمت
+  const setupWarnings = [];
+  if(studentsRes.error){ console.error('خطأ بجلب الطلاب:', studentsRes.error); setupWarnings.push('تعذر جلب بيانات الطلاب'); }
+  if(logsRes.error){ console.error('خطأ بجلب سجل الإجابات:', logsRes.error); setupWarnings.push('تعذر جلب سجل الإجابات — تأكد من تشغيل كود SQL الخاص بجدول answer_log'); }
+  if(pendingRes.error){ console.error('خطأ بجلب الطلاب المعلّقين:', pendingRes.error); }
+
   const students = studentsRes.data || [];
   const logs = logsRes.data || [];
   const pendingCount = pendingRes.count || 0;
@@ -1345,6 +1351,7 @@ async function buildReport(){
   lastReportData = { topByPoints, topByTime, mostMissed, totalAnswers, accuracyRate, pendingCount, studentsCount: students.length, generatedAt: new Date() };
 
   box.innerHTML = `
+    ${setupWarnings.length ? `<div class="conceptBox" style="border-inline-start-color:var(--maroon); margin-bottom:20px;"><strong>⚠️ تنبيه:</strong> ${setupWarnings.join(' · ')}</div>` : ''}
     <div class="unitHead">
       <div class="tag">تقرير الأداء</div>
       <h2>تقرير أداء أسبوعي — رحّالة</h2>
