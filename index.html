@@ -275,6 +275,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   /* unit detail view */
   #unitView{display:none;}
   #unitView.show{display:block;}
+  #reportView{display:none;}
   .backLink{display:inline-block; margin-bottom:20px; color:var(--teal); font-weight:700; font-size:.9rem;}
   .unitHead{margin-bottom:28px;}
   .unitHead .tag{color:var(--gold); font-family:'Aref Ruqaa'; font-size:1.1rem;}
@@ -300,6 +301,25 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .qList em{color:var(--teal); font-style:normal; font-weight:700;}
 
   section.alt{background:#fff;}
+
+  /* تقرير الأداء الأسبوعي */
+  .reportActions{display:flex; gap:10px; margin:20px 0; flex-wrap:wrap;}
+  .repSection{background:#fff; border:1px solid #e8e0cd; border-radius:16px; padding:24px; margin-bottom:20px;}
+  .repSection h3{color:var(--navy); margin-bottom:16px; font-size:1.1rem;}
+  .repTable{width:100%; border-collapse:collapse; font-size:.9rem;}
+  .repTable th{text-align:right; padding:10px 12px; background:var(--cream); color:var(--navy); font-weight:700;}
+  .repTable td{padding:10px 12px; border-bottom:1px solid #eee;}
+  .repStatsRow{display:flex; gap:16px; flex-wrap:wrap; margin-bottom:20px;}
+  .repStatCard{background:var(--navy); color:#fff; border-radius:14px; padding:20px 26px; text-align:center; flex:1; min-width:140px;}
+  .repStatCard .num{font-size:2rem; font-weight:700; color:var(--gold-light); font-family:'Aref Ruqaa';}
+  .repStatCard .lbl{font-size:.8rem; opacity:.85; margin-top:4px;}
+  @media print{
+    .noPrint, header, #topPendingBar, #lastUpdateBar, #chatFab, #chatPanel, footer{display:none !important;}
+    #reportView{display:block !important;}
+    section{display:none !important;}
+    #reportView, #reportView .wrap{display:block !important;}
+    body{background:#fff;}
+  }
 
   /* class display mode — للعرض على شاشة/بروجكتر بالحصة */
   #classDisplayView{
@@ -579,6 +599,19 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   </div>
 </section>
 
+<section id="reportView" class="eyebrow-free">
+  <div class="wrap">
+    <div class="noPrint">
+      <a href="#" onclick="closeUnit(); return false;" class="backLink">→ رجوع للرئيسية</a>
+      <div class="reportActions">
+        <button class="btn btn-gold" onclick="exportReportCSV()">⬇️ تصدير CSV (يفتح بإكسل)</button>
+        <button class="btn btn-outline" onclick="window.print()">🖨️ طباعة / حفظ PDF</button>
+      </div>
+    </div>
+    <div id="reportContent">جاري إعداد التقرير...</div>
+  </div>
+</section>
+
 <section id="games">
   <div class="wrap">
     <h2>الألعاب</h2>
@@ -650,6 +683,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <p class="lead">مرحباً بك — تابع نشاط الطلاب وأدر بنك الأسئلة (الموافقة على الطلاب الجدد تظهر بالشريط أعلى الصفحة).</p>
 
     <button class="btn btn-gold" style="margin-bottom:24px;" onclick="openClassDisplay()">🖥️ ابدأ وضع العرض الجماعي للحصة</button>
+    <button class="btn" style="margin-bottom:24px; margin-inline-start:10px; background:transparent; border:2px solid var(--navy); color:var(--navy);" onclick="openReport()">📊 تقرير الأداء الأسبوعي</button>
 
     <div class="adminTabs">
       <button class="adminTab active" data-tab="students">👥 الطلاب (<span id="activeCount">0</span> نشط الآن)</button>
@@ -1258,6 +1292,118 @@ function cdReveal(){
   playSound('correct');
 }
 
+// ---------- تقرير الأداء الأسبوعي (خاص بالمعلم) ----------
+let lastReportData = null; // نخزّنها عشان زر التصدير يستخدم نفس البيانات المعروضة
+
+function openReport(){
+  if(!isAdmin){ showToast('التقرير مخصص للمعلم فقط', 'error'); return; }
+  document.querySelectorAll('section').forEach(s=>{ if(s.id !== 'reportView') s.style.display = 'none'; });
+  document.getElementById('reportView').style.display = '';
+  document.getElementById('unitView').classList.remove('show');
+  document.getElementById('enrichView').classList.remove('show');
+  window.scrollTo({top:0, behavior:'instant'});
+  buildReport();
+}
+
+async function buildReport(){
+  const box = document.getElementById('reportContent');
+  box.innerHTML = 'جاري إعداد التقرير...';
+  if(!requireDb()) return;
+
+  const weekAgoISO = new Date(Date.now() - 7*24*60*60*1000).toISOString();
+
+  const [studentsRes, logsRes, pendingRes] = await Promise.all([
+    sb.from('students').select('*').eq('status','approved'),
+    sb.from('answer_log').select('*').gte('created_at', weekAgoISO),
+    sb.from('students').select('key', {count:'exact', head:true}).eq('status','pending'),
+  ]);
+
+  const students = studentsRes.data || [];
+  const logs = logsRes.data || [];
+  const pendingCount = pendingRes.count || 0;
+
+  const topByPoints = [...students].sort((a,b)=> b.points - a.points).slice(0,5);
+  const topByTime = [...students].sort((a,b)=> (b.total_seconds||0) - (a.total_seconds||0)).slice(0,5);
+
+  // تجميع الأخطاء لكل سؤال
+  const qStats = {};
+  logs.forEach(l=>{
+    if(!qStats[l.question_id]) qStats[l.question_id] = {total:0, wrong:0};
+    qStats[l.question_id].total++;
+    if(!l.correct) qStats[l.question_id].wrong++;
+  });
+  const mostMissed = Object.entries(qStats)
+    .map(([qid, s])=>({ qid, ...s, qText: (QUESTIONS.find(q=>q.id == qid)||{}).q || `سؤال #${qid}`, rate: s.wrong / s.total }))
+    .filter(x=> x.total >= 2) // نتجاهل أسئلة اتجاوبت مرة وحدة بس، عشان الإحصائية تكون ذات معنى
+    .sort((a,b)=> b.rate - a.rate)
+    .slice(0,5);
+
+  const totalAnswers = logs.length;
+  const correctAnswers = logs.filter(l=>l.correct).length;
+  const accuracyRate = totalAnswers ? Math.round((correctAnswers/totalAnswers)*100) : 0;
+
+  lastReportData = { topByPoints, topByTime, mostMissed, totalAnswers, accuracyRate, pendingCount, studentsCount: students.length, generatedAt: new Date() };
+
+  box.innerHTML = `
+    <div class="unitHead">
+      <div class="tag">تقرير الأداء</div>
+      <h2>تقرير أداء أسبوعي — رحّالة</h2>
+      <div class="fw">تم إنشاؤه بتاريخ ${lastReportData.generatedAt.toLocaleDateString('ar-QA')}</div>
+    </div>
+
+    <div class="repStatsRow">
+      <div class="repStatCard"><div class="num">${students.length}</div><div class="lbl">إجمالي الطلاب الموافق عليهم</div></div>
+      <div class="repStatCard"><div class="num">${pendingCount}</div><div class="lbl">بانتظار الموافقة</div></div>
+      <div class="repStatCard"><div class="num">${totalAnswers}</div><div class="lbl">إجابات هذا الأسبوع</div></div>
+      <div class="repStatCard"><div class="num">${accuracyRate}%</div><div class="lbl">نسبة الإجابات الصحيحة</div></div>
+    </div>
+
+    <div class="repSection">
+      <h3>🏆 الأكثر نقاطاً</h3>
+      <table class="repTable"><tr><th>الطالب</th><th>الصف</th><th>النقاط</th></tr>
+        ${topByPoints.map(s=>`<tr><td>${s.name}</td><td>${s.cls}</td><td>${s.points}</td></tr>`).join('') || '<tr><td colspan="3">لا توجد بيانات بعد</td></tr>'}
+      </table>
+    </div>
+
+    <div class="repSection">
+      <h3>⏱️ الأكثر وقت استخدام</h3>
+      <table class="repTable"><tr><th>الطالب</th><th>الصف</th><th>وقت الاستخدام</th></tr>
+        ${topByTime.map(s=>`<tr><td>${s.name}</td><td>${s.cls}</td><td>${formatDuration(s.total_seconds)}</td></tr>`).join('') || '<tr><td colspan="3">لا توجد بيانات بعد</td></tr>'}
+      </table>
+    </div>
+
+    <div class="repSection">
+      <h3>⚠️ الأسئلة الأكثر خطأ (آخر 7 أيام)</h3>
+      <table class="repTable"><tr><th>السؤال</th><th>مرات الخطأ</th><th>نسبة الخطأ</th></tr>
+        ${mostMissed.map(m=>`<tr><td>${m.qText}</td><td>${m.wrong} من ${m.total}</td><td>${Math.round(m.rate*100)}%</td></tr>`).join('') || '<tr><td colspan="3">ما فيه بيانات كافية بعد (يحتاج إجابتين على الأقل لنفس السؤال)</td></tr>'}
+      </table>
+    </div>`;
+}
+
+function exportReportCSV(){
+  if(!lastReportData){ showToast('انتظر التقرير يخلص التحميل أول', 'error'); return; }
+  const d = lastReportData;
+  let csv = '\uFEFF'; // BOM عشان إكسل يقرأ العربي صح
+  csv += 'تقرير أداء رحّالة الأسبوعي\n';
+  csv += `تاريخ الإنشاء,${d.generatedAt.toLocaleDateString('ar-QA')}\n\n`;
+  csv += `إجمالي الطلاب,${d.studentsCount}\nبانتظار الموافقة,${d.pendingCount}\nإجابات هذا الأسبوع,${d.totalAnswers}\nنسبة الصحة,${d.accuracyRate}%\n\n`;
+  csv += 'الأكثر نقاطاً\nالطالب,الصف,النقاط\n';
+  d.topByPoints.forEach(s=> csv += `${s.name},${s.cls},${s.points}\n`);
+  csv += '\nالأكثر وقت استخدام\nالطالب,الصف,ثواني الاستخدام\n';
+  d.topByTime.forEach(s=> csv += `${s.name},${s.cls},${s.total_seconds||0}\n`);
+  csv += '\nالأسئلة الأكثر خطأ\nالسؤال,مرات الخطأ,الإجمالي\n';
+  d.mostMissed.forEach(m=> csv += `"${m.qText.replace(/"/g,'""')}",${m.wrong},${m.total}\n`);
+
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `تقرير-رحالة-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ تم تحميل ملف CSV — يفتح مباشرة بإكسل', 'success');
+}
+
 document.getElementById('curriculumDropBtn').addEventListener('click', (e)=>{
   e.stopPropagation();
   document.getElementById('enrichDropBtn').closest('.navDrop').classList.remove('open'); // سكّر القائمة الثانية أول
@@ -1572,15 +1718,16 @@ function renderQuestion(){
     const b = document.createElement('button');
     b.className = 'choice';
     b.textContent = choice;
-    b.onclick = ()=> answer(i, item.a, b, box);
+    b.onclick = ()=> answer(i, item.a, b, box, item.id);
     box.appendChild(b);
   });
 }
-function answer(i, correctIdx, btn, box){
+function answer(i, correctIdx, btn, box, questionId){
   if(!state){ openLogin(); return; }
   [...box.children].forEach(c=>c.onclick=null);
   const fb = document.getElementById('quizFeedback');
-  if(i === correctIdx){
+  const isCorrect = (i === correctIdx);
+  if(isCorrect){
     btn.classList.add('correct');
     fb.textContent = '✅ إجابة صحيحة! +10 نقاط، +1 طاقة';
     fb.style.color = '#6fd3b8';
@@ -1594,6 +1741,7 @@ function answer(i, correctIdx, btn, box){
     fb.style.color = '#e39b9b';
     playSound('wrong');
   }
+  if(sb && questionId){ sb.from('answer_log').insert({question_id: questionId, correct: isCorrect}); } // تسجيل للتقرير — لا ننتظر النتيجة، ما يبطّئ التجربة
   const newly = checkBadges();
   persist();
   if(newly.length) celebrateBadges(newly);
