@@ -164,7 +164,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .addQForm input{width:100%; padding:10px 12px; border-radius:8px; border:1.5px solid #dcd4c0; font-family:'Tajawal'; margin-bottom:10px; font-size:.9rem;}
   .addQForm label{font-size:.82rem; font-weight:700; color:var(--navy); display:block; margin-bottom:4px;}
 
-  .rosterClassBar{display:flex; gap:10px; margin-bottom:20px;}
+  .rosterClassBar{display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;}
   .rosterClassBtn{
     padding:10px 22px; border-radius:30px; border:2px solid var(--navy); background:transparent;
     color:var(--navy); font-weight:700; font-size:.9rem; cursor:pointer; font-family:'Tajawal';
@@ -182,6 +182,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .rStat.warnBad{background:#fbe9e9; color:var(--maroon);}
   .rStat button{border:none; background:none; cursor:pointer; font-size:1rem; padding:0 2px;}
   .rDelete{background:none; border:none; color:#b0a898; cursor:pointer; font-size:1rem;}
+  .lastWarnNote{margin-top:8px; padding-top:8px; border-top:1px dashed #eee; font-size:.78rem; color:var(--maroon);}
 
   .studentRow{background:#fff; border:1px solid #e8e0cd; border-radius:12px; padding:16px 18px; margin-bottom:10px;}
   .studentRow .srTop{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:10px;}
@@ -459,10 +460,11 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .modal p.sub{color:#6b7a7e; font-size:.88rem; margin-bottom:20px;}
   .field{margin-bottom:14px;}
   .field label{display:block; font-size:.85rem; margin-bottom:6px; color:var(--navy); font-weight:700;}
-  .field input{
+  .field input, .field textarea{
     width:100%; padding:11px 14px; border-radius:9px; border:1.5px solid #dcd4c0; font-family:'Tajawal'; font-size:.95rem;
   }
-  .field input:focus{outline:none; border-color:var(--gold);}
+  .field textarea{resize:vertical;}
+  .field input:focus, .field textarea:focus{outline:none; border-color:var(--gold);}
 
   /* connection banner */
   /* toast notifications */
@@ -748,6 +750,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
         <button class="rosterClassBtn active" data-cls="7-1" onclick="switchRosterClass('7-1', this)">سابع 1</button>
         <button class="rosterClassBtn" data-cls="7-2" onclick="switchRosterClass('7-2', this)">سابع 2</button>
         <button class="rosterClassBtn" data-cls="7-3" onclick="switchRosterClass('7-3', this)">سابع 3</button>
+        <button class="btn" style="background:transparent; border:2px solid var(--navy); color:var(--navy); margin-inline-start:auto;" onclick="exportWarningsCSV()">⬇️ تصدير كل التنبيهات</button>
       </div>
       <div class="addQForm" style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
         <div style="flex:1; min-width:180px;">
@@ -785,6 +788,16 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <div class="field"><label>كلمة المرور</label><input id="inAdminPass" type="password" placeholder="••••••••"></div>
     <div id="adminLoginError" style="color:var(--maroon); font-size:.85rem; margin-bottom:10px; display:none;"></div>
     <button class="btn btn-gold" style="width:100%" onclick="adminLogin(this)">دخول</button>
+  </div>
+</div>
+
+<div class="modalBg" id="warningModal">
+  <div class="modal">
+    <button class="modalClose" onclick="closeWarningModal()" title="إلغاء">✕</button>
+    <h3>تسجيل تنبيه</h3>
+    <p class="sub" id="warningModalStudentName">اكتب سبب التنبيه بإيجاز</p>
+    <div class="field"><label>الملاحظة</label><textarea id="warningNoteInput" rows="3" placeholder="مثال: تكلم بدون إذن أثناء الحصة"></textarea></div>
+    <button class="btn btn-gold" style="width:100%" onclick="submitWarningNote()">✅ تسجيل التنبيه</button>
   </div>
 </div>
 
@@ -2230,17 +2243,26 @@ function switchRosterClass(cls, btn){
   loadRoster();
 }
 
+let warningsCache = {}; // roster_id -> [{note, created_at}, ...] لآخر تحميل، يُستخدم بالتصدير وعرض آخر تنبيه
+
 function renderRosterRow(r){
-  const warnClass = r.warnings > 0 ? 'warnBad' : 'warnOk';
-  const warnLabel = r.warnings > 0 ? `⚠️ ${r.warnings} تنبيه` : '✅ لا يوجد تنبيه';
+  const wList = warningsCache[r.id] || [];
+  const warnCount = wList.length;
+  const warnClass = warnCount > 0 ? 'warnBad' : 'warnOk';
+  const lastWarning = wList[0]; // مرتبة الأحدث أول
+  const warnLabel = warnCount > 0 ? `⚠️ ${warnCount} تنبيه` : '✅ لا يوجد تنبيه';
+  const lastNoteHtml = lastWarning
+    ? `<div class="lastWarnNote">آخر تنبيه (${new Date(lastWarning.created_at).toLocaleDateString('ar-QA')}): ${lastWarning.note}</div>`
+    : '';
   return `
     <div class="rosterRow">
       <div class="rName">${r.student_name}</div>
       <div class="rosterStats">
         <div class="rStat points">⭐ ${r.participation_points} <button onclick="addParticipationPoint(${r.id}, this)" title="أضف نقطة مشاركة">➕</button></div>
-        <div class="rStat ${warnClass}">${warnLabel} <button onclick="addWarning(${r.id}, this)" title="أضف تنبيه">➕</button></div>
+        <div class="rStat ${warnClass}">${warnLabel} <button onclick="openWarningModal(${r.id}, '${r.student_name.replace(/'/g,"\\'")}')" title="أضف تنبيه">➕</button></div>
         <button class="rDelete" onclick="deleteRosterStudent(${r.id})" title="حذف الطالب من القائمة">🗑️</button>
       </div>
+      ${lastNoteHtml}
     </div>`;
 }
 
@@ -2253,6 +2275,14 @@ async function loadRoster(){
     list.innerHTML = '<p style="color:#8a8a8a; margin-top:16px;">لا يوجد طلاب مضافين لهذا الصف بعد — أضف أول طالب من الأعلى.</p>';
     return;
   }
+  // نجيب كل تنبيهات طلاب هذا الصف دفعة وحدة، ونرتبها الأحدث أول لكل طالب
+  const ids = data.map(r=>r.id);
+  const { data: warnData } = await sb.from('roster_warnings').select('*').in('roster_id', ids).order('created_at', {ascending:false});
+  warningsCache = {};
+  (warnData || []).forEach(w=>{
+    if(!warningsCache[w.roster_id]) warningsCache[w.roster_id] = [];
+    warningsCache[w.roster_id].push(w);
+  });
   list.innerHTML = data.map(renderRosterRow).join('');
 }
 async function addRosterStudent(btn){
@@ -2272,16 +2302,69 @@ async function addParticipationPoint(id, btn){
   await sb.from('class_roster').update({participation_points: (data?.participation_points || 0) + 1}).eq('id', id);
   loadRoster();
 }
-async function addWarning(id, btn){
-  if(btn){ btn.disabled = true; }
-  const { data } = await sb.from('class_roster').select('warnings').eq('id', id).maybeSingle();
-  await sb.from('class_roster').update({warnings: (data?.warnings || 0) + 1}).eq('id', id);
+
+// ---------- تنبيهات بملاحظة وتاريخ ----------
+let warningTargetId = null;
+
+function openWarningModal(rosterId, studentName){
+  warningTargetId = rosterId;
+  document.getElementById('warningModalStudentName').textContent = `تنبيه للطالب: ${studentName}`;
+  document.getElementById('warningNoteInput').value = '';
+  document.getElementById('warningModal').classList.add('show');
+}
+function closeWarningModal(){
+  document.getElementById('warningModal').classList.remove('show');
+  warningTargetId = null;
+}
+document.getElementById('warningModal').addEventListener('click', (e)=>{
+  if(e.target.id === 'warningModal') closeWarningModal();
+});
+
+async function submitWarningNote(){
+  const note = document.getElementById('warningNoteInput').value.trim();
+  if(!note){ showToast('اكتب سبب التنبيه أول', 'error'); return; }
+  if(!warningTargetId) return;
+  const { error } = await sb.from('roster_warnings').insert({roster_id: warningTargetId, note});
+  if(error){ showToast('تعذر تسجيل التنبيه: ' + error.message, 'error'); return; }
+  closeWarningModal();
+  showToast('⚠️ تم تسجيل التنبيه بنجاح', 'success');
   loadRoster();
 }
+
 async function deleteRosterStudent(id){
   if(!confirm('حذف هذا الطالب من قائمة المتابعة؟ (نقاطه وتنبيهاته بتنحذف نهائياً)')) return;
   await sb.from('class_roster').delete().eq('id', id);
   loadRoster();
+}
+
+// ---------- تصدير سجل التنبيهات الكامل (كل الصفوف، أي وقت) ----------
+async function exportWarningsCSV(){
+  if(!requireDb()) return;
+  const { data, error } = await sb
+    .from('roster_warnings')
+    .select('note, created_at, class_roster(student_name, cls)')
+    .order('created_at', {ascending:false});
+  if(error){ showToast('تعذر تحميل سجل التنبيهات: ' + error.message, 'error'); return; }
+  if(!data || data.length === 0){ showToast('ما فيه أي تنبيهات مسجّلة بعد', 'error'); return; }
+
+  let csv = '\uFEFF';
+  csv += 'سجل تنبيهات السلوك — رحّالة\n\n';
+  csv += 'الطالب,الصف,الملاحظة,التاريخ\n';
+  data.forEach(w=>{
+    const name = w.class_roster?.student_name || '—';
+    const cls = w.class_roster?.cls || '—';
+    const date = new Date(w.created_at).toLocaleDateString('ar-QA');
+    csv += `${name},${cls},"${w.note.replace(/"/g,'""')}",${date}\n`;
+  });
+
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `سجل-التنبيهات-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ تم تحميل سجل التنبيهات كامل', 'success');
 }
 
 // ---------- قسم إدارة الأسئلة ----------
