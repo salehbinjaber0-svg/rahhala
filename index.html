@@ -184,6 +184,17 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .rDelete{background:none; border:none; color:#b0a898; cursor:pointer; font-size:1rem;}
   .lastWarnNote{margin-top:8px; padding-top:8px; border-top:1px dashed #eee; font-size:.78rem; color:var(--maroon);}
 
+  .trashRow{
+    background:#fff; border:1px solid #e8e0cd; border-radius:12px; padding:14px 18px;
+    display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; flex-wrap:wrap;
+  }
+  .trashRow .tType{font-size:.72rem; background:var(--cream); color:var(--navy); padding:2px 10px; border-radius:10px; font-weight:700; margin-inline-end:8px;}
+  .trashRow .tInfo{flex:1; min-width:200px; font-size:.88rem; color:var(--navy);}
+  .trashRow .tDate{font-size:.75rem; color:#8a8a8a; display:block; margin-top:2px;}
+  .trashActions{display:flex; gap:8px;}
+  .restoreBtn{background:var(--teal); color:#fff; border:none; border-radius:8px; padding:8px 14px; font-size:.8rem; font-weight:700; cursor:pointer;}
+  .purgeBtn{background:var(--maroon); color:#fff; border:none; border-radius:8px; padding:8px 14px; font-size:.8rem; font-weight:700; cursor:pointer;}
+
   .studentRow{background:#fff; border:1px solid #e8e0cd; border-radius:12px; padding:16px 18px; margin-bottom:10px;}
   .studentRow .srTop{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:10px;}
   .studentRow .srInfo strong{color:var(--navy); font-size:1rem;}
@@ -719,6 +730,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <button class="adminTab active" data-tab="students">👥 الطلاب (<span id="activeCount">0</span> نشط الآن)</button>
       <button class="adminTab" data-tab="questions">📝 إدارة الأسئلة</button>
       <button class="adminTab" data-tab="roster">📋 متابعة الحصة</button>
+      <button class="adminTab" data-tab="trash">🗑️ سلة المحذوفات</button>
     </div>
 
     <div class="adminPanelBody active" id="tab-students">
@@ -760,6 +772,11 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
         <button class="btn btn-gold" onclick="addRosterStudent(this)" style="height:44px;">➕ إضافة</button>
       </div>
       <div id="rosterList"></div>
+    </div>
+
+    <div class="adminPanelBody" id="tab-trash">
+      <p class="lead" style="margin-bottom:16px;">أي شي تحذفه (سؤال أو طالب متابعة) يجي هنا أول بدل ما ينحذف نهائياً — قدرك ترجعه أو تتخلص منه للأبد.</p>
+      <div id="trashList"></div>
     </div>
   </div>
 </section>
@@ -1482,7 +1499,7 @@ let qIndex = 0;
 
 async function loadQuestions(){
   if(!requireDb()) return;
-  const { data, error } = await supaCall(() => sb.from('questions').select('*').order('id', {ascending:true}));
+  const { data, error } = await supaCall(() => sb.from('questions').select('*').is('deleted_at', null).order('id', {ascending:true}));
   if(error){ console.error('تعذر تحميل الأسئلة:', error); return; }
   QUESTIONS = (data || []).map(r => ({ id:r.id, q:r.q, c:r.choices, a:r.correct_index }));
   renderQuestion(); // نعيد عرض السؤال الأول بعد التحميل
@@ -2094,6 +2111,7 @@ function setAdminActive(active){
     loadQuestionsAdmin();
     loadStudentsList();
     loadRoster();
+    loadTrash();
     document.getElementById('adminPanel').scrollIntoView({behavior:'smooth'});
   }
 }
@@ -2268,7 +2286,7 @@ function renderRosterRow(r){
 
 async function loadRoster(){
   if(!isAdmin || !requireDb()) return;
-  const { data, error } = await sb.from('class_roster').select('*').eq('cls', currentRosterCls).order('student_name');
+  const { data, error } = await sb.from('class_roster').select('*').eq('cls', currentRosterCls).is('deleted_at', null).order('student_name');
   const list = document.getElementById('rosterList');
   if(error){ list.innerHTML = '<p style="color:#8a8a8a;">تعذر تحميل القائمة.</p>'; return; }
   if(!data || data.length === 0){
@@ -2332,9 +2350,57 @@ async function submitWarningNote(){
 }
 
 async function deleteRosterStudent(id){
-  if(!confirm('حذف هذا الطالب من قائمة المتابعة؟ (نقاطه وتنبيهاته بتنحذف نهائياً)')) return;
-  await sb.from('class_roster').delete().eq('id', id);
+  if(!confirm('حذف هذا الطالب من قائمة المتابعة؟ (يروح لسلة المحذوفات، تقدر ترجعه لاحقاً)')) return;
+  await sb.from('class_roster').update({deleted_at: new Date().toISOString()}).eq('id', id);
+  showToast('🗑️ انتقل الطالب لسلة المحذوفات', 'info');
   loadRoster();
+}
+
+// ---------- سلة المحذوفات (خاصة بالمعلم — أسئلة وطلاب متابعة الحصة المحذوفين) ----------
+async function loadTrash(){
+  if(!isAdmin || !requireDb()) return;
+  const list = document.getElementById('trashList');
+  const [qRes, rRes] = await Promise.all([
+    sb.from('questions').select('*').not('deleted_at', 'is', null),
+    sb.from('class_roster').select('*').not('deleted_at', 'is', null),
+  ]);
+  const items = [];
+  (qRes.data || []).forEach(q => items.push({type:'question', id:q.id, label: q.q, deleted_at: q.deleted_at}));
+  (rRes.data || []).forEach(r => items.push({type:'roster', id:r.id, label: `${r.student_name} (${r.cls})`, deleted_at: r.deleted_at}));
+  items.sort((a,b) => new Date(b.deleted_at) - new Date(a.deleted_at));
+
+  if(items.length === 0){
+    list.innerHTML = '<p style="color:#8a8a8a;">السلة فاضية — ما فيه شي محذوف حالياً.</p>';
+    return;
+  }
+  list.innerHTML = items.map(item => `
+    <div class="trashRow">
+      <div class="tInfo">
+        <span class="tType">${item.type === 'question' ? '📝 سؤال' : '📋 طالب متابعة'}</span>${item.label}
+        <span class="tDate">اتحذف بتاريخ ${new Date(item.deleted_at).toLocaleDateString('ar-QA')}</span>
+      </div>
+      <div class="trashActions">
+        <button class="restoreBtn" onclick="restoreItem('${item.type}', ${item.id})">↩️ استرجاع</button>
+        <button class="purgeBtn" onclick="permanentlyDelete('${item.type}', ${item.id})">❌ حذف نهائي</button>
+      </div>
+    </div>`).join('');
+}
+
+async function restoreItem(type, id){
+  const table = type === 'question' ? 'questions' : 'class_roster';
+  await sb.from(table).update({deleted_at: null}).eq('id', id);
+  showToast('✅ تم الاسترجاع بنجاح', 'success');
+  loadTrash();
+  if(type === 'question'){ loadQuestionsAdmin(); loadQuestions(); }
+  else { loadRoster(); }
+}
+
+async function permanentlyDelete(type, id){
+  if(!confirm('⚠️ حذف نهائي — ما راح تقدر ترجعه بعدها إطلاقاً. متأكد؟')) return;
+  const table = type === 'question' ? 'questions' : 'class_roster';
+  await sb.from(table).delete().eq('id', id);
+  showToast('🗑️ تم الحذف النهائي', 'info');
+  loadTrash();
 }
 
 // ---------- تصدير سجل التنبيهات الكامل (كل الصفوف، أي وقت) ----------
@@ -2370,7 +2436,7 @@ async function exportWarningsCSV(){
 // ---------- قسم إدارة الأسئلة ----------
 async function loadQuestionsAdmin(){
   if(!isAdmin || !requireDb()) return;
-  const { data, error } = await sb.from('questions').select('*').order('id', {ascending:true});
+  const { data, error } = await sb.from('questions').select('*').is('deleted_at', null).order('id', {ascending:true});
   const list = document.getElementById('questionsList');
   if(error){ list.innerHTML = '<p style="color:#8a8a8a;">تعذر تحميل الأسئلة.</p>'; return; }
   list.innerHTML = '';
@@ -2409,10 +2475,10 @@ async function addQuestion(btn){
 async function deleteQuestion(id, btn){
   if(!isAdmin) return;
   if(btn){ btn.disabled = true; btn.textContent = '⏳ جاري الحذف...'; btn.style.opacity='.6'; }
-  await sb.from('questions').delete().eq('id', id);
+  await sb.from('questions').update({deleted_at: new Date().toISOString()}).eq('id', id); // حذف مؤقت — يروح لسلة المحذوفات
   loadQuestionsAdmin();
   loadQuestions();
-  showToast('🗑️ تم حذف السؤال', 'info');
+  showToast('🗑️ انتقل السؤال لسلة المحذوفات', 'info');
 }
 
 // ---------- المنقذ: بوت مساعد بمفاهيم المنهج (مبني على معرفة شاملة لكل الفصل الأول، مجاني بالكامل، بدون أي API) ----------
