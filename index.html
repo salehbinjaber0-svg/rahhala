@@ -3700,7 +3700,7 @@ function renderCdQuestion(){
   document.getElementById('cdQuestion').textContent = item.q;
   document.getElementById('cdChoices').innerHTML = item.c.map((choice, i)=> `
     <div class="cdChoice" data-idx="${i}">
-      <span class="cdLetter">${CD_LETTERS[i]}</span><span>${choice}</span>
+      <span class="cdLetter">${CD_LETTERS[i]}</span><span>${esc(choice)}</span>
     </div>`).join('');
 }
 function cdNext(){
@@ -4354,7 +4354,7 @@ function renderMatchGrid(){
   grid.innerHTML = matchCards.map((c, i)=> `
     <div class="matchCard ${c.flipped?'flipped':''} ${c.matched?'matched':''}" onclick="flipMatchCard(${i})">
       <div class="mFace mBack">🃏</div>
-      <div class="mFace mFront">${c.text}</div>
+      <div class="mFace mFront">${esc(c.text)}</div>
     </div>`).join('');
 }
 
@@ -4584,7 +4584,7 @@ document.querySelectorAll('.adminTab').forEach(btn=>{
 function renderPendingPill(r){
   return `
     <div class="pendingPill">
-      <span class="pname">${r.name}</span><span class="pcls">${r.cls}</span>
+      <span class="pname">${esc(r.name)}</span><span class="pcls">${r.cls}</span>
       <button class="pApprove" title="موافقة" onclick="approveStudent('${r.key}', this)">✅</button>
       <button class="pReject" title="رفض" onclick="rejectStudent('${r.key}', this)">❌</button>
     </div>`;
@@ -4640,15 +4640,20 @@ function formatLastSeen(iso){
   return 'قبل ' + Math.floor(diff/3600) + ' ساعة';
 }
 
+// يمنع حقن أي كود ضار عبر أسماء الطلاب أو الملاحظات — أي رمز HTML يُعرض كنص عادي بدل ما يُنفّذ
+function esc(s){
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
 function renderStudentRow(r){
   const diff = r.last_seen ? (Date.now() - new Date(r.last_seen).getTime())/1000 : 9999;
   const isActive = diff < ACTIVE_THRESHOLD_SEC;
-  const noteVal = (r.admin_note || '').replace(/"/g,'&quot;');
+  const noteVal = esc(r.admin_note || '');
   return `
     <div class="studentRow">
       <div class="srTop">
         <div class="srInfo">
-          <strong>${r.name}</strong> — ${r.cls}
+          <strong>${esc(r.name)}</strong> — ${esc(r.cls)}
           <span>${r.points} نقطة · وقت الاستخدام: ${formatDuration(r.total_seconds)} · ${formatLastSeen(r.last_seen)}</span>
         </div>
         <div class="srActions">
@@ -4708,6 +4713,7 @@ function switchRosterClass(cls, btn){
 }
 
 let warningsCache = {}; // roster_id -> [{note, created_at}, ...] لآخر تحميل، يُستخدم بالتصدير وعرض آخر تنبيه
+let rosterNameCache = {}; // roster_id -> اسم الطالب، يُستخدم بنافذة التنبيه بدون حقن الاسم بكود HTML
 
 function renderRosterRow(r){
   const wList = warningsCache[r.id] || [];
@@ -4716,14 +4722,14 @@ function renderRosterRow(r){
   const lastWarning = wList[0]; // مرتبة الأحدث أول
   const warnLabel = warnCount > 0 ? `⚠️ ${warnCount} تنبيه` : '✅ لا يوجد تنبيه';
   const lastNoteHtml = lastWarning
-    ? `<div class="lastWarnNote">آخر تنبيه (${new Date(lastWarning.created_at).toLocaleDateString('ar-QA')}): ${lastWarning.note}</div>`
+    ? `<div class="lastWarnNote">آخر تنبيه (${new Date(lastWarning.created_at).toLocaleDateString('ar-QA')}): ${esc(lastWarning.note)}</div>`
     : '';
   return `
     <div class="rosterRow">
-      <div class="rName">${r.student_name}</div>
+      <div class="rName">${esc(r.student_name)}</div>
       <div class="rosterStats">
         <div class="rStat points">⭐ ${r.participation_points} <button onclick="addParticipationPoint(${r.id}, this)" title="أضف نقطة مشاركة">➕</button></div>
-        <div class="rStat ${warnClass}">${warnLabel} <button onclick="openWarningModal(${r.id}, '${r.student_name.replace(/'/g,"\\'")}')" title="أضف تنبيه">➕</button></div>
+        <div class="rStat ${warnClass}">${warnLabel} <button onclick="openWarningModal(${r.id})" title="أضف تنبيه">➕</button></div>
         <button class="rDelete" onclick="deleteRosterStudent(${r.id})" title="حذف الطالب من القائمة">🗑️</button>
       </div>
       ${lastNoteHtml}
@@ -4747,6 +4753,8 @@ async function loadRoster(){
     if(!warningsCache[w.roster_id]) warningsCache[w.roster_id] = [];
     warningsCache[w.roster_id].push(w);
   });
+  rosterNameCache = {};
+  data.forEach(r=>{ rosterNameCache[r.id] = r.student_name; }); // نحفظ الأسماء بأمان بدل تمريرها داخل كود HTML
   list.innerHTML = data.map(renderRosterRow).join('');
 }
 async function addRosterStudent(btn){
@@ -4770,9 +4778,10 @@ async function addParticipationPoint(id, btn){
 // ---------- تنبيهات بملاحظة وتاريخ ----------
 let warningTargetId = null;
 
-function openWarningModal(rosterId, studentName){
+function openWarningModal(rosterId){
   warningTargetId = rosterId;
-  document.getElementById('warningModalStudentName').textContent = `تنبيه للطالب: ${studentName}`;
+  const studentName = rosterNameCache[rosterId] || '';
+  document.getElementById('warningModalStudentName').textContent = `تنبيه للطالب: ${studentName}`; // textContent آمن تلقائياً — يعرض أي رمز كنص عادي
   document.getElementById('warningNoteInput').value = '';
   document.getElementById('warningModal').classList.add('show');
 }
@@ -4822,7 +4831,7 @@ async function loadTrash(){
   list.innerHTML = items.map(item => `
     <div class="trashRow">
       <div class="tInfo">
-        <span class="tType">${item.type === 'question' ? '📝 سؤال' : '📋 طالب متابعة'}</span>${item.label}
+        <span class="tType">${item.type === 'question' ? '📝 سؤال' : '📋 طالب متابعة'}</span>${esc(item.label)}
         <span class="tDate">اتحذف بتاريخ ${new Date(item.deleted_at).toLocaleDateString('ar-QA')}</span>
       </div>
       <div class="trashActions">
@@ -4891,7 +4900,7 @@ async function loadQuestionsAdmin(){
     row.className = 'qRow';
     const choicesHtml = r.choices.map((c,i)=> i===r.correct_index ? `<span class="correctChoice">${c} ✓</span>` : c).join(' · ');
     row.innerHTML = `
-      <div class="qtext">${r.q}</div>
+      <div class="qtext">${esc(r.q)}</div>
       <div class="qchoices">${choicesHtml}</div>
       <button class="miniBtn reject" onclick="deleteQuestion(${r.id}, this)">🗑️ حذف</button>`;
     list.appendChild(row);
