@@ -2634,6 +2634,50 @@ var qrcode = function() {
     transition:transform .2s, box-shadow .2s;
   }
   .card:hover{transform:translateY(-2px); box-shadow:0 8px 26px rgba(16,48,63,.11);}
+
+  /* بطاقة تعريف المعلم */
+  .teacherCard{
+    background:#fff; border:1px solid #ece5d4; border-radius:20px;
+    box-shadow:var(--shadow-soft); overflow:hidden; margin-top:22px;
+  }
+  .tcHeader{
+    background:var(--grad-navy); color:var(--cream); padding:30px 28px;
+    display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+    border-bottom:3px solid var(--gold);
+  }
+  .tcAvatar{
+    width:74px; height:74px; border-radius:50%; background:var(--grad-gold);
+    display:flex; align-items:center; justify-content:center; font-size:2.1rem;
+    flex-shrink:0; box-shadow:0 4px 14px rgba(0,0,0,.25);
+  }
+  .tcIntro{flex:1; min-width:210px;}
+  .tcName{font-family:'Aref Ruqaa'; font-size:1.75rem; color:var(--gold-light); line-height:1.3;}
+  .tcRole{font-size:.88rem; opacity:.8; margin-bottom:12px;}
+  .tcChips{display:flex; flex-wrap:wrap; gap:8px;}
+  .tcChip{
+    background:rgba(255,255,255,.1); border:1px solid rgba(201,161,94,.4);
+    color:var(--cream); padding:5px 13px; border-radius:20px; font-size:.76rem; font-weight:700;
+  }
+  .tcQuote{
+    font-family:'Aref Ruqaa'; font-size:1.15rem; color:var(--navy); text-align:center;
+    padding:24px 28px 4px; line-height:1.9;
+  }
+  .tcGrid{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr));
+    gap:16px; padding:22px 28px;
+  }
+  .tcBlock{
+    background:var(--cream); border-radius:14px; padding:20px 18px;
+    border-inline-start:3px solid var(--gold);
+  }
+  .tcIcon{font-size:1.5rem; margin-bottom:8px;}
+  .tcBlock h4{color:var(--navy); font-size:1rem; margin-bottom:7px;}
+  .tcBlock p{font-size:.87rem; color:#4d5f65; line-height:1.8;}
+  .tcVision{
+    background:var(--cream); border-top:1px solid #ece5d4;
+    padding:22px 28px; font-size:.92rem; line-height:1.9; color:#3d4e54;
+  }
+  .tcVision strong{color:var(--navy); display:block; margin-bottom:5px; font-size:1rem;}
   .card h3{font-size:1.2rem; margin-bottom:8px; color:var(--navy);}
   .card p{font-size:.92rem; color:#5c6a6e;}
   .unit-num{
@@ -3163,9 +3207,53 @@ var qrcode = function() {
 </section>
 
 <section id="about">
-  <div class="wrap" style="max-width:700px;">
+  <div class="wrap" style="max-width:860px;">
     <h2>عن المعلم</h2>
-    <p class="lead">معلم دراسات اجتماعية في قطر، بنى هذه المنصة لجعل المراجعة تجربة يقبل عليها الطلاب بدل أن يهربوا منها — رؤية تجمع بين المتعة والتعلم الحقيقي.</p>
+
+    <div class="teacherCard">
+      <div class="tcHeader">
+        <div class="tcAvatar">👨‍🏫</div>
+        <div class="tcIntro">
+          <div class="tcName">الأستاذ صالح بن جابر</div>
+          <div class="tcRole">معلم الدراسات الاجتماعية · الصف السابع</div>
+          <div class="tcChips">
+            <span class="tcChip">🎓 خريج جامعة قطر · 2022</span>
+            <span class="tcChip">🧭 قيادة وإدارة</span>
+            <span class="tcChip">🤖 توظيف الذكاء الاصطناعي</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="tcQuote">«التعلّم رحلة لا تتوقف — وأجمل ما فيها أن تأخذ غيرك معك.»</p>
+
+      <div class="tcGrid">
+        <div class="tcBlock">
+          <div class="tcIcon">📚</div>
+          <h4>الجانب التربوي أولاً</h4>
+          <p>يضع بناء الإنسان قبل تلقين المعلومة، ويؤمن أن أثر المعلم الحقيقي يُقاس بما يبقى في الطالب بعد انتهاء الحصة.</p>
+        </div>
+        <div class="tcBlock">
+          <div class="tcIcon">🌱</div>
+          <h4>تعلّم مستمر</h4>
+          <p>يقضي معظم وقته في التطوير الذاتي والاطلاع الدائم، ثم ينقل ما تعلّمه لزملائه وطلابه بدل أن يحتفظ به لنفسه.</p>
+        </div>
+        <div class="tcBlock">
+          <div class="tcIcon">💡</div>
+          <h4>سبّاق للتقنية</h4>
+          <p>يرى في الذكاء الاصطناعي فرصة لا تُفوَّت، فوظّفه لتسهيل عمله وعمل الآخرين — وهذه المنصة إحدى ثمار ذلك.</p>
+        </div>
+        <div class="tcBlock">
+          <div class="tcIcon">🧭</div>
+          <h4>خبرة قيادية</h4>
+          <p>رصيد من الخبرات في القيادة والإدارة، يوظّفها في تنظيم بيئة صفّية محفّزة تجمع بين الانضباط والمتعة.</p>
+        </div>
+      </div>
+
+      <div class="tcVision">
+        <strong>لماذا «رحّالة»؟</strong>
+        بُنيت هذه المنصة لتجعل المراجعة تجربة يُقبل عليها الطالب بدل أن يهرب منها — رحلة يكتشف فيها منهجه بنفسه، بين المتعة والتعلّم الحقيقي.
+      </div>
+    </div>
   </div>
 </section>
 
@@ -3177,7 +3265,6 @@ var qrcode = function() {
     <button class="btn btn-gold" style="margin-bottom:24px;" onclick="openClassDisplay()">🖥️ ابدأ وضع العرض الجماعي للحصة</button>
     <button class="btn" style="margin-bottom:24px; margin-inline-start:10px; background:transparent; border:2px solid var(--navy); color:var(--navy);" onclick="openReport()">📊 تقرير الأداء الأسبوعي</button>
     <button class="btn" style="margin-bottom:24px; margin-inline-start:10px; background:transparent; border:2px solid var(--navy); color:var(--navy);" onclick="showSiteQR()">📱 رمز QR للموقع</button>
-    <button class="btn" style="margin-bottom:24px; margin-inline-start:10px; background:transparent; border:2px solid var(--navy); color:var(--navy);" onclick="showQRCode()">📱 رمز QR للموقع</button>
 
     <div class="adminTabs">
       <button class="adminTab active" data-tab="students">👥 الطلاب (<span id="activeCount">0</span> نشط الآن)</button>
@@ -3277,16 +3364,6 @@ var qrcode = function() {
     <h3>رمز QR لموقع رحّالة</h3>
     <p class="sub">امسحه بكاميرا أي جوال ليوصل الموقع مباشرة</p>
     <div id="qrCodeHolder" style="display:flex; justify-content:center; margin:16px 0;"></div>
-    <p style="font-size:.8rem; color:#8a8a8a; word-break:break-all;">salehbinjaber0-svg.github.io/rahhala</p>
-  </div>
-</div>
-
-<div class="modalBg" id="qrModal">
-  <div class="modal" style="text-align:center;">
-    <button class="modalClose" onclick="document.getElementById('qrModal').classList.remove('show')" title="إغلاق">✕</button>
-    <h3>رمز QR للموقع</h3>
-    <p class="sub">اعرضه على شاشة الصف، والطلاب يمسحونه بكاميرا الجوال ليدخلوا الموقع مباشرة</p>
-    <div id="qrImageBox" style="margin:16px 0;"></div>
     <p style="font-size:.8rem; color:#8a8a8a; word-break:break-all;">salehbinjaber0-svg.github.io/rahhala</p>
   </div>
 </div>
@@ -7859,22 +7936,6 @@ const createDataURL = function(width, height, getPixel) {
 
 
 // ---------- رمز QR (يستخدم المكتبة المضمّنة بالأسفل) ----------
-function showQRCode(){
-  const box = document.getElementById('qrImageBox');
-  try{
-    const qr = qrcode(0, 'M');
-    qr.addData('https://salehbinjaber0-svg.github.io/rahhala');
-    qr.make();
-    box.innerHTML = `<img src="${qr.createDataURL(8, 4)}" alt="QR رابط الموقع" style="border-radius:10px;">`;
-  } catch(e){
-    box.innerHTML = '<p style="color:var(--maroon);">تعذر توليد الرمز.</p>';
-  }
-  document.getElementById('qrModal').classList.add('show');
-}
-document.getElementById('qrModal').addEventListener('click', (e)=>{
-  if(e.target.id === 'qrModal') e.target.classList.remove('show');
-});
-
 // ---------- init ----------
 renderQuestion();
 renderEnergy();
