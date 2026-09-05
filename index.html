@@ -4480,6 +4480,7 @@ function startPolling(){
   refreshClassChallenge();
   if(pollTimer) clearInterval(pollTimer);
   pollTimer = setInterval(()=>{
+    if(document.hidden) return; // التبويب مخفي — نوقف الاستعلامات، يوفّر بطارية وبيانات الطالب
     refreshLeaderboard();
     refreshClassChallenge();
     refreshMyState();
@@ -4489,6 +4490,15 @@ function startPolling(){
     }
   }, 5000);
 }
+
+// أول ما يرجع الطالب للتبويب، نحدّث فوراً بدل ما ينتظر دورة كاملة
+document.addEventListener('visibilitychange', ()=>{
+  if(!document.hidden && sb){
+    refreshLeaderboard();
+    refreshClassChallenge();
+    refreshMyState();
+  }
+});
 
 // ---------- admin (لوحة المعلم — منفصلة تماماً عن نظام دخول الطلاب) ----------
 function openAdminLogin(){
