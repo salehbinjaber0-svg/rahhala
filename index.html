@@ -6036,7 +6036,7 @@ function buildCurriculumCorpus(){
   });
   return corpus;
 }
-function searchCurriculumDeep(qTokens){
+function searchCurriculumDeep(qTokens, boostWords){
   if(!CURRICULUM_CORPUS) CURRICULUM_CORPUS = buildCurriculumCorpus();
   const meaningfulTokens = qTokens.filter(t => t.length >= 3); // نتجاهل كلمات الربط القصيرة (عن، في، من...) اللي ما تحمل معنى بحثي
   if(meaningfulTokens.length === 0) return null;
@@ -6046,6 +6046,12 @@ function searchCurriculumDeep(qTokens){
     meaningfulTokens.forEach(qt=>{
       if(chunk.tokens.some(ct => wordsClose(ct, qt))) score++;
     });
+    // لأسئلة السبب: نرجّح المقاطع اللي فيها كلمات تعليل (بسبب، لأن، أدى...)
+    if(boostWords && score >= meaningfulTokens.length){
+      const hits = boostWords.filter(bw => chunk.text.includes(bw)).length;
+      if(hits === 0) return; // ما فيه تعليل — نتجاهله بهذا الوضع
+      score += hits * 0.5;
+    }
     if(score > bestScore){ bestScore = score; best = chunk; }
   });
   // لازم يطابق كل كلمات السؤال المهمة (أو كلها إذا سؤال قصير) عشان نثق بالنتيجة
@@ -6063,6 +6069,38 @@ function pageRef(unit){
 
 let lastTopic = null; // آخر مفهوم فهمه المنقذ، عشان يفهم أسئلة المتابعة القصيرة
 
+// ردود تحفيزية للطالب المحبط — الصمت أسوأ رد ممكن بهذي اللحظة
+const ENCOURAGE_PATTERNS = ['مو فاهم','ما فهمت','مافهمت','صعب','تعبت','ما اقدر','مااقدر','زهقت','مليت','محتار','ضايع','خايف','قلقان'];
+const ENCOURAGE_REPLIES = [
+  'عادي جداً تحس كذا 💙 المنهج فيه مفاهيم تحتاج وقت. خلّنا نبدأ بخطوة صغيرة: اسألني عن أي مفهوم واحد بس، وبشرحه لك ببساطة.',
+  'لا تشيل هم! 🌟 كل طالب يمر بهذا الإحساس. جرّب تسألني عن أصعب نقطة عندك بالضبط، وبفصّلها لك خطوة خطوة.',
+  'أنا معك خطوة بخطوة 💪 قولّي أي وحدة أو درس تحس إنه أصعب شي، ونبدأ منه.',
+];
+
+// طلب ملخص وحدة كاملة
+function tryUnitSummary(query){
+  const arabicNums = {'الاولى':1,'الأولى':1,'اولى':1,'1':1,'الثانية':2,'ثانية':2,'2':2,'الثالثة':3,'ثالثة':3,'3':3,
+                      'الرابعة':4,'رابعة':4,'4':4,'الخامسة':5,'خامسة':5,'5':5,'السادسة':6,'سادسة':6,'6':6};
+  const wantsSummary = /ملخص|لخص|اختصر|خلاصة|نبذة|عن الوحدة|ايش في الوحدة|وش في الوحدة/.test(query);
+  if(!wantsSummary) return null;
+  let unitNum = null;
+  for(const [word, num] of Object.entries(arabicNums)){
+    if(query.includes(word)){ unitNum = num; break; }
+  }
+  if(!unitNum){
+    // ما حدد وحدة — نعرض القائمة عليه
+    const list = Object.keys(UNITS_DATA).map(n => `${n}. ${UNITS_DATA[n].title}`).join('\n');
+    return { text: 'أي وحدة تبي ملخصها؟ 📚\n\n' + list + '\n\nاكتب مثلاً: "ملخص الوحدة الثانية"', chips: [] };
+  }
+  const u = UNITS_DATA[unitNum];
+  if(!u) return null;
+  const lessons = u.lessons.map(l => `• ${l.title.replace(/^الدرس (الأول|الثاني): /, '')} (ص ${l.pages})`).join('\n');
+  return {
+    text: `📚 ملخص الوحدة ${unitNum}: ${u.title}\nالمادة: ${u.subject} · صفحات ${u.pages}\n\nالدروس:\n${lessons}\n\nاسألني عن أي مفهوم بهذي الوحدة وبشرحه لك بالتفصيل.`,
+    chips: []
+  };
+}
+
 function matchKnowledge(query){
   const qTokens = tokenize(query);
 
@@ -6072,6 +6110,15 @@ function matchKnowledge(query){
     if(lastTopic.extra) return { text: lastTopic.extra, chips: [] };
     return { text: 'خلّني أوضح أكثر: ' + lastTopic.a, chips: [] };
   }
+
+  // طالب محبط أو محتار — نشجّعه بدل ما نصمت
+  if(ENCOURAGE_PATTERNS.some(p => query.includes(p))){
+    return { text: ENCOURAGE_REPLIES[Math.floor(Math.random()*ENCOURAGE_REPLIES.length)], chips: [] };
+  }
+
+  // طلب ملخص وحدة
+  const summary = tryUnitSummary(query);
+  if(summary) return summary;
 
   const scored = KNOWLEDGE_BASE.map(entry => ({ entry, ...scoreEntry(entry, qTokens) }));
   const fullMatches = scored.filter(s => s.full).sort((a,b)=> b.score - a.score);
@@ -6103,13 +6150,42 @@ function matchKnowledge(query){
     return { text: `"${deep.text}"\n📄 صفحة ${deep.pages} بالكتاب`, chips: [] };
   }
 
+  // أسئلة السبب ("ليش سقطت الدولة العباسية") — نجرّد أداة الاستفهام وندوّر عن التعليل بنص المنهج
+  const whyWords = ['ليش','لماذا','لمذا','ليه','وش السبب','ماسبب','ما سبب','اسباب','أسباب','سبب','علل','بم تفسر'];
+  const isWhy = whyWords.some(w => query.includes(w));
+  if(isWhy){
+    const stripped = query;
+    let cleaned = stripped;
+    whyWords.forEach(w => { cleaned = cleaned.split(w).join(' '); });
+    const causalTokens = tokenize(cleaned);
+    if(causalTokens.length > 0){
+      // ندوّر عن جملة تجمع الموضوع مع كلمة تعليل
+      const causal = searchCurriculumDeep(causalTokens, ['بسبب','لأن','يعود','نتيجة','أدى','ضعف','سقوط','عوامل','أسباب']);
+      if(causal){
+        lastTopic = { a: causal.text, extra: null };
+        return { text: `${causal.text}\n📄 صفحة ${causal.pages} بالكتاب`, chips: [] };
+      }
+      // ما لقينا تعليل مباشر — نرجع لأقرب مفهوم بالموضوع نفسه
+      const byTopic = searchCurriculumDeep(causalTokens);
+      if(byTopic){
+        lastTopic = { a: byTopic.text, extra: null };
+        return { text: `${byTopic.text}\n📄 صفحة ${byTopic.pages} بالكتاب`, chips: [] };
+      }
+    }
+  }
+
   // ما فيه تطابق كامل — نقترح أقرب المواضيع بدل ما نسكت
   const partial = scored.filter(s => s.score > 0).sort((a,b)=> b.score - a.score).slice(0,3);
   if(partial.length > 0){
     const chips = partial.map(p => p.entry.k[0]);
     return { text: 'ما لقيت جواب دقيق 🤔 يمكن تقصد أحد هذي المواضيع:', chips };
   }
-  return null;
+
+  // خارج نطاق المنهج تماماً — نوجّهه بلطف بدل الصمت
+  return {
+    text: 'هذا السؤال خارج منهج الدراسات الاجتماعية للصف السابع 📘\nأنا متخصص بمنهجك: المناخ، حضارة الرافدين، السلطات الدستورية، السكان، الدولة العباسية، والأمن الوطني.\n\nجرّب تسألني عن أي مفهوم منها!',
+    chips: ['المناخ', 'حمورابي', 'مجلس الشورى', 'الأمن الوطني']
+  };
 }
 
 function addChatMsg(sender, html){
