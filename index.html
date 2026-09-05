@@ -2844,6 +2844,26 @@ var qrcode = function() {
   .energyDot{width:14px; height:14px; border-radius:3px; background:rgba(255,255,255,.15);}
   .energyDot.filled{background:var(--gold);}
 
+  #orderList{max-width:560px; margin:0 auto; display:flex; flex-direction:column; gap:10px;}
+  .orderItem{
+    background:#fff; border:1.5px solid #e8e0cd; border-radius:12px; padding:14px 16px;
+    display:flex; align-items:center; gap:12px; transition:.25s;
+  }
+  .orderItem .oNum{
+    width:30px; height:30px; border-radius:50%; background:var(--grad-navy); color:var(--gold-light);
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.85rem; flex-shrink:0;
+  }
+  .orderItem .oText{flex:1; font-size:.9rem; color:var(--navy); font-weight:700; text-align:right;}
+  .orderItem .oMoves{display:flex; flex-direction:column; gap:3px;}
+  .orderItem .oMoves button{
+    background:var(--cream); border:1px solid #dcd4c0; border-radius:6px; cursor:pointer;
+    width:30px; height:22px; font-size:.7rem; line-height:1; color:var(--navy);
+  }
+  .orderItem .oMoves button:hover:not(:disabled){background:var(--gold-light);}
+  .orderItem .oMoves button:disabled{opacity:.3; cursor:not-allowed;}
+  .orderItem.correctPos{background:#eaf4f1; border-color:var(--teal);}
+  .orderItem.wrongPos{background:#fbe9e9; border-color:var(--maroon);}
+
   #matchGrid{
     display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; max-width:420px; margin:0 auto;
   }
@@ -3148,6 +3168,7 @@ var qrcode = function() {
         <button class="gtab active" data-panel="quiz">🧠 مراجعة سريعة</button>
         <button class="gtab" data-panel="fun">⚽ ركلات الترجيح</button>
         <button class="gtab" data-panel="match">🃏 لعبة المطابقة</button>
+        <button class="gtab" data-panel="order">📜 رتّب الأحداث</button>
       </div>
 
       <div id="energyBar">⚡ طاقتك: <span id="energyDots"></span> (<span id="energyNum">0</span>)</div>
@@ -3179,6 +3200,17 @@ var qrcode = function() {
         <div id="matchGrid"></div>
         <div style="text-align:center; margin-top:16px;">
           <button class="btn btn-gold" onclick="startMatchGame()">🔄 جولة جديدة</button>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-order">
+        <p style="text-align:center; color:#5c6a6e; margin-bottom:14px;">رتّب البطاقات بالتسلسل الصحيح — استخدم الأسهم لتحريك كل بطاقة، وبعدين تحقق من إجابتك.</p>
+        <div id="orderTopic" style="text-align:center; font-weight:700; color:var(--navy); margin-bottom:14px;"></div>
+        <div id="orderList"></div>
+        <div id="orderStatus" style="text-align:center; font-weight:700; margin:14px 0;"></div>
+        <div style="text-align:center; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+          <button class="btn btn-gold" onclick="checkOrder()">✅ تحقق من ترتيبي</button>
+          <button class="btn" style="background:transparent; border:2px solid var(--navy); color:var(--navy);" onclick="startOrderGame()">🔄 جولة جديدة</button>
         </div>
       </div>
     </div>
@@ -4482,6 +4514,10 @@ document.querySelectorAll('.gtab').forEach(btn=>{
     document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('panel-'+btn.dataset.panel).classList.add('active');
+    // نبدأ جولة تلقائياً أول ما يفتح تبويب الترتيب، بدل ما يشوف لوحة فاضية
+    if(btn.dataset.panel === 'order' && !orderCurrent && document.getElementById('orderList').innerHTML === ''){
+      startOrderGame();
+    }
   });
 });
 
@@ -4633,6 +4669,91 @@ function shuffleArray(arr){
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+// ---------- لعبة ترتيب الأحداث — تسلسلات حقيقية من المنهج ----------
+const ORDER_SETS = [
+  {
+    topic: 'رتّب دول بلاد الرافدين من الأقدم إلى الأحدث',
+    items: ['الدولة السومرية', 'الدولة الأكدية', 'الدولة البابلية الأولى', 'الدولة الآشورية', 'الدولة الكلدانية (البابلية الحديثة)'],
+  },
+  {
+    topic: 'رتّب خلفاء الدولة العباسية من الأقدم إلى الأحدث',
+    items: ['أبو جعفر المنصور', 'هارون الرشيد', 'المأمون', 'المعتصم بالله'],
+  },
+  {
+    topic: 'رتّب مراحل تكوّن المطر بالترتيب الصحيح',
+    items: ['تسخين الشمس لمياه البحار', 'تبخّر الماء وصعوده', 'تكاثف البخار وتكوّن السحب', 'سقوط المطر'],
+  },
+  {
+    topic: 'رتّب خطوات صدور القانون في دولة قطر',
+    items: ['اقتراح مشروع القانون', 'مناقشته في مجلس الشورى', 'إقراره من المجلس', 'مصادقة الأمير عليه', 'نشره في الجريدة الرسمية'],
+  },
+];
+
+let orderCurrent = null;   // {topic, correct:[...]}
+let orderArrangement = []; // ترتيب الطالب الحالي
+
+function startOrderGame(){
+  if(!requireApproved()) return;
+  const set = ORDER_SETS[Math.floor(Math.random() * ORDER_SETS.length)];
+  orderCurrent = { topic: set.topic, correct: [...set.items] };
+  // نخلط الترتيب، ونتأكد ما يطلع مرتّب صح بالصدفة
+  do {
+    orderArrangement = shuffleArray(set.items);
+  } while (orderArrangement.every((v, i) => v === set.items[i]));
+  document.getElementById('orderTopic').textContent = set.topic;
+  document.getElementById('orderStatus').textContent = '';
+  renderOrderList();
+}
+
+function renderOrderList(showResult){
+  const box = document.getElementById('orderList');
+  box.innerHTML = orderArrangement.map((text, i)=>{
+    let cls = '';
+    if(showResult) cls = (text === orderCurrent.correct[i]) ? 'correctPos' : 'wrongPos';
+    return `
+      <div class="orderItem ${cls}">
+        <span class="oNum">${i + 1}</span>
+        <span class="oText">${esc(text)}</span>
+        <span class="oMoves">
+          <button onclick="moveOrderItem(${i}, -1)" ${i === 0 ? 'disabled' : ''} title="لأعلى">▲</button>
+          <button onclick="moveOrderItem(${i}, 1)" ${i === orderArrangement.length - 1 ? 'disabled' : ''} title="لأسفل">▼</button>
+        </span>
+      </div>`;
+  }).join('');
+}
+
+function moveOrderItem(index, dir){
+  const target = index + dir;
+  if(target < 0 || target >= orderArrangement.length) return;
+  [orderArrangement[index], orderArrangement[target]] = [orderArrangement[target], orderArrangement[index]];
+  document.getElementById('orderStatus').textContent = '';
+  renderOrderList();
+}
+
+function checkOrder(){
+  if(!orderCurrent){ startOrderGame(); return; }
+  if(!requireApproved()) return;
+  const correctCount = orderArrangement.filter((v, i) => v === orderCurrent.correct[i]).length;
+  const total = orderCurrent.correct.length;
+  const status = document.getElementById('orderStatus');
+  renderOrderList(true);
+
+  if(correctCount === total){
+    state.points += 20;
+    status.textContent = '🎉 ممتاز! الترتيب صحيح بالكامل — +20 نقطة';
+    status.style.color = 'var(--teal)';
+    playSound('correct');
+    const newly = checkBadges();
+    persist();
+    if(newly.length) celebrateBadges(newly);
+    orderCurrent = null; // نمنع تكرار النقاط لنفس الجولة
+  } else {
+    status.textContent = `${correctCount} من ${total} في مكانها الصحيح — الأخضر صح والأحمر يحتاج تعديل`;
+    status.style.color = 'var(--maroon)';
+    playSound('wrong');
+  }
 }
 
 function startMatchGame(){
