@@ -4432,8 +4432,18 @@ function renderQuestion(){
     box.appendChild(b);
   });
 }
+// بوابة موحّدة: ما أحد يلعب إلا بعد تسجيل الدخول + موافقتك الشخصية عليه
+function requireApproved(){
+  if(!state){ openLogin(); return false; }
+  if(state.status !== 'approved'){
+    showToast('⏳ حسابك بانتظار موافقة المعلم — ما تقدر تلعب قبل الموافقة', 'error');
+    return false;
+  }
+  return true;
+}
+
 function answer(i, correctIdx, btn, box, questionId){
-  if(!state){ openLogin(); return; }
+  if(!requireApproved()) return;
   [...box.children].forEach(c=>c.onclick=null);
   const fb = document.getElementById('quizFeedback');
   const isCorrect = (i === correctIdx);
@@ -4479,7 +4489,7 @@ function renderEnergy(){
   }
 }
 function shoot(dir){
-  if(!state){ openLogin(); return; }
+  if(!requireApproved()) return;
   if(state.energy <= 0){
     document.getElementById('funFeedback').textContent = '⚡ ما عندك طاقة كافية — جاوب أسئلة المراجعة لتكسب طاقة!';
     document.getElementById('funFeedback').style.color = '#e3c98b';
@@ -4537,7 +4547,7 @@ function shuffleArray(arr){
 }
 
 function startMatchGame(){
-  if(!state){ openLogin(); return; }
+  if(!requireApproved()) return;
   if(state.energy <= 0){
     document.getElementById('matchStatus').textContent = '⚡ ما عندك طاقة كافية — جاوب أسئلة المراجعة لتكسب طاقة!';
     return;
@@ -4721,11 +4731,18 @@ document.getElementById('adminLoginModal').addEventListener('click', (e)=>{
   if(e.target.id === 'adminLoginModal') closeAdminLogin();
 });
 
+// البريد الوحيد المصرّح له بصلاحيات المعلم — أي حساب آخر يُرفض حتى لو نجح تسجيل دخوله
+const ADMIN_EMAIL = 'saleh@rahhala.app';
+
 async function checkAdminSession(){
   if(!requireDb()) return;
   const { data } = await sb.auth.getSession();
-  if(data && data.session){
+  // لازم نتأكد إن الجلسة المحفوظة تخص حساب المعلم تحديداً — مو أي حساب مسجّل
+  const email = (data?.session?.user?.email || '').toLowerCase();
+  if(data && data.session && email === ADMIN_EMAIL.toLowerCase()){
     setAdminActive(true);
+  } else if(data && data.session){
+    await sb.auth.signOut(); // جلسة لحساب غير مصرّح به — ننهيها فوراً
   }
 }
 
@@ -4737,12 +4754,21 @@ async function adminLogin(btn){
   errBox.style.display = 'none';
   if(!email || !pass){ errBox.textContent = 'الرجاء إدخال البريد وكلمة المرور'; errBox.style.display='block'; return; }
   setBtnLoading(btn, true, 'جاري الدخول...');
-  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
   setBtnLoading(btn, false);
   if(error){
     errBox.textContent = 'بيانات الدخول غير صحيحة';
     errBox.style.display = 'block';
     showToast('❌ فشل تسجيل الدخول — تأكد من البريد وكلمة المرور', 'error');
+    return;
+  }
+  // حتى لو نجح تسجيل الدخول، نتأكد إنه حساب المعلم المصرّح به تحديداً
+  const signedInEmail = (data?.user?.email || '').toLowerCase();
+  if(signedInEmail !== ADMIN_EMAIL.toLowerCase()){
+    await sb.auth.signOut(); // نطرده فوراً — ما نخليه بجلسة مفتوحة
+    errBox.textContent = 'هذا الحساب غير مصرّح له بالدخول للوحة المعلم';
+    errBox.style.display = 'block';
+    showToast('🚫 حساب غير مصرّح به', 'error');
     return;
   }
   closeAdminLogin();
