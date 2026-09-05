@@ -5345,6 +5345,7 @@ document.getElementById('bulkNames').addEventListener('input', (e)=>{
 });
 
 async function addRosterStudent(btn){
+  if(!isAdmin || !requireDb()) return;
   const input = document.getElementById('newRosterName');
   const name = input.value.trim();
   if(!name){ showToast('اكتب اسم الطالب أول', 'error'); return; }
@@ -5356,6 +5357,7 @@ async function addRosterStudent(btn){
   loadRoster();
 }
 async function addParticipationPoint(id, btn){
+  if(!isAdmin || !requireDb()) return;
   if(btn){ btn.disabled = true; }
   const { data } = await sb.from('class_roster').select('participation_points').eq('id', id).maybeSingle();
   await sb.from('class_roster').update({participation_points: (data?.participation_points || 0) + 1}).eq('id', id);
@@ -5407,6 +5409,7 @@ const NOTE_TEMPLATES = {
 };
 
 function openNoteModal(rosterId, kind){
+  if(!isAdmin) return;
   warningTargetId = rosterId;
   noteKind = kind || 'warning';
   const studentName = rosterNameCache[rosterId] || '';
@@ -5430,6 +5433,7 @@ document.getElementById('warningModal').addEventListener('click', (e)=>{
 });
 
 async function submitWarningNote(){
+  if(!isAdmin || !requireDb()) return;
   const note = document.getElementById('warningNoteInput').value.trim();
   if(!note){ showToast('اكتب الملاحظة أول (أو اختر قالباً جاهزاً)', 'error'); return; }
   if(!warningTargetId) return;
@@ -5442,6 +5446,7 @@ async function submitWarningNote(){
 }
 
 async function deleteRosterStudent(id){
+  if(!isAdmin || !requireDb()) return;
   if(!confirm('حذف هذا الطالب من قائمة المتابعة؟ (يروح لسلة المحذوفات، تقدر ترجعه لاحقاً)')) return;
   await sb.from('class_roster').update({deleted_at: new Date().toISOString()}).eq('id', id);
   showToast('🗑️ انتقل الطالب لسلة المحذوفات', 'info');
@@ -5479,6 +5484,7 @@ async function loadTrash(){
 }
 
 async function restoreItem(type, id){
+  if(!isAdmin || !requireDb()) return;
   const table = type === 'question' ? 'questions' : 'class_roster';
   await sb.from(table).update({deleted_at: null}).eq('id', id);
   showToast('✅ تم الاسترجاع بنجاح', 'success');
@@ -5488,6 +5494,7 @@ async function restoreItem(type, id){
 }
 
 async function permanentlyDelete(type, id){
+  if(!isAdmin || !requireDb()) return;
   if(!confirm('⚠️ حذف نهائي — ما راح تقدر ترجعه بعدها إطلاقاً. متأكد؟')) return;
   const table = type === 'question' ? 'questions' : 'class_roster';
   await sb.from(table).delete().eq('id', id);
@@ -5497,7 +5504,7 @@ async function permanentlyDelete(type, id){
 
 // ---------- تصدير سجل التنبيهات الكامل (كل الصفوف، أي وقت) ----------
 async function exportWarningsCSV(){
-  if(!requireDb()) return;
+  if(!isAdmin || !requireDb()) return;
   const { data, error } = await sb
     .from('roster_warnings')
     .select('note, kind, created_at, class_roster(student_name, cls)')
