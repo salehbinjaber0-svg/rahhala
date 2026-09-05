@@ -2742,6 +2742,15 @@ var qrcode = function() {
   .unitHead .tag{color:var(--gold); font-family:'Aref Ruqaa'; font-size:1.1rem;}
   .unitHead h2{margin:6px 0 8px;}
   .unitHead .fw{color:#5c6a6e; font-size:.88rem; line-height:1.9;}
+  .lessonFig{
+    margin:22px 0; background:#fff; border:1px solid #e8e0cd; border-radius:14px;
+    padding:14px; box-shadow:var(--shadow-soft); overflow-x:auto;
+  }
+  .lessonFig svg{width:100%; min-width:330px; height:auto; display:block; border-radius:8px;}
+  .lessonFig figcaption{
+    margin-top:10px; font-size:.82rem; color:#5c6a6e; text-align:center; line-height:1.7;
+  }
+
   .lessonBlock{
     background:#fff; border:1px solid #e8e0cd; border-radius:16px; padding:24px; margin-bottom:20px;
   }
@@ -3577,6 +3586,26 @@ const UNITS_DATA = {
     {title:"الدرس الأول: حضارات بلاد الرافدين وعوامل قيامها", pages:"37–48", html:`
       <p><strong>الحضارة</strong> هي كل ما أنتجه العقل الإنساني من مظاهر مادية (كالمباني والأدوات) أو معنوية (كالثقافة والعادات والفنون). و<strong>بلاد الرافدين</strong> هي المنطقة الواقعة بين نهري دجلة والفرات، وتقع ضمن حدود جمهورية العراق حالياً.</p>
 
+      <figure class="lessonFig">
+        <svg viewBox="0 0 460 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="خريطة بلاد الرافدين بين نهري دجلة والفرات وأهم المدن التاريخية">
+          <rect width="460" height="340" fill="#f4ead6"/>
+          <path d="M0,250 Q120,268 240,282 T460,300 L460,340 L0,340 Z" fill="#bcd9dd"/>
+          <text x="392" y="326" font-size="11" fill="#3f6b72" text-anchor="middle">الخليج العربي</text>
+          <path d="M118,20 C150,80 168,140 196,196 C214,232 238,262 262,286" stroke="#3d84a8" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <text x="97" y="120" font-size="13" fill="#2a6b8a" font-weight="bold" transform="rotate(58 97 120)">نهر دجلة</text>
+          <path d="M64,44 C82,112 116,172 158,214 C192,248 226,272 258,290" stroke="#59a5c4" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <text x="176" y="196" font-size="13" fill="#2a6b8a" font-weight="bold" transform="rotate(46 176 196)">نهر الفرات</text>
+          <g font-size="12" fill="#10303f" font-weight="bold">
+            <circle cx="150" cy="70" r="6" fill="#7a3030"/><text x="162" y="74">نينوى (آشور)</text>
+            <circle cx="176" cy="176" r="6" fill="#c9a15e"/><text x="188" y="180">بابل</text>
+            <circle cx="196" cy="214" r="6" fill="#1f6f5c"/><text x="208" y="218">أكاد</text>
+            <circle cx="246" cy="272" r="6" fill="#5a3d7a"/><text x="258" y="276">أور (سومر)</text>
+          </g>
+          <text x="230" y="22" font-size="14" fill="#10303f" font-weight="bold" text-anchor="middle">بلاد الرافدين — أهم المدن التاريخية</text>
+        </svg>
+        <figcaption>خريطة توضيحية: موقع أهم عواصم بلاد الرافدين بين نهري دجلة والفرات (رسم تخطيطي مبسّط).</figcaption>
+      </figure>
+
       <h4>عوامل قيام الحضارة في بلاد الرافدين</h4>
       <ul>
         <li><strong>الموقع الجغرافي:</strong> وقوع بلاد الرافدين وسط صحارٍ شكّل حافزاً قوياً للاستقرار حول مصادر المياه.</li>
@@ -3650,6 +3679,41 @@ const UNITS_DATA = {
   lessons:[
     {title:"الدرس الأول: السلطة التشريعية والتنفيذية في دولة قطر", pages:"63–70", html:`
       <p><strong>الدستور</strong> هو مجموعة القواعد الأساسية التي تحدد شكل الدولة، وترسم نظام الحكم فيها، والسلطات العامة بها. وتقوم الدولة على ثلاثة أركان رئيسة: <strong>السلطة، الشعب، والإقليم</strong>. وتتوزع السلطة في دولة قطر على ثلاث سلطات دستورية: التشريعية والتنفيذية والقضائية.</p>
+
+      <figure class="lessonFig">
+        <svg viewBox="0 0 470 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="مخطط السلطات الدستورية الثلاث في دولة قطر">
+          <rect width="470" height="250" fill="#fdfbf6"/>
+          <rect x="160" y="12" width="150" height="42" rx="10" fill="#10303f"/>
+          <text x="235" y="33" font-size="13" fill="#e3c98b" text-anchor="middle" font-weight="bold">أمير البلاد</text>
+          <text x="235" y="47" font-size="10" fill="#e3c98b" text-anchor="middle">رأس الدولة</text>
+          <path d="M235,54 L235,80 M80,80 L390,80 M80,80 L80,98 M235,80 L235,98 M390,80 L390,98"
+                stroke="#c9a15e" stroke-width="2" fill="none"/>
+          <g>
+            <rect x="12" y="98" width="136" height="86" rx="10" fill="#eaf4f1" stroke="#1f6f5c" stroke-width="2"/>
+            <text x="80" y="120" font-size="12" fill="#1f6f5c" text-anchor="middle" font-weight="bold">التشريعية</text>
+            <text x="80" y="140" font-size="11" fill="#10303f" text-anchor="middle">مجلس الشورى</text>
+            <text x="80" y="158" font-size="10" fill="#4d5f65" text-anchor="middle">تشريع القوانين</text>
+            <text x="80" y="173" font-size="10" fill="#4d5f65" text-anchor="middle">وإقرار الموازنة</text>
+          </g>
+          <g>
+            <rect x="167" y="98" width="136" height="86" rx="10" fill="#fdf4e3" stroke="#c9a15e" stroke-width="2"/>
+            <text x="235" y="120" font-size="12" fill="#a8813f" text-anchor="middle" font-weight="bold">التنفيذية</text>
+            <text x="235" y="140" font-size="11" fill="#10303f" text-anchor="middle">مجلس الوزراء</text>
+            <text x="235" y="158" font-size="10" fill="#4d5f65" text-anchor="middle">تنفيذ السياسة</text>
+            <text x="235" y="173" font-size="10" fill="#4d5f65" text-anchor="middle">العامة للدولة</text>
+          </g>
+          <g>
+            <rect x="322" y="98" width="136" height="86" rx="10" fill="#f4eaf4" stroke="#5a3d7a" stroke-width="2"/>
+            <text x="390" y="120" font-size="12" fill="#5a3d7a" text-anchor="middle" font-weight="bold">القضائية</text>
+            <text x="390" y="140" font-size="11" fill="#10303f" text-anchor="middle">المحاكم</text>
+            <text x="390" y="158" font-size="10" fill="#4d5f65" text-anchor="middle">الفصل في</text>
+            <text x="390" y="173" font-size="10" fill="#4d5f65" text-anchor="middle">المنازعات</text>
+          </g>
+          <text x="235" y="214" font-size="11" fill="#4d5f65" text-anchor="middle">تتعاون السلطات الثلاث فيما بينها وفق أحكام الدستور</text>
+          <text x="235" y="234" font-size="10" fill="#8a8a8a" text-anchor="middle">المرجع: الدستور القطري — المواد (60) وما بعدها</text>
+        </svg>
+        <figcaption>مخطط توضيحي: السلطات الدستورية الثلاث في دولة قطر واختصاص كل منها.</figcaption>
+      </figure>
 
       <h4>السلطة التشريعية — مجلس الشورى</h4>
       <p>نصّت المادة (77) من الدستور القطري على أن يتكون مجلس الشورى من عدد لا يقل عن 45 عضواً، يصدر بتعيينهم قرار أميري، ومدة العضوية فيه أربع سنوات. ويُشترط في عضو مجلس الشورى أن يكون قطري الجنسية، وأن يكون من أهل العلم والرأي أو من ذوي الكفاءة والخبرة.</p>
