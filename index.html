@@ -2348,6 +2348,38 @@ var qrcode = function() {
   .wrap{max-width:1100px; margin:0 auto; padding:0 20px;}
 
   /* Header */
+  #bootScreen{
+    position:fixed; inset:0; z-index:9999; background:var(--navy-deep);
+    display:flex; align-items:center; justify-content:center;
+    transition:opacity .5s ease, visibility .5s ease;
+  }
+  #bootScreen.hide{opacity:0; visibility:hidden;}
+  .bootInner{text-align:center;}
+  .bootCompass{margin-bottom:22px;}
+  .bootNeedle{transform-origin:50px 50px; animation:bootSpin 2.4s cubic-bezier(.5,0,.5,1) infinite;}
+  @keyframes bootSpin{
+    0%{transform:rotate(0deg);}
+    45%{transform:rotate(340deg);}
+    60%{transform:rotate(315deg);}
+    75%{transform:rotate(330deg);}
+    100%{transform:rotate(360deg);}
+  }
+  .bootTitle{
+    font-family:'Aref Ruqaa'; font-size:2.4rem; color:var(--gold-light); margin-bottom:6px;
+  }
+  .bootSub{font-size:.82rem; color:rgba(255,255,255,.55); margin-bottom:26px;}
+  .bootBar{
+    width:170px; height:3px; background:rgba(255,255,255,.12); border-radius:3px;
+    margin:0 auto; overflow:hidden;
+  }
+  .bootBar span{
+    display:block; height:100%; width:40%; background:var(--gold); border-radius:3px;
+    animation:bootSlide 1.3s ease-in-out infinite;
+  }
+  @keyframes bootSlide{
+    0%{transform:translateX(-110%);} 100%{transform:translateX(320%);}
+  }
+
   header{
     background:var(--navy);
     color:var(--cream);
@@ -2603,6 +2635,16 @@ var qrcode = function() {
   #unitView{display:none;}
   #unitView.show{display:block;}
   #reportView{display:none;}
+  #profileView{display:none;}
+  .profBadgeGrid{display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:14px;}
+  .profBadge{
+    border-radius:14px; padding:18px 14px; text-align:center; border:1px solid #e8e0cd; transition:.2s;
+  }
+  .profBadge.earned{background:linear-gradient(160deg,#fffdf7,#f7f0dd); border-color:var(--gold);}
+  .profBadge.locked{background:#f7f7f5; opacity:.6;}
+  .pbIcon{font-size:2rem; margin-bottom:8px;}
+  .pbName{font-weight:700; color:var(--navy); font-size:.9rem; margin-bottom:4px;}
+  .pbDesc{font-size:.75rem; color:#7a8a8e; line-height:1.5;}
   .backLink{display:inline-block; margin-bottom:20px; color:var(--teal); font-weight:700; font-size:.9rem;}
   .unitHead{margin-bottom:28px;}
   .unitHead .tag{color:var(--gold); font-family:'Aref Ruqaa'; font-size:1.1rem;}
@@ -2676,6 +2718,19 @@ var qrcode = function() {
   #cdExit:hover{background:rgba(255,255,255,.2);}
   .cdWrap{max-width:1000px; margin:0 auto; padding:100px 30px 60px; text-align:center;}
   .cdCounter{color:var(--gold-light); font-size:1.1rem; margin-bottom:24px; font-weight:700;}
+  #cdTimer{
+    display:none; font-size:clamp(2.5rem,7vw,4.5rem); font-weight:700; font-family:'Aref Ruqaa';
+    color:var(--gold); margin-bottom:16px; line-height:1;
+  }
+  #cdTimer.show{display:block;}
+  #cdTimer.urgent{color:#e39b9b; animation:cdPulse .6s ease-in-out infinite;}
+  @keyframes cdPulse{0%,100%{transform:scale(1);} 50%{transform:scale(1.08);}}
+  #cdPickedStudent{
+    display:none; background:rgba(201,161,94,.15); border:2px solid var(--gold);
+    border-radius:16px; padding:16px 28px; margin-bottom:20px;
+    font-size:clamp(1.3rem,3vw,2rem); font-weight:700; color:var(--gold-light);
+  }
+  #cdPickedStudent.show{display:block; animation:badgePop .45s ease-out;}
   .cdQuestion{
     font-family:'Aref Ruqaa'; font-size:clamp(1.8rem, 4vw, 3rem); line-height:1.5;
     margin-bottom:50px; color:#fff;
@@ -2847,6 +2902,24 @@ var qrcode = function() {
 </style>
 </head>
 <body>
+<div id="bootScreen">
+  <div class="bootInner">
+    <div class="bootCompass">
+      <svg viewBox="0 0 100 100" width="90" height="90">
+        <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(201,161,94,.35)" stroke-width="2"/>
+        <circle cx="50" cy="50" r="34" fill="none" stroke="rgba(201,161,94,.2)" stroke-width="1.5"/>
+        <g class="bootNeedle">
+          <path d="M50,10 L57,50 L50,90 L43,50 Z" fill="#C9A15E"/>
+          <path d="M10,50 L50,43 L90,50 L50,57 Z" fill="#e3c98b" opacity=".75"/>
+          <circle cx="50" cy="50" r="6" fill="#fff"/>
+        </g>
+      </svg>
+    </div>
+    <div class="bootTitle">رحّالة</div>
+    <div class="bootSub">دراسات اجتماعية · الصف السابع</div>
+    <div class="bootBar"><span></span></div>
+  </div>
+</div>
 
 <div id="toastBox"></div>
 
@@ -2892,6 +2965,7 @@ var qrcode = function() {
       <a href="#classchallenge">تحدي الصفوف</a>
       <a href="#leaderboard">لوحة الصدارة</a>
       <a href="#about">عن المعلم</a>
+      <a href="#" id="profileNavLink" style="display:none;" onclick="openProfile(); return false;">👤 ملفي</a>
     </nav>
     <button id="userChip">دخول الطالب</button>
     <div id="badgesRow" style="display:none;"></div>
@@ -2961,14 +3035,28 @@ var qrcode = function() {
   <button id="cdExit" onclick="closeClassDisplay()">✕ خروج من وضع العرض</button>
   <div class="cdWrap">
     <div class="cdCounter" id="cdCounter">سؤال 1 من 1</div>
+    <div id="cdTimer"></div>
+    <div id="cdPickedStudent"></div>
     <div class="cdQuestion" id="cdQuestion">...</div>
     <div class="cdChoices" id="cdChoices"></div>
     <div class="cdControls">
       <button class="cdBtn" onclick="cdPrev()">→ السابق</button>
       <button class="cdBtn gold" onclick="cdReveal()">🔍 إظهار الإجابة</button>
-      <button class="cdBtn" onclick="cdRandom()">🎲 عشوائي</button>
       <button class="cdBtn" onclick="cdNext()">التالي ←</button>
     </div>
+    <div class="cdControls" style="margin-top:14px;">
+      <button class="cdBtn" onclick="cdStartTimer(30)">⏱️ مؤقت 30ث</button>
+      <button class="cdBtn" onclick="cdStartTimer(60)">⏱️ مؤقت 60ث</button>
+      <button class="cdBtn" onclick="cdPickStudent()">🎯 اختر طالباً</button>
+      <button class="cdBtn" onclick="cdRandom()">🎲 سؤال عشوائي</button>
+    </div>
+  </div>
+</section>
+
+<section id="profileView" class="eyebrow-free">
+  <div class="wrap">
+    <a href="#" onclick="closeUnit(); return false;" class="backLink">→ رجوع للرئيسية</a>
+    <div id="profileContent"></div>
   </div>
 </section>
 
@@ -3693,11 +3781,16 @@ function openClassDisplay(){
 }
 function closeClassDisplay(){
   document.getElementById('classDisplayView').classList.remove('show');
+  if(cdTimerInterval){ clearInterval(cdTimerInterval); cdTimerInterval = null; } // ما نخلي المؤقت شغّال بالخلفية بعد الخروج
 }
 function renderCdQuestion(){
   const item = QUESTIONS[cdIndex];
   document.getElementById('cdCounter').textContent = `سؤال ${cdIndex + 1} من ${QUESTIONS.length}`;
   document.getElementById('cdQuestion').textContent = item.q;
+  // نصفّر المؤقت والاسم المختار مع كل سؤال جديد
+  if(cdTimerInterval){ clearInterval(cdTimerInterval); cdTimerInterval = null; }
+  document.getElementById('cdTimer').classList.remove('show','urgent');
+  document.getElementById('cdPickedStudent').classList.remove('show');
   document.getElementById('cdChoices').innerHTML = item.c.map((choice, i)=> `
     <div class="cdChoice" data-idx="${i}">
       <span class="cdLetter">${CD_LETTERS[i]}</span><span>${esc(choice)}</span>
@@ -3715,6 +3808,58 @@ function cdRandom(){
   cdIndex = Math.floor(Math.random() * QUESTIONS.length);
   renderCdQuestion();
 }
+// ---------- أدوات الحصة: المؤقت واختيار طالب عشوائي ----------
+let cdTimerInterval = null;
+
+function cdStartTimer(seconds){
+  const el = document.getElementById('cdTimer');
+  if(cdTimerInterval) clearInterval(cdTimerInterval);
+  let remaining = seconds;
+  el.classList.add('show');
+  const tick = ()=>{
+    const m = Math.floor(remaining/60), s = remaining % 60;
+    el.textContent = m > 0 ? `${m}:${String(s).padStart(2,'0')}` : String(remaining);
+    el.classList.toggle('urgent', remaining <= 5 && remaining > 0);
+    if(remaining <= 0){
+      clearInterval(cdTimerInterval);
+      cdTimerInterval = null;
+      el.textContent = '⏰ انتهى الوقت!';
+      el.classList.remove('urgent');
+      playSound('wrong');
+      return;
+    }
+    remaining--;
+  };
+  tick();
+  cdTimerInterval = setInterval(tick, 1000);
+}
+
+async function cdPickStudent(){
+  const el = document.getElementById('cdPickedStudent');
+  if(!requireDb()) return;
+  // نسحب من قائمة متابعة الحصة للصف المختار حالياً بلوحة المعلم
+  const { data, error } = await sb.from('class_roster')
+    .select('student_name').eq('cls', currentRosterCls).is('deleted_at', null);
+  if(error || !data || data.length === 0){
+    el.classList.add('show');
+    el.textContent = `⚠️ أضف طلاب الصف ${currentRosterCls} من تبويب «متابعة الحصة» أول`;
+    return;
+  }
+  el.classList.add('show');
+  // تأثير "قرعة" بصري سريع قبل ما يستقر على الاسم النهائي
+  let spins = 0;
+  const spinner = setInterval(()=>{
+    const temp = data[Math.floor(Math.random()*data.length)].student_name;
+    el.textContent = `🎯 ${temp}`;
+    if(++spins >= 12){
+      clearInterval(spinner);
+      const picked = data[Math.floor(Math.random()*data.length)].student_name;
+      el.textContent = `🎯 الدور على: ${picked}`;
+      playSound('badge');
+    }
+  }, 90);
+}
+
 function cdReveal(){
   const item = QUESTIONS[cdIndex];
   document.querySelectorAll('.cdChoice').forEach(el=>{
@@ -3738,6 +3883,70 @@ function showSiteQR(){
 document.getElementById('qrModal').addEventListener('click', (e)=>{
   if(e.target.id === 'qrModal') e.target.classList.remove('show');
 });
+
+// ---------- صفحة "ملفي" للطالب ----------
+async function openProfile(){
+  if(!state){ openLogin(); return; }
+  document.querySelectorAll('section').forEach(s=>{ if(s.id !== 'profileView') s.style.display = 'none'; });
+  document.getElementById('profileView').style.display = '';
+  document.getElementById('unitView').classList.remove('show');
+  document.getElementById('enrichView').classList.remove('show');
+  document.getElementById('mainNav').classList.remove('show');
+  window.scrollTo({top:0, behavior:'instant'});
+  buildProfile();
+}
+
+async function buildProfile(){
+  const box = document.getElementById('profileContent');
+  if(!state) return;
+
+  // ترتيب الطالب بين زملائه الموافق عليهم
+  let rankText = '—', totalText = '';
+  if(sb){
+    const { data } = await sb.from('students').select('key,points').eq('status','approved').order('points', {ascending:false});
+    if(data && data.length){
+      const idx = data.findIndex(s => s.key === currentKey());
+      if(idx !== -1){ rankText = `#${idx + 1}`; totalText = `من ${data.length} طالب`; }
+    }
+  }
+
+  const earned = Array.isArray(state.badges) ? state.badges : [];
+  const badgesHtml = BADGE_DEFS.map(b=>{
+    const has = earned.includes(b.id);
+    return `
+      <div class="profBadge ${has ? 'earned' : 'locked'}">
+        <div class="pbIcon">${has ? b.icon : '🔒'}</div>
+        <div class="pbName">${esc(b.name)}</div>
+        <div class="pbDesc">${esc(b.desc)}</div>
+      </div>`;
+  }).join('');
+
+  const nextBadge = BADGE_DEFS.find(b => !earned.includes(b.id));
+  const nextHtml = nextBadge
+    ? `<div class="conceptBox">🎯 <strong>هدفك القادم:</strong> ${esc(nextBadge.icon)} ${esc(nextBadge.name)} — ${esc(nextBadge.desc)}</div>`
+    : `<div class="conceptBox">🏆 <strong>ما شاء الله!</strong> جمعت كل الشارات المتاحة.</div>`;
+
+  box.innerHTML = `
+    <div class="unitHead">
+      <div class="tag">ملفي الشخصي</div>
+      <h2>${esc(state.name)}</h2>
+      <div class="fw">الصف ${esc(state.cls)}${state.status === 'pending' ? ' · بانتظار موافقة المعلم' : ''}</div>
+    </div>
+
+    <div class="repStatsRow">
+      <div class="repStatCard"><div class="num">${state.points}</div><div class="lbl">مجموع نقاطي</div></div>
+      <div class="repStatCard"><div class="num">${rankText}</div><div class="lbl">ترتيبي ${totalText}</div></div>
+      <div class="repStatCard"><div class="num">${state.energy}</div><div class="lbl">طاقتي الحالية</div></div>
+      <div class="repStatCard"><div class="num">${earned.length}/${BADGE_DEFS.length}</div><div class="lbl">شاراتي</div></div>
+    </div>
+
+    ${nextHtml}
+
+    <div class="repSection">
+      <h3>🏅 شاراتي</h3>
+      <div class="profBadgeGrid">${badgesHtml}</div>
+    </div>`;
+}
 
 function openReport(){
   if(!isAdmin){ showToast('التقرير مخصص للمعلم فقط', 'error'); return; }
@@ -4155,6 +4364,8 @@ function updateChip(){
   if(notice) notice.style.display = (state && state.status === 'pending') ? 'block' : 'none';
   renderBadges();
   renderJourneyMap();
+  const profLink = document.getElementById('profileNavLink');
+  if(profLink) profLink.style.display = state ? 'inline-block' : 'none';
 }
 
 async function restoreSession(){
@@ -7632,6 +7843,15 @@ renderEnergy();
 initUpdateBar();
 showCompare(0);
 initSupabase(); // restoreSession + تحديث دوري للوحة الصدارة وتحدي الصفوف ونقاطي بعد النجاح
+
+// إخفاء شاشة البداية — بحد أدنى بسيط عشان ما تومض، وبحد أقصى احتياطي لو تعطّل أي شي
+(function(){
+  const boot = document.getElementById('bootScreen');
+  const hide = ()=> boot.classList.add('hide');
+  if(document.readyState === 'complete') setTimeout(hide, 500);
+  else window.addEventListener('load', ()=> setTimeout(hide, 500));
+  setTimeout(hide, 4000); // شبكة أمان: ما نخلي الطالب عالق بشاشة تحميل أبداً
+})();
 </script>
 
 </body>
