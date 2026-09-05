@@ -2325,17 +2325,24 @@ var qrcode = function() {
   :root{
     --navy:#10303f;
     --navy-deep:#0a2029;
+    --navy-soft:#164256;      /* درجة أفتح للتدرّجات */
     --gold:#c9a15e;
     --gold-light:#e3c98b;
+    --gold-deep:#a8813f;      /* ذهبي أعمق لطرف التدرّج */
     --cream:#f6f1e6;
+    --cream-warm:#fdfbf6;     /* خلفية دافئة بدل الأبيض الجاف */
     --teal:#1f6f5c;
     --maroon:#7a3030;
     --ink:#1c2b30;
     --radius:14px;
+    /* تدرّجات جاهزة تُستخدم بالعناصر المميزة */
+    --grad-navy:linear-gradient(155deg, var(--navy-soft), var(--navy-deep));
+    --grad-gold:linear-gradient(135deg, var(--gold-light), var(--gold));
+    --shadow-soft:0 4px 20px rgba(16,48,63,.07);
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{
-    background:var(--cream);
+    background:var(--cream-warm);
     color:var(--ink);
     font-family:'Tajawal', sans-serif;
     line-height:1.7;
@@ -2381,10 +2388,11 @@ var qrcode = function() {
   }
 
   header{
-    background:var(--navy);
+    background:var(--grad-navy);
     color:var(--cream);
     position:sticky; top:0; z-index:50;
     border-bottom:3px solid var(--gold);
+    box-shadow:0 2px 16px rgba(10,32,41,.18);
   }
   header .wrap{display:flex; align-items:center; justify-content:space-between; padding:14px 20px;}
   .brand{display:flex; align-items:center; gap:10px; font-size:1.5rem;}
@@ -2415,8 +2423,9 @@ var qrcode = function() {
   .enrichMenu a:hover{background:#faf3e3;}
 
   #userChip{
-    background:var(--gold); color:var(--navy-deep); padding:7px 16px; border-radius:30px;
+    background:var(--grad-gold); color:var(--navy-deep); padding:7px 16px; border-radius:30px;
     font-weight:700; font-size:.85rem; cursor:pointer; border:none;
+    box-shadow:0 2px 8px rgba(168,129,63,.3);
   }
   #badgesRow{gap:4px; align-items:center; margin-inline-start:6px;}
   .badgeIcon{
@@ -2592,8 +2601,8 @@ var qrcode = function() {
     display:inline-block; padding:13px 26px; border-radius:10px; font-weight:700; cursor:pointer;
     border:2px solid transparent; font-family:'Tajawal'; font-size:.95rem; transition:.2s;
   }
-  .btn-gold{background:var(--gold); color:var(--navy-deep);}
-  .btn-gold:hover{background:var(--gold-light);}
+  .btn-gold{background:var(--grad-gold); color:var(--navy-deep); box-shadow:0 3px 12px rgba(168,129,63,.28);}
+  .btn-gold:hover{background:linear-gradient(135deg, #f0daa5, var(--gold-light)); transform:translateY(-1px);}
   .btn-outline{border-color:var(--gold-light); color:var(--cream);}
   .btn-outline:hover{background:rgba(201,161,94,.15);}
   .compass{width:100%; max-width:340px; justify-self:center;}
@@ -2621,14 +2630,17 @@ var qrcode = function() {
   .grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:20px;}
   .card{
     background:#fff; border-radius:var(--radius); padding:24px;
-    border:1px solid #e8e0cd; box-shadow:0 2px 0 rgba(16,48,63,.04);
+    border:1px solid #ece5d4; box-shadow:var(--shadow-soft);
+    transition:transform .2s, box-shadow .2s;
   }
+  .card:hover{transform:translateY(-2px); box-shadow:0 8px 26px rgba(16,48,63,.11);}
   .card h3{font-size:1.2rem; margin-bottom:8px; color:var(--navy);}
   .card p{font-size:.92rem; color:#5c6a6e;}
   .unit-num{
     display:inline-flex; align-items:center; justify-content:center;
-    width:34px; height:34px; border-radius:50%; background:var(--navy); color:var(--gold);
+    width:34px; height:34px; border-radius:50%; background:var(--grad-navy); color:var(--gold-light);
     font-family:'Aref Ruqaa'; font-size:1.1rem; margin-bottom:12px;
+    border:1.5px solid var(--gold-deep);
   }
 
   /* unit detail view */
