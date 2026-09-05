@@ -2507,6 +2507,15 @@ var qrcode = function() {
   .addQForm label{font-size:.82rem; font-weight:700; color:var(--navy); display:block; margin-bottom:4px;}
 
   .rosterClassBar{display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;}
+  .bulkBox{
+    background:#fff; border:1px solid #e8e0cd; border-radius:12px;
+    padding:16px 20px; margin-bottom:20px;
+  }
+  .bulkBox summary{
+    cursor:pointer; font-weight:700; color:var(--navy); font-size:.92rem;
+  }
+  .bulkBox summary:hover{color:var(--teal);}
+  .bulkBox textarea:focus{outline:none; border-color:var(--gold);}
   .rosterClassBtn{
     padding:10px 22px; border-radius:30px; border:2px solid var(--navy); background:transparent;
     color:var(--navy); font-weight:700; font-size:.9rem; cursor:pointer; font-family:'Tajawal';
@@ -3343,6 +3352,21 @@ var qrcode = function() {
         </div>
         <button class="btn btn-gold" onclick="addRosterStudent(this)" style="height:44px;">➕ إضافة</button>
       </div>
+
+      <details class="bulkBox">
+        <summary>📋 لصق قائمة أسماء من إكسل (إضافة دفعة واحدة)</summary>
+        <div style="padding:16px 0 0;">
+          <p style="font-size:.84rem; color:#5c6a6e; margin-bottom:10px;">
+            انسخ عمود الأسماء من ملف الإكسل والصقه هنا مباشرة — كل اسم بسطر. سيُضافون كلهم للصف <strong id="bulkTargetCls">سابع 1</strong>.
+          </p>
+          <textarea id="bulkNames" rows="7" placeholder="محمد أحمد&#10;سالم خالد&#10;عبدالله ناصر" style="width:100%; padding:12px; border-radius:9px; border:1.5px solid #dcd4c0; font-family:'Tajawal'; font-size:.9rem;"></textarea>
+          <div style="display:flex; gap:10px; align-items:center; margin-top:10px; flex-wrap:wrap;">
+            <button class="btn btn-gold" onclick="bulkAddRoster(this)">⬆️ إضافة الكل</button>
+            <span id="bulkPreview" style="font-size:.84rem; color:#5c6a6e;"></span>
+          </div>
+        </div>
+      </details>
+
       <div id="rosterList"></div>
     </div>
 
@@ -5162,6 +5186,9 @@ function switchRosterClass(cls, btn){
   currentRosterCls = cls;
   document.querySelectorAll('.rosterClassBtn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  // نحدّث اسم الصف بصندوق اللصق الجماعي — يمنع إضافة الأسماء للصف الخطأ بالغلط
+  const lbl = document.getElementById('bulkTargetCls');
+  if(lbl) lbl.textContent = btn.textContent.trim();
   loadRoster();
 }
 
@@ -5210,6 +5237,54 @@ async function loadRoster(){
   data.forEach(r=>{ rosterNameCache[r.id] = r.student_name; }); // نحفظ الأسماء بأمان بدل تمريرها داخل كود HTML
   list.innerHTML = data.map(renderRosterRow).join('');
 }
+// ---------- إضافة أسماء دفعة واحدة (لصق من إكسل) ----------
+function parseBulkNames(raw){
+  return raw
+    .split(/[\r\n\t]+/)              // كل سطر (أو خانة إكسل) اسم مستقل
+    .map(s => s.replace(/\s+/g, ' ').trim())  // نوحّد المسافات ونشيل الزوائد
+    .filter(s => s.length > 0)
+    .filter((s, i, arr) => arr.indexOf(s) === i); // نشيل التكرار داخل اللصقة نفسها
+}
+
+async function bulkAddRoster(btn){
+  if(!isAdmin || !requireDb()) return;
+  const box = document.getElementById('bulkNames');
+  const names = parseBulkNames(box.value);
+  if(names.length === 0){ showToast('الصق الأسماء أول — كل اسم بسطر', 'error'); return; }
+
+  setBtnLoading(btn, true, 'جاري الإضافة');
+
+  // نتجنّب تكرار أسماء موجودة مسبقاً بنفس الصف
+  const { data: existing } = await sb.from('class_roster')
+    .select('student_name').eq('cls', currentRosterCls).is('deleted_at', null);
+  const existingNames = new Set((existing || []).map(r => r.student_name));
+  const toAdd = names.filter(n => !existingNames.has(n));
+  const skipped = names.length - toAdd.length;
+
+  if(toAdd.length === 0){
+    setBtnLoading(btn, false);
+    showToast('كل الأسماء موجودة مسبقاً بهذا الصف', 'error');
+    return;
+  }
+
+  const rows = toAdd.map(n => ({ cls: currentRosterCls, student_name: n }));
+  const { error } = await sb.from('class_roster').insert(rows);
+  setBtnLoading(btn, false);
+
+  if(error){ showToast('تعذر الإضافة: ' + error.message, 'error'); return; }
+
+  box.value = '';
+  document.getElementById('bulkPreview').textContent = '';
+  showToast(`✅ أُضيف ${toAdd.length} طالب${skipped ? ` · تخطّيت ${skipped} مكرر` : ''}`, 'success');
+  loadRoster();
+}
+
+// معاينة حيّة لعدد الأسماء أثناء اللصق
+document.getElementById('bulkNames').addEventListener('input', (e)=>{
+  const count = parseBulkNames(e.target.value).length;
+  document.getElementById('bulkPreview').textContent = count ? `${count} اسم جاهز للإضافة` : '';
+});
+
 async function addRosterStudent(btn){
   const input = document.getElementById('newRosterName');
   const name = input.value.trim();
