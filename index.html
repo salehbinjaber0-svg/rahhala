@@ -4549,11 +4549,17 @@ function renderQuestion(){
   const box = document.getElementById('quizChoices');
   box.innerHTML = '';
   document.getElementById('quizFeedback').textContent = '';
-  item.c.forEach((choice, i)=>{
+
+  // نخلط ترتيب الخيارات كل مرة — عشان ما يحفظ الطالب موضع الإجابة بدل المحتوى.
+  // نحتفظ بالموضع الأصلي لكل خيار لنعرف أيّها الصحيح بعد الخلط.
+  const shuffled = shuffleArray(item.c.map((text, origIdx) => ({ text, origIdx })));
+  const newCorrectIdx = shuffled.findIndex(o => o.origIdx === item.a);
+
+  shuffled.forEach((opt, i)=>{
     const b = document.createElement('button');
     b.className = 'choice';
-    b.textContent = choice;
-    b.onclick = ()=> answer(i, item.a, b, box, item.id);
+    b.textContent = opt.text;
+    b.onclick = ()=> answer(i, newCorrectIdx, b, box, item.id);
     box.appendChild(b);
   });
 }
