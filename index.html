@@ -2516,6 +2516,33 @@ var qrcode = function() {
   }
   .bulkBox summary:hover{color:var(--teal);}
   .bulkBox textarea:focus{outline:none; border-color:var(--gold);}
+
+  /* الحضور */
+  .attGroup{display:inline-flex; gap:3px; margin-inline-end:6px;}
+  .attBtn{
+    width:30px; height:30px; border-radius:8px; border:1.5px solid #dcd4c0;
+    background:#fff; cursor:pointer; font-size:.85rem; opacity:.4; transition:.15s;
+  }
+  .attBtn:hover{opacity:.8;}
+  .attBtn.on{opacity:1; transform:scale(1.05);}
+  .attBtn.on.present{background:#eaf4f1; border-color:var(--teal);}
+  .attBtn.on.late{background:#fdf4e3; border-color:var(--gold);}
+  .attBtn.on.absent{background:#fbe9e9; border-color:var(--maroon);}
+  .attSummary{
+    background:var(--cream); border:1px solid #e8e0cd; border-radius:10px;
+    padding:10px 16px; margin-bottom:14px; font-size:.86rem; color:var(--navy);
+  }
+  .attSummary strong{color:var(--teal);}
+
+  /* الملاحظات الإيجابية والقوالب السريعة */
+  .rStat.praise{background:#fdf4e3; color:var(--gold-deep);}
+  .noteTplRow{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;}
+  .noteTpl{
+    background:var(--cream); border:1px solid #dcd4c0; border-radius:16px;
+    padding:5px 12px; font-size:.78rem; cursor:pointer; font-family:'Tajawal'; color:var(--navy);
+  }
+  .noteTpl:hover{background:var(--gold-light); border-color:var(--gold);}
+  .lastWarnNote.praiseNote{color:var(--teal);}
   .rosterClassBtn{
     padding:10px 22px; border-radius:30px; border:2px solid var(--navy); background:transparent;
     color:var(--navy); font-weight:700; font-size:.9rem; cursor:pointer; font-family:'Tajawal';
@@ -3367,6 +3394,7 @@ var qrcode = function() {
         </div>
       </details>
 
+      <div id="attendanceSummary" class="attSummary"></div>
       <div id="rosterList"></div>
     </div>
 
@@ -3407,10 +3435,14 @@ var qrcode = function() {
 <div class="modalBg" id="warningModal">
   <div class="modal">
     <button class="modalClose" onclick="closeWarningModal()" title="إلغاء">✕</button>
-    <h3>تسجيل تنبيه</h3>
-    <p class="sub" id="warningModalStudentName">اكتب سبب التنبيه بإيجاز</p>
-    <div class="field"><label>الملاحظة</label><textarea id="warningNoteInput" rows="3" placeholder="مثال: تكلم بدون إذن أثناء الحصة"></textarea></div>
-    <button class="btn btn-gold" style="width:100%" onclick="submitWarningNote()">✅ تسجيل التنبيه</button>
+    <h3 id="warningModalTitle">تسجيل تنبيه ⚠️</h3>
+    <p class="sub" id="warningModalStudentName"></p>
+    <div class="field">
+      <label>اختر قالباً جاهزاً أو اكتب ملاحظتك</label>
+      <div id="noteTemplates" class="noteTplRow"></div>
+      <textarea id="warningNoteInput" rows="3" placeholder="اكتب هنا..."></textarea>
+    </div>
+    <button class="btn btn-gold" style="width:100%" onclick="submitWarningNote()">✅ تسجيل</button>
   </div>
 </div>
 
@@ -5193,23 +5225,42 @@ function switchRosterClass(cls, btn){
 }
 
 let warningsCache = {}; // roster_id -> [{note, created_at}, ...] لآخر تحميل، يُستخدم بالتصدير وعرض آخر تنبيه
+let lastRosterData = null; // آخر قائمة طلاب محمّلة — تُستخدم لإعادة الرسم الفوري بدون استعلام
 let rosterNameCache = {}; // roster_id -> اسم الطالب، يُستخدم بنافذة التنبيه بدون حقن الاسم بكود HTML
 
 function renderRosterRow(r){
-  const wList = warningsCache[r.id] || [];
-  const warnCount = wList.length;
-  const warnClass = warnCount > 0 ? 'warnBad' : 'warnOk';
-  const lastWarning = wList[0]; // مرتبة الأحدث أول
-  const warnLabel = warnCount > 0 ? `⚠️ ${warnCount} تنبيه` : '✅ لا يوجد تنبيه';
-  const lastNoteHtml = lastWarning
-    ? `<div class="lastWarnNote">آخر تنبيه (${new Date(lastWarning.created_at).toLocaleDateString('ar-QA')}): ${esc(lastWarning.note)}</div>`
+  const all = warningsCache[r.id] || [];
+  const warns = all.filter(w => (w.kind || 'warning') === 'warning');
+  const praises = all.filter(w => w.kind === 'praise');
+  const warnClass = warns.length > 0 ? 'warnBad' : 'warnOk';
+  const warnLabel = warns.length > 0 ? `⚠️ ${warns.length} تنبيه` : '✅ لا تنبيهات';
+
+  const last = all[0]; // الأحدث من الاثنين معاً
+  const lastNoteHtml = last
+    ? `<div class="lastWarnNote ${last.kind === 'praise' ? 'praiseNote' : ''}">
+         ${last.kind === 'praise' ? '🌟 آخر ملاحظة' : '⚠️ آخر تنبيه'}
+         (${new Date(last.created_at).toLocaleDateString('ar-QA')}): ${esc(last.note)}
+       </div>`
     : '';
+
+  const att = attendanceCache[r.id] || 'present';
+  const attStates = [
+    ['present', '✅', 'حاضر'],
+    ['late',    '⏰', 'متأخر'],
+    ['absent',  '❌', 'غائب'],
+  ];
+  const attHtml = attStates.map(([val, icon, label]) =>
+    `<button class="attBtn ${att === val ? 'on ' + val : ''}" onclick="setAttendance(${r.id}, '${val}')" title="${label}">${icon}</button>`
+  ).join('');
+
   return `
     <div class="rosterRow">
       <div class="rName">${esc(r.student_name)}</div>
       <div class="rosterStats">
+        <span class="attGroup">${attHtml}</span>
         <div class="rStat points">⭐ ${r.participation_points} <button onclick="addParticipationPoint(${r.id}, this)" title="أضف نقطة مشاركة">➕</button></div>
-        <div class="rStat ${warnClass}">${warnLabel} <button onclick="openWarningModal(${r.id})" title="أضف تنبيه">➕</button></div>
+        <div class="rStat praise">🌟 ${praises.length} <button onclick="openNoteModal(${r.id}, 'praise')" title="أضف ملاحظة إيجابية">➕</button></div>
+        <div class="rStat ${warnClass}">${warnLabel} <button onclick="openNoteModal(${r.id}, 'warning')" title="أضف تنبيه">➕</button></div>
         <button class="rDelete" onclick="deleteRosterStudent(${r.id})" title="حذف الطالب من القائمة">🗑️</button>
       </div>
       ${lastNoteHtml}
@@ -5225,17 +5276,25 @@ async function loadRoster(){
     list.innerHTML = '<p style="color:#8a8a8a; margin-top:16px;">لا يوجد طلاب مضافين لهذا الصف بعد — أضف أول طالب من الأعلى.</p>';
     return;
   }
-  // نجيب كل تنبيهات طلاب هذا الصف دفعة وحدة، ونرتبها الأحدث أول لكل طالب
+  // نجيب كل ملاحظات طلاب هذا الصف + حضور اليوم دفعة وحدة
   const ids = data.map(r=>r.id);
-  const { data: warnData } = await sb.from('roster_warnings').select('*').in('roster_id', ids).order('created_at', {ascending:false});
+  const today = new Date().toISOString().slice(0,10);
+  const [warnRes, attRes] = await Promise.all([
+    sb.from('roster_warnings').select('*').in('roster_id', ids).order('created_at', {ascending:false}),
+    sb.from('roster_attendance').select('roster_id,status').in('roster_id', ids).eq('day', today),
+  ]);
   warningsCache = {};
-  (warnData || []).forEach(w=>{
+  (warnRes.data || []).forEach(w=>{
     if(!warningsCache[w.roster_id]) warningsCache[w.roster_id] = [];
     warningsCache[w.roster_id].push(w);
   });
+  attendanceCache = {};
+  (attRes.data || []).forEach(a=>{ attendanceCache[a.roster_id] = a.status; });
   rosterNameCache = {};
   data.forEach(r=>{ rosterNameCache[r.id] = r.student_name; }); // نحفظ الأسماء بأمان بدل تمريرها داخل كود HTML
+  lastRosterData = data;
   list.innerHTML = data.map(renderRosterRow).join('');
+  updateAttendanceSummary(data.length);
 }
 // ---------- إضافة أسماء دفعة واحدة (لصق من إكسل) ----------
 function parseBulkNames(raw){
@@ -5303,14 +5362,63 @@ async function addParticipationPoint(id, btn){
   loadRoster();
 }
 
-// ---------- تنبيهات بملاحظة وتاريخ ----------
-let warningTargetId = null;
+// ---------- الحضور ----------
+let attendanceCache = {}; // roster_id -> 'present' | 'late' | 'absent'
 
-function openWarningModal(rosterId){
+async function setAttendance(rosterId, status){
+  if(!isAdmin || !requireDb()) return;
+  attendanceCache[rosterId] = status; // تحديث فوري بالواجهة قبل ما يرد الخادم
+  loadRosterFromCache();
+  const today = new Date().toISOString().slice(0,10);
+  const { error } = await sb.from('roster_attendance')
+    .upsert({ roster_id: rosterId, status, day: today }, { onConflict: 'roster_id,day' });
+  if(error){ showToast('تعذر حفظ الحضور: ' + error.message, 'error'); loadRoster(); }
+}
+
+// إعادة رسم القائمة من البيانات المحفوظة بدون استعلام جديد — استجابة فورية
+function loadRosterFromCache(){
+  const list = document.getElementById('rosterList');
+  const rows = Object.keys(rosterNameCache);
+  if(rows.length === 0) return;
+  // نعيد بناء الصفوف من آخر بيانات محمّلة
+  if(lastRosterData){
+    list.innerHTML = lastRosterData.map(renderRosterRow).join('');
+    updateAttendanceSummary(lastRosterData.length);
+  }
+}
+
+function updateAttendanceSummary(total){
+  const el = document.getElementById('attendanceSummary');
+  if(!el) return;
+  const vals = Object.values(attendanceCache);
+  const absent = vals.filter(v => v === 'absent').length;
+  const late = vals.filter(v => v === 'late').length;
+  const present = total - absent - late;
+  el.innerHTML = `✅ حاضر: <strong>${present}</strong> · ⏰ متأخر: <strong>${late}</strong> · ❌ غائب: <strong>${absent}</strong> · المجموع: <strong>${total}</strong>`;
+}
+
+// ---------- الملاحظات (تنبيه أو إيجابية) ----------
+let warningTargetId = null;
+let noteKind = 'warning';
+
+const NOTE_TEMPLATES = {
+  praise:  ['شارك بفاعلية في الحصة', 'ساعد زميله', 'أجاب إجابة متميزة', 'التزم بالواجب كاملاً', 'أظهر تحسناً ملحوظاً'],
+  warning: ['تحدّث بدون إذن', 'لم يُحضر الواجب', 'تأخر عن الحصة', 'انشغل عن الشرح', 'إزعاج زملائه'],
+};
+
+function openNoteModal(rosterId, kind){
   warningTargetId = rosterId;
+  noteKind = kind || 'warning';
   const studentName = rosterNameCache[rosterId] || '';
-  document.getElementById('warningModalStudentName').textContent = `تنبيه للطالب: ${studentName}`; // textContent آمن تلقائياً — يعرض أي رمز كنص عادي
+  const isPraise = noteKind === 'praise';
+  document.getElementById('warningModalTitle').textContent = isPraise ? 'ملاحظة إيجابية 🌟' : 'تسجيل تنبيه ⚠️';
+  document.getElementById('warningModalStudentName').textContent =
+    `${isPraise ? 'للطالب' : 'تنبيه للطالب'}: ${studentName}`;
   document.getElementById('warningNoteInput').value = '';
+  // قوالب سريعة بضغطة بدل الكتابة كل مرة
+  document.getElementById('noteTemplates').innerHTML = NOTE_TEMPLATES[noteKind]
+    .map(t => `<button class="noteTpl" onclick="document.getElementById('warningNoteInput').value=this.textContent">${esc(t)}</button>`)
+    .join('');
   document.getElementById('warningModal').classList.add('show');
 }
 function closeWarningModal(){
@@ -5323,12 +5431,13 @@ document.getElementById('warningModal').addEventListener('click', (e)=>{
 
 async function submitWarningNote(){
   const note = document.getElementById('warningNoteInput').value.trim();
-  if(!note){ showToast('اكتب سبب التنبيه أول', 'error'); return; }
+  if(!note){ showToast('اكتب الملاحظة أول (أو اختر قالباً جاهزاً)', 'error'); return; }
   if(!warningTargetId) return;
-  const { error } = await sb.from('roster_warnings').insert({roster_id: warningTargetId, note});
-  if(error){ showToast('تعذر تسجيل التنبيه: ' + error.message, 'error'); return; }
+  const { error } = await sb.from('roster_warnings').insert({roster_id: warningTargetId, note, kind: noteKind});
+  if(error){ showToast('تعذر التسجيل: ' + error.message, 'error'); return; }
+  const wasPraise = noteKind === 'praise';
   closeWarningModal();
-  showToast('⚠️ تم تسجيل التنبيه بنجاح', 'success');
+  showToast(wasPraise ? '🌟 تم تسجيل الملاحظة الإيجابية' : '⚠️ تم تسجيل التنبيه', 'success');
   loadRoster();
 }
 
@@ -5391,26 +5500,27 @@ async function exportWarningsCSV(){
   if(!requireDb()) return;
   const { data, error } = await sb
     .from('roster_warnings')
-    .select('note, created_at, class_roster(student_name, cls)')
+    .select('note, kind, created_at, class_roster(student_name, cls)')
     .order('created_at', {ascending:false});
-  if(error){ showToast('تعذر تحميل سجل التنبيهات: ' + error.message, 'error'); return; }
-  if(!data || data.length === 0){ showToast('ما فيه أي تنبيهات مسجّلة بعد', 'error'); return; }
+  if(error){ showToast('تعذر تحميل السجل: ' + error.message, 'error'); return; }
+  if(!data || data.length === 0){ showToast('ما فيه أي ملاحظات مسجّلة بعد', 'error'); return; }
 
   let csv = '\uFEFF';
-  csv += 'سجل تنبيهات السلوك — رحّالة\n\n';
-  csv += 'الطالب,الصف,الملاحظة,التاريخ\n';
+  csv += 'سجل ملاحظات الطلاب — رحّالة\n\n';
+  csv += 'الطالب,الصف,النوع,الملاحظة,التاريخ\n';
   data.forEach(w=>{
     const name = w.class_roster?.student_name || '—';
     const cls = w.class_roster?.cls || '—';
+    const kind = w.kind === 'praise' ? 'إيجابية' : 'تنبيه';
     const date = new Date(w.created_at).toLocaleDateString('ar-QA');
-    csv += `${name},${cls},"${w.note.replace(/"/g,'""')}",${date}\n`;
+    csv += `${name},${cls},${kind},"${w.note.replace(/"/g,'""')}",${date}\n`;
   });
 
   const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `سجل-التنبيهات-${new Date().toISOString().slice(0,10)}.csv`;
+  a.download = `سجل-الملاحظات-${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
   URL.revokeObjectURL(url);
   showToast('✅ تم تحميل سجل التنبيهات كامل', 'success');
