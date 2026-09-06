@@ -2718,9 +2718,9 @@ var qrcode = function() {
   }
   .tcVision strong{color:var(--navy); display:block; margin-bottom:5px; font-size:1rem;}
 
-  /* شريط الإنجازات بالصفحة الرئيسية */
+  /* شريط الإنجازات */
   .impactBar{
-    display:grid; grid-template-columns:repeat(auto-fit, minmax(190px,1fr));
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr));
     gap:14px; margin-top:44px; padding-top:26px;
     border-top:1px solid rgba(201,161,94,.25);
   }
@@ -2732,6 +2732,28 @@ var qrcode = function() {
   }
   .impNum{font-family:'Aref Ruqaa'; font-size:1.1rem; color:var(--gold-light); line-height:1.35;}
   .impLbl{font-size:.75rem; color:rgba(246,241,230,.62);}
+
+  /* نسخة الشريط داخل قسم "عن المعلم" — خلفية فاتحة، فتحتاج ألواناً معاكسة */
+  .aboutImpact{
+    grid-template-columns:repeat(auto-fit, minmax(215px,1fr));
+    margin-top:26px; padding:22px; border:1px solid #ece5d4; border-radius:16px;
+    background:#fff; box-shadow:var(--shadow-soft);
+  }
+  .aboutImpact .impactItem{
+    justify-content:flex-start; padding:10px 12px; border-radius:12px;
+    background:var(--cream); transition:transform .2s;
+  }
+  .aboutImpact .impactItem:hover{transform:translateY(-2px);}
+  .aboutImpact .impIcon{background:var(--grad-gold); border-color:var(--gold-deep);}
+  .aboutImpact .impNum{color:var(--navy); font-size:1.05rem;}
+  .aboutImpact .impLbl{color:#5c6a6e;}
+
+  /* الرسم التوضيحي بأعلى قسم المعلم */
+  .aboutHeroArt{
+    background:var(--grad-navy); border-radius:18px; padding:18px;
+    margin-top:20px; border:1px solid rgba(201,161,94,.3);
+  }
+  .aboutHeroArt svg{width:100%; max-width:460px; height:auto; display:block; margin:0 auto;}
 
   /* قائمة الإنجازات ببطاقة المعلم */
   .tcAchievements{padding:4px 28px 20px;}
@@ -3164,26 +3186,6 @@ var qrcode = function() {
     </svg>
   </div>
 
-  <div class="wrap">
-    <div class="impactBar">
-      <div class="impactItem">
-        <div class="impIcon">🎓</div>
-        <div><div class="impNum">+5 سنوات</div><div class="impLbl">خبرة في التعليم</div></div>
-      </div>
-      <div class="impactItem">
-        <div class="impIcon">👥</div>
-        <div><div class="impNum">+1000 طالب</div><div class="impLbl">أكاديمياً وتربوياً</div></div>
-      </div>
-      <div class="impactItem">
-        <div class="impIcon">🏅</div>
-        <div><div class="impNum">برامج تربوية</div><div class="impLbl">مشاركات متعددة</div></div>
-      </div>
-      <div class="impactItem">
-        <div class="impIcon">✨</div>
-        <div><div class="impNum">رواق الضياء</div><div class="impLbl">النسخة الأولى · وزارة التربية</div></div>
-      </div>
-    </div>
-  </div>
 </section>
 
 <section id="journeySection" class="alt" style="display:none;">
@@ -3340,8 +3342,58 @@ var qrcode = function() {
 </section>
 
 <section id="about">
-  <div class="wrap" style="max-width:860px;">
+  <div class="wrap" style="max-width:900px;">
     <h2>عن المعلم</h2>
+
+    <div class="aboutHeroArt">
+      <svg viewBox="0 0 420 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="رسم توضيحي: كرة أرضية وكتب الدراسات الاجتماعية">
+        <defs>
+          <linearGradient id="globeG" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#5aa9d6"/><stop offset="100%" stop-color="#2a6b8a"/>
+          </linearGradient>
+        </defs>
+        <ellipse cx="210" cy="140" rx="180" ry="8" fill="#000" opacity=".12"/>
+        <g transform="translate(72,26)">
+          <circle cx="46" cy="46" r="44" fill="url(#globeG)"/>
+          <path d="M14,26 Q34,18 52,30 Q40,44 22,42 Z" fill="#4a9b6e" opacity=".9"/>
+          <path d="M46,58 Q62,52 74,64 Q64,80 46,74 Z" fill="#4a9b6e" opacity=".9"/>
+          <path d="M56,16 Q72,14 80,26 Q66,34 56,28 Z" fill="#4a9b6e" opacity=".85"/>
+          <ellipse cx="46" cy="46" rx="44" ry="16" fill="none" stroke="#fff" stroke-width="1" opacity=".35"/>
+          <ellipse cx="46" cy="46" rx="18" ry="44" fill="none" stroke="#fff" stroke-width="1" opacity=".35"/>
+          <circle cx="46" cy="46" r="44" fill="none" stroke="#c9a15e" stroke-width="2.5"/>
+          <path d="M46,94 L46,104 M28,110 L64,110" stroke="#a8813f" stroke-width="4" stroke-linecap="round"/>
+        </g>
+        <g transform="translate(198,52)">
+          <rect x="0" y="60" width="180" height="17" rx="3" fill="#7a3030"/>
+          <text x="90" y="72" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">المواطنة</text>
+          <rect x="6" y="42" width="172" height="17" rx="3" fill="#a8813f"/>
+          <text x="92" y="54" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">الجغرافيا</text>
+          <rect x="2" y="24" width="176" height="17" rx="3" fill="#1f6f5c"/>
+          <text x="90" y="36" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">التاريخ</text>
+          <rect x="10" y="6" width="164" height="17" rx="3" fill="#164256"/>
+          <text x="92" y="18" font-size="10" fill="#e3c98b" text-anchor="middle" font-weight="bold">الدراسات الاجتماعية</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="impactBar aboutImpact">
+      <div class="impactItem">
+        <div class="impIcon">🎓</div>
+        <div><div class="impNum">+5 سنوات</div><div class="impLbl">خبرة في التعليم</div></div>
+      </div>
+      <div class="impactItem">
+        <div class="impIcon">👥</div>
+        <div><div class="impNum">+1000 طالب</div><div class="impLbl">أكاديمياً وتربوياً</div></div>
+      </div>
+      <div class="impactItem">
+        <div class="impIcon">🏅</div>
+        <div><div class="impNum">برامج تربوية</div><div class="impLbl">مشاركات متعددة</div></div>
+      </div>
+      <div class="impactItem">
+        <div class="impIcon">✨</div>
+        <div><div class="impNum">رواق الضياء</div><div class="impLbl">النسخة الأولى · وزارة التربية</div></div>
+      </div>
+    </div>
 
     <div class="teacherCard">
       <div class="tcHeader">
