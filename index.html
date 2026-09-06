@@ -6041,9 +6041,11 @@ const KNOWLEDGE_BASE = [
 function normalizeArabic(text){
   return (text || "")
     .replace(/[\u064B-\u0652\u0670\u0640]/g, "") // إزالة التشكيل والتطويل
+    .replace(/[؟?!.،,;:"'«»()\[\]{}]/g, " ")     // إزالة علامات الترقيم — كانت "وطني؟" ما تطابق "وطني"
     .replace(/[إأآا]/g, "ا")
     .replace(/ى/g, "ي")
     .replace(/ة/g, "ه")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
@@ -6051,13 +6053,19 @@ function normalizeArabic(text){
 function stripPrefix(word){
   let w = word;
   if(/^[وف]/.test(w) && w.length > 3) w = w.slice(1);       // و/ف الاستئنافية
+  if(/^لل/.test(w) && w.length > 3) w = w.slice(2);          // لام الجر مدغمة بأل: للامن → امن
   if(/^[بكل]ال/.test(w)) w = w.slice(1);                     // بال / كال / لل → شيل الحرف الملتصق
   if(/^ال/.test(w) && w.length > 3) w = w.slice(2);           // شيل "ال" التعريف نفسها
   return w;
 }
 
+// كلمات استفهام وحشو لا تحمل معنى بحثياً — استبعادها يمنعها من تعطيل المطابقة
+const STOPWORDS = new Set(['كم','عدد','ما','ماهي','ماهو','هي','هو','وش','ايش','هل','من','الى','على','في','عن','مع','هذا','هذي','هذه','ذلك','التي','الذي','يعني','قصد','المقصود','تعريف','معني','معنى','اذكر','عدد','بين','وضح','اشرح','عرف','لي','لنا','كان','هناك']);
+
 function tokenize(text){
-  return normalizeArabic(text).split(/\s+/).filter(Boolean).map(stripPrefix);
+  const raw = normalizeArabic(text).split(/\s+/).filter(Boolean).map(stripPrefix);
+  const filtered = raw.filter(t => !STOPWORDS.has(t));
+  return filtered.length > 0 ? filtered : raw; // لو السؤال كله كلمات استفهام، نرجع الأصل بدل قائمة فاضية
 }
 
 // مسافة التحرير (Levenshtein) — يتحمّل غلطة إملائية وحدة بكلمة
@@ -6073,12 +6081,27 @@ function editDistance(a, b){
   }
   return dp[a.length][b.length];
 }
+// يربط المفرد بجمع التكسير العربي: بعد↔ابعاد · سلطه↔سلطات · ركن↔اركان · قليم↔اقاليم
+function pluralMatch(a, b){
+  const [s, l] = a.length < b.length ? [a, b] : [b, a];
+  if(s.length < 3) return false;
+  // جمع سالم: سلطه → سلطات · معلم → معلمين/معلمون
+  if(l === s + 'ات' || l === s.replace(/ه$/,'') + 'ات') return true;
+  if(l === s + 'ين' || l === s + 'ون') return true;
+  // جمع تكسير بزيادة ألف: بعد → ابعاد · ركن → اركان · قسم → اقسام
+  if(s.length === 3 && l === 'ا' + s[0] + s[1] + 'ا' + s[2]) return true;
+  // جمع تكسير: عامل → عوامل · اقليم → اقاليم
+  if(s.length >= 4 && l.length === s.length + 1 && l[0] === s[0] && l.slice(-2) === s.slice(-2)) return true;
+  return false;
+}
+
 function wordsClose(a, b){
   if(a.length <= 1 || b.length <= 1) return false;
   if(a === b) return true;
   const shorter = a.length < b.length ? a : b;
   if(shorter.length >= 5 && (a.includes(b) || b.includes(a))) return true; // احتواء موثوق بس لو الكلمة الأقصر 5 أحرف فأكثر (يمنع تطابقات عرضية زي "شوري" داخل "اشوريون")
   if(a.length >= 4 && b.length >= 4 && editDistance(a,b) <= 1) return true; // يتحمّل غلطة حرف وحدة
+  if(pluralMatch(a, b)) return true; // المفرد يطابق جمعه
   return false;
 }
 
