@@ -2624,6 +2624,49 @@ var qrcode = function() {
   .chatInputRow button{background:var(--teal); color:#fff; border:none; border-radius:10px; padding:0 16px; font-weight:700; cursor:pointer;}
 
   /* Hero */
+  /* ===== البانر التعريفي بالصفحة الرئيسية ===== */
+  .heroIntro{position:relative; overflow:hidden; padding:56px 0 60px;}
+  .heroMapBg{
+    position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; pointer-events:none; z-index:0;
+  }
+  .heroIntroInner{
+    position:relative; z-index:1;
+    display:grid; grid-template-columns:1.22fr .95fr; gap:36px; align-items:center;
+  }
+  .heroEyebrow{
+    display:flex; align-items:center; gap:10px;
+    color:var(--gold); font-size:.85rem; font-weight:700; margin-bottom:14px; letter-spacing:.3px;
+  }
+  .ebLine{display:inline-block; width:34px; height:2px; background:var(--gold); border-radius:2px;}
+  .heroIntroTitle{
+    font-family:'Aref Ruqaa'; font-size:clamp(1.6rem,3.6vw,2.55rem);
+    color:#fff; line-height:1.68; margin-bottom:18px;
+    text-shadow:0 2px 14px rgba(0,0,0,.28);
+  }
+  .heroIntroTitle em{
+    color:var(--gold-light); font-style:normal; position:relative;
+    background:linear-gradient(transparent 68%, rgba(201,161,94,.28) 68%);
+  }
+  .heroIntroLead{
+    color:rgba(246,241,230,.82); font-size:.95rem; line-height:2.05;
+    max-width:560px; margin-bottom:24px;
+  }
+  .heroIntroArt{position:relative; text-align:center;}
+  .heroIntroArt svg{width:100%; max-width:340px; height:auto; display:block; margin:0 auto;}
+  .heroQuoteBadge{
+    display:inline-block; font-family:'Aref Ruqaa'; color:var(--gold-light); font-size:.95rem;
+    padding:8px 20px; border-radius:30px; margin-bottom:14px;
+    background:rgba(201,161,94,.12); border:1px solid rgba(201,161,94,.36);
+  }
+  @media(max-width:860px){
+    .heroIntroInner{grid-template-columns:1fr; text-align:center; gap:26px;}
+    .heroEyebrow{justify-content:center;}
+    .heroIntroLead{margin-inline:auto;}
+    .heroIntro .heroBtns{justify-content:center;}
+    .heroIntroArt svg{max-width:270px;}
+  }
+
   .hero{
     background:linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
     color:var(--cream);
@@ -2686,6 +2729,11 @@ var qrcode = function() {
     padding:9px 20px; border-radius:30px; background:rgba(201,161,94,.12); border:1px solid rgba(201,161,94,.35);
   }
   .abtBannerArt svg{width:100%; height:auto; display:block;}
+  .abtChipsRow{display:flex; flex-wrap:wrap; gap:9px; margin-top:6px;}
+  .abtChip{
+    background:rgba(255,255,255,.08); border:1px solid rgba(201,161,94,.36);
+    color:var(--cream); padding:6px 15px; border-radius:20px; font-size:.79rem; font-weight:700;
+  }
 
   .abtSection{padding:52px 0;}
   .abtLabel{color:var(--gold-deep); font-size:.83rem; font-weight:700; margin-bottom:8px;}
@@ -3119,27 +3167,80 @@ var qrcode = function() {
   </div>
 </div>
 
-<section id="hero" class="hero">
-  <div class="wrap">
-    <div>
-      <h1>اكتشف <em>الدراسات الاجتماعية</em>… وأنت تلعب وتربح النقاط</h1>
-      <p>منصة تفاعلية لطلاب الصف السابع، تجمع المنهج والمصادر الإثرائية بألعاب مراجعة وألعاب ترفيهية حقيقية، ونظام نقاط يكافئ كل خطوة تتعلمها.</p>
+<section id="hero" class="hero heroIntro">
+  <!-- خلفية: خريطة عالم باهتة تعطي عمقاً بصرياً -->
+  <svg class="heroMapBg" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g fill="#c9a15e" opacity="0.055">
+      <path d="M120,90 Q160,70 200,88 L230,120 Q210,165 175,180 L140,215 Q108,200 100,160 Q95,120 120,90 Z"/>
+      <path d="M180,235 Q215,225 235,250 L245,300 Q230,350 205,365 Q185,340 180,300 Q172,265 180,235 Z"/>
+      <path d="M380,80 Q430,62 470,80 L490,110 Q470,145 435,152 L395,145 Q368,115 380,80 Z"/>
+      <path d="M395,175 Q440,165 465,190 L470,245 Q450,300 420,325 Q395,290 392,240 Q385,205 395,175 Z"/>
+      <path d="M500,75 Q580,55 660,78 L700,120 Q680,175 620,185 L540,168 Q495,125 500,75 Z"/>
+      <path d="M640,255 Q690,240 720,265 L725,305 Q700,335 660,330 Q630,300 640,255 Z"/>
+    </g>
+    <g stroke="#c9a15e" stroke-width="0.6" opacity="0.09" fill="none">
+      <line x1="0" y1="100" x2="800" y2="100"/><line x1="0" y1="200" x2="800" y2="200"/><line x1="0" y1="300" x2="800" y2="300"/>
+      <line x1="160" y1="0" x2="160" y2="400"/><line x1="320" y1="0" x2="320" y2="400"/>
+      <line x1="480" y1="0" x2="480" y2="400"/><line x1="640" y1="0" x2="640" y2="400"/>
+    </g>
+  </svg>
+
+  <div class="wrap heroIntroInner">
+    <div class="heroIntroText">
+      <div class="heroEyebrow"><span class="ebLine"></span> مرحباً بك في منصتي التعليمية</div>
+      <h1 class="heroIntroTitle">أصنع تجربة تعليمية<br>تجعل الطالب <em>مشاركاً لا متلقياً</em></h1>
+      <p class="heroIntroLead">
+        الأستاذ صالح جبر ناصر — معلم دراسات اجتماعية للصف السابع، خريج جامعة قطر،
+        وأكثر من خمس سنوات في ميدان التعليم. أوظّف التقنية والذكاء الاصطناعي لبناء
+        بيئة تعليمية تنمّي التفكير والقيادة.
+      </p>
       <div class="heroBtns">
-        <button class="btn btn-gold" onclick="openLogin()">ابدأ رحلتك</button>
-        <a href="#games" class="btn btn-outline">جرّب الألعاب</a>
+        <button class="btn btn-gold" onclick="openLogin()">🚀 ابدأ رحلتك</button>
+        <button class="btn btn-outline" onclick="showSection('about')">✦ تعرّف عليّ</button>
       </div>
     </div>
-    <svg class="compass" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="100" cy="100" r="92" stroke="#c9a15e" stroke-width="2" opacity="0.5"/>
-      <circle cx="100" cy="100" r="70" stroke="#c9a15e" stroke-width="1.5" opacity="0.35"/>
-      <polygon points="100,26 112,100 100,174 88,100" fill="#c9a15e"/>
-      <polygon points="26,100 100,88 174,100 100,112" fill="#e3c98b" opacity="0.85"/>
-      <circle cx="100" cy="100" r="7" fill="#f6f1e6"/>
-      <text x="100" y="18" fill="#f6f1e6" font-size="12" text-anchor="middle" font-family="Tajawal">ش</text>
-      <text x="100" y="192" fill="#f6f1e6" font-size="12" text-anchor="middle" font-family="Tajawal">ج</text>
-    </svg>
-  </div>
 
+    <div class="heroIntroArt">
+      <div class="heroQuoteBadge">« بالتعليم نبني أجيالاً أكثر وعياً »</div>
+      <svg viewBox="0 0 320 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="كرة أرضية وكتب المواد الدراسية">
+        <defs>
+          <linearGradient id="hgG" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#6bb8e0"/><stop offset="55%" stop-color="#3a86ad"/><stop offset="100%" stop-color="#1e5771"/>
+          </linearGradient>
+          <radialGradient id="hgShine" cx="32%" cy="28%" r="62%">
+            <stop offset="0%" stop-color="#fff" stop-opacity=".42"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <ellipse cx="160" cy="216" rx="132" ry="8" fill="#000" opacity=".22"/>
+        <g transform="translate(22,14)">
+          <circle cx="56" cy="56" r="54" fill="url(#hgG)"/>
+          <path d="M16,30 Q42,18 66,34 Q50,56 26,50 Z" fill="#4faa7c" opacity=".93"/>
+          <path d="M56,72 Q78,62 94,80 Q80,100 56,92 Z" fill="#4faa7c" opacity=".93"/>
+          <path d="M70,16 Q90,14 100,30 Q82,42 70,32 Z" fill="#4faa7c" opacity=".88"/>
+          <path d="M18,78 Q34,72 44,86 Q32,96 20,90 Z" fill="#4faa7c" opacity=".8"/>
+          <ellipse cx="56" cy="56" rx="54" ry="19" fill="none" stroke="#fff" stroke-width="1" opacity=".3"/>
+          <ellipse cx="56" cy="56" rx="22" ry="54" fill="none" stroke="#fff" stroke-width="1" opacity=".3"/>
+          <circle cx="56" cy="56" r="54" fill="url(#hgShine)"/>
+          <circle cx="56" cy="56" r="54" fill="none" stroke="#c9a15e" stroke-width="3.2"/>
+          <path d="M56,113 L56,128 M32,134 L80,134" stroke="#a8813f" stroke-width="5.5" stroke-linecap="round"/>
+        </g>
+        <g transform="translate(128,96)">
+          <rect x="0" y="72" width="180" height="21" rx="3.5" fill="#7a3030"/>
+          <rect x="0" y="72" width="180" height="4" rx="2" fill="#fff" opacity=".14"/>
+          <text x="90" y="86" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold">المواطنة</text>
+          <rect x="6" y="49" width="170" height="21" rx="3.5" fill="#a8813f"/>
+          <rect x="6" y="49" width="170" height="4" rx="2" fill="#fff" opacity=".16"/>
+          <text x="91" y="63" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold">الجغرافيا</text>
+          <rect x="2" y="26" width="176" height="21" rx="3.5" fill="#1f6f5c"/>
+          <rect x="2" y="26" width="176" height="4" rx="2" fill="#fff" opacity=".16"/>
+          <text x="90" y="40" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold">التاريخ</text>
+          <rect x="10" y="3" width="162" height="21" rx="3.5" fill="#164256"/>
+          <rect x="10" y="3" width="162" height="4" rx="2" fill="#fff" opacity=".18"/>
+          <text x="91" y="17" font-size="10.5" fill="#e3c98b" text-anchor="middle" font-weight="bold">الدراسات الاجتماعية</text>
+        </g>
+      </svg>
+    </div>
+  </div>
 </section>
 
 <section id="journeySection" class="alt" style="display:none;">
@@ -3300,41 +3401,22 @@ var qrcode = function() {
   <div class="abtBanner">
     <div class="wrap abtBannerInner">
       <div class="abtBannerText">
-        <div class="abtEyebrow">— الأستاذ صالح جبر ناصر</div>
-        <h2 class="abtHeadline">أصنع تجربة تعليمية<br>تجعل الطالب <em>مشاركاً لا متلقياً</em></h2>
+        <div class="abtEyebrow">— نبذة عني</div>
+        <h2 class="abtHeadline">شغفي التعليم<br>ورسالتي <em>بناء المستقبل</em></h2>
         <p class="abtLead">
-          معلم دراسات اجتماعية للصف السابع، خريج جامعة قطر، وأكثر من خمس سنوات
-          في ميدان التعليم. أوظّف التقنية والذكاء الاصطناعي لبناء بيئة تعليمية
-          تنمّي التفكير والقيادة — و«رحّالة» إحدى ثمار ذلك.
+          خريج جامعة قطر، وأكثر من خمس سنوات في ميدان التعليم والتربية.
+          أركّز على تنمية مهارات التفكير والقيادة لدى طلابي، وأسعى دائماً
+          للتطوير المهني المستمر — وأنقل ما أتعلّمه لزملائي وطلابي.
         </p>
-        <div class="abtQuote">« بالتعليم نبني أجيالاً أكثر وعياً »</div>
+        <div class="abtChipsRow">
+          <span class="abtChip">🎓 جامعة قطر</span>
+          <span class="abtChip">📚 التربية أولاً</span>
+          <span class="abtChip">🤖 توظيف الذكاء الاصطناعي</span>
+          <span class="abtChip">🧭 قيادة وأنشطة</span>
+        </div>
       </div>
       <div class="abtBannerArt">
-        <svg viewBox="0 0 300 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="كرة أرضية وكتب المواد">
-          <defs><linearGradient id="gG" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#5aa9d6"/><stop offset="100%" stop-color="#2a6b8a"/></linearGradient></defs>
-          <ellipse cx="150" cy="198" rx="128" ry="7" fill="#000" opacity=".18"/>
-          <g transform="translate(20,16)">
-            <circle cx="52" cy="52" r="50" fill="url(#gG)"/>
-            <path d="M16,28 Q40,18 60,32 Q46,50 24,46 Z" fill="#4a9b6e" opacity=".92"/>
-            <path d="M52,66 Q70,58 84,72 Q72,90 52,84 Z" fill="#4a9b6e" opacity=".92"/>
-            <path d="M64,16 Q82,14 90,28 Q74,38 64,30 Z" fill="#4a9b6e" opacity=".85"/>
-            <ellipse cx="52" cy="52" rx="50" ry="18" fill="none" stroke="#fff" stroke-width="1" opacity=".33"/>
-            <ellipse cx="52" cy="52" rx="20" ry="50" fill="none" stroke="#fff" stroke-width="1" opacity=".33"/>
-            <circle cx="52" cy="52" r="50" fill="none" stroke="#c9a15e" stroke-width="3"/>
-            <path d="M52,106 L52,120 M30,126 L74,126" stroke="#a8813f" stroke-width="5" stroke-linecap="round"/>
-          </g>
-          <g transform="translate(122,92)">
-            <rect x="0" y="66" width="166" height="19" rx="3" fill="#7a3030"/>
-            <text x="83" y="79" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">المواطنة</text>
-            <rect x="5" y="45" width="158" height="19" rx="3" fill="#a8813f"/>
-            <text x="84" y="58" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">الجغرافيا</text>
-            <rect x="2" y="24" width="162" height="19" rx="3" fill="#1f6f5c"/>
-            <text x="83" y="37" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">التاريخ</text>
-            <rect x="9" y="3" width="150" height="19" rx="3" fill="#164256"/>
-            <text x="84" y="16" font-size="10" fill="#e3c98b" text-anchor="middle" font-weight="bold">الدراسات الاجتماعية</text>
-          </g>
-        </svg>
+        <div class="abtQuote">« التعلّم رحلة لا تتوقف — وأجمل ما فيها أن تأخذ غيرك معك »</div>
       </div>
     </div>
   </div>
