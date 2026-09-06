@@ -2692,29 +2692,22 @@ var qrcode = function() {
   .abtLabel.gold{color:var(--gold);}
   .abtTitle{font-family:'Aref Ruqaa'; font-size:clamp(1.3rem,2.7vw,1.85rem); color:var(--navy); margin-bottom:14px; line-height:1.6;}
   .abtTitle.light{color:#fff;}
-  .abtBody{font-size:.94rem; color:#4d5f65; line-height:2.05; max-width:760px; margin-bottom:30px;}
-  .abtSubLight{color:rgba(246,241,230,.7); font-size:.88rem;}
-
-  .abtPillars{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:18px;}
-  .abtPillar{text-align:center; padding:20px 12px; border-radius:14px; background:#fff; border:1px solid #ece5d4; box-shadow:var(--shadow-soft); transition:transform .2s;}
-  .abtPillar:hover{transform:translateY(-3px);}
-  .apIcon{
-    width:50px; height:50px; border-radius:50%; margin:0 auto 12px;
-    display:flex; align-items:center; justify-content:center; font-size:1.35rem; color:#fff;
-  }
-  .apIcon.navy{background:var(--grad-navy);} .apIcon.gold{background:var(--grad-gold);}
+    
+           .apIcon.gold{background:var(--grad-gold);}
   .apIcon.teal{background:linear-gradient(140deg,#2b8f78,#1f6f5c);} .apIcon.plum{background:linear-gradient(140deg,#7a5a9e,#5a3d7a);}
-  .apName{font-weight:700; color:var(--navy); font-size:.93rem; margin-bottom:4px;}
-  .apSub{font-size:.78rem; color:#7a8a8e;}
-
-  .abtStatsBand{background:var(--grad-navy); padding:52px 0; border-block:1px solid rgba(201,161,94,.2);}
-  .abtStatsInner{display:grid; grid-template-columns:.85fr 2fr; gap:34px; align-items:center;}
-  .abtStatsGrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px;}
+    
+      .abtStatsGrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px;}
   .abtStat{
     background:rgba(255,255,255,.055); border:1px solid rgba(201,161,94,.25);
     border-radius:15px; padding:22px 14px; text-align:center; transition:.2s;
   }
   .abtStat:hover{background:rgba(255,255,255,.1); transform:translateY(-3px);}
+  /* نسخة فاتحة تُستخدم داخل قسم بخلفية فاتحة */
+  .abtStat.light{background:#fff; border:1px solid #ece5d4; box-shadow:var(--shadow-soft);}
+  .abtStat.light:hover{background:#fff; box-shadow:0 8px 26px rgba(16,48,63,.1);}
+  .abtStat.light .asNum{color:var(--navy);}
+  .abtStat.light .asName{color:var(--gold-deep);}
+  .abtStat.light .asSub{color:#7a8a8e;}
   .asIcon{
     width:46px; height:46px; border-radius:50%; margin:0 auto 12px;
     display:flex; align-items:center; justify-content:center; font-size:1.25rem; color:#fff;
@@ -2725,21 +2718,11 @@ var qrcode = function() {
   .asName{color:var(--gold-light); font-size:.85rem; font-weight:700; margin-bottom:5px;}
   .asSub{font-size:.74rem; color:rgba(246,241,230,.58); line-height:1.7;}
 
-  .abtTimeline{display:grid; grid-template-columns:repeat(auto-fit,minmax(165px,1fr)); gap:18px; position:relative; margin-top:26px;}
-  .abtTLItem{text-align:center; position:relative;}
-  .tlIcon{
-    width:52px; height:52px; border-radius:50%; margin:0 auto 12px;
-    display:flex; align-items:center; justify-content:center; font-size:1.3rem; color:#fff;
-    box-shadow:0 4px 14px rgba(16,48,63,.16);
-  }
-  .tlIcon.navy{background:var(--grad-navy);} .tlIcon.gold{background:var(--grad-gold);}
+         .tlIcon.gold{background:var(--grad-gold);}
   .tlIcon.teal{background:linear-gradient(140deg,#2b8f78,#1f6f5c);} .tlIcon.plum{background:linear-gradient(140deg,#7a5a9e,#5a3d7a);}
-  .tlName{font-weight:700; color:var(--navy); font-size:.92rem; margin-bottom:5px;}
-  .tlSub{font-size:.78rem; color:#7a8a8e; line-height:1.75; padding:0 6px;}
-
+    
   @media(max-width:860px){
-    .abtBannerInner, .abtStatsInner{grid-template-columns:1fr;}
-    .abtBannerArt{max-width:330px; margin:0 auto;}
+    .abtBannerInner,     .abtBannerArt{max-width:330px; margin:0 auto;}
   }
 
   .card h3{font-size:1.2rem; margin-bottom:8px; color:var(--navy);}
@@ -3313,16 +3296,16 @@ var qrcode = function() {
 </section>
 
 <section id="about">
-  <!-- 1) لوحة تعريفية بأسلوب البانر -->
+  <!-- بانر تعريفي مختصر -->
   <div class="abtBanner">
     <div class="wrap abtBannerInner">
       <div class="abtBannerText">
-        <div class="abtEyebrow">— مرحباً بك في منصتي التعليمية</div>
+        <div class="abtEyebrow">— الأستاذ صالح جبر ناصر</div>
         <h2 class="abtHeadline">أصنع تجربة تعليمية<br>تجعل الطالب <em>مشاركاً لا متلقياً</em></h2>
         <p class="abtLead">
-          معلم دراسات اجتماعية للصف السابع، أؤمن أن التعليم تجربة تُبنى لا تُلقّن.
-          وأسعى إلى توظيف التقنية والذكاء الاصطناعي لخلق بيئة تعليمية تفاعلية
-          تنمّي التفكير والقيادة لدى الطلاب.
+          معلم دراسات اجتماعية للصف السابع، خريج جامعة قطر، وأكثر من خمس سنوات
+          في ميدان التعليم. أوظّف التقنية والذكاء الاصطناعي لبناء بيئة تعليمية
+          تنمّي التفكير والقيادة — و«رحّالة» إحدى ثمار ذلك.
         </p>
         <div class="abtQuote">« بالتعليم نبني أجيالاً أكثر وعياً »</div>
       </div>
@@ -3356,50 +3339,15 @@ var qrcode = function() {
     </div>
   </div>
 
-  <!-- 2) نبذة + محاور الاهتمام -->
+  <!-- أرقام وإنجازات -->
   <div class="wrap abtSection">
-    <div class="abtLabel">— نبذة عني</div>
-    <h3 class="abtTitle">شغفي التعليم … ورسالتي بناء المستقبل</h3>
-    <p class="abtBody">
-      خريج جامعة قطر، وأحمل أكثر من خمس سنوات في ميدان التعليم والتربية.
-      أركّز على تنمية مهارات التفكير والقيادة لدى الطلاب، وأسعى دائماً لتطوير
-      نفسي مهنياً والمساهمة في خلق بيئة تعليمية محفّزة وآمنة.
-    </p>
-    <div class="abtPillars">
-      <div class="abtPillar"><div class="apIcon navy">📚</div><div class="apName">التربية والتعليم</div><div class="apSub">بأثر أعمق</div></div>
-      <div class="abtPillar"><div class="apIcon gold">🤖</div><div class="apName">الذكاء الاصطناعي</div><div class="apSub">لتعليم أفضل</div></div>
-      <div class="abtPillar"><div class="apIcon teal">🧭</div><div class="apName">القيادة والأنشطة</div><div class="apSub">بناء شخصيات مؤثرة</div></div>
-      <div class="abtPillar"><div class="apIcon plum">🌱</div><div class="apName">التطوير المستمر</div><div class="apSub">رحلة لا تتوقف</div></div>
-    </div>
-  </div>
-
-  <!-- 3) أرقام وإنجازات (لوحة داكنة) -->
-  <div class="abtStatsBand">
-    <div class="wrap abtStatsInner">
-      <div class="abtStatsHead">
-        <div class="abtLabel gold">— أرقام وإنجازات</div>
-        <h3 class="abtTitle light">رحلتي في التعليم</h3>
-        <p class="abtSubLight">أرقام تعكس العطاء .. وتجارب تصنع الفرق</p>
-      </div>
-      <div class="abtStatsGrid">
-        <div class="abtStat"><div class="asIcon teal">👥</div><div class="asNum">+1000</div><div class="asName">طالب وطالبة</div><div class="asSub">ساهمت في دعمهم أكاديمياً وتربوياً</div></div>
-        <div class="abtStat"><div class="asIcon navy">📅</div><div class="asNum">+5</div><div class="asName">سنوات خبرة</div><div class="asSub">في التعليم والتربية</div></div>
-        <div class="abtStat"><div class="asIcon gold">⭐</div><div class="asNum">مشاركات عديدة</div><div class="asName">في البرامج التربوية</div><div class="asSub">والفعاليات التعليمية</div></div>
-        <div class="abtStat"><div class="asIcon plum">📖</div><div class="asNum">أول نسخة</div><div class="asName">من رواق الضياء</div><div class="asSub">التابع لوزارة التربية والتعليم</div></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 4) أبرز المحطات -->
-  <div class="wrap abtSection">
-    <div class="abtLabel">— أبرز محطاتي</div>
-    <h3 class="abtTitle">من الإنجازات إلى المساهمة</h3>
-    <div class="abtTimeline">
-      <div class="abtTLItem"><div class="tlIcon gold">🏅</div><div class="tlName">خبرة مهنية</div><div class="tlSub">أكثر من 5 سنوات في التعليم والتربية</div></div>
-      <div class="abtTLItem"><div class="tlIcon navy">👥</div><div class="tlName">دعم الطلاب</div><div class="tlSub">أكثر من 1000 طالب وطالبة أكاديمياً وتربوياً</div></div>
-      <div class="abtTLItem"><div class="tlIcon plum">🎯</div><div class="tlName">البرامج التربوية</div><div class="tlSub">المشاركة في العديد من البرامج والأنشطة</div></div>
-      <div class="abtTLItem"><div class="tlIcon teal">📗</div><div class="tlName">رواق الضياء</div><div class="tlSub">النسخة الأولى — وزارة التربية والتعليم</div></div>
-      <div class="abtTLItem"><div class="tlIcon gold">🧭</div><div class="tlName">منصة رحّالة</div><div class="tlSub">صمّمها وطوّرها بنفسه لخدمة طلابه</div></div>
+    <div class="abtLabel">— أرقام وإنجازات</div>
+    <h3 class="abtTitle">رحلتي في التعليم</h3>
+    <div class="abtStatsGrid">
+      <div class="abtStat light"><div class="asIcon teal">👥</div><div class="asNum">+1000</div><div class="asName">طالب وطالبة</div><div class="asSub">دعم أكاديمي وتربوي</div></div>
+      <div class="abtStat light"><div class="asIcon navy">📅</div><div class="asNum">+5</div><div class="asName">سنوات خبرة</div><div class="asSub">في التعليم والتربية</div></div>
+      <div class="abtStat light"><div class="asIcon gold">⭐</div><div class="asNum">برامج تربوية</div><div class="asName">مشاركات عديدة</div><div class="asSub">داخل المدرسة وخارجها</div></div>
+      <div class="abtStat light"><div class="asIcon plum">📖</div><div class="asNum">رواق الضياء</div><div class="asName">النسخة الأولى</div><div class="asSub">وزارة التربية والتعليم</div></div>
     </div>
   </div>
 </section>
