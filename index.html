@@ -2717,6 +2717,38 @@ var qrcode = function() {
     padding:22px 28px; font-size:.92rem; line-height:1.9; color:#3d4e54;
   }
   .tcVision strong{color:var(--navy); display:block; margin-bottom:5px; font-size:1rem;}
+
+  /* شريط الإنجازات بالصفحة الرئيسية */
+  .impactBar{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(190px,1fr));
+    gap:14px; margin-top:44px; padding-top:26px;
+    border-top:1px solid rgba(201,161,94,.25);
+  }
+  .impactItem{display:flex; align-items:center; gap:12px; justify-content:center;}
+  .impIcon{
+    width:44px; height:44px; border-radius:12px; background:rgba(201,161,94,.14);
+    border:1px solid rgba(201,161,94,.3); display:flex; align-items:center;
+    justify-content:center; font-size:1.2rem; flex-shrink:0;
+  }
+  .impNum{font-family:'Aref Ruqaa'; font-size:1.1rem; color:var(--gold-light); line-height:1.35;}
+  .impLbl{font-size:.75rem; color:rgba(246,241,230,.62);}
+
+  /* قائمة الإنجازات ببطاقة المعلم */
+  .tcAchievements{padding:4px 28px 20px;}
+  .tcAchievements h4{color:var(--navy); font-size:1rem; margin-bottom:14px;}
+  .achList{list-style:none; padding:0; margin:0; position:relative;}
+  .achList li{
+    position:relative; padding-inline-start:22px; padding-bottom:14px;
+    font-size:.89rem; color:#4d5f65; line-height:1.85;
+    border-inline-start:2px solid #ece5d4; margin-inline-start:5px;
+  }
+  .achList li:last-child{border-inline-start-color:transparent; padding-bottom:0;}
+  .achList strong{color:var(--navy);}
+  .achDot{
+    position:absolute; inset-inline-start:-7px; top:9px;
+    width:11px; height:11px; border-radius:50%;
+    background:var(--grad-gold); border:2px solid #fff; box-shadow:0 0 0 1px var(--gold);
+  }
   .card h3{font-size:1.2rem; margin-bottom:8px; color:var(--navy);}
   .card p{font-size:.92rem; color:#5c6a6e;}
   .unit-num{
@@ -3131,6 +3163,27 @@ var qrcode = function() {
       <text x="100" y="192" fill="#f6f1e6" font-size="12" text-anchor="middle" font-family="Tajawal">ج</text>
     </svg>
   </div>
+
+  <div class="wrap">
+    <div class="impactBar">
+      <div class="impactItem">
+        <div class="impIcon">🎓</div>
+        <div><div class="impNum">+5 سنوات</div><div class="impLbl">خبرة في التعليم</div></div>
+      </div>
+      <div class="impactItem">
+        <div class="impIcon">👥</div>
+        <div><div class="impNum">+1000 طالب</div><div class="impLbl">أكاديمياً وتربوياً</div></div>
+      </div>
+      <div class="impactItem">
+        <div class="impIcon">🏅</div>
+        <div><div class="impNum">برامج تربوية</div><div class="impLbl">مشاركات متعددة</div></div>
+      </div>
+      <div class="impactItem">
+        <div class="impIcon">✨</div>
+        <div><div class="impNum">رواق الضياء</div><div class="impLbl">النسخة الأولى · وزارة التربية</div></div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section id="journeySection" class="alt" style="display:none;">
@@ -3297,8 +3350,9 @@ var qrcode = function() {
           <div class="tcName">الأستاذ صالح جبر ناصر</div>
           <div class="tcRole">معلم الدراسات الاجتماعية · الصف السابع</div>
           <div class="tcChips">
-            <span class="tcChip">🎓 خريج جامعة قطر · 2022</span>
-            <span class="tcChip">🧭 قيادة وإدارة</span>
+            <span class="tcChip">🎓 خريج جامعة قطر</span>
+            <span class="tcChip">⏳ +5 سنوات خبرة</span>
+            <span class="tcChip">✨ رواق الضياء — النسخة الأولى</span>
             <span class="tcChip">🤖 توظيف الذكاء الاصطناعي</span>
           </div>
         </div>
@@ -3327,6 +3381,17 @@ var qrcode = function() {
           <h4>خبرة قيادية</h4>
           <p>رصيد من الخبرات في القيادة والإدارة، يوظّفها في تنظيم بيئة صفّية محفّزة تجمع بين الانضباط والمتعة.</p>
         </div>
+      </div>
+
+      <div class="tcAchievements">
+        <h4>🏆 محطات وإنجازات</h4>
+        <ul class="achList">
+          <li><span class="achDot"></span><strong>أكثر من 5 سنوات</strong> في ميدان التعليم والتربية.</li>
+          <li><span class="achDot"></span>ساهم في مسيرة <strong>أكثر من 1000 طالب</strong> أكاديمياً وتربوياً.</li>
+          <li><span class="achDot"></span>شارك في العديد من <strong>البرامج التربوية</strong> داخل المدرسة وخارجها.</li>
+          <li><span class="achDot"></span>من المشاركين في <strong>النسخة الأولى من «رواق الضياء»</strong> التابع لوزارة التربية والتعليم والتعليم العالي.</li>
+          <li><span class="achDot"></span>صمّم وطوّر منصة <strong>«رحّالة»</strong> بنفسه — توظيفاً عملياً للتقنية في خدمة الطالب.</li>
+        </ul>
       </div>
 
       <div class="tcVision">
