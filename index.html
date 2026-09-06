@@ -4190,6 +4190,7 @@ function openClassDisplay(){
   if(!QUESTIONS || QUESTIONS.length === 0){ showToast('بنك الأسئلة لسا ما تحمّل، انتظر لحظة وجرّب مرة ثانية', 'error'); return; }
   cdIndex = 0;
   renderCdQuestion();
+  closeChat(); // نسكّر نافذة المنقذ — ما نبيها تظل مفتوحة خلف شاشة العرض
   document.getElementById('classDisplayView').classList.add('show');
   window.scrollTo({top:0, behavior:'instant'});
 }
@@ -4373,6 +4374,7 @@ function openReport(){
 }
 
 async function buildReport(){
+  if(!isAdmin) return;
   const box = document.getElementById('reportContent');
   box.innerHTML = 'جاري إعداد التقرير...';
   if(!requireDb()) return;
@@ -4435,26 +4437,27 @@ async function buildReport(){
     <div class="repSection">
       <h3>🏆 الأكثر نقاطاً</h3>
       <table class="repTable"><tr><th>الطالب</th><th>الصف</th><th>النقاط</th></tr>
-        ${topByPoints.map(s=>`<tr><td>${s.name}</td><td>${s.cls}</td><td>${s.points}</td></tr>`).join('') || '<tr><td colspan="3">لا توجد بيانات بعد</td></tr>'}
+        ${topByPoints.map(s=>`<tr><td>${esc(s.name)}</td><td>${esc(s.cls)}</td><td>${s.points}</td></tr>`).join('') || '<tr><td colspan="3">لا توجد بيانات بعد</td></tr>'}
       </table>
     </div>
 
     <div class="repSection">
       <h3>⏱️ الأكثر وقت استخدام</h3>
       <table class="repTable"><tr><th>الطالب</th><th>الصف</th><th>وقت الاستخدام</th></tr>
-        ${topByTime.map(s=>`<tr><td>${s.name}</td><td>${s.cls}</td><td>${formatDuration(s.total_seconds)}</td></tr>`).join('') || '<tr><td colspan="3">لا توجد بيانات بعد</td></tr>'}
+        ${topByTime.map(s=>`<tr><td>${esc(s.name)}</td><td>${esc(s.cls)}</td><td>${formatDuration(s.total_seconds)}</td></tr>`).join('') || '<tr><td colspan="3">لا توجد بيانات بعد</td></tr>'}
       </table>
     </div>
 
     <div class="repSection">
       <h3>⚠️ الأسئلة الأكثر خطأ (آخر 7 أيام)</h3>
       <table class="repTable"><tr><th>السؤال</th><th>مرات الخطأ</th><th>نسبة الخطأ</th></tr>
-        ${mostMissed.map(m=>`<tr><td>${m.qText}</td><td>${m.wrong} من ${m.total}</td><td>${Math.round(m.rate*100)}%</td></tr>`).join('') || '<tr><td colspan="3">ما فيه بيانات كافية بعد (يحتاج إجابتين على الأقل لنفس السؤال)</td></tr>'}
+        ${mostMissed.map(m=>`<tr><td>${esc(m.qText)}</td><td>${m.wrong} من ${m.total}</td><td>${Math.round(m.rate*100)}%</td></tr>`).join('') || '<tr><td colspan="3">ما فيه بيانات كافية بعد (يحتاج إجابتين على الأقل لنفس السؤال)</td></tr>'}
       </table>
     </div>`;
 }
 
 function exportReportCSV(){
+  if(!isAdmin) return;
   if(!lastReportData){ showToast('انتظر التقرير يخلص التحميل أول', 'error'); return; }
   const d = lastReportData;
   let csv = '\uFEFF'; // BOM عشان إكسل يقرأ العربي صح
