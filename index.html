@@ -2361,6 +2361,9 @@ var qrcode = function() {
     transition:opacity .5s ease, visibility .5s ease;
   }
   #bootScreen.hide{opacity:0; visibility:hidden;}
+  /* شبكة أمان بالـCSS نفسه: تخفي الشاشة بعد 5 ثوانٍ حتى لو الجافاسكربت تعطّل كلياً */
+  #bootScreen{animation:bootFailsafe 0s linear 5s forwards;}
+  @keyframes bootFailsafe{to{opacity:0; visibility:hidden; pointer-events:none;}}
   .bootInner{text-align:center;}
   .bootCompass{margin-bottom:22px;}
   .bootNeedle{transform-origin:50px 50px; animation:bootSpin 2.4s cubic-bezier(.5,0,.5,1) infinite;}
@@ -8572,20 +8575,23 @@ const createDataURL = function(width, height, getPixel) {
 
 // ---------- رمز QR (يستخدم المكتبة المضمّنة بالأسفل) ----------
 // ---------- init ----------
-renderQuestion();
-renderEnergy();
-initUpdateBar();
-showCompare(0);
-initSupabase(); // restoreSession + تحديث دوري للوحة الصدارة وتحدي الصفوف ونقاطي بعد النجاح
-
-// إخفاء شاشة البداية — بحد أدنى بسيط عشان ما تومض، وبحد أقصى احتياطي لو تعطّل أي شي
+// إخفاء شاشة البداية أولاً ومستقلاً تماماً — ما نخليه معتمداً على نجاح أي كود ثاني،
+// عشان ما يعلق الطالب بشاشة تحميل لو صار أي خطأ بالتهيئة
 (function(){
   const boot = document.getElementById('bootScreen');
-  const hide = ()=> boot.classList.add('hide');
-  if(document.readyState === 'complete') setTimeout(hide, 500);
-  else window.addEventListener('load', ()=> setTimeout(hide, 500));
-  setTimeout(hide, 4000); // شبكة أمان: ما نخلي الطالب عالق بشاشة تحميل أبداً
+  if(!boot) return;
+  const hide = ()=>{ try{ boot.classList.add('hide'); }catch(e){} };
+  setTimeout(hide, 900);                       // المسار الطبيعي
+  window.addEventListener('load', ()=> setTimeout(hide, 300)); // بعد اكتمال تحميل الصفحة
+  setTimeout(hide, 3500);                      // شبكة أمان أخيرة مهما صار
 })();
+
+// نغلّف التهيئة بحماية — أي خطأ بجزء ما يوقف باقي الموقع
+try { renderQuestion(); } catch(e){ console.error('renderQuestion:', e); }
+try { renderEnergy(); } catch(e){ console.error('renderEnergy:', e); }
+try { initUpdateBar(); } catch(e){ console.error('initUpdateBar:', e); }
+try { showCompare(0); } catch(e){ console.error('showCompare:', e); }
+try { initSupabase(); } catch(e){ console.error('initSupabase:', e); }
 </script>
 
 </body>
