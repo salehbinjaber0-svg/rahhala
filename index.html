@@ -2674,103 +2674,74 @@ var qrcode = function() {
   }
   .card:hover{transform:translateY(-2px); box-shadow:0 8px 26px rgba(16,48,63,.11);}
 
-  /* بطاقة تعريف المعلم */
-  .teacherCard{
-    background:#fff; border:1px solid #ece5d4; border-radius:20px;
-    box-shadow:var(--shadow-soft); overflow:hidden; margin-top:22px;
+  /* ===== قسم "عن المعلم" — تصميم متكامل ===== */
+  .abtBanner{background:var(--grad-navy); border-bottom:3px solid var(--gold); padding:52px 0 46px;}
+  .abtBannerInner{display:grid; grid-template-columns:1.25fr .95fr; gap:34px; align-items:center;}
+  .abtEyebrow{color:var(--gold); font-size:.84rem; font-weight:700; margin-bottom:12px; letter-spacing:.4px;}
+  .abtHeadline{font-family:'Aref Ruqaa'; font-size:clamp(1.55rem,3.4vw,2.4rem); color:#fff; line-height:1.65; margin-bottom:16px;}
+  .abtHeadline em{color:var(--gold-light); font-style:normal;}
+  .abtLead{color:rgba(246,241,230,.8); font-size:.94rem; line-height:2; margin-bottom:18px;}
+  .abtQuote{
+    display:inline-block; font-family:'Aref Ruqaa'; color:var(--gold-light); font-size:1.05rem;
+    padding:9px 20px; border-radius:30px; background:rgba(201,161,94,.12); border:1px solid rgba(201,161,94,.35);
   }
-  .tcHeader{
-    background:var(--grad-navy); color:var(--cream); padding:30px 28px;
-    display:flex; align-items:center; gap:20px; flex-wrap:wrap;
-    border-bottom:3px solid var(--gold);
-  }
-  .tcAvatar{
-    width:74px; height:74px; border-radius:50%; background:var(--grad-gold);
-    display:flex; align-items:center; justify-content:center; font-size:2.1rem;
-    flex-shrink:0; box-shadow:0 4px 14px rgba(0,0,0,.25);
-  }
-  .tcIntro{flex:1; min-width:210px;}
-  .tcName{font-family:'Aref Ruqaa'; font-size:1.75rem; color:var(--gold-light); line-height:1.3;}
-  .tcRole{font-size:.88rem; opacity:.8; margin-bottom:12px;}
-  .tcChips{display:flex; flex-wrap:wrap; gap:8px;}
-  .tcChip{
-    background:rgba(255,255,255,.1); border:1px solid rgba(201,161,94,.4);
-    color:var(--cream); padding:5px 13px; border-radius:20px; font-size:.76rem; font-weight:700;
-  }
-  .tcQuote{
-    font-family:'Aref Ruqaa'; font-size:1.15rem; color:var(--navy); text-align:center;
-    padding:24px 28px 4px; line-height:1.9;
-  }
-  .tcGrid{
-    display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr));
-    gap:16px; padding:22px 28px;
-  }
-  .tcBlock{
-    background:var(--cream); border-radius:14px; padding:20px 18px;
-    border-inline-start:3px solid var(--gold);
-  }
-  .tcIcon{font-size:1.5rem; margin-bottom:8px;}
-  .tcBlock h4{color:var(--navy); font-size:1rem; margin-bottom:7px;}
-  .tcBlock p{font-size:.87rem; color:#4d5f65; line-height:1.8;}
-  .tcVision{
-    background:var(--cream); border-top:1px solid #ece5d4;
-    padding:22px 28px; font-size:.92rem; line-height:1.9; color:#3d4e54;
-  }
-  .tcVision strong{color:var(--navy); display:block; margin-bottom:5px; font-size:1rem;}
+  .abtBannerArt svg{width:100%; height:auto; display:block;}
 
-  /* شريط الإنجازات */
-  .impactBar{
-    display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr));
-    gap:14px; margin-top:44px; padding-top:26px;
-    border-top:1px solid rgba(201,161,94,.25);
-  }
-  .impactItem{display:flex; align-items:center; gap:12px; justify-content:center;}
-  .impIcon{
-    width:44px; height:44px; border-radius:12px; background:rgba(201,161,94,.14);
-    border:1px solid rgba(201,161,94,.3); display:flex; align-items:center;
-    justify-content:center; font-size:1.2rem; flex-shrink:0;
-  }
-  .impNum{font-family:'Aref Ruqaa'; font-size:1.1rem; color:var(--gold-light); line-height:1.35;}
-  .impLbl{font-size:.75rem; color:rgba(246,241,230,.62);}
+  .abtSection{padding:52px 0;}
+  .abtLabel{color:var(--gold-deep); font-size:.83rem; font-weight:700; margin-bottom:8px;}
+  .abtLabel.gold{color:var(--gold);}
+  .abtTitle{font-family:'Aref Ruqaa'; font-size:clamp(1.3rem,2.7vw,1.85rem); color:var(--navy); margin-bottom:14px; line-height:1.6;}
+  .abtTitle.light{color:#fff;}
+  .abtBody{font-size:.94rem; color:#4d5f65; line-height:2.05; max-width:760px; margin-bottom:30px;}
+  .abtSubLight{color:rgba(246,241,230,.7); font-size:.88rem;}
 
-  /* نسخة الشريط داخل قسم "عن المعلم" — خلفية فاتحة، فتحتاج ألواناً معاكسة */
-  .aboutImpact{
-    grid-template-columns:repeat(auto-fit, minmax(215px,1fr));
-    margin-top:26px; padding:22px; border:1px solid #ece5d4; border-radius:16px;
-    background:#fff; box-shadow:var(--shadow-soft);
+  .abtPillars{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:18px;}
+  .abtPillar{text-align:center; padding:20px 12px; border-radius:14px; background:#fff; border:1px solid #ece5d4; box-shadow:var(--shadow-soft); transition:transform .2s;}
+  .abtPillar:hover{transform:translateY(-3px);}
+  .apIcon{
+    width:50px; height:50px; border-radius:50%; margin:0 auto 12px;
+    display:flex; align-items:center; justify-content:center; font-size:1.35rem; color:#fff;
   }
-  .aboutImpact .impactItem{
-    justify-content:flex-start; padding:10px 12px; border-radius:12px;
-    background:var(--cream); transition:transform .2s;
-  }
-  .aboutImpact .impactItem:hover{transform:translateY(-2px);}
-  .aboutImpact .impIcon{background:var(--grad-gold); border-color:var(--gold-deep);}
-  .aboutImpact .impNum{color:var(--navy); font-size:1.05rem;}
-  .aboutImpact .impLbl{color:#5c6a6e;}
+  .apIcon.navy{background:var(--grad-navy);} .apIcon.gold{background:var(--grad-gold);}
+  .apIcon.teal{background:linear-gradient(140deg,#2b8f78,#1f6f5c);} .apIcon.plum{background:linear-gradient(140deg,#7a5a9e,#5a3d7a);}
+  .apName{font-weight:700; color:var(--navy); font-size:.93rem; margin-bottom:4px;}
+  .apSub{font-size:.78rem; color:#7a8a8e;}
 
-  /* الرسم التوضيحي بأعلى قسم المعلم */
-  .aboutHeroArt{
-    background:var(--grad-navy); border-radius:18px; padding:18px;
-    margin-top:20px; border:1px solid rgba(201,161,94,.3);
+  .abtStatsBand{background:var(--grad-navy); padding:52px 0; border-block:1px solid rgba(201,161,94,.2);}
+  .abtStatsInner{display:grid; grid-template-columns:.85fr 2fr; gap:34px; align-items:center;}
+  .abtStatsGrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px;}
+  .abtStat{
+    background:rgba(255,255,255,.055); border:1px solid rgba(201,161,94,.25);
+    border-radius:15px; padding:22px 14px; text-align:center; transition:.2s;
   }
-  .aboutHeroArt svg{width:100%; max-width:460px; height:auto; display:block; margin:0 auto;}
+  .abtStat:hover{background:rgba(255,255,255,.1); transform:translateY(-3px);}
+  .asIcon{
+    width:46px; height:46px; border-radius:50%; margin:0 auto 12px;
+    display:flex; align-items:center; justify-content:center; font-size:1.25rem; color:#fff;
+  }
+  .asIcon.navy{background:#2f6fa8;} .asIcon.gold{background:var(--gold);}
+  .asIcon.teal{background:#2b8f78;} .asIcon.plum{background:#7a5a9e;}
+  .asNum{font-family:'Aref Ruqaa'; font-size:1.4rem; color:#fff; line-height:1.4;}
+  .asName{color:var(--gold-light); font-size:.85rem; font-weight:700; margin-bottom:5px;}
+  .asSub{font-size:.74rem; color:rgba(246,241,230,.58); line-height:1.7;}
 
-  /* قائمة الإنجازات ببطاقة المعلم */
-  .tcAchievements{padding:4px 28px 20px;}
-  .tcAchievements h4{color:var(--navy); font-size:1rem; margin-bottom:14px;}
-  .achList{list-style:none; padding:0; margin:0; position:relative;}
-  .achList li{
-    position:relative; padding-inline-start:22px; padding-bottom:14px;
-    font-size:.89rem; color:#4d5f65; line-height:1.85;
-    border-inline-start:2px solid #ece5d4; margin-inline-start:5px;
+  .abtTimeline{display:grid; grid-template-columns:repeat(auto-fit,minmax(165px,1fr)); gap:18px; position:relative; margin-top:26px;}
+  .abtTLItem{text-align:center; position:relative;}
+  .tlIcon{
+    width:52px; height:52px; border-radius:50%; margin:0 auto 12px;
+    display:flex; align-items:center; justify-content:center; font-size:1.3rem; color:#fff;
+    box-shadow:0 4px 14px rgba(16,48,63,.16);
   }
-  .achList li:last-child{border-inline-start-color:transparent; padding-bottom:0;}
-  .achList strong{color:var(--navy);}
-  .achDot{
-    position:absolute; inset-inline-start:-7px; top:9px;
-    width:11px; height:11px; border-radius:50%;
-    background:var(--grad-gold); border:2px solid #fff; box-shadow:0 0 0 1px var(--gold);
+  .tlIcon.navy{background:var(--grad-navy);} .tlIcon.gold{background:var(--grad-gold);}
+  .tlIcon.teal{background:linear-gradient(140deg,#2b8f78,#1f6f5c);} .tlIcon.plum{background:linear-gradient(140deg,#7a5a9e,#5a3d7a);}
+  .tlName{font-weight:700; color:var(--navy); font-size:.92rem; margin-bottom:5px;}
+  .tlSub{font-size:.78rem; color:#7a8a8e; line-height:1.75; padding:0 6px;}
+
+  @media(max-width:860px){
+    .abtBannerInner, .abtStatsInner{grid-template-columns:1fr;}
+    .abtBannerArt{max-width:330px; margin:0 auto;}
   }
+
   .card h3{font-size:1.2rem; margin-bottom:8px; color:var(--navy);}
   .card p{font-size:.92rem; color:#5c6a6e;}
   .unit-num{
@@ -3342,114 +3313,93 @@ var qrcode = function() {
 </section>
 
 <section id="about">
-  <div class="wrap" style="max-width:900px;">
-    <h2>عن المعلم</h2>
-
-    <div class="aboutHeroArt">
-      <svg viewBox="0 0 420 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="رسم توضيحي: كرة أرضية وكتب الدراسات الاجتماعية">
-        <defs>
-          <linearGradient id="globeG" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#5aa9d6"/><stop offset="100%" stop-color="#2a6b8a"/>
-          </linearGradient>
-        </defs>
-        <ellipse cx="210" cy="140" rx="180" ry="8" fill="#000" opacity=".12"/>
-        <g transform="translate(72,26)">
-          <circle cx="46" cy="46" r="44" fill="url(#globeG)"/>
-          <path d="M14,26 Q34,18 52,30 Q40,44 22,42 Z" fill="#4a9b6e" opacity=".9"/>
-          <path d="M46,58 Q62,52 74,64 Q64,80 46,74 Z" fill="#4a9b6e" opacity=".9"/>
-          <path d="M56,16 Q72,14 80,26 Q66,34 56,28 Z" fill="#4a9b6e" opacity=".85"/>
-          <ellipse cx="46" cy="46" rx="44" ry="16" fill="none" stroke="#fff" stroke-width="1" opacity=".35"/>
-          <ellipse cx="46" cy="46" rx="18" ry="44" fill="none" stroke="#fff" stroke-width="1" opacity=".35"/>
-          <circle cx="46" cy="46" r="44" fill="none" stroke="#c9a15e" stroke-width="2.5"/>
-          <path d="M46,94 L46,104 M28,110 L64,110" stroke="#a8813f" stroke-width="4" stroke-linecap="round"/>
-        </g>
-        <g transform="translate(198,52)">
-          <rect x="0" y="60" width="180" height="17" rx="3" fill="#7a3030"/>
-          <text x="90" y="72" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">المواطنة</text>
-          <rect x="6" y="42" width="172" height="17" rx="3" fill="#a8813f"/>
-          <text x="92" y="54" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">الجغرافيا</text>
-          <rect x="2" y="24" width="176" height="17" rx="3" fill="#1f6f5c"/>
-          <text x="90" y="36" font-size="10" fill="#fff" text-anchor="middle" font-weight="bold">التاريخ</text>
-          <rect x="10" y="6" width="164" height="17" rx="3" fill="#164256"/>
-          <text x="92" y="18" font-size="10" fill="#e3c98b" text-anchor="middle" font-weight="bold">الدراسات الاجتماعية</text>
-        </g>
-      </svg>
-    </div>
-
-    <div class="impactBar aboutImpact">
-      <div class="impactItem">
-        <div class="impIcon">🎓</div>
-        <div><div class="impNum">+5 سنوات</div><div class="impLbl">خبرة في التعليم</div></div>
+  <!-- 1) لوحة تعريفية بأسلوب البانر -->
+  <div class="abtBanner">
+    <div class="wrap abtBannerInner">
+      <div class="abtBannerText">
+        <div class="abtEyebrow">— مرحباً بك في منصتي التعليمية</div>
+        <h2 class="abtHeadline">أصنع تجربة تعليمية<br>تجعل الطالب <em>مشاركاً لا متلقياً</em></h2>
+        <p class="abtLead">
+          معلم دراسات اجتماعية للصف السابع، أؤمن أن التعليم تجربة تُبنى لا تُلقّن.
+          وأسعى إلى توظيف التقنية والذكاء الاصطناعي لخلق بيئة تعليمية تفاعلية
+          تنمّي التفكير والقيادة لدى الطلاب.
+        </p>
+        <div class="abtQuote">« بالتعليم نبني أجيالاً أكثر وعياً »</div>
       </div>
-      <div class="impactItem">
-        <div class="impIcon">👥</div>
-        <div><div class="impNum">+1000 طالب</div><div class="impLbl">أكاديمياً وتربوياً</div></div>
-      </div>
-      <div class="impactItem">
-        <div class="impIcon">🏅</div>
-        <div><div class="impNum">برامج تربوية</div><div class="impLbl">مشاركات متعددة</div></div>
-      </div>
-      <div class="impactItem">
-        <div class="impIcon">✨</div>
-        <div><div class="impNum">رواق الضياء</div><div class="impLbl">النسخة الأولى · وزارة التربية</div></div>
+      <div class="abtBannerArt">
+        <svg viewBox="0 0 300 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="كرة أرضية وكتب المواد">
+          <defs><linearGradient id="gG" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#5aa9d6"/><stop offset="100%" stop-color="#2a6b8a"/></linearGradient></defs>
+          <ellipse cx="150" cy="198" rx="128" ry="7" fill="#000" opacity=".18"/>
+          <g transform="translate(20,16)">
+            <circle cx="52" cy="52" r="50" fill="url(#gG)"/>
+            <path d="M16,28 Q40,18 60,32 Q46,50 24,46 Z" fill="#4a9b6e" opacity=".92"/>
+            <path d="M52,66 Q70,58 84,72 Q72,90 52,84 Z" fill="#4a9b6e" opacity=".92"/>
+            <path d="M64,16 Q82,14 90,28 Q74,38 64,30 Z" fill="#4a9b6e" opacity=".85"/>
+            <ellipse cx="52" cy="52" rx="50" ry="18" fill="none" stroke="#fff" stroke-width="1" opacity=".33"/>
+            <ellipse cx="52" cy="52" rx="20" ry="50" fill="none" stroke="#fff" stroke-width="1" opacity=".33"/>
+            <circle cx="52" cy="52" r="50" fill="none" stroke="#c9a15e" stroke-width="3"/>
+            <path d="M52,106 L52,120 M30,126 L74,126" stroke="#a8813f" stroke-width="5" stroke-linecap="round"/>
+          </g>
+          <g transform="translate(122,92)">
+            <rect x="0" y="66" width="166" height="19" rx="3" fill="#7a3030"/>
+            <text x="83" y="79" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">المواطنة</text>
+            <rect x="5" y="45" width="158" height="19" rx="3" fill="#a8813f"/>
+            <text x="84" y="58" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">الجغرافيا</text>
+            <rect x="2" y="24" width="162" height="19" rx="3" fill="#1f6f5c"/>
+            <text x="83" y="37" font-size="10.5" fill="#fff" text-anchor="middle" font-weight="bold">التاريخ</text>
+            <rect x="9" y="3" width="150" height="19" rx="3" fill="#164256"/>
+            <text x="84" y="16" font-size="10" fill="#e3c98b" text-anchor="middle" font-weight="bold">الدراسات الاجتماعية</text>
+          </g>
+        </svg>
       </div>
     </div>
+  </div>
 
-    <div class="teacherCard">
-      <div class="tcHeader">
-        <div class="tcAvatar">👨‍🏫</div>
-        <div class="tcIntro">
-          <div class="tcName">الأستاذ صالح جبر ناصر</div>
-          <div class="tcRole">معلم الدراسات الاجتماعية · الصف السابع</div>
-          <div class="tcChips">
-            <span class="tcChip">🎓 خريج جامعة قطر</span>
-            <span class="tcChip">⏳ +5 سنوات خبرة</span>
-            <span class="tcChip">✨ رواق الضياء — النسخة الأولى</span>
-            <span class="tcChip">🤖 توظيف الذكاء الاصطناعي</span>
-          </div>
-        </div>
+  <!-- 2) نبذة + محاور الاهتمام -->
+  <div class="wrap abtSection">
+    <div class="abtLabel">— نبذة عني</div>
+    <h3 class="abtTitle">شغفي التعليم … ورسالتي بناء المستقبل</h3>
+    <p class="abtBody">
+      خريج جامعة قطر، وأحمل أكثر من خمس سنوات في ميدان التعليم والتربية.
+      أركّز على تنمية مهارات التفكير والقيادة لدى الطلاب، وأسعى دائماً لتطوير
+      نفسي مهنياً والمساهمة في خلق بيئة تعليمية محفّزة وآمنة.
+    </p>
+    <div class="abtPillars">
+      <div class="abtPillar"><div class="apIcon navy">📚</div><div class="apName">التربية والتعليم</div><div class="apSub">بأثر أعمق</div></div>
+      <div class="abtPillar"><div class="apIcon gold">🤖</div><div class="apName">الذكاء الاصطناعي</div><div class="apSub">لتعليم أفضل</div></div>
+      <div class="abtPillar"><div class="apIcon teal">🧭</div><div class="apName">القيادة والأنشطة</div><div class="apSub">بناء شخصيات مؤثرة</div></div>
+      <div class="abtPillar"><div class="apIcon plum">🌱</div><div class="apName">التطوير المستمر</div><div class="apSub">رحلة لا تتوقف</div></div>
+    </div>
+  </div>
+
+  <!-- 3) أرقام وإنجازات (لوحة داكنة) -->
+  <div class="abtStatsBand">
+    <div class="wrap abtStatsInner">
+      <div class="abtStatsHead">
+        <div class="abtLabel gold">— أرقام وإنجازات</div>
+        <h3 class="abtTitle light">رحلتي في التعليم</h3>
+        <p class="abtSubLight">أرقام تعكس العطاء .. وتجارب تصنع الفرق</p>
       </div>
-
-      <p class="tcQuote">«التعلّم رحلة لا تتوقف — وأجمل ما فيها أن تأخذ غيرك معك.»</p>
-
-      <div class="tcGrid">
-        <div class="tcBlock">
-          <div class="tcIcon">📚</div>
-          <h4>الجانب التربوي أولاً</h4>
-          <p>يضع بناء الإنسان قبل تلقين المعلومة، ويؤمن أن أثر المعلم الحقيقي يُقاس بما يبقى في الطالب بعد انتهاء الحصة.</p>
-        </div>
-        <div class="tcBlock">
-          <div class="tcIcon">🌱</div>
-          <h4>تعلّم مستمر</h4>
-          <p>يقضي معظم وقته في التطوير الذاتي والاطلاع الدائم، ثم ينقل ما تعلّمه لزملائه وطلابه بدل أن يحتفظ به لنفسه.</p>
-        </div>
-        <div class="tcBlock">
-          <div class="tcIcon">💡</div>
-          <h4>سبّاق للتقنية</h4>
-          <p>يرى في الذكاء الاصطناعي فرصة لا تُفوَّت، فوظّفه لتسهيل عمله وعمل الآخرين — وهذه المنصة إحدى ثمار ذلك.</p>
-        </div>
-        <div class="tcBlock">
-          <div class="tcIcon">🧭</div>
-          <h4>خبرة قيادية</h4>
-          <p>رصيد من الخبرات في القيادة والإدارة، يوظّفها في تنظيم بيئة صفّية محفّزة تجمع بين الانضباط والمتعة.</p>
-        </div>
+      <div class="abtStatsGrid">
+        <div class="abtStat"><div class="asIcon teal">👥</div><div class="asNum">+1000</div><div class="asName">طالب وطالبة</div><div class="asSub">ساهمت في دعمهم أكاديمياً وتربوياً</div></div>
+        <div class="abtStat"><div class="asIcon navy">📅</div><div class="asNum">+5</div><div class="asName">سنوات خبرة</div><div class="asSub">في التعليم والتربية</div></div>
+        <div class="abtStat"><div class="asIcon gold">⭐</div><div class="asNum">مشاركات عديدة</div><div class="asName">في البرامج التربوية</div><div class="asSub">والفعاليات التعليمية</div></div>
+        <div class="abtStat"><div class="asIcon plum">📖</div><div class="asNum">أول نسخة</div><div class="asName">من رواق الضياء</div><div class="asSub">التابع لوزارة التربية والتعليم</div></div>
       </div>
+    </div>
+  </div>
 
-      <div class="tcAchievements">
-        <h4>🏆 محطات وإنجازات</h4>
-        <ul class="achList">
-          <li><span class="achDot"></span><strong>أكثر من 5 سنوات</strong> في ميدان التعليم والتربية.</li>
-          <li><span class="achDot"></span>ساهم في مسيرة <strong>أكثر من 1000 طالب</strong> أكاديمياً وتربوياً.</li>
-          <li><span class="achDot"></span>شارك في العديد من <strong>البرامج التربوية</strong> داخل المدرسة وخارجها.</li>
-          <li><span class="achDot"></span>من المشاركين في <strong>النسخة الأولى من «رواق الضياء»</strong> التابع لوزارة التربية والتعليم والتعليم العالي.</li>
-          <li><span class="achDot"></span>صمّم وطوّر منصة <strong>«رحّالة»</strong> بنفسه — توظيفاً عملياً للتقنية في خدمة الطالب.</li>
-        </ul>
-      </div>
-
-      <div class="tcVision">
-        <strong>لماذا «رحّالة»؟</strong>
-        بُنيت هذه المنصة لتجعل المراجعة تجربة يُقبل عليها الطالب بدل أن يهرب منها — رحلة يكتشف فيها منهجه بنفسه، بين المتعة والتعلّم الحقيقي.
-      </div>
+  <!-- 4) أبرز المحطات -->
+  <div class="wrap abtSection">
+    <div class="abtLabel">— أبرز محطاتي</div>
+    <h3 class="abtTitle">من الإنجازات إلى المساهمة</h3>
+    <div class="abtTimeline">
+      <div class="abtTLItem"><div class="tlIcon gold">🏅</div><div class="tlName">خبرة مهنية</div><div class="tlSub">أكثر من 5 سنوات في التعليم والتربية</div></div>
+      <div class="abtTLItem"><div class="tlIcon navy">👥</div><div class="tlName">دعم الطلاب</div><div class="tlSub">أكثر من 1000 طالب وطالبة أكاديمياً وتربوياً</div></div>
+      <div class="abtTLItem"><div class="tlIcon plum">🎯</div><div class="tlName">البرامج التربوية</div><div class="tlSub">المشاركة في العديد من البرامج والأنشطة</div></div>
+      <div class="abtTLItem"><div class="tlIcon teal">📗</div><div class="tlName">رواق الضياء</div><div class="tlSub">النسخة الأولى — وزارة التربية والتعليم</div></div>
+      <div class="abtTLItem"><div class="tlIcon gold">🧭</div><div class="tlName">منصة رحّالة</div><div class="tlSub">صمّمها وطوّرها بنفسه لخدمة طلابه</div></div>
     </div>
   </div>
 </section>
