@@ -3084,11 +3084,11 @@ var qrcode = function() {
           <a href="#" onclick="openEnrichment(6); return false;">🎥 وحدة ٦ · الأمن الوطني</a>
         </div>
       </div>
-      <a href="#games">الألعاب</a>
-      <a href="#compareTool">قارن بين</a>
-      <a href="#classchallenge">تحدي الصفوف</a>
-      <a href="#leaderboard">لوحة الصدارة</a>
-      <a href="#about">عن المعلم</a>
+      <a href="#" onclick="showSection('games'); return false;">الألعاب</a>
+      <a href="#" onclick="showSection('compareTool'); return false;">قارن بين</a>
+      <a href="#" onclick="showSection('classchallenge'); return false;">تحدي الصفوف</a>
+      <a href="#" onclick="showSection('leaderboard'); return false;">لوحة الصدارة</a>
+      <a href="#" onclick="showSection('about'); return false;">عن المعلم</a>
       <a href="#" id="profileNavLink" style="display:none;" onclick="openProfile(); return false;">👤 ملفي</a>
     </nav>
     <button id="userChip">دخول الطالب</button>
@@ -3111,7 +3111,7 @@ var qrcode = function() {
   </div>
 </div>
 
-<section class="hero">
+<section id="hero" class="hero">
   <div class="wrap">
     <div>
       <h1>اكتشف <em>الدراسات الاجتماعية</em>… وأنت تلعب وتربح النقاط</h1>
@@ -4169,12 +4169,41 @@ function openEnrichment(n){
   document.getElementById('mainNav').classList.remove('show');
 }
 
-function closeUnit(){
-  document.querySelectorAll('section').forEach(s=>{ s.style.display=''; });
+// الصفحة الرئيسية تعرض قسم البطل فقط — والباقي يظهر بالضغط على رابطه بالقائمة
+const HOME_SECTIONS = ['hero'];
+
+// يعرض قسماً واحداً فقط ويخفي البقية — بدل تكديس كل الأقسام بالصفحة
+function showSection(id){
+  document.querySelectorAll('section').forEach(s=>{
+    s.style.display = (s.id === id) ? '' : 'none';
+  });
   document.getElementById('unitView').classList.remove('show');
   document.getElementById('enrichView').classList.remove('show');
-  history.pushState('', document.title, window.location.pathname + window.location.search);
+  document.getElementById('mainNav').classList.remove('show');
+  document.querySelectorAll('.navDrop').forEach(d=>d.classList.remove('open'));
+  const target = document.getElementById(id);
+  if(target) target.style.display = '';
   window.scrollTo({top:0, behavior:'instant'});
+}
+
+// يرجّع للصفحة الرئيسية: البطل وبطاقات الوحدات فقط
+function showHome(){
+  document.querySelectorAll('section').forEach(s=>{
+    s.style.display = HOME_SECTIONS.includes(s.id) ? '' : 'none';
+  });
+  document.getElementById('unitView').classList.remove('show');
+  document.getElementById('enrichView').classList.remove('show');
+  // لوحة المعلم تظهر تلقائياً لو كان مسجّلاً دخوله
+  if(isAdmin){
+    const ap = document.getElementById('adminPanel');
+    if(ap) ap.style.display = '';
+  }
+  window.scrollTo({top:0, behavior:'instant'});
+}
+
+function closeUnit(){
+  showHome();
+  history.pushState('', document.title, window.location.pathname + window.location.search);
 }
 
 // يرجّع لأول الصفحة الرئيسية من أي مكان بالموقع — يُستخدم عند الضغط على شعار "رحّالة"
@@ -5305,6 +5334,7 @@ function setAdminActive(active){
   document.getElementById('adminPanel').classList.toggle('show', active);
   document.getElementById('adminLogoutTop').classList.toggle('show', active);
   if(active){
+    document.getElementById('adminPanel').style.display = ''; // نتجاوز إخفاء الصفحة الرئيسية
     loadPendingStudents();
     loadQuestionsAdmin();
     loadStudentsList();
@@ -8588,6 +8618,7 @@ const createDataURL = function(width, height, getPixel) {
 
 // نغلّف التهيئة بحماية — أي خطأ بجزء ما يوقف باقي الموقع
 try { renderQuestion(); } catch(e){ console.error('renderQuestion:', e); }
+try { showHome(); } catch(e){ console.error('showHome:', e); } // نبدأ بالصفحة الرئيسية النظيفة
 try { renderEnergy(); } catch(e){ console.error('renderEnergy:', e); }
 try { initUpdateBar(); } catch(e){ console.error('initUpdateBar:', e); }
 try { showCompare(0); } catch(e){ console.error('showCompare:', e); }
