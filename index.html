@@ -2913,6 +2913,28 @@ var qrcode = function() {
   .unitHead .tag{color:var(--gold); font-family:'Aref Ruqaa'; font-size:1.1rem;}
   .unitHead h2{margin:6px 0 8px;}
   .unitHead .fw{color:#5c6a6e; font-size:.88rem; line-height:1.9;}
+  /* أدوات الدرس والتنقل بينه */
+  .lessonTools{display:flex; gap:9px; flex-wrap:wrap; margin-top:14px;}
+  .lessonTools a, .lessonTools button{
+    background:var(--cream); border:1.5px solid #dcd4c0; border-radius:9px;
+    padding:7px 15px; font-size:.83rem; font-weight:700; color:var(--navy);
+    cursor:pointer; font-family:'Tajawal';
+  }
+  .lessonTools a:hover, .lessonTools button:hover{background:var(--gold-light); border-color:var(--gold);}
+  .lessonNav{
+    display:flex; justify-content:space-between; gap:12px; margin-top:30px;
+    padding-top:20px; border-top:2px solid #ece5d4;
+  }
+  .lessonNav button{
+    background:#fff; border:1.5px solid var(--navy); border-radius:10px;
+    padding:11px 18px; font-size:.85rem; font-weight:700; color:var(--navy);
+    cursor:pointer; font-family:'Tajawal'; max-width:46%; text-align:start;
+  }
+  .lessonNav button:hover{background:var(--grad-navy); color:var(--gold-light); border-color:var(--navy);}
+  @media print{
+    .lessonTools, .lessonNav, .backLink{display:none !important;}
+  }
+
   .lessonFig{
     margin:22px 0; background:#fff; border:1px solid #e8e0cd; border-radius:14px;
     padding:14px; box-shadow:var(--shadow-soft); overflow-x:auto;
@@ -2970,9 +2992,10 @@ var qrcode = function() {
   .repStatCard .lbl{font-size:.8rem; opacity:.85; margin-top:4px;}
   @media print{
     .noPrint, header, #topPendingBar, #lastUpdateBar, #chatFab, #chatPanel, footer{display:none !important;}
-    #reportView{display:block !important;}
     section{display:none !important;}
     #reportView, #reportView .wrap{display:block !important;}
+    /* طباعة صفحة الدرس كذلك لو كانت مفتوحة */
+    #unitView.show, #unitView.show .wrap{display:block !important;}
     body{background:#fff;}
   }
 
@@ -4375,19 +4398,55 @@ const UNITS_DATA = {
   ]}
 };
 
+let currentLessonText = ''; // نص الدرس المعروض — للقراءة الصوتية
+
+// قراءة الدرس صوتياً (نفس تقنية قراءة الأسئلة — مدمجة بالمتصفح ومجانية)
+function speakLesson(){
+  if(!('speechSynthesis' in window)){ showToast('متصفحك ما يدعم القراءة الصوتية', 'error'); return; }
+  if(speechSynthesis.speaking){ speechSynthesis.cancel(); showToast('⏹️ توقفت القراءة', 'info'); return; }
+  if(!currentLessonText){ showToast('افتح درساً أولاً', 'error'); return; }
+  const u = new SpeechSynthesisUtterance(currentLessonText);
+  u.lang = 'ar-SA';
+  u.rate = 0.92;
+  speechSynthesis.speak(u);
+  showToast('🔊 بدأت القراءة — اضغط الزر مرة ثانية للإيقاف', 'success');
+}
+
+// طباعة الدرس أو حفظه PDF
+function printLesson(){
+  window.print();
+}
+
 // يعرض درساً واحداً فقط بدل الوحدة كاملة
 function openLesson(unitNum, lessonIdx){
   const u = UNITS_DATA[unitNum];
   if(!u || !u.lessons[lessonIdx]) return;
   const l = u.lessons[lessonIdx];
+  // نحسب الدرس السابق والتالي عبر الوحدات كلها — تسلسل متصل من أول درس لآخر درس
+  const flat = [];
+  Object.keys(UNITS_DATA).forEach(un=>{
+    UNITS_DATA[un].lessons.forEach((ls,li)=> flat.push([parseInt(un,10), li, ls.title.replace(/^الدرس (الأول|الثاني): /,'')]));
+  });
+  const pos = flat.findIndex(x => x[0] === unitNum && x[1] === lessonIdx);
+  const prev = pos > 0 ? flat[pos-1] : null;
+  const next = pos < flat.length-1 ? flat[pos+1] : null;
+  currentLessonText = (u.title + '. ' + l.title + '. ' + l.html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ')).slice(0, 4000);
   document.getElementById('unitViewContent').innerHTML = `
     <div class="unitHead">
       <div class="tag">الوحدة ${unitNum} · ${esc(u.subject)} · صفحات ${esc(l.pages || u.pages)}</div>
       <h2>${esc(l.title)}</h2>
       <div class="fw">${esc(u.title)}</div>
-      <a href="#" class="backLink" style="margin-top:12px;" onclick="openUnit(${unitNum}); return false;">📚 عرض الوحدة كاملة</a>
+      <div class="lessonTools">
+        <a href="#" onclick="openUnit(${unitNum}); return false;">📚 الوحدة كاملة</a>
+        <button onclick="speakLesson()" title="قراءة الدرس صوتياً">🔊 استمع</button>
+        <button onclick="printLesson()" title="طباعة أو حفظ PDF">🖨️ طباعة</button>
+      </div>
     </div>
-    <div class="lessonBlock">${l.html}</div>`;
+    <div class="lessonBlock">${l.html}</div>
+    <div class="lessonNav">
+      ${prev ? `<button onclick="openLesson(${prev[0]},${prev[1]})">→ ${esc(prev[2])}</button>` : '<span></span>'}
+      ${next ? `<button onclick="openLesson(${next[0]},${next[1]})">${esc(next[2])} ←</button>` : '<span></span>'}
+    </div>`;
   const uv = document.getElementById('unitView');
   uv.style.display = '';
   uv.classList.add('show');
