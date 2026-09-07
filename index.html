@@ -6740,7 +6740,6 @@ function pageRef(unit){
 }
 
 let lastTopic = null; // آخر مفهوم فهمه المنقذ، عشان يفهم أسئلة المتابعة القصيرة
-let lastTopicKeys = []; // كلمات آخر موضوع — تُستخدم لدمجها مع أسئلة الضمائر
 
 // ردود تحفيزية للطالب المحبط — الصمت أسوأ رد ممكن بهذي اللحظة
 const ENCOURAGE_PATTERNS = ['مو فاهم','ما فهمت','مافهمت','صعب','تعبت','ما اقدر','مااقدر','زهقت','مليت','محتار','ضايع','خايف','قلقان'];
@@ -6798,7 +6797,6 @@ function tryUnitSummary(query){
 }
 
 // ---------- ذاكرة السياق: يتذكر موضوع الحوار الحالي ----------
-let contextTopic = null;   // آخر موضوع رئيسي (نص المفهوم + كلماته المفتاحية)
 let contextTokens = [];    // كلمات الموضوع — تُدمج بأسئلة المتابعة الناقصة
 
 // هل السؤال ناقص ويحتاج السياق؟ (قصير، أو فيه ضمير، أو يبدأ بأداة استفهام بلا موضوع)
@@ -6853,9 +6851,9 @@ function matchKnowledge(query){
   // سؤال بضمير غامض ("مين أسسها؟") — نجرّب دمجه مع آخر موضوع للبحث الدقيق أولاً
   if(/^(مين|من|متى|وين|كيف|ليش)\s+\S{1,12}(ها|ه|هم)\??$/.test(query.trim()) && lastTopic){
     // نبحث بموضوع آخر سؤال + الفعل الحالي — يعطي جواباً أدق من مجرد إعادة الموضوع
-    if(lastTopicKeys && lastTopicKeys.length){
+    if(contextTokens.length){
       const verb = query.trim().split(/\s+/)[1].replace(/(ها|ه|هم)\??$/,'');
-      const merged = tokenize(lastTopicKeys.join(' ') + ' ' + verb);
+      const merged = [...new Set([...contextTokens, ...tokenize(verb)])];
       const found = searchCurriculumDeep(merged);
       if(found){
         lastTopic = { a: found.text, extra: null };
@@ -6875,8 +6873,6 @@ function matchKnowledge(query){
       top.push(fullMatches[1].entry);
     }
     lastTopic = top[0];
-    lastTopicKeys = top[0].k || [];
-    contextTopic = top[0];
     contextTokens = top[0].k.flatMap(k => tokenize(k)).filter(t => t.length >= 3).slice(0, 4);
     const text = top.map(e=> e.a + pageRef(e.unit)).join('\n\n');
     return { text, chips: [] };
@@ -6887,7 +6883,7 @@ function matchKnowledge(query){
     const shortMatch = findShortQueryMatch(qTokens);
     if(shortMatch){
       lastTopic = shortMatch;
-      lastTopicKeys = shortMatch.k || [];
+      contextTokens = shortMatch.k.flatMap(k => tokenize(k)).filter(t => t.length >= 3).slice(0, 4);
       return { text: shortMatch.a + pageRef(shortMatch.unit), chips: [] };
     }
   }
