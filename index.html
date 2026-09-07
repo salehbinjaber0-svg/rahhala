@@ -2440,6 +2440,14 @@ var qrcode = function() {
   }
   .curriculumMenu a.cmLesson:hover{background:#faf6ec; color:var(--navy); border-inline-start-color:var(--gold);}
 
+  /* رابط لوحة المعلم بالشريط العلوي — مميّز بصرياً عن روابط الطلاب */
+  .adminNavLink{
+    background:rgba(201,161,94,.16); border:1px solid var(--gold) !important;
+    border-radius:20px; padding:5px 14px !important; color:var(--gold-light) !important;
+    font-weight:700; margin-inline-start:6px;
+  }
+  .adminNavLink:hover{background:var(--gold); color:var(--navy-deep) !important;}
+
   /* ===== قسم صفوفي ===== */
   .myClassBar{display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; align-items:center;}
   .myClassBtn{
@@ -3232,6 +3240,7 @@ var qrcode = function() {
       <a href="#" onclick="showSection('leaderboard'); return false;">لوحة الصدارة</a>
       <a href="#" onclick="showSection('about'); return false;">عن المعلم</a>
       <a href="#" id="profileNavLink" style="display:none;" onclick="openProfile(); return false;">👤 ملفي</a>
+      <a href="#" id="adminNavLink" class="adminNavLink" style="display:none;" onclick="openAdminPanel(); return false;">🎛️ لوحة المعلم</a>
     </nav>
     <button id="userChip">دخول الطالب</button>
     <div id="badgesRow" style="display:none;"></div>
@@ -5664,11 +5673,30 @@ async function adminLogout(btn){
   showToast('👋 تم تسجيل خروج المعلم بنجاح', 'success');
 }
 
+// يفتح لوحة المعلم وحدها بملء الشاشة — وصول سريع من الشريط العلوي
+function openAdminPanel(){
+  if(!isAdmin){ openAdminLogin(); return; }
+  document.querySelectorAll('section').forEach(s=>{
+    s.style.display = (s.id === 'adminPanel') ? '' : 'none';
+  });
+  const ap = document.getElementById('adminPanel');
+  ap.style.display = '';
+  ap.classList.add('show');
+  document.getElementById('unitView').classList.remove('show');
+  document.getElementById('enrichView').classList.remove('show');
+  document.getElementById('mainNav').classList.remove('show');
+  document.querySelectorAll('.navDrop').forEach(d=>d.classList.remove('open'));
+  window.scrollTo({top:0, behavior:'instant'});
+}
+
 function setAdminActive(active){
   isAdmin = active;
   document.getElementById('adminChip').classList.toggle('active', active);
   document.getElementById('adminPanel').classList.toggle('show', active);
   document.getElementById('adminLogoutTop').classList.toggle('show', active);
+  // رابط لوحة المعلم بالشريط العلوي — يظهر لك وحدك بعد تسجيل الدخول
+  const navLink = document.getElementById('adminNavLink');
+  if(navLink) navLink.style.display = active ? 'inline-block' : 'none';
   if(active){
     document.getElementById('adminPanel').style.display = ''; // نتجاوز إخفاء الصفحة الرئيسية
     loadPendingStudents();
