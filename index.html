@@ -4901,7 +4901,7 @@ function requireDb(){
 
 // يعيد أي عملية اتصال بقاعدة البيانات حتى 3 مرات قبل ما يعتبرها فشل حقيقي —
 // يمتص الانقطاعات اللحظية البسيطة الشائعة بالشبكات المزدحمة (زي شبكات المدارس)
-async function supaCall(fn, attempts = 3, delayMs = 900){
+async function supaCall(fn, attempts = 3, delayMs = 350){
   let result;
   for(let i = 0; i < attempts; i++){
     result = await fn();
@@ -5619,16 +5619,23 @@ function startPolling(){
   refreshLeaderboard();
   refreshClassChallenge();
   if(pollTimer) clearInterval(pollTimer);
+  let tick = 0;
   pollTimer = setInterval(()=>{
     if(document.hidden) return; // التبويب مخفي — نوقف الاستعلامات، يوفّر بطارية وبيانات الطالب
-    refreshLeaderboard();
-    refreshClassChallenge();
-    refreshMyState();
-    if(isAdmin){
-      loadPendingStudents(); // يحدّث قائمة الطلاب بانتظار الموافقة تلقائياً، حتى لو سجّل طالب بعد ما فتحت اللوحة
-      loadStudentsList(); // يحدّث حالة النشاط والوقت تلقائياً (يتجنّب مسح الكتابة أثناء إضافة ملاحظة)
+    tick++;
+    // الطالب المنتظر للموافقة: فحص كل ثانيتين عشان الموافقة والطرد يوصلانه بسرعة
+    const waiting = state && state.status !== 'approved';
+    if(waiting || tick % 3 === 0) refreshMyState();
+    // البقية كل 6 ثوانٍ — أخف على قاعدة البيانات
+    if(tick % 3 === 0){
+      refreshLeaderboard();
+      refreshClassChallenge();
     }
-  }, 5000);
+    if(isAdmin){
+      loadPendingStudents(); // كل ثانيتين — الطالب الجديد يظهر لك بسرعة
+      if(tick % 3 === 0) loadStudentsList();
+    }
+  }, 2000);
 }
 
 // أول ما يرجع الطالب للتبويب، نحدّث فوراً بدل ما ينتظر دورة كاملة
@@ -5784,12 +5791,16 @@ async function loadPendingStudents(){
   topList.innerHTML = n > 0 ? data.map(renderPendingPill).join('') : '';
 }
 async function approveStudent(key, btn){
-  if(btn){ btn.disabled = true; btn.textContent = '⏳'; btn.style.opacity='.6'; }
-  await sb.from('students').update({status:'approved'}).eq('key', key);
+  // إزالة فورية من القائمة قبل رد الخادم — استجابة سريعة بدل انتظار
+  if(btn){
+    const pill = btn.closest('.pendingPill');
+    if(pill) pill.remove();
+  }
+  showToast('✅ تمت الموافقة على الطالب', 'success');
+  const { error } = await sb.from('students').update({status:'approved'}).eq('key', key);
+  if(error){ showToast('تعذر الحفظ: ' + error.message, 'error'); }
   loadPendingStudents();
   refreshLeaderboard();
-  refreshClassChallenge();
-  showToast('✅ تمت الموافقة على الطالب', 'success');
 }
 async function rejectStudent(key, btn){
   if(btn){ btn.disabled = true; btn.textContent = '⏳'; btn.style.opacity='.6'; }
@@ -5877,10 +5888,12 @@ async function removeStudent(key, btn){
 }
 
 async function kickStudent(key, btn){
-  if(!confirm('تأكيد طرد هذا الطالب؟ راح تنتهي جلسته فوراً (يقدر يرجع يسجّل دخول من جديد لاحقاً).')) return;
+  if(!isAdmin || !requireDb()) return;
+  if(!confirm('تأكيد إنهاء جلسة هذا الطالب؟ (يقدر يرجع يسجّل دخول لاحقاً)')) return;
   if(btn){ btn.disabled = true; btn.textContent = '⏳'; }
-  await sb.from('students').update({kicked:true}).eq('key', key);
-  showToast('🚫 تم طرد الطالب من الجلسة الحالية', 'info');
+  showToast('🚫 تم إنهاء جلسة الطالب', 'info'); // رد فوري قبل انتظار الخادم
+  const { error } = await sb.from('students').update({kicked:true}).eq('key', key);
+  if(error){ showToast('تعذر التنفيذ: ' + error.message, 'error'); }
   loadStudentsList();
 }
 
