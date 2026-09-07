@@ -6745,6 +6745,29 @@ const ENCOURAGE_REPLIES = [
   'أنا معك خطوة بخطوة 💪 قولّي أي وحدة أو درس تحس إنه أصعب شي، ونبدأ منه.',
 ];
 
+// طلب أسئلة للتدريب على وحدة
+function tryQuizRequest(query){
+  if(!/اسئلة|أسئلة|اختبرني|اختبار|تدريب|مراجعة|درّبني|دربني|سؤال عن/.test(query)) return null;
+  const nums={'الاولى':1,'الأولى':1,'اولى':1,'1':1,'الثانية':2,'ثانية':2,'2':2,'الثالثة':3,'ثالثة':3,'3':3,
+              'الرابعة':4,'رابعة':4,'4':4,'الخامسة':5,'خامسة':5,'5':5,'السادسة':6,'سادسة':6,'6':6};
+  let un=null;
+  for(const [w,n] of Object.entries(nums)) if(query.includes(w)){ un=n; break; }
+  const where = un && UNITS_DATA[un] ? `«${UNITS_DATA[un].title}»` : 'المنهج';
+  return {
+    text: `📝 عندك أسئلة تدريب جاهزة على ${where}!\n\nروح لقسم «الألعاب» ← «🧠 مراجعة سريعة» — الأسئلة مأخوذة من الكتاب نفسه، وكل إجابة صحيحة تكسبك نقاطاً وطاقة.\n\nوفيه كمان: 🃏 لعبة المطابقة · 📜 رتّب الأحداث — تختبر فهمك بطريقة مختلفة.`,
+    chips: []
+  };
+}
+
+// نصائح المذاكرة والاستعداد للاختبار
+function tryStudyTips(query){
+  if(!/كيف اذاكر|كيف أذاكر|طريقة المذاكرة|استعد للاختبار|أستعد للاختبار|نصيحة|نصائح|احفظ|أحفظ|ما اقدر احفظ/.test(query)) return null;
+  return {
+    text: `📚 خطة مذاكرة عملية لمادة الدراسات الاجتماعية:\n\n1️⃣ اقرأ الدرس من قسم «المنهج» — فيه رسوم توضيحية تسهّل الحفظ.\n2️⃣ جرّب «🧠 مراجعة سريعة» — الأسئلة اللي تخطئ فيها تتكرر عليك تلقائياً حتى تتقنها.\n3️⃣ استخدم «📜 رتّب الأحداث» للتسلسل التاريخي، و«🃏 المطابقة» للمصطلحات.\n4️⃣ لو وقفت بمفهوم، اسألني عنه مباشرة وأشرحه لك.\n\n💡 نصيحة: المذاكرة بجلسات قصيرة متكررة أفضل من جلسة طويلة واحدة.`,
+    chips: []
+  };
+}
+
 // طلب ملخص وحدة كاملة
 function tryUnitSummary(query){
   const arabicNums = {'الاولى':1,'الأولى':1,'اولى':1,'1':1,'الثانية':2,'ثانية':2,'2':2,'الثالثة':3,'ثالثة':3,'3':3,
@@ -6784,9 +6807,22 @@ function matchKnowledge(query){
     return { text: ENCOURAGE_REPLIES[Math.floor(Math.random()*ENCOURAGE_REPLIES.length)], chips: [] };
   }
 
+  // نصائح المذاكرة أولاً — أدق من نمط الأسئلة العام
+  const tips = tryStudyTips(query);
+  if(tips) return tips;
+
+  // طلب أسئلة تدريب
+  const quiz = tryQuizRequest(query);
+  if(quiz) return quiz;
+
   // طلب ملخص وحدة
   const summary = tryUnitSummary(query);
   if(summary) return summary;
+
+  // سؤال بضمير غامض ("مين أسسها؟") — نربطه بآخر موضوع تكلمنا عنه
+  if(/^(مين|من|متى|وين|كيف|ليش)\s+\S{1,12}(ها|ه|هم)\??$/.test(query.trim()) && lastTopic){
+    return { text: 'بخصوص آخر موضوع تكلمنا عنه:\n' + lastTopic.a, chips: [] };
+  }
 
   const scored = KNOWLEDGE_BASE.map(entry => ({ entry, ...scoreEntry(entry, qTokens) }));
   const fullMatches = scored.filter(s => s.full).sort((a,b)=> b.score - a.score);
@@ -6819,6 +6855,25 @@ function matchKnowledge(query){
   }
 
   // أسئلة السبب ("ليش سقطت الدولة العباسية") — نجرّد أداة الاستفهام وندوّر عن التعليل بنص المنهج
+  // أسئلة التاريخ ("متى قامت...") — نجرّد أداة الاستفهام ونرجّح المقاطع اللي فيها تواريخ
+  if(/^متى|متى\s/.test(query.trim())){
+    const cleaned = query.replace(/متى/g,' ');
+    const dateTokens = tokenize(cleaned);
+    if(dateTokens.length){
+      let dated = searchCurriculumDeep(dateTokens, ['هـ','ق.م','عام','سنة','قرن']);
+      if(!dated){
+        // الكتاب يستخدم "قيام/نشأة/تأسيس" بدل "قامت" — نجرّب المرادفات
+        const alt = dateTokens.map(t => ({'قامت':'قيام','قام':'قيام','تاسست':'تاسيس','بدات':'بدايه','انتهت':'نهايه','سقطت':'سقوط'})[t] || t);
+        dated = searchCurriculumDeep(alt, ['هـ','ق.م','عام','سنة','قرن']) || searchCurriculumDeep(alt);
+      }
+      if(!dated) dated = searchCurriculumDeep(dateTokens); // آخر محاولة بلا شرط
+      if(dated){
+        lastTopic = { a: dated.text, extra: null };
+        return { text: `${dated.text}\n📄 صفحة ${dated.pages} بالكتاب`, chips: [] };
+      }
+    }
+  }
+
   const whyWords = ['ليش','لماذا','لمذا','ليه','وش السبب','ماسبب','ما سبب','اسباب','أسباب','سبب','علل','بم تفسر'];
   const isWhy = whyWords.some(w => query.includes(w));
   if(isWhy){
