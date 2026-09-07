@@ -2660,6 +2660,7 @@ var qrcode = function() {
   .srBadge{padding:3px 10px; border-radius:20px; font-size:.72rem; font-weight:700;}
   .srBadge.active{background:var(--teal); color:#fff;}
   .srBadge.away{background:#e8e0cd; color:#7a8a8e;}
+  .srBadge.kicked{background:var(--maroon); color:#fff;}
   .studentRow .srActions{display:flex; gap:8px; align-items:center;}
   .noteInput{flex:1; padding:8px 10px; border-radius:8px; border:1.5px solid #dcd4c0; font-family:'Tajawal'; font-size:.82rem;}
   .kickBtn{background:var(--maroon); color:#fff; border:none; border-radius:8px; padding:8px 14px; font-size:.8rem; font-weight:700; cursor:pointer;}
@@ -4598,7 +4599,8 @@ async function buildProfile(){
   // ترتيب الطالب بين زملائه الموافق عليهم
   let rankText = '—', totalText = '';
   if(sb){
-    const { data } = await sb.from('students').select('key,points').eq('status','approved').order('points', {ascending:false});
+    const { data: raw } = await sb.from('students').select('key,points,kicked').eq('status','approved').order('points', {ascending:false});
+    const data = (raw || []).filter(s => !s.kicked); // نفس منطق لوحة الصدارة
     if(data && data.length){
       const idx = data.findIndex(s => s.key === currentKey());
       if(idx !== -1){ rankText = `#${idx + 1}`; totalText = `من ${data.length} طالب`; }
@@ -5172,6 +5174,10 @@ function renderQuestion(){
 // بوابة موحّدة: ما أحد يلعب إلا بعد تسجيل الدخول + موافقتك الشخصية عليه
 function requireApproved(){
   if(!state){ openLogin(); return false; }
+  if(state.kicked){
+    showToast('🚫 أنهى المعلم جلستك — سجّل دخول من جديد', 'error');
+    return false;
+  }
   if(state.status !== 'approved'){
     // نتحقق فوراً من قاعدة البيانات بدل انتظار دورة التحديث — الموافقة قد تكون وصلت للتو
     refreshMyState().then(()=>{
@@ -5808,6 +5814,7 @@ async function approveStudent(key, btn){
   const { error } = await sb.from('students').update({status:'approved'}).eq('key', key);
   if(error){ showToast('تعذر الحفظ: ' + error.message, 'error'); }
   loadPendingStudents();
+  loadStudentsList();   // يظهر فوراً بقائمة الطلاب/الحضور
   refreshLeaderboard();
 }
 async function rejectStudent(key, btn){
@@ -5855,7 +5862,7 @@ function renderStudentRow(r){
           <span>${r.points} نقطة · وقت الاستخدام: ${formatDuration(r.total_seconds)} · ${formatLastSeen(r.last_seen)}</span>
         </div>
         <div class="srActions">
-          <span class="srBadge ${isActive?'active':'away'}">${isActive?'🟢 نشط الآن':'⚪ غير متصل'}</span>
+          <span class="srBadge ${r.kicked ? 'kicked' : (isActive?'active':'away')}">${r.kicked ? '🚫 مطرود' : (isActive?'🟢 نشط الآن':'⚪ غير متصل')}</span>
           <button class="kickBtn" onclick="kickStudent('${r.key}', this)" title="ينهي جلسته الحالية فقط — يقدر يرجع يدخل">🚫 إنهاء الجلسة</button>
           <button class="kickBtn" style="background:#5a1f1f;" onclick="removeStudent('${r.key}', this)" title="يزيله نهائياً من المنصة ولوحة الصدارة">⛔ إزالة نهائية</button>
         </div>
