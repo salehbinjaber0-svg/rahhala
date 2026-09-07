@@ -2541,6 +2541,21 @@ var qrcode = function() {
     display:none; background:var(--teal); color:#fff; text-align:center; padding:9px 20px;
     font-size:.82rem; position:relative;
   }
+  /* شريط طقس الدوحة — بنفس نمط شريط التحديث، بلون سماوي يناسب موضوعه */
+  #weatherBar{
+    display:none; background:linear-gradient(90deg,#2a6b8a,#3a86ad); color:#fff;
+    text-align:center; padding:9px 20px; font-size:.82rem; position:relative;
+  }
+  #weatherBar.show{display:block;}
+  #weatherBar strong{color:#ffe6b0;}
+  #weatherBar .wbHint{opacity:.72; font-size:.76rem;}
+  #weatherBar button{
+    position:absolute; inset-inline-end:12px; top:50%; transform:translateY(-50%);
+    background:rgba(255,255,255,.16); border:none; color:#fff; cursor:pointer;
+    width:22px; height:22px; border-radius:50%; font-size:.72rem; line-height:1;
+  }
+  #weatherBar button:hover{background:rgba(255,255,255,.3);}
+  @media(max-width:620px){ #weatherBar .wbHint{display:none;} }
   #lastUpdateBar.show{display:block;}
   #lastUpdateBar button{
     position:absolute; left:16px; top:50%; transform:translateY(-50%); background:none; border:none;
@@ -3263,6 +3278,11 @@ var qrcode = function() {
     <button class="menuBtn" id="menuBtn">☰</button>
   </div>
 </header>
+
+<div id="weatherBar">
+  <span id="weatherText">🌤️ جاري جلب طقس الدوحة...</span>
+  <button onclick="dismissWeatherBar()" title="إغلاق">✕</button>
+</div>
 
 <div id="lastUpdateBar">
   🆕 آخر تحديث للموقع: <span id="lastUpdateText">...</span>
@@ -6844,6 +6864,45 @@ function dismissUpdateBar(){
   document.getElementById('lastUpdateBar').classList.remove('show');
   localStorage.setItem('rahhala_seen_update', document.lastModified);
 }
+// ---------- شريط طقس الدوحة (يرتبط بالوحدة الأولى: عناصر المناخ) ----------
+function dismissWeatherBar(){
+  document.getElementById('weatherBar').classList.remove('show');
+  // نخفيه لبقية اليوم فقط — يرجع يظهر بكرة بطقس جديد
+  localStorage.setItem('rahhala_weather_dismissed', new Date().toISOString().slice(0,10));
+}
+
+const WEATHER_CODES = {
+  0:['☀️','صحو'], 1:['🌤️','صحو غالباً'], 2:['⛅','غائم جزئياً'], 3:['☁️','غائم'],
+  45:['🌫️','ضباب'], 48:['🌫️','ضباب متجمد'],
+  51:['🌦️','رذاذ خفيف'], 53:['🌦️','رذاذ'], 55:['🌦️','رذاذ كثيف'],
+  61:['🌧️','مطر خفيف'], 63:['🌧️','مطر'], 65:['🌧️','مطر غزير'],
+  80:['🌦️','زخات مطر'], 81:['🌧️','زخات غزيرة'], 82:['⛈️','زخات شديدة'],
+  95:['⛈️','عاصفة رعدية'], 96:['⛈️','عاصفة مع برد'],
+};
+
+async function initWeatherBar(){
+  const bar = document.getElementById('weatherBar');
+  if(!bar) return;
+  // لو أغلقه اليوم، ما نزعجه مرة ثانية
+  if(localStorage.getItem('rahhala_weather_dismissed') === new Date().toISOString().slice(0,10)) return;
+  try{
+    // خدمة مفتوحة بلا مفتاح — إحداثيات الدوحة
+    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=25.29&longitude=51.53&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=Asia%2FQatar');
+    if(!res.ok) throw new Error('bad response');
+    const j = await res.json();
+    const cur = j.current;
+    const [icon, desc] = WEATHER_CODES[cur.weather_code] || ['🌡️','—'];
+    document.getElementById('weatherText').innerHTML =
+      `${icon} <strong>الدوحة الآن:</strong> ${Math.round(cur.temperature_2m)}° · ${desc}` +
+      ` · 💧 رطوبة ${cur.relative_humidity_2m}% · 💨 رياح ${Math.round(cur.wind_speed_10m)} كم/س` +
+      ` <span class="wbHint">— عناصر المناخ من الوحدة الأولى!</span>`;
+    bar.classList.add('show');
+  } catch(e){
+    // فشل الاتصال — ما نعرض شريطاً فاضياً أو رسالة خطأ مزعجة
+    console.warn('تعذر جلب الطقس:', e.message);
+  }
+}
+
 function initUpdateBar(){
   const lm = new Date(document.lastModified);
   const dateStr = lm.toLocaleDateString('ar-QA', {year:'numeric', month:'long', day:'numeric'});
@@ -6925,6 +6984,7 @@ try { renderQuestion(); } catch(e){ console.error('renderQuestion:', e); }
 try { showHome(); } catch(e){ console.error('showHome:', e); } // نبدأ بالصفحة الرئيسية النظيفة
 try { renderEnergy(); } catch(e){ console.error('renderEnergy:', e); }
 try { initUpdateBar(); } catch(e){ console.error('initUpdateBar:', e); }
+try { initWeatherBar(); } catch(e){ console.error('initWeatherBar:', e); }
 try { showCompare(0); } catch(e){ console.error('showCompare:', e); }
 try { initSupabase(); } catch(e){ console.error('initSupabase:', e); }
 </script>
