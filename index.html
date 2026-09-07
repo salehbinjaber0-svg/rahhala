@@ -2495,6 +2495,10 @@ var qrcode = function() {
     color:var(--navy); cursor:pointer; font-size:.9rem; line-height:1; margin-inline-start:5px; font-weight:700;
   }
   .mcAdd:hover{background:var(--gold-light); border-color:var(--gold);}
+  .mcAdd.minus{color:var(--maroon); border-color:#e8cccc;}
+  .mcAdd.minus:hover{background:#fbe9e9; border-color:var(--maroon);}
+  .mcAttCell{white-space:nowrap; min-width:110px;}
+  .mcAttCell .attBtn{width:27px; height:27px; margin:0 1px; font-size:.78rem;}
   .mcNoteCell{text-align:right !important; max-width:190px;}
   .mcNote{font-size:.79rem; display:inline-block;}
   .mcNote.good{color:var(--teal);}
@@ -5517,12 +5521,20 @@ async function refreshClassChallenge(){
     myClassNotes[n.roster_id].push(n);
   });
 
+  // حضور اليوم
+  const today = new Date().toISOString().slice(0,10);
+  const { data: att } = await sb.from('roster_attendance')
+    .select('roster_id,status').in('roster_id', ids).eq('day', today);
+  mcAttendance = {};
+  (att || []).forEach(a=>{ mcAttendance[a.roster_id] = a.status; });
+
   renderMyClassTable();
 }
 
 function renderMyClassTable(){
   if(!isAdmin) return;
   const rows = myClassData.map((r, i)=>{
+    const att = mcAttendance[r.id] || 'present';
     const all = myClassNotes[r.id] || [];
     const warns = all.filter(n => (n.kind || 'warning') === 'warning');
     const praises = all.filter(n => n.kind === 'praise');
@@ -5534,8 +5546,14 @@ function renderMyClassTable(){
       <tr>
         <td class="mcIdx">${i + 1}</td>
         <td class="mcName">${esc(r.student_name)}</td>
+        <td class="mcAttCell">
+          <button class="attBtn ${att==='present'?'on present':''}" onclick="mcSetAtt(${r.id},'present')" title="حاضر">✅</button>
+          <button class="attBtn ${att==='late'?'on late':''}" onclick="mcSetAtt(${r.id},'late')" title="متأخر">⏰</button>
+          <button class="attBtn ${att==='absent'?'on absent':''}" onclick="mcSetAtt(${r.id},'absent')" title="غائب">❌</button>
+        </td>
         <td><span class="mcBadge points">⭐ ${r.participation_points || 0}</span>
-            <button class="mcAdd" onclick="mcAddPoint(${r.id})" title="أضف نقطة مشاركة">+</button></td>
+            <button class="mcAdd" onclick="mcAddPoint(${r.id})" title="أضف نقطة مشاركة">+</button>
+            <button class="mcAdd minus" onclick="mcSubPoint(${r.id})" title="تراجع عن نقطة">−</button></td>
         <td><span class="mcBadge praise">🌟 ${praises.length}</span>
             <button class="mcAdd" onclick="mcOpenNote(${r.id}, 'praise')" title="أضف تكريماً">+</button></td>
         <td><span class="mcBadge ${warns.length ? 'warn' : 'ok'}">${warns.length ? '⚠️ ' + warns.length : '✅ 0'}</span>
@@ -5547,7 +5565,7 @@ function renderMyClassTable(){
   document.getElementById('myClassTableWrap').innerHTML = `
     <table class="myClassTable">
       <thead>
-        <tr><th>#</th><th>اسم الطالب</th><th>المشاركة</th><th>التكريم</th><th>التنبيه</th><th>آخر ملاحظة</th></tr>
+        <tr><th>#</th><th>اسم الطالب</th><th>الحضور</th><th>المشاركة</th><th>التكريم</th><th>التنبيه</th><th>آخر ملاحظة</th></tr>
       </thead>
       <tbody>${rows}</tbody>
     </table>`;
@@ -5559,8 +5577,37 @@ function renderMyClassTable(){
     totalW += arr.filter(n => (n.kind || 'warning') === 'warning').length;
     totalPr += arr.filter(n => n.kind === 'praise').length;
   });
+  const vals = Object.values(mcAttendance);
+  const absent = vals.filter(v=>v==='absent').length;
+  const late = vals.filter(v=>v==='late').length;
+  const present = myClassData.length - absent - late;
   document.getElementById('myClassSummary').innerHTML =
-    `👥 <strong>${myClassData.length}</strong> طالب · ⭐ <strong>${totalP}</strong> نقطة مشاركة · 🌟 <strong>${totalPr}</strong> تكريم · ⚠️ <strong>${totalW}</strong> تنبيه`;
+    `👥 <strong>${myClassData.length}</strong> طالب · ✅ <strong>${present}</strong> حاضر · ⏰ <strong>${late}</strong> متأخر · ❌ <strong>${absent}</strong> غائب<br>⭐ <strong>${totalP}</strong> نقطة مشاركة · 🌟 <strong>${totalPr}</strong> تكريم · ⚠️ <strong>${totalW}</strong> تنبيه`;
+}
+
+let mcAttendance = {}; // roster_id -> حالة حضور اليوم
+
+// تسجيل الحضور من جدول صفوفي مباشرة — بدون الذهاب للوحة المعلم
+async function mcSetAtt(id, status){
+  if(!isAdmin) return;
+  mcAttendance[id] = status;
+  renderMyClassTable(); // استجابة فورية
+  const today = new Date().toISOString().slice(0,10);
+  const { error } = await sb.from('roster_attendance')
+    .upsert({ roster_id: id, status, day: today }, { onConflict: 'roster_id,day' });
+  if(error) showToast('تعذر حفظ الحضور: ' + error.message, 'error');
+}
+
+// تراجع عن نقطة مشاركة أُضيفت بالغلط
+async function mcSubPoint(id){
+  if(!isAdmin) return;
+  const row = myClassData.find(r => r.id === id);
+  if(!row || (row.participation_points || 0) <= 0) return;
+  row.participation_points -= 1;
+  renderMyClassTable();
+  const { error } = await sb.from('class_roster')
+    .update({participation_points: row.participation_points}).eq('id', id);
+  if(error){ showToast('تعذر الحفظ', 'error'); refreshClassChallenge(); }
 }
 
 async function mcAddPoint(id){
@@ -5587,13 +5634,15 @@ function exportMyClassCSV(){
   if(!myClassData.length){ showToast('ما فيه بيانات للتصدير', 'error'); return; }
   let csv = '\uFEFF';
   csv += `متابعة صف ${myClassCls} — رحّالة\n\n`;
-  csv += '#,اسم الطالب,نقاط المشاركة,التكريم,التنبيهات,آخر ملاحظة\n';
+  csv += '#,اسم الطالب,الحضور,نقاط المشاركة,التكريم,التنبيهات,آخر ملاحظة\n';
+  const attLabel = {present:'حاضر', late:'متأخر', absent:'غائب'};
   myClassData.forEach((r, i)=>{
     const all = myClassNotes[r.id] || [];
     const w = all.filter(n => (n.kind || 'warning') === 'warning').length;
     const p = all.filter(n => n.kind === 'praise').length;
     const last = all[0] ? all[0].note.replace(/"/g, '""') : '';
-    csv += `${i+1},${r.student_name},${r.participation_points || 0},${p},${w},"${last}"\n`;
+    const a = attLabel[mcAttendance[r.id] || 'present'];
+    csv += `${i+1},${r.student_name},${a},${r.participation_points || 0},${p},${w},"${last}"\n`;
   });
   const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
   const a = document.createElement('a');
