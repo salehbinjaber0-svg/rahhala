@@ -6722,8 +6722,12 @@ function searchCurriculumDeep(qTokens, boostWords){
     }
     if(score > bestScore){ bestScore = score; best = chunk; }
   });
-  // لازم يطابق كل كلمات السؤال المهمة (أو كلها إذا سؤال قصير) عشان نثق بالنتيجة
-  if(best && bestScore >= meaningfulTokens.length){
+  // لازم يطابق كل كلمات السؤال المهمة عشان نثق بالنتيجة.
+  // ومع السياق (كلمات كثيرة)، نقبل تطابقاً عالياً بدل الكامل — لكن ليس أقل من 70%.
+  const threshold = meaningfulTokens.length >= 5
+    ? Math.ceil(meaningfulTokens.length * 0.7)
+    : meaningfulTokens.length;
+  if(best && bestScore >= threshold){
     return best;
   }
   return null;
@@ -6736,6 +6740,7 @@ function pageRef(unit){
 }
 
 let lastTopic = null; // آخر مفهوم فهمه المنقذ، عشان يفهم أسئلة المتابعة القصيرة
+let lastTopicKeys = []; // كلمات آخر موضوع — تُستخدم لدمجها مع أسئلة الضمائر
 
 // ردود تحفيزية للطالب المحبط — الصمت أسوأ رد ممكن بهذي اللحظة
 const ENCOURAGE_PATTERNS = ['مو فاهم','ما فهمت','مافهمت','صعب','تعبت','ما اقدر','مااقدر','زهقت','مليت','محتار','ضايع','خايف','قلقان'];
@@ -6792,11 +6797,37 @@ function tryUnitSummary(query){
   };
 }
 
+// ---------- ذاكرة السياق: يتذكر موضوع الحوار الحالي ----------
+let contextTopic = null;   // آخر موضوع رئيسي (نص المفهوم + كلماته المفتاحية)
+let contextTokens = [];    // كلمات الموضوع — تُدمج بأسئلة المتابعة الناقصة
+
+// هل السؤال ناقص ويحتاج السياق؟ (قصير، أو فيه ضمير، أو يبدأ بأداة استفهام بلا موضوع)
+function needsContext(query, qTokens){
+  const t = query.trim();
+  if(/(ها|ه|هم|هن)[\s؟?]*$/.test(t) && qTokens.length <= 3) return true;  // "وش سوى؟" "متى سقطت؟"
+  if(qTokens.length <= 2) return true;                                     // "كم عددها" "مثال"
+  if(/^(وش|ايش|كم|متى|وين|كيف|ليش|من|ما)\s/.test(t) && qTokens.length <= 3) return true;
+  return false;
+}
+
 function matchKnowledge(query){
-  const qTokens = tokenize(query);
+  let qTokens = tokenize(query);
+
+  // لو السؤال يطابق مفهوماً مستقلاً بنفسه، فهو موضوع جديد — ما نلوّثه بسياق سابق
+  const standsAlone = KNOWLEDGE_BASE.some(e => scoreEntry(e, qTokens).full);
+
+  // دمج السياق: لو السؤال ناقص فعلاً (ولا يقف بنفسه)، نضيف كلمات الموضوع السابق
+  const usedContext = !standsAlone && contextTokens.length > 0 && needsContext(query, qTokens);
+  if(usedContext){
+    qTokens = [...new Set([...qTokens, ...contextTokens])];
+  }
 
   // سؤال متابعة قصير ("ليش؟"، "مثال؟"، "وضح أكثر") على آخر موضوع
-  const isFollowup = qTokens.length <= 3 && qTokens.some(qt => FOLLOWUP_WORDS.some(fw => wordsClose(qt, fw)));
+  // شرط مهم: لا نعتبره متابعة لو كان يطابق مفهوماً مستقلاً بقاعدة المعرفة —
+  // وإلا "بيت الحكمة" بعد "حمورابي" يرجّع جواب حمورابي بالغلط
+  const matchesOwnTopic = KNOWLEDGE_BASE.some(e => scoreEntry(e, qTokens).full);
+  const isFollowup = !matchesOwnTopic && qTokens.length <= 3 &&
+                     qTokens.some(qt => FOLLOWUP_WORDS.some(fw => wordsClose(qt, fw)));
   if(isFollowup && lastTopic){
     if(lastTopic.extra) return { text: lastTopic.extra, chips: [] };
     return { text: 'خلّني أوضح أكثر: ' + lastTopic.a, chips: [] };
@@ -6819,8 +6850,18 @@ function matchKnowledge(query){
   const summary = tryUnitSummary(query);
   if(summary) return summary;
 
-  // سؤال بضمير غامض ("مين أسسها؟") — نربطه بآخر موضوع تكلمنا عنه
+  // سؤال بضمير غامض ("مين أسسها؟") — نجرّب دمجه مع آخر موضوع للبحث الدقيق أولاً
   if(/^(مين|من|متى|وين|كيف|ليش)\s+\S{1,12}(ها|ه|هم)\??$/.test(query.trim()) && lastTopic){
+    // نبحث بموضوع آخر سؤال + الفعل الحالي — يعطي جواباً أدق من مجرد إعادة الموضوع
+    if(lastTopicKeys && lastTopicKeys.length){
+      const verb = query.trim().split(/\s+/)[1].replace(/(ها|ه|هم)\??$/,'');
+      const merged = tokenize(lastTopicKeys.join(' ') + ' ' + verb);
+      const found = searchCurriculumDeep(merged);
+      if(found){
+        lastTopic = { a: found.text, extra: null };
+        return { text: `${found.text}\n📄 صفحة ${found.pages} بالكتاب`, chips: [] };
+      }
+    }
     return { text: 'بخصوص آخر موضوع تكلمنا عنه:\n' + lastTopic.a, chips: [] };
   }
 
@@ -6834,6 +6875,9 @@ function matchKnowledge(query){
       top.push(fullMatches[1].entry);
     }
     lastTopic = top[0];
+    lastTopicKeys = top[0].k || [];
+    contextTopic = top[0];
+    contextTokens = top[0].k.flatMap(k => tokenize(k)).filter(t => t.length >= 3).slice(0, 4);
     const text = top.map(e=> e.a + pageRef(e.unit)).join('\n\n');
     return { text, chips: [] };
   }
@@ -6843,6 +6887,7 @@ function matchKnowledge(query){
     const shortMatch = findShortQueryMatch(qTokens);
     if(shortMatch){
       lastTopic = shortMatch;
+      lastTopicKeys = shortMatch.k || [];
       return { text: shortMatch.a + pageRef(shortMatch.unit), chips: [] };
     }
   }
@@ -6851,6 +6896,7 @@ function matchKnowledge(query){
   const deep = searchCurriculumDeep(qTokens);
   if(deep){
     lastTopic = { a: deep.text, extra: null };
+    contextTokens = tokenize(deep.lessonTitle).filter(t => t.length >= 4).slice(0, 4);
     return { text: `"${deep.text}"\n📄 صفحة ${deep.pages} بالكتاب`, chips: [] };
   }
 
@@ -6860,7 +6906,13 @@ function matchKnowledge(query){
     const cleaned = query.replace(/متى/g,' ');
     const dateTokens = tokenize(cleaned);
     if(dateTokens.length){
-      let dated = searchCurriculumDeep(dateTokens, ['هـ','ق.م','عام','سنة','قرن']);
+      // نشترط أن يطابق المقطع كلمةً موضوعية من السؤال (مو مجرد رقم/تاريخ عشوائي)
+      const topical = dateTokens.filter(t => t.length >= 4);
+      let dated = topical.length ? searchCurriculumDeep(dateTokens, ['هـ','ق.م','عام','سنة','قرن']) : null;
+      if(dated && topical.length){
+        const hit = topical.some(t => dated.tokens.some(ct => wordsClose(ct, t)));
+        if(!hit) dated = null; // المقطع ما يخص موضوع السؤال — نرفضه
+      }
       if(!dated){
         // الكتاب يستخدم "قيام/نشأة/تأسيس" بدل "قامت" — نجرّب المرادفات
         const alt = dateTokens.map(t => ({'قامت':'قيام','قام':'قيام','تاسست':'تاسيس','بدات':'بدايه','انتهت':'نهايه','سقطت':'سقوط'})[t] || t);
