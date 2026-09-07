@@ -5577,6 +5577,7 @@ function mcOpenNote(id, kind){
 let mcPendingRefresh = false;
 
 function exportMyClassCSV(){
+  if(!isAdmin){ showToast('هذي الأداة للمعلم فقط','error'); return; }
   if(!myClassData.length){ showToast('ما فيه بيانات للتصدير', 'error'); return; }
   let csv = '\uFEFF';
   csv += `متابعة صف ${myClassCls} — رحّالة\n\n`;
@@ -5797,6 +5798,7 @@ async function loadPendingStudents(){
   topList.innerHTML = n > 0 ? data.map(renderPendingPill).join('') : '';
 }
 async function approveStudent(key, btn){
+  if(!isAdmin || !requireDb()) return;
   // إزالة فورية من القائمة قبل رد الخادم — استجابة سريعة بدل انتظار
   if(btn){
     const pill = btn.closest('.pendingPill');
@@ -5809,6 +5811,7 @@ async function approveStudent(key, btn){
   refreshLeaderboard();
 }
 async function rejectStudent(key, btn){
+  if(!isAdmin || !requireDb()) return;
   if(btn){ btn.disabled = true; btn.textContent = '⏳'; btn.style.opacity='.6'; }
   await sb.from('students').update({status:'rejected'}).eq('key', key);
   loadPendingStudents();
