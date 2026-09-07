@@ -4656,9 +4656,29 @@ function pickNextQuestionIndex(){
 
 async function loadQuestions(){
   if(!requireDb()) return;
-  const { data, error } = await supaCall(() => sb.from('questions').select('*').is('deleted_at', null).order('id', {ascending:true}));
-  if(error){ console.error('تعذر تحميل الأسئلة:', error); return; }
-  QUESTIONS = (data || []).map(r => ({ id:r.id, q:r.q, c:r.choices, a:r.correct_index }));
+  // نحاول أولاً مع استبعاد المحذوفات (يتطلب عمود deleted_at)
+  let { data, error } = await supaCall(() => sb.from('questions').select('*').is('deleted_at', null).order('id', {ascending:true}));
+  if(error){
+    // لو فشل (غالباً لأن كود سلة المحذوفات ما شُغّل بعد)، نجيب كل الأسئلة بدون فلترة
+    console.warn('تعذر الاستعلام مع deleted_at، نجرّب بدونه:', error.message || error);
+    const fallback = await supaCall(() => sb.from('questions').select('*').order('id', {ascending:true}));
+    data = fallback.data; error = fallback.error;
+  }
+  if(error){
+    console.error('تعذر تحميل الأسئلة:', error);
+    const el = document.getElementById('quizQuestion');
+    if(el) el.textContent = 'تعذر تحميل الأسئلة — تأكد من الاتصال بالإنترنت، أو راجع إعدادات قاعدة البيانات.';
+    return;
+  }
+  // نستبعد المحذوفة يدوياً لو العمود موجود بالبيانات
+  QUESTIONS = (data || [])
+    .filter(r => !r.deleted_at)
+    .map(r => ({ id:r.id, q:r.q, c:r.choices, a:r.correct_index }));
+  if(QUESTIONS.length === 0){
+    const el = document.getElementById('quizQuestion');
+    if(el) el.textContent = 'ما فيه أسئلة بعد — أضف أسئلة من لوحة المعلم.';
+    return;
+  }
   renderQuestion(); // نعيد عرض السؤال الأول بعد التحميل
 }
 
@@ -5643,7 +5663,11 @@ function renderRosterRow(r){
 
 async function loadRoster(){
   if(!isAdmin || !requireDb()) return;
-  const { data, error } = await sb.from('class_roster').select('*').eq('cls', currentRosterCls).is('deleted_at', null).order('student_name');
+  let { data, error } = await sb.from('class_roster').select('*').eq('cls', currentRosterCls).is('deleted_at', null).order('student_name');
+  if(error){ // احتياطي لو عمود deleted_at غير موجود
+    const fb = await sb.from('class_roster').select('*').eq('cls', currentRosterCls).order('student_name');
+    data = (fb.data || []).filter(r => !r.deleted_at); error = fb.error;
+  }
   const list = document.getElementById('rosterList');
   if(error){ list.innerHTML = '<p style="color:#8a8a8a;">تعذر تحميل القائمة.</p>'; return; }
   if(!data || data.length === 0){
@@ -5910,7 +5934,11 @@ async function exportWarningsCSV(){
 // ---------- قسم إدارة الأسئلة ----------
 async function loadQuestionsAdmin(){
   if(!isAdmin || !requireDb()) return;
-  const { data, error } = await sb.from('questions').select('*').is('deleted_at', null).order('id', {ascending:true});
+  let { data, error } = await sb.from('questions').select('*').is('deleted_at', null).order('id', {ascending:true});
+  if(error){ // احتياطي لو عمود deleted_at غير موجود
+    const fb = await sb.from('questions').select('*').order('id', {ascending:true});
+    data = (fb.data || []).filter(r => !r.deleted_at); error = fb.error;
+  }
   const list = document.getElementById('questionsList');
   if(error){ list.innerHTML = '<p style="color:#8a8a8a;">تعذر تحميل الأسئلة.</p>'; return; }
   list.innerHTML = '';
