@@ -2439,6 +2439,13 @@ var qrcode = function() {
     margin-inline-start:14px; border-inline-start:2px solid #ece5d4;
   }
   .curriculumMenu a.cmLesson:hover{background:#faf6ec; color:var(--navy); border-inline-start-color:var(--gold);}
+  /* أدوات المنهج داخل نفس القائمة — مفصولة بصرياً عن الوحدات */
+  .cmTools{margin-top:6px; padding-top:8px; border-top:2px solid var(--gold);}
+  .curriculumMenu a.cmToolLink{
+    display:block; padding:9px 12px; border-radius:8px; font-weight:700;
+    color:var(--gold-deep); font-size:.85rem; background:#fdf6e8;
+  }
+  .curriculumMenu a.cmToolLink:hover{background:var(--gold-light); color:var(--navy);}
 
   /* رابط لوحة المعلم بالشريط العلوي — مميّز بصرياً عن روابط الطلاب */
   .adminNavLink{
@@ -3221,6 +3228,9 @@ var qrcode = function() {
             <a class="cmLesson" href="#" onclick="openLesson(6,0); return false;">الدرس الأول: الأمن الوطني وأبعاده</a>
             <a class="cmLesson" href="#" onclick="openLesson(6,1); return false;">الدرس الثاني: مقوماته ومؤسساته</a>
           </div>
+          <div class="cmTools">
+            <a class="cmToolLink" href="#" onclick="showSection('compareTool'); return false;">⚖️ أداة: قارن بين المفاهيم</a>
+          </div>
         </div>
       </div>
       <div class="navDrop">
@@ -3235,7 +3245,6 @@ var qrcode = function() {
         </div>
       </div>
       <a href="#" onclick="showSection('games'); return false;">الألعاب</a>
-      <a href="#" onclick="showSection('compareTool'); return false;">قارن بين</a>
       <a href="#" id="myClassesNavLink" style="display:none;" onclick="showSection('classchallenge'); return false;">📋 صفوفي</a>
       <a href="#" onclick="showSection('leaderboard'); return false;">لوحة الصدارة</a>
       <a href="#" onclick="showSection('about'); return false;">عن المعلم</a>
