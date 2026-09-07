@@ -3236,7 +3236,7 @@ var qrcode = function() {
       </div>
       <a href="#" onclick="showSection('games'); return false;">الألعاب</a>
       <a href="#" onclick="showSection('compareTool'); return false;">قارن بين</a>
-      <a href="#" onclick="showSection('classchallenge'); return false;">صفوفي</a>
+      <a href="#" id="myClassesNavLink" style="display:none;" onclick="showSection('classchallenge'); return false;">📋 صفوفي</a>
       <a href="#" onclick="showSection('leaderboard'); return false;">لوحة الصدارة</a>
       <a href="#" onclick="showSection('about'); return false;">عن المعلم</a>
       <a href="#" id="profileNavLink" style="display:none;" onclick="openProfile(); return false;">👤 ملفي</a>
@@ -4405,7 +4405,14 @@ let isAdmin = false; // يُعرّف مبكراً لأن showHome تستخدمه
 const HOME_SECTIONS = ['hero'];
 
 // يعرض قسماً واحداً فقط ويخفي البقية — بدل تكديس كل الأقسام بالصفحة
+// أقسام خاصة بالمعلم فقط — ما يفتحها أي طالب
+const TEACHER_ONLY_SECTIONS = ['classchallenge', 'adminPanel', 'reportView'];
+
 function showSection(id){
+  if(TEACHER_ONLY_SECTIONS.includes(id) && !isAdmin){
+    showToast('🔒 هذا القسم مخصص للمعلم', 'error');
+    return;
+  }
   document.querySelectorAll('section').forEach(s=>{
     s.style.display = (s.id === id) ? '' : 'none';
   });
@@ -5034,6 +5041,11 @@ async function login(btn){
   }
   if(data){
     state = rowToState(data);
+    // لو كان مطروداً سابقاً، نصفّر العلامة عند دخوله الجديد — وإلا يعلق بحلقة طرد لا تنتهي
+    if(data.kicked){
+      await supaCall(() => sb.from('students').update({kicked:false}).eq('key', key));
+      state.kicked = false;
+    }
   } else {
     state = {name, cls, points:0, energy:0, badges:[], gamesPlayed:0, status:'pending'};
     await supaCall(() => sb.from('students').insert({
@@ -5146,7 +5158,13 @@ function renderQuestion(){
 function requireApproved(){
   if(!state){ openLogin(); return false; }
   if(state.status !== 'approved'){
-    showToast('⏳ حسابك بانتظار موافقة المعلم — ما تقدر تلعب قبل الموافقة', 'error');
+    // نتحقق فوراً من قاعدة البيانات بدل انتظار دورة التحديث — الموافقة قد تكون وصلت للتو
+    refreshMyState().then(()=>{
+      if(state && state.status === 'approved'){
+        showToast('✅ تمت الموافقة على حسابك — جرّب مرة ثانية الآن!', 'success');
+      }
+    });
+    showToast('⏳ حسابك بانتظار موافقة المعلم — بنتحقق الآن…', 'error');
     return false;
   }
   return true;
@@ -5441,6 +5459,7 @@ let myClassData = [];
 let myClassNotes = {};
 
 function switchMyClass(cls, btn){
+  if(!isAdmin) return;
   myClassCls = cls;
   document.querySelectorAll('.myClassBtn').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
@@ -5448,6 +5467,7 @@ function switchMyClass(cls, btn){
 }
 
 async function refreshClassChallenge(){
+  if(!isAdmin) return; // بيانات صفوفك — للمعلم فقط
   if(!requireDb()) return;
   const wrap = document.getElementById('myClassTableWrap');
   if(!wrap) return;
@@ -5480,6 +5500,7 @@ async function refreshClassChallenge(){
 }
 
 function renderMyClassTable(){
+  if(!isAdmin) return;
   const rows = myClassData.map((r, i)=>{
     const all = myClassNotes[r.id] || [];
     const warns = all.filter(n => (n.kind || 'warning') === 'warning');
@@ -5697,6 +5718,8 @@ function setAdminActive(active){
   // رابط لوحة المعلم بالشريط العلوي — يظهر لك وحدك بعد تسجيل الدخول
   const navLink = document.getElementById('adminNavLink');
   if(navLink) navLink.style.display = active ? 'inline-block' : 'none';
+  const myCls = document.getElementById('myClassesNavLink');
+  if(myCls) myCls.style.display = active ? 'inline-block' : 'none';
   if(active){
     document.getElementById('adminPanel').style.display = ''; // نتجاوز إخفاء الصفحة الرئيسية
     loadPendingStudents();
