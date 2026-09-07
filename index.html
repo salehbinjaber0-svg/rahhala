@@ -2439,6 +2439,52 @@ var qrcode = function() {
     margin-inline-start:14px; border-inline-start:2px solid #ece5d4;
   }
   .curriculumMenu a.cmLesson:hover{background:#faf6ec; color:var(--navy); border-inline-start-color:var(--gold);}
+
+  /* ===== قسم صفوفي ===== */
+  .myClassBar{display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; align-items:center;}
+  .myClassBtn{
+    padding:10px 24px; border-radius:30px; border:2px solid var(--navy); background:transparent;
+    color:var(--navy); font-weight:700; font-size:.9rem; cursor:pointer; font-family:'Tajawal';
+  }
+  .myClassBtn.active{background:var(--grad-navy); color:var(--gold-light); border-color:var(--navy);}
+  .myClassExport{
+    margin-inline-start:auto; padding:9px 18px; border-radius:10px; cursor:pointer;
+    background:transparent; border:2px solid var(--gold-deep); color:var(--gold-deep);
+    font-weight:700; font-size:.84rem; font-family:'Tajawal';
+  }
+  .myClassExport:hover{background:var(--gold-light); border-color:var(--gold);}
+  .myClassSummary{
+    background:var(--cream); border:1px solid #e8e0cd; border-radius:10px;
+    padding:11px 18px; margin-bottom:14px; font-size:.87rem; color:var(--navy);
+  }
+  .myClassSummary strong{color:var(--gold-deep);}
+  .myClassTableWrap{overflow-x:auto; border-radius:14px; border:1px solid #e8e0cd; background:#fff;}
+  .myClassTable{width:100%; min-width:600px; border-collapse:collapse; font-size:.88rem;}
+  .myClassTable thead th{
+    background:var(--grad-navy); color:var(--gold-light); padding:13px 10px;
+    text-align:center; font-weight:700; font-size:.82rem; white-space:nowrap;
+  }
+  .myClassTable tbody td{padding:11px 10px; border-bottom:1px solid #f2ede0; text-align:center; vertical-align:middle;}
+  .myClassTable tbody tr:last-child td{border-bottom:none;}
+  .myClassTable tbody tr:nth-child(even){background:#fdfbf6;}
+  .myClassTable tbody tr:hover{background:var(--cream);}
+  .mcIdx{color:#a8a08e; font-size:.8rem; width:38px;}
+  .mcName{font-weight:700; color:var(--navy); text-align:right !important; min-width:130px;}
+  .mcBadge{display:inline-block; padding:4px 11px; border-radius:16px; font-size:.8rem; font-weight:700;}
+  .mcBadge.points{background:#eaf0f4; color:#2a6b8a;}
+  .mcBadge.praise{background:#fdf4e3; color:var(--gold-deep);}
+  .mcBadge.warn{background:#fbe9e9; color:var(--maroon);}
+  .mcBadge.ok{background:#eaf4f1; color:var(--teal);}
+  .mcAdd{
+    width:24px; height:24px; border-radius:50%; border:1.5px solid #dcd4c0; background:#fff;
+    color:var(--navy); cursor:pointer; font-size:.9rem; line-height:1; margin-inline-start:5px; font-weight:700;
+  }
+  .mcAdd:hover{background:var(--gold-light); border-color:var(--gold);}
+  .mcNoteCell{text-align:right !important; max-width:190px;}
+  .mcNote{font-size:.79rem; display:inline-block;}
+  .mcNote.good{color:var(--teal);}
+  .mcNote.bad{color:var(--maroon);}
+  .mcNoteEmpty{color:#c5bda9;}
   .enrichMenu a:hover{background:#faf3e3;}
 
   #userChip{
@@ -3182,7 +3228,7 @@ var qrcode = function() {
       </div>
       <a href="#" onclick="showSection('games'); return false;">الألعاب</a>
       <a href="#" onclick="showSection('compareTool'); return false;">قارن بين</a>
-      <a href="#" onclick="showSection('classchallenge'); return false;">تحدي الصفوف</a>
+      <a href="#" onclick="showSection('classchallenge'); return false;">صفوفي</a>
       <a href="#" onclick="showSection('leaderboard'); return false;">لوحة الصدارة</a>
       <a href="#" onclick="showSection('about'); return false;">عن المعلم</a>
       <a href="#" id="profileNavLink" style="display:none;" onclick="openProfile(); return false;">👤 ملفي</a>
@@ -3417,10 +3463,19 @@ var qrcode = function() {
 
 <section id="classchallenge" class="alt">
   <div class="wrap">
-    <h2>تحدي الصفوف</h2>
-    <p class="lead">مجموع نقاط كل صف مجتمعاً — كل إجابة صحيحة أو هدف يسجّله أي طالب يرفع رصيد صفّه كامل. المنافسة هنا جماعية، مو فردية.</p>
-    <div id="classChallengeBody">
-      <p style="color:#8a8a8a;">جاري تحميل النتائج...</p>
+    <h2>صفوفي</h2>
+    <p class="lead">اختر الصف لعرض قائمة طلابه ومتابعتهم — نقاط المشاركة، التكريم، التنبيهات، والملاحظات.</p>
+
+    <div class="myClassBar">
+      <button class="myClassBtn active" data-cls="7-1" onclick="switchMyClass('7-1', this)">سابع 1</button>
+      <button class="myClassBtn" data-cls="7-2" onclick="switchMyClass('7-2', this)">سابع 2</button>
+      <button class="myClassBtn" data-cls="7-3" onclick="switchMyClass('7-3', this)">سابع 3</button>
+      <button class="myClassExport" onclick="exportMyClassCSV()">⬇️ تصدير الصف</button>
+    </div>
+
+    <div id="myClassSummary" class="myClassSummary"></div>
+    <div id="myClassTableWrap" class="myClassTableWrap">
+      <p style="color:#8a8a8a;">جاري تحميل القائمة...</p>
     </div>
   </div>
 </section>
@@ -5371,37 +5426,129 @@ async function refreshLeaderboard(){
 }
 
 // ---------- class challenge (تجميع نقاط كل صف، تحدّث دوري) ----------
+// ---------- قسم "صفوفي" — جدول متابعة كامل لكل صف ----------
+let myClassCls = '7-1';
+let myClassData = [];
+let myClassNotes = {};
+
+function switchMyClass(cls, btn){
+  myClassCls = cls;
+  document.querySelectorAll('.myClassBtn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  refreshClassChallenge();
+}
+
 async function refreshClassChallenge(){
   if(!requireDb()) return;
-  const { data, error } = await supaCall(() => sb.from('students').select('cls, points').eq('status','approved'), 2, 500);
-  if(error){ console.error('تعذر تحميل تحدي الصفوف:', error); return; }
-  const totals = {};
-  (data || []).forEach(r=>{
-    if(!r.cls) return;
-    if(!totals[r.cls]) totals[r.cls] = {points:0, students:0};
-    totals[r.cls].points += (r.points || 0);
-    totals[r.cls].students += 1;
-  });
-  const ranked = Object.entries(totals).sort((a,b)=> b[1].points - a[1].points);
-  const box = document.getElementById('classChallengeBody');
-  box.innerHTML = '';
-  if(ranked.length === 0){
-    box.innerHTML = '<p style="color:#8a8a8a;">لا توجد نتائج بعد — أول طالب يسجّل دخول يبدأ التحدي.</p>';
+  const wrap = document.getElementById('myClassTableWrap');
+  if(!wrap) return;
+
+  const { data, error } = await sb.from('class_roster')
+    .select('*').eq('cls', myClassCls).order('student_name');
+  if(error){
+    wrap.innerHTML = '<p style="color:var(--maroon);">تعذر تحميل القائمة — تأكد من تشغيل كود قاعدة البيانات الخاص بمتابعة الحصة.</p>';
     return;
   }
-  ranked.forEach(([cls, d], i)=>{
-    const avg = Math.round(d.points / d.students);
-    const row = document.createElement('div');
-    row.className = 'classRow';
-    row.innerHTML = `
-      <div class="medal">${i+1}</div>
-      <div class="info">
-        <strong>صف ${cls}</strong>
-        <span>${d.students} طالب مشارك · متوسط ${avg} نقطة للطالب</span>
-      </div>
-      <div class="total">${d.points}</div>`;
-    box.appendChild(row);
+  myClassData = (data || []).filter(r => !r.deleted_at);
+
+  if(myClassData.length === 0){
+    wrap.innerHTML = `<p style="color:#8a8a8a;">ما فيه طلاب مضافين لصف ${esc(myClassCls)} بعد.<br>أضفهم من لوحة المعلم ← تبويب «متابعة الحصة» (تقدر تلصق الأسماء دفعة واحدة من إكسل).</p>`;
+    document.getElementById('myClassSummary').innerHTML = '';
+    return;
+  }
+
+  // نجيب الملاحظات والتنبيهات والتكريمات
+  const ids = myClassData.map(r => r.id);
+  const { data: notes } = await sb.from('roster_warnings')
+    .select('*').in('roster_id', ids).order('created_at', {ascending:false});
+  myClassNotes = {};
+  (notes || []).forEach(n=>{
+    if(!myClassNotes[n.roster_id]) myClassNotes[n.roster_id] = [];
+    myClassNotes[n.roster_id].push(n);
   });
+
+  renderMyClassTable();
+}
+
+function renderMyClassTable(){
+  const rows = myClassData.map((r, i)=>{
+    const all = myClassNotes[r.id] || [];
+    const warns = all.filter(n => (n.kind || 'warning') === 'warning');
+    const praises = all.filter(n => n.kind === 'praise');
+    const lastNote = all[0];
+    const noteTxt = lastNote
+      ? `<span class="mcNote ${lastNote.kind === 'praise' ? 'good' : 'bad'}" title="${esc(lastNote.note)}">${esc(lastNote.note.slice(0, 30))}${lastNote.note.length > 30 ? '…' : ''}</span>`
+      : '<span class="mcNoteEmpty">—</span>';
+    return `
+      <tr>
+        <td class="mcIdx">${i + 1}</td>
+        <td class="mcName">${esc(r.student_name)}</td>
+        <td><span class="mcBadge points">⭐ ${r.participation_points || 0}</span>
+            <button class="mcAdd" onclick="mcAddPoint(${r.id})" title="أضف نقطة مشاركة">+</button></td>
+        <td><span class="mcBadge praise">🌟 ${praises.length}</span>
+            <button class="mcAdd" onclick="mcOpenNote(${r.id}, 'praise')" title="أضف تكريماً">+</button></td>
+        <td><span class="mcBadge ${warns.length ? 'warn' : 'ok'}">${warns.length ? '⚠️ ' + warns.length : '✅ 0'}</span>
+            <button class="mcAdd" onclick="mcOpenNote(${r.id}, 'warning')" title="أضف تنبيهاً">+</button></td>
+        <td class="mcNoteCell">${noteTxt}</td>
+      </tr>`;
+  }).join('');
+
+  document.getElementById('myClassTableWrap').innerHTML = `
+    <table class="myClassTable">
+      <thead>
+        <tr><th>#</th><th>اسم الطالب</th><th>المشاركة</th><th>التكريم</th><th>التنبيه</th><th>آخر ملاحظة</th></tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+
+  // ملخص الصف
+  const totalP = myClassData.reduce((s, r) => s + (r.participation_points || 0), 0);
+  let totalW = 0, totalPr = 0;
+  Object.values(myClassNotes).forEach(arr=>{
+    totalW += arr.filter(n => (n.kind || 'warning') === 'warning').length;
+    totalPr += arr.filter(n => n.kind === 'praise').length;
+  });
+  document.getElementById('myClassSummary').innerHTML =
+    `👥 <strong>${myClassData.length}</strong> طالب · ⭐ <strong>${totalP}</strong> نقطة مشاركة · 🌟 <strong>${totalPr}</strong> تكريم · ⚠️ <strong>${totalW}</strong> تنبيه`;
+}
+
+async function mcAddPoint(id){
+  if(!isAdmin){ showToast('هذي الأدوات للمعلم فقط', 'error'); return; }
+  const row = myClassData.find(r => r.id === id);
+  if(!row) return;
+  row.participation_points = (row.participation_points || 0) + 1;
+  renderMyClassTable(); // تحديث فوري
+  const { error } = await sb.from('class_roster').update({participation_points: row.participation_points}).eq('id', id);
+  if(error){ showToast('تعذر الحفظ: ' + error.message, 'error'); refreshClassChallenge(); }
+}
+
+function mcOpenNote(id, kind){
+  if(!isAdmin){ showToast('هذي الأدوات للمعلم فقط', 'error'); return; }
+  const row = myClassData.find(r => r.id === id);
+  rosterNameCache[id] = row ? row.student_name : '';
+  openNoteModal(id, kind);
+  mcPendingRefresh = true;
+}
+let mcPendingRefresh = false;
+
+function exportMyClassCSV(){
+  if(!myClassData.length){ showToast('ما فيه بيانات للتصدير', 'error'); return; }
+  let csv = '\uFEFF';
+  csv += `متابعة صف ${myClassCls} — رحّالة\n\n`;
+  csv += '#,اسم الطالب,نقاط المشاركة,التكريم,التنبيهات,آخر ملاحظة\n';
+  myClassData.forEach((r, i)=>{
+    const all = myClassNotes[r.id] || [];
+    const w = all.filter(n => (n.kind || 'warning') === 'warning').length;
+    const p = all.filter(n => n.kind === 'praise').length;
+    const last = all[0] ? all[0].note.replace(/"/g, '""') : '';
+    csv += `${i+1},${r.student_name},${r.participation_points || 0},${p},${w},"${last}"\n`;
+  });
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `متابعة-${myClassCls}-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast('✅ تم التصدير', 'success');
 }
 
 // يبقي نقاط الطالب متزامنة لو فتح الموقع من جهازين + يفحص إذا طرده المعلم + نبضة نشاط (آخر ظهور ووقت الاستخدام)
@@ -5920,8 +6067,9 @@ async function submitWarningNote(){
   if(error){ showToast('تعذر التسجيل: ' + error.message, 'error'); return; }
   const wasPraise = noteKind === 'praise';
   closeWarningModal();
-  showToast(wasPraise ? '🌟 تم تسجيل الملاحظة الإيجابية' : '⚠️ تم تسجيل التنبيه', 'success');
+  showToast(wasPraise ? '🌟 تم تسجيل التكريم' : '⚠️ تم تسجيل التنبيه', 'success');
   loadRoster();
+  if(typeof mcPendingRefresh !== 'undefined' && mcPendingRefresh){ mcPendingRefresh = false; refreshClassChallenge(); }
 }
 
 async function deleteRosterStudent(id){
