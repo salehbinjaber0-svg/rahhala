@@ -2685,7 +2685,7 @@ var qrcode = function() {
   }
   .btn-gold{background:var(--grad-gold); color:var(--navy-deep); box-shadow:0 3px 12px rgba(168,129,63,.28);}
   .btn-gold:hover{background:linear-gradient(135deg, #f0daa5, var(--gold-light)); transform:translateY(-1px);}
-  .btn-outline{border-color:var(--gold-light); color:var(--cream);}
+  .btn-outline{background:transparent; border-color:var(--gold-light); color:var(--cream);}
   .btn-outline:hover{background:rgba(201,161,94,.15);}
   .compass{width:100%; max-width:340px; justify-self:center;}
 
@@ -4221,7 +4221,9 @@ function openUnit(n){
     </div>
     ${lessonsHtml}`;
   document.querySelectorAll('section').forEach(s=>{ if(s.id !== 'unitView') s.style.display='none'; });
-  document.getElementById('unitView').classList.add('show');
+  const uv = document.getElementById('unitView');
+  uv.style.display = ''; // نصفّر الإخفاء المباشر عشان الـclass تقدر تُظهره
+  uv.classList.add('show');
   document.getElementById('enrichView').classList.remove('show');
   document.querySelector('header').style.display = '';
   location.hash = 'unit-' + n;
@@ -4257,7 +4259,9 @@ function openEnrichment(n){
     </div>
     <div class="grid">${cardsHtml}</div>`;
   document.querySelectorAll('section').forEach(s=>{ if(s.id !== 'enrichView') s.style.display='none'; });
-  document.getElementById('enrichView').classList.add('show');
+  const ev = document.getElementById('enrichView');
+  ev.style.display = ''; // نصفّر الإخفاء المباشر عشان الـclass تقدر تُظهره
+  ev.classList.add('show');
   document.getElementById('unitView').classList.remove('show');
   document.querySelector('header').style.display = '';
   location.hash = 'enrich-' + n;
