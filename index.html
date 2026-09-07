@@ -5287,17 +5287,19 @@ function finishMatchGame(){
 // ---------- leaderboard (تحدّث كل بضع ثوانٍ — مشتركة بين كل الطلاب والأجهزة) ----------
 async function refreshLeaderboard(){
   if(!requireDb()) return;
-  const { data, error } = await supaCall(() => sb.from('students').select('*').eq('status','approved').order('points', {ascending:false}).limit(10), 2, 500);
+  const { data, error } = await supaCall(() => sb.from('students').select('*').eq('status','approved').order('points', {ascending:false}).limit(20), 2, 500);
   if(error){ console.error('تعذر تحميل لوحة الصدارة:', error); return; }
   const body = document.getElementById('leaderboardBody');
   body.innerHTML = '';
-  if(!data || data.length === 0){
+  // نستبعد المطرودين — ما يفترض يظهرون بلوحة الصدارة
+  const list = (data || []).filter(r => !r.kicked).slice(0, 10);
+  if(list.length === 0){
     body.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#8a8a8a;">لا يوجد طلاب بعد — كن أول من يبدأ!</td></tr>';
     return;
   }
-  data.forEach((r, i)=>{
+  list.forEach((r, i)=>{
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td><td>${r.name}</td><td>${r.cls}</td><td>${r.points}</td>`;
+    tr.innerHTML = `<td>${i+1}</td><td>${esc(r.name)}</td><td>${esc(r.cls)}</td><td>${r.points}</td>`;
     body.appendChild(tr);
   });
 }
@@ -5561,7 +5563,8 @@ function renderStudentRow(r){
         </div>
         <div class="srActions">
           <span class="srBadge ${isActive?'active':'away'}">${isActive?'🟢 نشط الآن':'⚪ غير متصل'}</span>
-          <button class="kickBtn" onclick="kickStudent('${r.key}', this)">🚫 طرد</button>
+          <button class="kickBtn" onclick="kickStudent('${r.key}', this)" title="ينهي جلسته الحالية فقط — يقدر يرجع يدخل">🚫 إنهاء الجلسة</button>
+          <button class="kickBtn" style="background:#5a1f1f;" onclick="removeStudent('${r.key}', this)" title="يزيله نهائياً من المنصة ولوحة الصدارة">⛔ إزالة نهائية</button>
         </div>
       </div>
       <div class="srActions">
@@ -5586,6 +5589,18 @@ async function loadStudentsList(){
     return;
   }
   list.innerHTML = data.map(renderStudentRow).join('');
+}
+
+// إزالة نهائية: تسحب الموافقة فيختفي من الصدارة، ويحتاج موافقتك من جديد لو رجع
+async function removeStudent(key, btn){
+  if(!isAdmin || !requireDb()) return;
+  if(!confirm('إزالة هذا الطالب نهائياً؟\n\n• يختفي من لوحة الصدارة\n• تنتهي جلسته فوراً\n• لو رجع سجّل دخول، يحتاج موافقتك من جديد')) return;
+  if(btn){ btn.disabled = true; btn.textContent = '⏳'; }
+  const { error } = await sb.from('students').update({ status:'rejected', kicked:true }).eq('key', key);
+  if(error){ showToast('تعذر الإزالة: ' + error.message, 'error'); return; }
+  showToast('⛔ تم إزالة الطالب نهائياً', 'info');
+  loadStudentsList();
+  refreshLeaderboard();
 }
 
 async function kickStudent(key, btn){
