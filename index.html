@@ -365,6 +365,29 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .rDelete{background:none; border:none; color:#b0a898; cursor:pointer; font-size:1rem;}
   .lastWarnNote{margin-top:8px; padding-top:8px; border-top:1px dashed #eee; font-size:.78rem; color:var(--maroon);}
 
+  /* الأسئلة غير المجابة */
+  .tabBadge{
+    display:inline-block; background:var(--maroon); color:#fff; border-radius:11px;
+    padding:1px 7px; font-size:.7rem; margin-inline-start:5px; min-width:18px;
+  }
+  .gapRow{
+    background:#fff; border:1px solid #e8e0cd; border-radius:12px; padding:14px 18px;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    margin-bottom:10px; flex-wrap:wrap; border-inline-start:3px solid var(--gold);
+  }
+  .gapInfo{flex:1; min-width:200px;}
+  .gapQ{font-weight:700; color:var(--navy); font-size:.92rem; margin-bottom:4px;}
+  .gapMeta{font-size:.76rem; color:#8a8a8a;}
+  .gapHot{color:var(--maroon); font-weight:700;}
+  .gapActions{display:flex; gap:8px;}
+  .gapBtn{
+    border:none; border-radius:8px; padding:8px 14px; font-size:.8rem;
+    font-weight:700; cursor:pointer; font-family:'Tajawal';
+  }
+  .gapBtn.done{background:var(--teal); color:#fff;}
+  .gapBtn.drop{background:var(--cream); color:#8a8a8a; border:1px solid #dcd4c0;}
+  .gapBtn.drop:hover{background:#fbe9e9; color:var(--maroon);}
+
   .trashRow{
     background:#fff; border:1px solid #e8e0cd; border-radius:12px; padding:14px 18px;
     display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; flex-wrap:wrap;
@@ -1338,6 +1361,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <button class="adminTab active" data-tab="students">👥 الطلاب (<span id="activeCount">0</span> نشط الآن)</button>
       <button class="adminTab" data-tab="questions">📝 إدارة الأسئلة</button>
       <button class="adminTab" data-tab="roster">📋 متابعة الحصة</button>
+      <button class="adminTab" data-tab="gaps">💡 أسئلة بلا جواب <span id="gapsCount" class="tabBadge"></span></button>
       <button class="adminTab" data-tab="trash">🗑️ سلة المحذوفات</button>
     </div>
 
@@ -1396,6 +1420,11 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
       <div id="attendanceSummary" class="attSummary"></div>
       <div id="rosterList"></div>
+    </div>
+
+    <div class="adminPanelBody" id="tab-gaps">
+      <p class="lead" style="margin-bottom:16px;">أسئلة سألها الطلاب ولم يجد المنقذ لها جواباً — تكشف لك ما ينقص قاعدة المعرفة وما يحتاجه طلابك فعلاً.</p>
+      <div id="gapsList"></div>
     </div>
 
     <div class="adminPanelBody" id="tab-trash">
@@ -3637,7 +3666,7 @@ function setAdminActive(active){
     loadPendingStudents();
     loadStudentsList();
     // البقية بعد لحظة — ما تعطّل ظهور اللوحة
-    setTimeout(()=>{ loadRoster(); loadQuestionsAdmin(); loadTrash(); }, 150);
+    setTimeout(()=>{ loadRoster(); loadQuestionsAdmin(); loadTrash(); loadGaps(); }, 150);
   }
 }
 
@@ -4050,6 +4079,54 @@ async function deleteRosterStudent(id){
   await sb.from('class_roster').update({deleted_at: new Date().toISOString()}).eq('id', id);
   showToast('🗑️ انتقل الطالب لسلة المحذوفات', 'info');
   loadRoster();
+}
+
+// ---------- الأسئلة غير المجابة — تشخيص فجوات المنقذ ----------
+async function loadGaps(){
+  if(!isAdmin || !requireDb()) return;
+  const list = document.getElementById('gapsList');
+  const badge = document.getElementById('gapsCount');
+  const { data, error } = await sb.from('unanswered_questions')
+    .select('*').eq('resolved', false)
+    .order('asked_count', {ascending:false}).order('last_asked', {ascending:false});
+  if(error){
+    list.innerHTML = '<p style="color:#8a8a8a;">تعذر التحميل — تأكد من تشغيل كود جدول الأسئلة غير المجابة.</p>';
+    if(badge) badge.textContent = '';
+    return;
+  }
+  if(!data || data.length === 0){
+    list.innerHTML = '<p style="color:#8a8a8a;">ما فيه أسئلة بلا جواب 👍 المنقذ يغطي كل ما سُئل عنه.</p>';
+    if(badge) badge.textContent = '';
+    return;
+  }
+  if(badge) badge.textContent = data.length;
+  list.innerHTML = data.map(g => `
+    <div class="gapRow">
+      <div class="gapInfo">
+        <div class="gapQ">${esc(g.question)}</div>
+        <div class="gapMeta">
+          ${g.asked_count > 1 ? `<span class="gapHot">🔥 تكرر ${g.asked_count} مرات</span> · ` : ''}
+          آخر مرة: ${new Date(g.last_asked).toLocaleDateString('ar-QA')}
+        </div>
+      </div>
+      <div class="gapActions">
+        <button class="gapBtn done" onclick="resolveGap(${g.id})" title="أضفت الجواب — أخفه من القائمة">✅ عولج</button>
+        <button class="gapBtn drop" onclick="deleteGap(${g.id})" title="سؤال غير مهم — احذفه">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+
+async function resolveGap(id){
+  if(!isAdmin) return;
+  await sb.from('unanswered_questions').update({resolved:true}).eq('id', id);
+  showToast('✅ عُلّم كمعالَج', 'success');
+  loadGaps();
+}
+
+async function deleteGap(id){
+  if(!isAdmin) return;
+  await sb.from('unanswered_questions').delete().eq('id', id);
+  loadGaps();
 }
 
 // ---------- سلة المحذوفات (خاصة بالمعلم — أسئلة وطلاب متابعة الحصة المحذوفين) ----------
@@ -4708,15 +4785,37 @@ function matchKnowledge(query){
   // ما فيه تطابق كامل — نقترح أقرب المواضيع بدل ما نسكت
   const partial = scored.filter(s => s.score > 0).sort((a,b)=> b.score - a.score).slice(0,3);
   if(partial.length > 0){
+    logUnanswered(query); // نسجّله — تطابق جزئي يعني فجوة بقاعدة المعرفة
     const chips = partial.map(p => p.entry.k[0]);
     return { text: 'ما لقيت جواب دقيق 🤔 يمكن تقصد أحد هذي المواضيع:', chips };
   }
 
   // خارج نطاق المنهج تماماً — نوجّهه بلطف بدل الصمت
+  logUnanswered(query);
   return {
     text: 'هذا السؤال خارج منهج الدراسات الاجتماعية للصف السابع 📘\nأنا متخصص بمنهجك: المناخ، حضارة الرافدين، السلطات الدستورية، السكان، الدولة العباسية، والأمن الوطني.\n\nجرّب تسألني عن أي مفهوم منها!',
     chips: ['المناخ', 'حمورابي', 'مجلس الشورى', 'الأمن الوطني']
   };
+}
+
+// يسجّل الأسئلة التي لم يجد لها المنقذ جواباً — تكشف للمعلم فجوات قاعدة المعرفة
+async function logUnanswered(question){
+  if(!sb) return;
+  const q = (question || '').trim().slice(0, 200);
+  if(q.length < 3) return;                       // نتجاهل الإدخال العابث
+  if(/^[\d\s+\-*/=.]+$/.test(q)) return;         // أرقام وعمليات حسابية
+  try{
+    // نحاول زيادة العدّاد لو السؤال مسجّل، وإلا ندرجه جديداً
+    const { data } = await sb.from('unanswered_questions')
+      .select('id,asked_count').eq('question', q).maybeSingle();
+    if(data){
+      await sb.from('unanswered_questions')
+        .update({ asked_count: data.asked_count + 1, last_asked: new Date().toISOString() })
+        .eq('id', data.id);
+    } else {
+      await sb.from('unanswered_questions').insert({ question: q });
+    }
+  } catch(e){ /* التسجيل ثانوي — ما يعطّل تجربة الطالب أبداً */ }
 }
 
 function addChatMsg(sender, html){
