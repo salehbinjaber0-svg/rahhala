@@ -2887,12 +2887,6 @@ var qrcode = function() {
 
   .card h3{font-size:1.2rem; margin-bottom:8px; color:var(--navy);}
   .card p{font-size:.92rem; color:#5c6a6e;}
-  .unit-num{
-    display:inline-flex; align-items:center; justify-content:center;
-    width:34px; height:34px; border-radius:50%; background:var(--grad-navy); color:var(--gold-light);
-    font-family:'Aref Ruqaa'; font-size:1.1rem; margin-bottom:12px;
-    border:1.5px solid var(--gold-deep);
-  }
 
   /* unit detail view */
   #unitView{display:none;}
@@ -4646,6 +4640,7 @@ function cdStartTimer(seconds){
 }
 
 async function cdPickStudent(){
+  if(!isAdmin) return; // تسحب أسماء طلابك — للمعلم فقط
   const el = document.getElementById('cdPickedStudent');
   if(!requireDb()) return;
   // نسحب من قائمة متابعة الحصة للصف المختار حالياً بلوحة المعلم
@@ -5942,7 +5937,7 @@ document.querySelectorAll('.adminTab').forEach(btn=>{
 function renderPendingPill(r){
   return `
     <div class="pendingPill">
-      <span class="pname">${esc(r.name)}</span><span class="pcls">${r.cls}</span>
+      <span class="pname">${esc(r.name)}</span><span class="pcls">${esc(r.cls)}</span>
       <button class="pApprove" title="موافقة" onclick="approveStudent('${r.key}', this)">✅</button>
       <button class="pReject" title="رفض" onclick="rejectStudent('${r.key}', this)">❌</button>
     </div>`;
@@ -6341,7 +6336,7 @@ async function loadTrash(){
   ]);
   const items = [];
   (qRes.data || []).forEach(q => items.push({type:'question', id:q.id, label: q.q, deleted_at: q.deleted_at}));
-  (rRes.data || []).forEach(r => items.push({type:'roster', id:r.id, label: `${r.student_name} (${r.cls})`, deleted_at: r.deleted_at}));
+  (rRes.data || []).forEach(r => items.push({type:'roster', id:r.id, label: `${esc(r.student_name)} (${esc(r.cls)})`, deleted_at: r.deleted_at}));
   items.sort((a,b) => new Date(b.deleted_at) - new Date(a.deleted_at));
 
   if(items.length === 0){
