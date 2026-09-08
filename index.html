@@ -370,6 +370,20 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     display:inline-block; background:var(--maroon); color:#fff; border-radius:11px;
     padding:1px 7px; font-size:.7rem; margin-inline-start:5px; min-width:18px;
   }
+  .fbSummary{margin-bottom:18px;}
+  .fbSummary:empty{display:none;}
+  .fbHead{font-weight:700; color:var(--navy); margin-bottom:10px; font-size:.95rem;}
+  .fbStats{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;}
+  .fbStat{padding:7px 15px; border-radius:20px; font-size:.83rem; font-weight:700;}
+  .fbStat.good{background:#eaf4f1; color:var(--teal);}
+  .fbStat.bad{background:#fbe9e9; color:var(--maroon);}
+  .fbStat.rate{background:var(--cream); color:var(--navy);}
+  .fbWorst{background:#fff; border:1px solid #e8e0cd; border-radius:10px; padding:12px 16px; font-size:.84rem;}
+  .fbWorst strong{color:var(--navy); display:block; margin-bottom:6px;}
+  .fbWorst ul{margin:0; padding-inline-start:18px; color:#5c6a6e;}
+  .fbWorst li{margin-bottom:3px;}
+  .fbHot{color:var(--maroon); font-weight:700;}
+
   .gapRow{
     background:#fff; border:1px solid #e8e0cd; border-radius:12px; padding:14px 18px;
     display:flex; align-items:center; justify-content:space-between; gap:12px;
@@ -434,6 +448,21 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .chatMsg{max-width:82%; padding:9px 13px; border-radius:12px; margin-bottom:10px; font-size:.86rem; line-height:1.6;}
   .chatMsg.bot{background:#fff; border:1px solid #e8e0cd; margin-inline-end:auto; border-start-start-radius:2px;}
   .chatMsg.user{background:var(--gold); color:var(--navy-deep); margin-inline-start:auto; border-start-end-radius:2px; font-weight:700;}
+  /* تقييم الإجابة */
+  .rateRow{
+    display:flex; align-items:center; gap:7px; margin:4px 0 10px;
+    padding-inline-start:6px; font-size:.75rem;
+  }
+  .rateLbl{color:#9a9282;}
+  .rateBtn{
+    background:#fff; border:1px solid #e0d8c4; border-radius:14px;
+    padding:3px 9px; cursor:pointer; font-size:.82rem; line-height:1.2;
+  }
+  .rateBtn:hover{background:var(--cream); border-color:var(--gold);}
+  .rateThanks{font-size:.74rem;}
+  .rateThanks.good{color:var(--teal);}
+  .rateThanks.bad{color:var(--gold-deep);}
+
   .chatHeadBtns{display:flex; gap:4px; align-items:center;}
   .chatHeadBtns button{
     background:rgba(255,255,255,.12); border:none; color:#fff; cursor:pointer;
@@ -1435,6 +1464,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
     <div class="adminPanelBody" id="tab-gaps">
       <p class="lead" style="margin-bottom:16px;">أسئلة سألها الطلاب ولم يجد المنقذ لها جواباً — تكشف لك ما ينقص قاعدة المعرفة وما يحتاجه طلابك فعلاً.</p>
+      <div id="feedbackSummary" class="fbSummary"></div>
       <div id="gapsList"></div>
     </div>
 
@@ -3680,7 +3710,7 @@ function setAdminActive(active){
     loadPendingStudents();
     loadStudentsList();
     // البقية بعد لحظة — ما تعطّل ظهور اللوحة
-    setTimeout(()=>{ loadRoster(); loadQuestionsAdmin(); loadTrash(); loadGaps(); }, 150);
+    setTimeout(()=>{ loadRoster(); loadQuestionsAdmin(); loadTrash(); loadGaps(); loadFeedbackSummary(); }, 150);
   }
 }
 
@@ -4128,6 +4158,33 @@ async function loadGaps(){
         <button class="gapBtn drop" onclick="deleteGap(${g.id})" title="سؤال غير مهم — احذفه">🗑️</button>
       </div>
     </div>`).join('');
+}
+
+// ملخص تقييمات الطلاب لإجابات المنقذ
+async function loadFeedbackSummary(){
+  if(!isAdmin || !requireDb()) return;
+  const box = document.getElementById('feedbackSummary');
+  if(!box) return;
+  const { data, error } = await sb.from('answer_feedback')
+    .select('helpful, question').order('created_at', {ascending:false}).limit(300);
+  if(error || !data || data.length === 0){ box.innerHTML = ''; return; }
+  const up = data.filter(r => r.helpful).length;
+  const down = data.length - up;
+  const pct = Math.round(up / data.length * 100);
+  // أكثر الأسئلة التي قُيّمت إجاباتها كغير مفيدة
+  const badCounts = {};
+  data.filter(r => !r.helpful).forEach(r => { badCounts[r.question] = (badCounts[r.question]||0)+1; });
+  const worst = Object.entries(badCounts).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  box.innerHTML = `
+    <div class="fbHead">📊 تقييم الطلاب لإجابات المنقذ</div>
+    <div class="fbStats">
+      <span class="fbStat good">👍 ${up} مفيدة</span>
+      <span class="fbStat bad">👎 ${down} غير مفيدة</span>
+      <span class="fbStat rate">نسبة الرضا: <strong>${pct}%</strong></span>
+    </div>
+    ${worst.length ? `<div class="fbWorst"><strong>أكثر الإجابات التي لم تُفد الطلاب:</strong><ul>${
+      worst.map(([q,n])=>`<li>${esc(q)} ${n>1?`<span class="fbHot">(${n} مرات)</span>`:''}</li>`).join('')
+    }</ul></div>` : ''}`;
 }
 
 async function resolveGap(id){
@@ -4832,6 +4889,45 @@ async function logUnanswered(question){
   } catch(e){ /* التسجيل ثانوي — ما يعطّل تجربة الطالب أبداً */ }
 }
 
+// ---------- تقييم الإجابات — يكشف الإجابات الضعيفة التي تحتاج تحسيناً ----------
+let ratingSeq = 0;
+const ratedAnswers = new Set(); // نمنع تقييم نفس الإجابة مرتين بنفس الجلسة
+
+function addRatingButtons(question, answer){
+  const id = 'rate-' + (++ratingSeq);
+  const body = document.getElementById('chatBody');
+  const div = document.createElement('div');
+  div.className = 'rateRow';
+  div.id = id;
+  div.innerHTML = `
+    <span class="rateLbl">هل ساعدك هذا؟</span>
+    <button class="rateBtn up" onclick="rateAnswer('${id}', true)" aria-label="مفيدة">👍</button>
+    <button class="rateBtn down" onclick="rateAnswer('${id}', false)" aria-label="غير مفيدة">👎</button>`;
+  body.appendChild(div);
+  // نحفظ السؤال والجواب على العنصر نفسه — أأمن من تمريرهما داخل HTML
+  div.dataset.q = question;
+  div.dataset.a = answer.slice(0, 120);
+}
+
+async function rateAnswer(id, helpful){
+  const el = document.getElementById(id);
+  if(!el || ratedAnswers.has(id)) return;
+  ratedAnswers.add(id);
+  el.innerHTML = helpful
+    ? '<span class="rateThanks good">✅ شكراً! سعيد إني ساعدتك</span>'
+    : '<span class="rateThanks bad">📝 شكراً — سجّلت ملاحظتك للمعلم</span>';
+  if(!sb) return;
+  try{
+    await sb.from('answer_feedback').insert({
+      question: (el.dataset.q || '').slice(0, 200),
+      answer_key: (el.dataset.a || '').slice(0, 120),
+      helpful
+    });
+    // الإجابة غير المفيدة تُسجَّل كفجوة كذلك — تظهر بتبويب "أسئلة بلا جواب"
+    if(!helpful) logUnanswered(el.dataset.q || '');
+  } catch(e){ /* التقييم ثانوي — ما يعطّل الشات */ }
+}
+
 // ---------- حفظ سجل المحادثة محلياً على جهاز الطالب ----------
 const CHAT_KEY = 'rahhala_chat_history';
 const CHAT_MAX = 40;   // آخر 40 رسالة تكفي، ولا تثقّل التخزين
@@ -4964,8 +5060,11 @@ function sendChat(){
       if(result.chips && result.chips.length){
         const chipsHtml = '<div class="chatChips">' + result.chips.map(c=>`<button class="chatChip" onclick="askChip('${c}')">${c}</button>`).join('') + '</div>';
         document.getElementById('chatBody').insertAdjacentHTML('beforeend', chipsHtml);
-        document.getElementById('chatBody').scrollTop = document.getElementById('chatBody').scrollHeight;
       }
+      // أزرار التقييم — تظهر فقط للإجابات الفعلية، لا للردود التوجيهية
+      const isRealAnswer = !result.text.includes('ما لقيت') && !result.text.includes('خارج منهج') && result.text.length > 60;
+      if(isRealAnswer) addRatingButtons(text, result.text);
+      document.getElementById('chatBody').scrollTop = document.getElementById('chatBody').scrollHeight;
     } else {
       addChatMsg('bot', 'ما لقيت جواب دقيق لسؤالك 🤔 جرّب تسأل بكلمات مختلفة، أو راجع قسم «المنهج» بالموقع.');
     }
