@@ -309,6 +309,28 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .mcNoteItem.good{border-inline-start-color:var(--teal); color:#2a6b5c;}
   .mcNoteItem.bad{border-inline-start-color:var(--maroon); color:#8a3838;}
   .mcNoteDate{color:#a8a08e; font-size:.68rem; margin-inline-end:4px;}
+  .mcNoteItem{display:flex; align-items:flex-start; gap:4px;}
+  .mcNoteTxt{flex:1;}
+  .mcNoteOps{display:flex; gap:2px; opacity:0; transition:opacity .15s; flex-shrink:0;}
+  .mcNoteItem:hover .mcNoteOps{opacity:1;}
+  .mcNoteOps button{
+    background:none; border:none; cursor:pointer; font-size:.72rem;
+    padding:1px 3px; line-height:1; opacity:.65;
+  }
+  .mcNoteOps button:hover{opacity:1;}
+  .mcEditBox{display:flex; gap:3px; width:100%; align-items:center;}
+  .mcEditInput{
+    flex:1; min-width:60px; padding:3px 7px; border-radius:5px;
+    border:1.5px solid var(--gold); font-family:'Tajawal'; font-size:.75rem;
+  }
+  .mcEditInput:focus{outline:none;}
+  .mcEditOk, .mcEditNo{
+    border:none; border-radius:5px; cursor:pointer; padding:3px 7px;
+    font-size:.75rem; line-height:1;
+  }
+  .mcEditOk{background:var(--teal); color:#fff;}
+  .mcEditNo{background:#e8e0cd; color:#7a8a8e;}
+  @media(hover:none){ .mcNoteOps{opacity:1;} } /* على الجوال تظهر دائماً */
   .mcNoteAdd{display:flex; gap:4px; margin-top:3px;}
   .mcNoteInput{
     flex:1; min-width:100px; padding:5px 9px; border-radius:7px;
@@ -3589,9 +3611,13 @@ function renderMyClassTable(){
     const praises = all.filter(n => n.kind === 'praise');
     // كل الملاحظات تراكمياً — الأحدث أولاً، مع إمكانية إضافة ملاحظة جديدة مباشرة
     const notesHtml = all.length
-      ? all.map(n => `<div class="mcNoteItem ${n.kind === 'praise' ? 'good' : 'bad'}">
+      ? all.map(n => `<div class="mcNoteItem ${n.kind === 'praise' ? 'good' : 'bad'}" id="noteItem-${n.id}">
            <span class="mcNoteDate">${new Date(n.created_at).toLocaleDateString('ar-QA', {day:'numeric', month:'numeric'})}</span>
-           ${n.kind === 'praise' ? '🌟' : '⚠️'} ${esc(n.note)}
+           <span class="mcNoteTxt">${n.kind === 'praise' ? '🌟' : '⚠️'} ${esc(n.note)}</span>
+           <span class="mcNoteOps">
+             <button onclick="mcEditNote(${n.id}, ${r.id})" title="تعديل">✏️</button>
+             <button onclick="mcDeleteNote(${n.id}, ${r.id})" title="حذف">🗑️</button>
+           </span>
          </div>`).join('')
       : '';
     const noteTxt = `
@@ -3752,6 +3778,69 @@ function applyMcFilter(rows){
   else if(mcFilter === 'absent') out = out.filter(r => (mcAttendance[r.id]||'present') === 'absent');
   else if(mcFilter === 'top') out = [...out].sort((a,b)=>(b.participation_points||0)-(a.participation_points||0)).slice(0,10);
   return out;
+}
+
+// حذف ملاحظة
+async function mcDeleteNote(noteId, rosterId){
+  if(!isAdmin || !requireDb()) return;
+  if(!confirm('حذف هذي الملاحظة؟')) return;
+  const { error } = await sb.from('roster_warnings').delete().eq('id', noteId);
+  if(error){ showToast('تعذر الحذف: ' + error.message, 'error'); return; }
+  // حذف فوري من الذاكرة — استجابة بلا انتظار
+  if(myClassNotes[rosterId]) myClassNotes[rosterId] = myClassNotes[rosterId].filter(n => n.id !== noteId);
+  renderMyClassTable();
+  showToast('🗑️ حُذفت الملاحظة', 'info');
+}
+
+// تعديل ملاحظة بمكانها — يتحوّل النص لحقل إدخال
+function mcEditNote(noteId, rosterId){
+  if(!isAdmin) return;
+  const item = document.getElementById('noteItem-' + noteId);
+  if(!item || item.querySelector('.mcEditBox')) return; // مفتوح أصلاً
+  const note = (myClassNotes[rosterId] || []).find(n => n.id === noteId);
+  if(!note) return;
+  const txt = item.querySelector('.mcNoteTxt');
+  const ops = item.querySelector('.mcNoteOps');
+  txt.style.display = 'none';
+  ops.style.display = 'none';
+  const box = document.createElement('span');
+  box.className = 'mcEditBox';
+  box.innerHTML = `
+    <input class="mcEditInput" value="${esc(note.note)}"
+           onkeydown="if(event.key==='Enter') mcSaveNote(${noteId}, ${rosterId}); if(event.key==='Escape') mcCancelEdit(${noteId});">
+    <button class="mcEditOk" onclick="mcSaveNote(${noteId}, ${rosterId})" title="حفظ">✓</button>
+    <button class="mcEditNo" onclick="mcCancelEdit(${noteId})" title="إلغاء">✕</button>`;
+  item.appendChild(box);
+  const input = box.querySelector('.mcEditInput');
+  input.focus();
+  input.setSelectionRange(input.value.length, input.value.length);
+}
+
+function mcCancelEdit(noteId){
+  const item = document.getElementById('noteItem-' + noteId);
+  if(!item) return;
+  const box = item.querySelector('.mcEditBox');
+  if(box) box.remove();
+  const txt = item.querySelector('.mcNoteTxt');
+  const ops = item.querySelector('.mcNoteOps');
+  if(txt) txt.style.display = '';
+  if(ops) ops.style.display = '';
+}
+
+async function mcSaveNote(noteId, rosterId){
+  if(!isAdmin || !requireDb()) return;
+  const item = document.getElementById('noteItem-' + noteId);
+  const input = item && item.querySelector('.mcEditInput');
+  if(!input) return;
+  const newText = input.value.trim();
+  if(!newText){ showToast('الملاحظة ما تكون فاضية', 'error'); input.focus(); return; }
+  const { error } = await sb.from('roster_warnings').update({note: newText}).eq('id', noteId);
+  if(error){ showToast('تعذر الحفظ: ' + error.message, 'error'); return; }
+  // تحديث فوري بالذاكرة
+  const note = (myClassNotes[rosterId] || []).find(n => n.id === noteId);
+  if(note) note.note = newText;
+  renderMyClassTable();
+  showToast('✅ عُدّلت الملاحظة', 'success');
 }
 
 // كتابة ملاحظة مباشرة من الجدول — بلا نافذة منبثقة
