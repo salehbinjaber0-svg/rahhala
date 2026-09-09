@@ -70,7 +70,11 @@ if (missingRefs.length) err(`مراجع DOM لعناصر غير موجودة: ${
 else ok(`كل مراجع DOM سليمة (${refs.length})`);
 
 const onclicks = [...new Set([...html.matchAll(/onclick="([^\s("]+)\(/g)].map(m => m[1]))];
-const definedAll = new Set([...html.matchAll(/function ([^\s(]+)\s*\(/g)].map(m => m[1]));
+// نلتقط الدوال بكل صيغها: function foo() · const foo = () => · const foo = function
+const definedAll = new Set([
+  ...[...html.matchAll(/function ([^\s(]+)\s*\(/g)].map(m => m[1]),
+  ...[...html.matchAll(/(?:const|let|var)\s+(\w+)\s*=\s*(?:async\s*)?(?:\([^)]*\)\s*=>|function)/g)].map(m => m[1]),
+]);
 // نستثني استدعاءات المتصفح المدمجة (window.print, location.reload...)
 const BUILTIN = /^(window|document|location|history|speechSynthesis)\./;
 const missingFns = onclicks.filter(f => !definedAll.has(f) && !BUILTIN.test(f));

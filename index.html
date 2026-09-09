@@ -3651,27 +3651,10 @@ function renderMyClassTable(){
 let mcAttendance = {}; // roster_id -> حالة حضور اليوم
 
 // تسجيل الحضور من جدول صفوفي مباشرة — بدون الذهاب للوحة المعلم
-async function mcSetAtt(id, status){
-  if(!isAdmin) return;
-  mcAttendance[id] = status;
-  renderMyClassTable(); // استجابة فورية
-  const today = new Date().toISOString().slice(0,10);
-  const { error } = await sb.from('roster_attendance')
-    .upsert({ roster_id: id, status, day: today }, { onConflict: 'roster_id,day' });
-  if(error) showToast('تعذر حفظ الحضور: ' + error.message, 'error');
-}
+const mcSetAtt = (id, status) => saveAttendance(id, status, renderMyClassTable);
 
 // تراجع عن نقطة مشاركة أُضيفت بالغلط
-async function mcSubPoint(id){
-  if(!isAdmin) return;
-  const row = myClassData.find(r => r.id === id);
-  if(!row || (row.participation_points || 0) <= 0) return;
-  row.participation_points -= 1;
-  renderMyClassTable();
-  const { error } = await sb.from('class_roster')
-    .update({participation_points: row.participation_points}).eq('id', id);
-  if(error){ showToast('تعذر الحفظ', 'error'); refreshClassChallenge(); }
-}
+const mcSubPoint = (id) => changePoints(id, -1, renderMyClassTable);
 
 // ══════ وضع الحصة السريع ══════
 function openFocusMode(){
@@ -3723,28 +3706,34 @@ function updateFmStats(){
 }
 
 // زر حضور واحد يتدوّر: حاضر ← متأخر ← غائب ← حاضر
-async function fmCycleAtt(id){
-  if(!isAdmin) return;
-  const cur = mcAttendance[id] || 'present';
-  const next = ATT_CYCLE[cur];
-  mcAttendance[id] = next;
-  renderFocusMode();          // استجابة فورية
-  const today = new Date().toISOString().slice(0,10);
-  const { error } = await sb.from('roster_attendance')
-    .upsert({ roster_id: id, status: next, day: today }, { onConflict: 'roster_id,day' });
-  if(error) showToast('تعذر حفظ الحضور', 'error');
-}
+const fmCycleAtt = (id) => saveAttendance(id, ATT_CYCLE[mcAttendance[id] || 'present'], renderFocusMode);
 
-async function fmAddPoint(id){
-  if(!isAdmin) return;
+// منطق واحد لتعديل نقاط المشاركة — يستخدمه الجدول والوضع السريع معاً
+async function changePoints(id, delta, rerender){
+  if(!isAdmin || !requireDb()) return;
   const row = myClassData.find(r => r.id === id);
   if(!row) return;
-  row.participation_points = (row.participation_points || 0) + 1;
-  renderFocusMode();
+  const next = (row.participation_points || 0) + delta;
+  if(next < 0) return;                 // ما ننزل تحت الصفر
+  row.participation_points = next;
+  rerender();                          // استجابة فورية
   const { error } = await sb.from('class_roster')
-    .update({participation_points: row.participation_points}).eq('id', id);
-  if(error) showToast('تعذر الحفظ', 'error');
+    .update({participation_points: next}).eq('id', id);
+  if(error){ showToast('تعذر الحفظ: ' + error.message, 'error'); refreshClassChallenge(); }
 }
+
+// منطق واحد لحفظ الحضور
+async function saveAttendance(id, status, rerender){
+  if(!isAdmin || !requireDb()) return;
+  mcAttendance[id] = status;
+  rerender();
+  const today = new Date().toISOString().slice(0,10);
+  const { error } = await sb.from('roster_attendance')
+    .upsert({ roster_id: id, status, day: today }, { onConflict: 'roster_id,day' });
+  if(error) showToast('تعذر حفظ الحضور: ' + error.message, 'error');
+}
+
+const fmAddPoint = (id) => changePoints(id, +1, renderFocusMode);
 
 // ══════ الفلاتر الذكية ══════
 let mcFilter = 'all';
@@ -3841,15 +3830,7 @@ document.getElementById('mcBulkNames').addEventListener('input', (e)=>{
   document.getElementById('mcBulkPreview').textContent = n ? `${n} اسم جاهز` : '';
 });
 
-async function mcAddPoint(id){
-  if(!isAdmin){ showToast('هذي الأدوات للمعلم فقط', 'error'); return; }
-  const row = myClassData.find(r => r.id === id);
-  if(!row) return;
-  row.participation_points = (row.participation_points || 0) + 1;
-  renderMyClassTable(); // تحديث فوري
-  const { error } = await sb.from('class_roster').update({participation_points: row.participation_points}).eq('id', id);
-  if(error){ showToast('تعذر الحفظ: ' + error.message, 'error'); refreshClassChallenge(); }
-}
+const mcAddPoint = (id) => changePoints(id, +1, renderMyClassTable);
 
 function mcOpenNote(id, kind){
   if(!isAdmin){ showToast('هذي الأدوات للمعلم فقط', 'error'); return; }
