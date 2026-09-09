@@ -86,7 +86,8 @@ const ADMIN_FNS = [
   'setAttendance','buildReport','exportReportCSV','openAdminPanel','refreshClassChallenge','switchMyClass',
   'renderMyClassTable','mcAddPoint','mcSubPoint','mcSetAtt','mcOpenNote','exportMyClassCSV','kickStudent',
   'removeStudent','approveStudent','rejectStudent','loadStudentsList','loadQuestionsAdmin','addQuestion',
-  'deleteQuestion','openClassDisplay','cdPickStudent','showSiteQR'
+  'deleteQuestion','openClassDisplay','cdPickStudent','showSiteQR',
+  'mcAddStudent','mcRemoveStudent','mcBulkAdd','loadGaps','resolveGap','deleteGap','loadFeedbackSummary'
 ];
 const unguarded = ADMIN_FNS.filter(fn => {
   const m = mainScript.match(new RegExp(`(async )?function ${fn}\\s*\\([^)]*\\)\\s*\\{([\\s\\S]{0,280})`));

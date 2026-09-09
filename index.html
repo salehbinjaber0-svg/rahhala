@@ -160,6 +160,34 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .adminNavLink:hover{background:var(--gold); color:var(--navy-deep) !important;}
 
   /* ===== قسم صفوفي ===== */
+  .mcManage{
+    background:#fff; border:1px solid #e8e0cd; border-radius:12px;
+    padding:14px 20px; margin-bottom:16px;
+  }
+  .mcManage summary{cursor:pointer; font-weight:700; color:var(--navy); font-size:.92rem;}
+  .mcManage summary:hover{color:var(--teal);}
+  .mcManageBody{padding-top:14px;}
+  .mcHint{font-size:.82rem; color:#7a8a8e; margin-bottom:14px; line-height:1.8;}
+  .mcAddRow{display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;}
+  .mcAddRow input{
+    flex:1; min-width:180px; padding:10px 14px; border-radius:9px;
+    border:1.5px solid #dcd4c0; font-family:'Tajawal'; font-size:.9rem;
+  }
+  .mcAddRow input:focus{outline:none; border-color:var(--gold);}
+  .mcBulk label{display:block; font-size:.84rem; font-weight:700; color:var(--navy); margin-bottom:7px;}
+  .mcBulk textarea{
+    width:100%; padding:12px; border-radius:9px; border:1.5px solid #dcd4c0;
+    font-family:'Tajawal'; font-size:.88rem; resize:vertical;
+  }
+  .mcBulk textarea:focus{outline:none; border-color:var(--gold);}
+  .mcBulkRow{display:flex; gap:12px; align-items:center; margin-top:10px; flex-wrap:wrap;}
+  #mcBulkPreview{font-size:.83rem; color:var(--teal); font-weight:700;}
+  .mcDel{
+    background:none; border:none; cursor:pointer; font-size:.9rem;
+    color:#c5bda9; padding:4px;
+  }
+  .mcDel:hover{color:var(--maroon);}
+
   .myClassBar{display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; align-items:center;}
   .myClassBtn{
     padding:10px 24px; border-radius:30px; border:2px solid var(--navy); background:transparent;
@@ -1323,6 +1351,27 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <button class="myClassExport" onclick="exportMyClassCSV()">⬇️ تصدير الصف</button>
     </div>
 
+    <details class="mcManage">
+      <summary>⚙️ إدارة قائمة الصف — إضافة وحذف الطلاب</summary>
+      <div class="mcManageBody">
+        <p class="mcHint">هذي قائمتك الثابتة — أنت وحدك من يضيف أو يحذف منها. لا علاقة لها بمن يسجّل دخول للموقع.</p>
+
+        <div class="mcAddRow">
+          <input id="mcNewName" placeholder="اسم طالب جديد" onkeydown="if(event.key==='Enter') mcAddStudent(this)">
+          <button class="btn btn-gold" onclick="mcAddStudent(this)">➕ إضافة</button>
+        </div>
+
+        <div class="mcBulk">
+          <label>أو الصق قائمة أسماء من إكسل (كل اسم بسطر):</label>
+          <textarea id="mcBulkNames" rows="6" placeholder="محمد أحمد&#10;سالم خالد&#10;عبدالله ناصر"></textarea>
+          <div class="mcBulkRow">
+            <button class="btn btn-gold" onclick="mcBulkAdd(this)">⬆️ إضافة الكل</button>
+            <span id="mcBulkPreview"></span>
+          </div>
+        </div>
+      </div>
+    </details>
+
     <div id="myClassSummary" class="myClassSummary"></div>
     <div id="myClassTableWrap" class="myClassTableWrap">
       <p style="color:#8a8a8a;">جاري تحميل القائمة...</p>
@@ -1398,9 +1447,8 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <button class="btn" style="margin-bottom:24px; margin-inline-start:10px; background:transparent; border:2px solid var(--navy); color:var(--navy);" onclick="showSiteQR()">📱 رمز QR للموقع</button>
 
     <div class="adminTabs">
-      <button class="adminTab active" data-tab="students">👥 الطلاب (<span id="activeCount">0</span> نشط الآن)</button>
+      <button class="adminTab active" data-tab="students">🌐 من دخل الموقع (<span id="activeCount">0</span> نشط)</button>
       <button class="adminTab" data-tab="questions">📝 إدارة الأسئلة</button>
-      <button class="adminTab" data-tab="roster">📋 متابعة الحصة</button>
       <button class="adminTab" data-tab="gaps">💡 أسئلة بلا جواب <span id="gapsCount" class="tabBadge"></span></button>
       <button class="adminTab" data-tab="trash">🗑️ سلة المحذوفات</button>
     </div>
@@ -3464,13 +3512,14 @@ function renderMyClassTable(){
         <td><span class="mcBadge ${warns.length ? 'warn' : 'ok'}">${warns.length ? '⚠️ ' + warns.length : '✅ 0'}</span>
             <button class="mcAdd" onclick="mcOpenNote(${r.id}, 'warning')" title="أضف تنبيهاً">+</button></td>
         <td class="mcNoteCell">${noteTxt}</td>
+        <td><button class="mcDel" onclick="mcRemoveStudent(${r.id}, '${esc(r.student_name).replace(/'/g,'&#39;')}')" title="حذف من القائمة">🗑️</button></td>
       </tr>`;
   }).join('');
 
   document.getElementById('myClassTableWrap').innerHTML = `
     <table class="myClassTable">
       <thead>
-        <tr><th>#</th><th>اسم الطالب</th><th>الحضور</th><th>المشاركة</th><th>التكريم</th><th>التنبيه</th><th>آخر ملاحظة</th></tr>
+        <tr><th>#</th><th>اسم الطالب</th><th>الحضور</th><th>المشاركة</th><th>التكريم</th><th>التنبيه</th><th>آخر ملاحظة</th><th></th></tr>
       </thead>
       <tbody>${rows}</tbody>
     </table>`;
@@ -3514,6 +3563,63 @@ async function mcSubPoint(id){
     .update({participation_points: row.participation_points}).eq('id', id);
   if(error){ showToast('تعذر الحفظ', 'error'); refreshClassChallenge(); }
 }
+
+// ---------- إدارة قائمة الصف الثابتة (إضافة/حذف) ----------
+async function mcAddStudent(btn){
+  if(!isAdmin || !requireDb()) return;
+  const input = document.getElementById('mcNewName');
+  const name = input.value.replace(/\s+/g,' ').trim();
+  if(!name){ showToast('اكتب اسم الطالب أول', 'error'); return; }
+  if(myClassData.some(r => r.student_name === name)){
+    showToast('الاسم موجود مسبقاً بهذا الصف', 'error'); return;
+  }
+  setBtnLoading(btn, true, 'جاري الإضافة');
+  const { error } = await sb.from('class_roster').insert({cls: myClassCls, student_name: name});
+  setBtnLoading(btn, false);
+  if(error){ showToast('تعذر الإضافة: ' + error.message, 'error'); return; }
+  input.value = '';
+  showToast('✅ أُضيف ' + name, 'success');
+  refreshClassChallenge();
+}
+
+async function mcRemoveStudent(id, name){
+  if(!isAdmin || !requireDb()) return;
+  if(!confirm(`حذف «${name}» من قائمة ${myClassCls}؟\n\nنقاطه وتنبيهاته وملاحظاته بتنحذف معه.`)) return;
+  const { error } = await sb.from('class_roster').delete().eq('id', id);
+  if(error){ showToast('تعذر الحذف: ' + error.message, 'error'); return; }
+  showToast('🗑️ حُذف ' + name, 'info');
+  refreshClassChallenge();
+}
+
+async function mcBulkAdd(btn){
+  if(!isAdmin || !requireDb()) return;
+  const box = document.getElementById('mcBulkNames');
+  const names = parseBulkNames(box.value);
+  if(names.length === 0){ showToast('الصق الأسماء أول — كل اسم بسطر', 'error'); return; }
+  setBtnLoading(btn, true, 'جاري الإضافة');
+  const existing = new Set(myClassData.map(r => r.student_name));
+  const toAdd = names.filter(n => !existing.has(n));
+  const skipped = names.length - toAdd.length;
+  if(toAdd.length === 0){
+    setBtnLoading(btn, false);
+    showToast('كل الأسماء موجودة مسبقاً', 'error');
+    return;
+  }
+  const { error } = await sb.from('class_roster')
+    .insert(toAdd.map(n => ({cls: myClassCls, student_name: n})));
+  setBtnLoading(btn, false);
+  if(error){ showToast('تعذر الإضافة: ' + error.message, 'error'); return; }
+  box.value = '';
+  document.getElementById('mcBulkPreview').textContent = '';
+  showToast(`✅ أُضيف ${toAdd.length} طالب${skipped ? ` · تخطّيت ${skipped} مكرر` : ''}`, 'success');
+  refreshClassChallenge();
+}
+
+// معاينة حيّة لعدد الأسماء أثناء اللصق
+document.getElementById('mcBulkNames').addEventListener('input', (e)=>{
+  const n = parseBulkNames(e.target.value).length;
+  document.getElementById('mcBulkPreview').textContent = n ? `${n} اسم جاهز` : '';
+});
 
 async function mcAddPoint(id){
   if(!isAdmin){ showToast('هذي الأدوات للمعلم فقط', 'error'); return; }
