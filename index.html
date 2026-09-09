@@ -231,7 +231,27 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .mcAdd.minus:hover{background:#fbe9e9; border-color:var(--maroon);}
   .mcAttCell{white-space:nowrap; min-width:110px;}
   .mcAttCell .attBtn{width:27px; height:27px; margin:0 1px; font-size:.78rem;}
-  .mcNoteCell{text-align:right !important; max-width:190px;}
+  .mcNoteCell{text-align:right !important; min-width:240px; max-width:300px;}
+  .mcNotesBox{display:flex; flex-direction:column; gap:4px;}
+  .mcNoteItem{
+    font-size:.76rem; line-height:1.6; padding:4px 8px; border-radius:6px;
+    background:var(--cream); border-inline-start:2px solid #dcd4c0;
+  }
+  .mcNoteItem.good{border-inline-start-color:var(--teal); color:#2a6b5c;}
+  .mcNoteItem.bad{border-inline-start-color:var(--maroon); color:#8a3838;}
+  .mcNoteDate{color:#a8a08e; font-size:.68rem; margin-inline-end:4px;}
+  .mcNoteAdd{display:flex; gap:4px; margin-top:3px;}
+  .mcNoteInput{
+    flex:1; min-width:100px; padding:5px 9px; border-radius:7px;
+    border:1.5px solid #dcd4c0; font-family:'Tajawal'; font-size:.76rem;
+  }
+  .mcNoteInput:focus{outline:none; border-color:var(--gold);}
+  .mcNoteSend{
+    border:1px solid #dcd4c0; border-radius:7px; background:#fff;
+    cursor:pointer; font-size:.8rem; padding:4px 7px; line-height:1;
+  }
+  .mcNoteSend.praise:hover{background:#eaf4f1; border-color:var(--teal);}
+  .mcNoteSend.warn:hover{background:#fbe9e9; border-color:var(--maroon);}
   .mcNote{font-size:.79rem; display:inline-block;}
   .mcNote.good{color:var(--teal);}
   .mcNote.bad{color:var(--maroon);}
@@ -3474,10 +3494,23 @@ function renderMyClassTable(){
     const all = myClassNotes[r.id] || [];
     const warns = all.filter(n => (n.kind || 'warning') === 'warning');
     const praises = all.filter(n => n.kind === 'praise');
-    const lastNote = all[0];
-    const noteTxt = lastNote
-      ? `<span class="mcNote ${lastNote.kind === 'praise' ? 'good' : 'bad'}" title="${esc(lastNote.note)}">${esc(lastNote.note.slice(0, 30))}${lastNote.note.length > 30 ? '…' : ''}</span>`
-      : '<span class="mcNoteEmpty">—</span>';
+    // كل الملاحظات تراكمياً — الأحدث أولاً، مع إمكانية إضافة ملاحظة جديدة مباشرة
+    const notesHtml = all.length
+      ? all.map(n => `<div class="mcNoteItem ${n.kind === 'praise' ? 'good' : 'bad'}">
+           <span class="mcNoteDate">${new Date(n.created_at).toLocaleDateString('ar-QA', {day:'numeric', month:'numeric'})}</span>
+           ${n.kind === 'praise' ? '🌟' : '⚠️'} ${esc(n.note)}
+         </div>`).join('')
+      : '';
+    const noteTxt = `
+      <div class="mcNotesBox">
+        ${notesHtml || '<span class="mcNoteEmpty">لا ملاحظات بعد</span>'}
+        <div class="mcNoteAdd">
+          <input class="mcNoteInput" id="mcNote-${r.id}" placeholder="اكتب ملاحظة…"
+                 onkeydown="if(event.key==='Enter') mcQuickNote(${r.id}, 'warning')">
+          <button class="mcNoteSend praise" onclick="mcQuickNote(${r.id}, 'praise')" title="حفظ كتكريم">🌟</button>
+          <button class="mcNoteSend warn" onclick="mcQuickNote(${r.id}, 'warning')" title="حفظ كتنبيه">⚠️</button>
+        </div>
+      </div>`;
     return `
       <tr>
         <td class="mcIdx">${i + 1}</td>
@@ -3545,6 +3578,25 @@ async function mcSubPoint(id){
   const { error } = await sb.from('class_roster')
     .update({participation_points: row.participation_points}).eq('id', id);
   if(error){ showToast('تعذر الحفظ', 'error'); refreshClassChallenge(); }
+}
+
+// كتابة ملاحظة مباشرة من الجدول — بلا نافذة منبثقة
+async function mcQuickNote(id, kind){
+  if(!isAdmin || !requireDb()) return;
+  const input = document.getElementById('mcNote-' + id);
+  if(!input) return;
+  const note = input.value.trim();
+  if(!note){ showToast('اكتب الملاحظة أول', 'error'); input.focus(); return; }
+  input.disabled = true;
+  const { error } = await sb.from('roster_warnings').insert({roster_id: id, note, kind});
+  if(error){
+    input.disabled = false;
+    showToast('تعذر الحفظ: ' + error.message, 'error');
+    return;
+  }
+  input.value = '';
+  showToast(kind === 'praise' ? '🌟 سُجّل التكريم' : '⚠️ سُجّل التنبيه', 'success');
+  refreshClassChallenge();
 }
 
 // ---------- إدارة قائمة الصف الثابتة (إضافة/حذف) ----------
@@ -3628,15 +3680,18 @@ function exportMyClassCSV(){
   if(!myClassData.length){ showToast('ما فيه بيانات للتصدير', 'error'); return; }
   let csv = '\uFEFF';
   csv += `متابعة صف ${myClassCls} — رحّالة\n\n`;
-  csv += '#,اسم الطالب,الحضور,نقاط المشاركة,التكريم,التنبيهات,آخر ملاحظة\n';
+  csv += '#,اسم الطالب,الحضور,نقاط المشاركة,التكريم,التنبيهات,كل الملاحظات\n';
   const attLabel = {present:'حاضر', late:'متأخر', absent:'غائب'};
   myClassData.forEach((r, i)=>{
     const all = myClassNotes[r.id] || [];
     const w = all.filter(n => (n.kind || 'warning') === 'warning').length;
     const p = all.filter(n => n.kind === 'praise').length;
-    const last = all[0] ? all[0].note.replace(/"/g, '""') : '';
+    // كل الملاحظات تراكمياً بالتصدير — لا آخر واحدة فقط
+    const allNotes = all.map(n =>
+      `${new Date(n.created_at).toLocaleDateString('ar-QA')} ${n.kind === 'praise' ? '[تكريم]' : '[تنبيه]'} ${n.note}`
+    ).join(' | ').replace(/"/g, '""');
     const a = attLabel[mcAttendance[r.id] || 'present'];
-    csv += `${i+1},${r.student_name},${a},${r.participation_points || 0},${p},${w},"${last}"\n`;
+    csv += `${i+1},${r.student_name},${a},${r.participation_points || 0},${p},${w},"${allNotes}"\n`;
   });
   const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
   const a = document.createElement('a');
