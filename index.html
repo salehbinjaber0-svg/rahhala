@@ -188,6 +188,75 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   }
   .mcDel:hover{color:var(--maroon);}
 
+  /* ══ وضع الحصة السريع ══ */
+  .focusModeBtn{
+    padding:9px 20px; border-radius:10px; cursor:pointer; font-family:'Tajawal';
+    background:var(--grad-gold); color:var(--navy-deep); border:none;
+    font-weight:700; font-size:.86rem; box-shadow:0 3px 10px rgba(168,129,63,.3);
+  }
+  .focusModeBtn:hover{transform:translateY(-1px);}
+  #focusMode{
+    display:none; position:fixed; inset:0; z-index:420; background:var(--navy-deep);
+    color:#fff; overflow-y:auto;
+  }
+  #focusMode.show{display:block;}
+  .fmHead{
+    position:sticky; top:0; background:var(--grad-navy); padding:16px 20px;
+    border-bottom:2px solid var(--gold); display:flex; align-items:center;
+    justify-content:space-between; gap:14px; flex-wrap:wrap; z-index:2;
+  }
+  .fmExit{
+    background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.3);
+    color:#fff; border-radius:24px; padding:8px 18px; cursor:pointer;
+    font-family:'Tajawal'; font-size:.86rem; font-weight:700;
+  }
+  .fmExit:hover{background:rgba(255,255,255,.24);}
+  .fmTitle{font-family:'Aref Ruqaa'; font-size:1.4rem; color:var(--gold-light);}
+  .fmStats{display:flex; gap:8px;}
+  .fmStat{padding:5px 13px; border-radius:18px; font-size:.85rem; font-weight:700;}
+  .fmStat.green{background:rgba(47,150,110,.22); color:#7fe0b8;}
+  .fmStat.amber{background:rgba(201,161,94,.22); color:var(--gold-light);}
+  .fmStat.red{background:rgba(160,60,60,.25); color:#f2a8a8;}
+  .fmList{max-width:760px; margin:0 auto; padding:18px 14px 40px; display:flex; flex-direction:column; gap:9px;}
+  .fmRow{
+    display:flex; align-items:center; gap:12px;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
+    border-radius:14px; padding:11px 14px;
+  }
+  .fmAtt{
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    min-width:74px; padding:9px 6px; border-radius:12px; cursor:pointer;
+    border:2px solid transparent; font-family:'Tajawal'; transition:.15s;
+  }
+  .fmAtt.present{background:rgba(47,150,110,.2); border-color:#2f966e; color:#7fe0b8;}
+  .fmAtt.late{background:rgba(201,161,94,.2); border-color:var(--gold); color:var(--gold-light);}
+  .fmAtt.absent{background:rgba(160,60,60,.22); border-color:#a03c3c; color:#f2a8a8;}
+  .fmAtt:active{transform:scale(.94);}
+  .fmAttIcon{font-size:1.15rem; line-height:1;}
+  .fmAttLbl{font-size:.72rem; font-weight:700;}
+  .fmName{flex:1; font-size:1.05rem; font-weight:700; color:#fff;}
+  .fmStars{font-size:.9rem; letter-spacing:1px; color:var(--gold-light); min-width:60px; text-align:center;}
+  .fmPlus{
+    min-width:52px; padding:11px 0; border-radius:12px; cursor:pointer;
+    background:var(--grad-gold); color:var(--navy-deep); border:none;
+    font-family:'Tajawal'; font-weight:700; font-size:.95rem;
+  }
+  .fmPlus:active{transform:scale(.92);}
+
+  /* ══ الفلاتر ══ */
+  .mcFilters{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; align-items:center;}
+  .mcFilterBtn{
+    padding:7px 15px; border-radius:20px; border:1.5px solid #dcd4c0;
+    background:#fff; color:var(--navy); cursor:pointer;
+    font-family:'Tajawal'; font-size:.82rem; font-weight:700;
+  }
+  .mcFilterBtn.active{background:var(--navy); color:var(--gold-light); border-color:var(--navy);}
+  .mcSearchBox{
+    flex:1; min-width:160px; padding:7px 14px; border-radius:20px;
+    border:1.5px solid #dcd4c0; font-family:'Tajawal'; font-size:.82rem;
+  }
+  .mcSearchBox:focus{outline:none; border-color:var(--gold);}
+
   .myClassBar{display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; align-items:center;}
   .myClassBtn{
     padding:10px 24px; border-radius:30px; border:2px solid var(--navy); background:transparent;
@@ -1224,6 +1293,15 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   </div>
 </section>
 
+<div id="focusMode">
+  <div class="fmHead">
+    <button class="fmExit" onclick="closeFocusMode()">✕ إنهاء</button>
+    <div class="fmTitle">⚡ <span id="fmCls">سابع 1</span></div>
+    <div class="fmStats" id="fmStats"></div>
+  </div>
+  <div id="fmList" class="fmList"></div>
+</div>
+
 <section id="classDisplayView">
   <button id="cdExit" onclick="closeClassDisplay()">✕ خروج من وضع العرض</button>
   <div class="cdWrap">
@@ -1351,7 +1429,16 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <button class="myClassBtn active" data-cls="7-1" onclick="switchMyClass('7-1', this)">سابع 1</button>
       <button class="myClassBtn" data-cls="7-2" onclick="switchMyClass('7-2', this)">سابع 2</button>
       <button class="myClassBtn" data-cls="7-3" onclick="switchMyClass('7-3', this)">سابع 3</button>
+      <button class="focusModeBtn" onclick="openFocusMode()">⚡ وضع الحصة السريع</button>
       <button class="myClassExport" onclick="exportMyClassCSV()">⬇️ تصدير الصف</button>
+    </div>
+
+    <div class="mcFilters">
+      <button class="mcFilterBtn active" data-f="all" onclick="setMcFilter('all', this)">الكل</button>
+      <button class="mcFilterBtn" data-f="present" onclick="setMcFilter('present', this)">🟢 الحاضرون</button>
+      <button class="mcFilterBtn" data-f="absent" onclick="setMcFilter('absent', this)">🔴 الغائبون</button>
+      <button class="mcFilterBtn" data-f="top" onclick="setMcFilter('top', this)">⭐ الأعلى مشاركة</button>
+      <input id="mcSearch" class="mcSearchBox" placeholder="🔍 بحث باسم الطالب…" oninput="renderMyClassTable()">
     </div>
 
     <details class="mcManage">
@@ -3489,7 +3576,13 @@ async function refreshClassChallenge(){
 
 function renderMyClassTable(){
   if(!isAdmin) return;
-  const rows = myClassData.map((r, i)=>{
+  const filtered = applyMcFilter(myClassData);
+  if(filtered.length === 0){
+    document.getElementById('myClassTableWrap').innerHTML =
+      '<p style="color:#8a8a8a; padding:20px; text-align:center;">ما فيه طلاب يطابقون الفلتر الحالي.</p>';
+    return;
+  }
+  const rows = filtered.map((r, i)=>{
     const att = mcAttendance[r.id] || 'present';
     const all = myClassNotes[r.id] || [];
     const warns = all.filter(n => (n.kind || 'warning') === 'warning');
@@ -3578,6 +3671,98 @@ async function mcSubPoint(id){
   const { error } = await sb.from('class_roster')
     .update({participation_points: row.participation_points}).eq('id', id);
   if(error){ showToast('تعذر الحفظ', 'error'); refreshClassChallenge(); }
+}
+
+// ══════ وضع الحصة السريع ══════
+function openFocusMode(){
+  if(!isAdmin){ showToast('هذا الوضع للمعلم فقط', 'error'); return; }
+  if(!myClassData.length){ showToast('أضف طلاب الصف أولاً', 'error'); return; }
+  document.getElementById('fmCls').textContent = myClassCls.replace('7-','سابع ');
+  document.getElementById('focusMode').classList.add('show');
+  renderFocusMode();
+}
+function closeFocusMode(){
+  document.getElementById('focusMode').classList.remove('show');
+  refreshClassChallenge(); // نحدّث الجدول الكامل بما سُجّل
+}
+
+const ATT_CYCLE = { present:'late', late:'absent', absent:'present' };
+const ATT_VIEW = {
+  present: ['🟢','حاضر','present'],
+  late:    ['🟡','متأخر','late'],
+  absent:  ['🔴','غائب','absent'],
+};
+
+function renderFocusMode(){
+  const list = document.getElementById('fmList');
+  list.innerHTML = myClassData.map(r=>{
+    const st = mcAttendance[r.id] || 'present';
+    const [icon, label, cls] = ATT_VIEW[st];
+    const pts = r.participation_points || 0;
+    const stars = pts > 0 ? '⭐'.repeat(Math.min(pts, 5)) + (pts > 5 ? ` +${pts-5}` : '') : '';
+    return `
+      <div class="fmRow">
+        <button class="fmAtt ${cls}" onclick="fmCycleAtt(${r.id})" title="اضغط لتبديل الحضور">
+          <span class="fmAttIcon">${icon}</span><span class="fmAttLbl">${label}</span>
+        </button>
+        <div class="fmName">${esc(r.student_name)}</div>
+        <div class="fmStars">${stars}</div>
+        <button class="fmPlus" onclick="fmAddPoint(${r.id})" title="نقطة مشاركة">+1</button>
+      </div>`;
+  }).join('');
+  updateFmStats();
+}
+
+function updateFmStats(){
+  const vals = myClassData.map(r => mcAttendance[r.id] || 'present');
+  const p = vals.filter(v=>v==='present').length;
+  const l = vals.filter(v=>v==='late').length;
+  const a = vals.filter(v=>v==='absent').length;
+  document.getElementById('fmStats').innerHTML =
+    `<span class="fmStat green">🟢 ${p}</span><span class="fmStat amber">🟡 ${l}</span><span class="fmStat red">🔴 ${a}</span>`;
+}
+
+// زر حضور واحد يتدوّر: حاضر ← متأخر ← غائب ← حاضر
+async function fmCycleAtt(id){
+  if(!isAdmin) return;
+  const cur = mcAttendance[id] || 'present';
+  const next = ATT_CYCLE[cur];
+  mcAttendance[id] = next;
+  renderFocusMode();          // استجابة فورية
+  const today = new Date().toISOString().slice(0,10);
+  const { error } = await sb.from('roster_attendance')
+    .upsert({ roster_id: id, status: next, day: today }, { onConflict: 'roster_id,day' });
+  if(error) showToast('تعذر حفظ الحضور', 'error');
+}
+
+async function fmAddPoint(id){
+  if(!isAdmin) return;
+  const row = myClassData.find(r => r.id === id);
+  if(!row) return;
+  row.participation_points = (row.participation_points || 0) + 1;
+  renderFocusMode();
+  const { error } = await sb.from('class_roster')
+    .update({participation_points: row.participation_points}).eq('id', id);
+  if(error) showToast('تعذر الحفظ', 'error');
+}
+
+// ══════ الفلاتر الذكية ══════
+let mcFilter = 'all';
+function setMcFilter(f, btn){
+  mcFilter = f;
+  document.querySelectorAll('.mcFilterBtn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderMyClassTable();
+}
+
+function applyMcFilter(rows){
+  const q = (document.getElementById('mcSearch')?.value || '').trim();
+  let out = rows;
+  if(q) out = out.filter(r => r.student_name.includes(q));
+  if(mcFilter === 'present') out = out.filter(r => (mcAttendance[r.id]||'present') === 'present');
+  else if(mcFilter === 'absent') out = out.filter(r => (mcAttendance[r.id]||'present') === 'absent');
+  else if(mcFilter === 'top') out = [...out].sort((a,b)=>(b.participation_points||0)-(a.participation_points||0)).slice(0,10);
+  return out;
 }
 
 // كتابة ملاحظة مباشرة من الجدول — بلا نافذة منبثقة
