@@ -301,7 +301,24 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .mcAttCell{white-space:nowrap; min-width:110px;}
   .mcAttCell .attBtn{width:27px; height:27px; margin:0 1px; font-size:.78rem;}
   .mcNoteCell{text-align:right !important; min-width:240px; max-width:300px;}
-  .mcNotesBox{display:flex; flex-direction:column; gap:4px;}
+  .mcNotesBox{display:flex; flex-direction:column; gap:5px;}
+  /* الملاحظات مطوية — الجدول يبقى مضغوطاً مهما كثرت */
+  .mcNotesFold{font-size:.76rem;}
+  .mcNotesSummary{
+    cursor:pointer; list-style:none; display:flex; align-items:center; gap:5px;
+    padding:4px 9px; border-radius:16px; background:var(--cream);
+    border:1px solid #e0d8c4; color:var(--navy); font-weight:700; width:fit-content;
+  }
+  .mcNotesSummary::-webkit-details-marker{display:none;}
+  .mcNotesSummary:hover{background:var(--gold-light); border-color:var(--gold);}
+  .mcNotesFold[open] .mcNotesSummary{background:var(--gold-light); border-color:var(--gold);}
+  .nfChip{padding:1px 6px; border-radius:10px; font-size:.68rem;}
+  .nfChip.good{background:#eaf4f1; color:var(--teal);}
+  .nfChip.bad{background:#fbe9e9; color:var(--maroon);}
+  .mcNotesList{
+    display:flex; flex-direction:column; gap:4px; margin-top:6px;
+    max-height:170px; overflow-y:auto; padding-inline-end:3px;
+  }
   .mcNoteItem{
     font-size:.76rem; line-height:1.6; padding:4px 8px; border-radius:6px;
     background:var(--cream); border-inline-start:2px solid #dcd4c0;
@@ -1460,7 +1477,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <button class="mcFilterBtn" data-f="present" onclick="setMcFilter('present', this)">🟢 الحاضرون</button>
       <button class="mcFilterBtn" data-f="absent" onclick="setMcFilter('absent', this)">🔴 الغائبون</button>
       <button class="mcFilterBtn" data-f="top" onclick="setMcFilter('top', this)">⭐ الأعلى مشاركة</button>
-      <input id="mcSearch" class="mcSearchBox" placeholder="🔍 بحث باسم الطالب…" oninput="renderMyClassTable()">
+      <input id="mcSearch" class="mcSearchBox" placeholder="🔍 بحث باسم الطالب…" autocomplete="off" data-lpignore="true" oninput="renderMyClassTable()">
     </div>
 
     <details class="mcManage">
@@ -1469,7 +1486,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
         <p class="mcHint">هذي قائمتك الثابتة — أنت وحدك من يضيف أو يحذف منها. لا علاقة لها بمن يسجّل دخول للموقع.</p>
 
         <div class="mcAddRow">
-          <input id="mcNewName" placeholder="اسم طالب جديد" onkeydown="if(event.key==='Enter') mcAddStudent(this)">
+          <input id="mcNewName" placeholder="اسم طالب جديد" autocomplete="off" data-lpignore="true" onkeydown="if(event.key==='Enter') mcAddStudent(this)">
           <button class="btn btn-gold" onclick="mcAddStudent(this)">➕ إضافة</button>
         </div>
 
@@ -1599,7 +1616,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <div class="addQForm" style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
         <div style="flex:1; min-width:180px;">
           <label>اسم طالب جديد بهذا الصف</label>
-          <input id="newRosterName" placeholder="مثال: محمد أحمد" style="margin-bottom:0;">
+          <input id="newRosterName" placeholder="مثال: محمد أحمد" autocomplete="off" data-lpignore="true" style="margin-bottom:0;">
         </div>
         <button class="btn btn-gold" onclick="addRosterStudent(this)" style="height:44px;">➕ إضافة</button>
       </div>
@@ -1655,8 +1672,8 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <button class="modalClose" onclick="closeAdminLogin()" title="إلغاء">✕</button>
     <h3>دخول المعلم</h3>
     <p class="sub">هذا الدخول مخصص للمعلم فقط — يحتاج بريد وكلمة مرور حقيقيين</p>
-    <div class="field"><label>البريد الإلكتروني</label><input id="inAdminEmail" type="email" placeholder="you@example.com"></div>
-    <div class="field"><label>كلمة المرور</label><input id="inAdminPass" type="password" placeholder="••••••••"></div>
+    <div class="field"><label>البريد الإلكتروني</label><input id="inAdminEmail" type="email" name="teacher-email" autocomplete="username" placeholder="you@example.com"></div>
+    <div class="field"><label>كلمة المرور</label><input id="inAdminPass" type="password" name="teacher-password" autocomplete="current-password" placeholder="••••••••"></div>
     <div id="adminLoginError" style="color:var(--maroon); font-size:.85rem; margin-bottom:10px; display:none;"></div>
     <button class="btn btn-gold" style="width:100%" onclick="adminLogin(this)">دخول</button>
   </div>
@@ -1702,7 +1719,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   </div>
   <div class="chatBody" id="chatBody"></div>
   <div class="chatInputRow">
-    <input id="chatInput" placeholder="اسأل عن أي مفهوم بالمنهج..." aria-label="اكتب سؤالك للمنقذ" onkeydown="if(event.key==='Enter') sendChat();">
+    <input id="chatInput" placeholder="اسأل عن أي مفهوم بالمنهج..." autocomplete="off" data-lpignore="true" aria-label="اكتب سؤالك للمنقذ" onkeydown="if(event.key==='Enter') sendChat();">
     <button onclick="sendChat()">إرسال</button>
   </div>
 </div>
@@ -3612,7 +3629,7 @@ function renderMyClassTable(){
     // كل الملاحظات تراكمياً — الأحدث أولاً، مع إمكانية إضافة ملاحظة جديدة مباشرة
     const notesHtml = all.length
       ? all.map(n => `<div class="mcNoteItem ${n.kind === 'praise' ? 'good' : 'bad'}" id="noteItem-${n.id}">
-           <span class="mcNoteDate">${new Date(n.created_at).toLocaleDateString('ar-QA', {day:'numeric', month:'numeric'})}</span>
+           <span class="mcNoteDate" title="${new Date(n.created_at).toLocaleDateString('ar-QA', {weekday:'long', day:'numeric', month:'long'})}">${new Date(n.created_at).toLocaleDateString('ar-QA', {day:'numeric', month:'short'})}</span>
            <span class="mcNoteTxt">${n.kind === 'praise' ? '🌟' : '⚠️'} ${esc(n.note)}</span>
            <span class="mcNoteOps">
              <button onclick="mcEditNote(${n.id}, ${r.id})" title="تعديل">✏️</button>
@@ -3622,9 +3639,17 @@ function renderMyClassTable(){
       : '';
     const noteTxt = `
       <div class="mcNotesBox">
-        ${notesHtml || '<span class="mcNoteEmpty">لا ملاحظات بعد</span>'}
+        ${all.length ? `
+          <details class="mcNotesFold">
+            <summary class="mcNotesSummary">
+              📋 ${all.length} ملاحظة
+              ${praises.length ? `<span class="nfChip good">🌟 ${praises.length}</span>` : ''}
+              ${warns.length ? `<span class="nfChip bad">⚠️ ${warns.length}</span>` : ''}
+            </summary>
+            <div class="mcNotesList">${notesHtml}</div>
+          </details>` : '<span class="mcNoteEmpty">لا ملاحظات بعد</span>'}
         <div class="mcNoteAdd">
-          <input class="mcNoteInput" id="mcNote-${r.id}" placeholder="اكتب ملاحظة…"
+          <input class="mcNoteInput" id="mcNote-${r.id}" placeholder="اكتب ملاحظة…" type="text" autocomplete="off" autocorrect="off" spellcheck="false" data-lpignore="true"
                  onkeydown="if(event.key==='Enter') mcQuickNote(${r.id}, 'warning')">
           <button class="mcNoteSend praise" onclick="mcQuickNote(${r.id}, 'praise')" title="حفظ كتكريم">🌟</button>
           <button class="mcNoteSend warn" onclick="mcQuickNote(${r.id}, 'warning')" title="حفظ كتنبيه">⚠️</button>
@@ -3806,7 +3831,7 @@ function mcEditNote(noteId, rosterId){
   const box = document.createElement('span');
   box.className = 'mcEditBox';
   box.innerHTML = `
-    <input class="mcEditInput" value="${esc(note.note)}"
+    <input class="mcEditInput" type="text" autocomplete="off" spellcheck="false" data-lpignore="true" value="${esc(note.note)}"
            onkeydown="if(event.key==='Enter') mcSaveNote(${noteId}, ${rosterId}); if(event.key==='Escape') mcCancelEdit(${noteId});">
     <button class="mcEditOk" onclick="mcSaveNote(${noteId}, ${rosterId})" title="حفظ">✓</button>
     <button class="mcEditNo" onclick="mcCancelEdit(${noteId})" title="إلغاء">✕</button>`;
