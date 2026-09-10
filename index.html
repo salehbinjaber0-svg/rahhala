@@ -310,7 +310,28 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     width:24px; height:24px; border-radius:50%; border:1.5px solid #dcd4c0; background:#fff;
     color:var(--navy); cursor:pointer; font-size:.9rem; line-height:1; margin-inline-start:5px; font-weight:700;
   }
-  .mcAdd:hover{background:var(--gold-light); border-color:var(--gold);}
+  .mcAdd:hover:not(:disabled){background:var(--gold-light); border-color:var(--gold);}
+  .mcAdd:disabled{opacity:.25; cursor:not-allowed;}
+  /* خانات العدّادات: سطر واحد ثابت لا يلتف مهما كان الرقم */
+  .mcCountCell{white-space:nowrap; padding:8px 6px !important;}
+  .mcCountBox{
+    display:inline-flex; align-items:center; gap:4px;
+    flex-wrap:nowrap; justify-content:center;
+  }
+  .mcCountBox .mcBadge{
+    min-width:52px; text-align:center; white-space:nowrap;
+    display:inline-block; padding:4px 8px;
+  }
+  .mcCountBox .mcAdd{margin:0; flex-shrink:0;}
+  /* أعمدة ثابتة العرض — لا تتحرك مع تغيّر الأرقام */
+  .myClassTable{table-layout:fixed;}
+  .myClassTable th:nth-child(1), .myClassTable td:nth-child(1){width:42px;}
+  .myClassTable th:nth-child(2), .myClassTable td:nth-child(2){width:170px;}
+  .myClassTable th:nth-child(3), .myClassTable td:nth-child(3){width:118px;}
+  .myClassTable th:nth-child(4), .myClassTable td:nth-child(4){width:132px;}
+  .myClassTable th:nth-child(5), .myClassTable td:nth-child(5){width:104px;}
+  .myClassTable th:nth-child(6), .myClassTable td:nth-child(6){width:112px;}
+  .myClassTable th:nth-child(8), .myClassTable td:nth-child(8){width:44px;}
   .mcAdd.minus{color:var(--maroon); border-color:#e8cccc;}
   .mcAdd.minus:hover{background:#fbe9e9; border-color:var(--maroon);}
   .mcAttCell{white-space:nowrap; min-width:110px;}
@@ -3679,13 +3700,19 @@ function renderMyClassTable(){
           <button class="attBtn ${att==='late'?'on late':''}" onclick="mcSetAtt(${r.id},'late')" title="متأخر">⏰</button>
           <button class="attBtn ${att==='absent'?'on absent':''}" onclick="mcSetAtt(${r.id},'absent')" title="غائب">❌</button>
         </td>
-        <td><span class="mcBadge points">⭐ ${r.participation_points || 0}</span>
-            <button class="mcAdd" onclick="mcAddPoint(${r.id})" title="أضف نقطة مشاركة">+</button>
-            <button class="mcAdd minus" onclick="mcSubPoint(${r.id})" title="تراجع عن نقطة">−</button></td>
-        <td><span class="mcBadge praise">🌟 ${praises.length}</span>
-            <button class="mcAdd" onclick="mcOpenNote(${r.id}, 'praise')" title="أضف تكريماً">+</button></td>
-        <td><span class="mcBadge ${warns.length ? 'warn' : 'ok'}">${warns.length ? '⚠️ ' + warns.length : '✅ 0'}</span>
-            <button class="mcAdd" onclick="mcOpenNote(${r.id}, 'warning')" title="أضف تنبيهاً">+</button></td>
+        <td class="mcCountCell"><div class="mcCountBox">
+          <button class="mcAdd minus" onclick="mcSubPoint(${r.id})" title="تراجع عن نقطة" ${(r.participation_points || 0) === 0 ? 'disabled' : ''}>−</button>
+          <span class="mcBadge points">⭐ ${r.participation_points || 0}</span>
+          <button class="mcAdd" onclick="mcAddPoint(${r.id})" title="أضف نقطة مشاركة">+</button>
+        </div></td>
+        <td class="mcCountCell"><div class="mcCountBox">
+          <span class="mcBadge praise">🌟 ${praises.length}</span>
+          <button class="mcAdd" onclick="mcOpenNote(${r.id}, 'praise')" title="أضف تكريماً">+</button>
+        </div></td>
+        <td class="mcCountCell"><div class="mcCountBox">
+          <span class="mcBadge ${warns.length ? 'warn' : 'ok'}">${warns.length ? '⚠️ ' + warns.length : '✅ 0'}</span>
+          <button class="mcAdd" onclick="mcOpenNote(${r.id}, 'warning')" title="أضف تنبيهاً">+</button>
+        </div></td>
         <td class="mcNoteCell">${noteTxt}</td>
         <td><button class="mcDel" onclick="mcRemoveStudent(${r.id}, '${esc(r.student_name).replace(/'/g,'&#39;')}')" title="حذف من القائمة">🗑️</button></td>
       </tr>`;
