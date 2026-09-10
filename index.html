@@ -236,12 +236,27 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .fmAttLbl{font-size:.72rem; font-weight:700;}
   .fmName{flex:1; font-size:1.05rem; font-weight:700; color:#fff;}
   .fmStars{font-size:.9rem; letter-spacing:1px; color:var(--gold-light); min-width:60px; text-align:center;}
+  .fmPts{display:flex; gap:6px; align-items:center;}
   .fmPlus{
     min-width:52px; padding:11px 0; border-radius:12px; cursor:pointer;
     background:var(--grad-gold); color:var(--navy-deep); border:none;
     font-family:'Tajawal'; font-weight:700; font-size:.95rem;
   }
   .fmPlus:active{transform:scale(.92);}
+  .fmMinus{
+    min-width:40px; padding:11px 0; border-radius:12px; cursor:pointer;
+    background:rgba(255,255,255,.08); color:#f2a8a8;
+    border:1.5px solid rgba(242,168,168,.35);
+    font-family:'Tajawal'; font-weight:700; font-size:1.05rem; line-height:1;
+  }
+  .fmMinus:active{transform:scale(.92);}
+  .fmMinus:disabled{opacity:.25; cursor:not-allowed;}
+  .fmZero{color:rgba(246,241,230,.28); font-size:1rem;}
+  .fmBig{
+    background:rgba(201,161,94,.2); border:1px solid rgba(201,161,94,.45);
+    border-radius:14px; padding:3px 11px; font-size:.85rem; font-weight:700;
+    color:var(--gold-light); white-space:nowrap;
+  }
 
   /* ══ الفلاتر ══ */
   .mcFilters{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; align-items:center;}
@@ -3733,7 +3748,10 @@ function renderFocusMode(){
     const st = mcAttendance[r.id] || 'present';
     const [icon, label, cls] = ATT_VIEW[st];
     const pts = r.participation_points || 0;
-    const stars = pts > 0 ? '⭐'.repeat(Math.min(pts, 5)) + (pts > 5 ? ` +${pts-5}` : '') : '';
+    // نعرض النجوم للنقاط القليلة، ورقماً واضحاً للكثيرة
+    const stars = pts === 0 ? '<span class="fmZero">—</span>'
+      : pts <= 5 ? '⭐'.repeat(pts)
+      : `<span class="fmBig">⭐ ${pts}</span>`;
     return `
       <div class="fmRow">
         <button class="fmAtt ${cls}" onclick="fmCycleAtt(${r.id})" title="اضغط لتبديل الحضور">
@@ -3741,7 +3759,10 @@ function renderFocusMode(){
         </button>
         <div class="fmName">${esc(r.student_name)}</div>
         <div class="fmStars">${stars}</div>
-        <button class="fmPlus" onclick="fmAddPoint(${r.id})" title="نقطة مشاركة">+1</button>
+        <div class="fmPts">
+          <button class="fmMinus" onclick="fmSubPoint(${r.id})" title="تراجع عن نقطة" ${pts === 0 ? 'disabled' : ''}>−</button>
+          <button class="fmPlus" onclick="fmAddPoint(${r.id})" title="نقطة مشاركة">+1</button>
+        </div>
       </div>`;
   }).join('');
   updateFmStats();
@@ -3785,6 +3806,7 @@ async function saveAttendance(id, status, rerender){
 }
 
 const fmAddPoint = (id) => changePoints(id, +1, renderFocusMode);
+const fmSubPoint = (id) => changePoints(id, -1, renderFocusMode);
 
 // ══════ الفلاتر الذكية ══════
 let mcFilter = 'all';
