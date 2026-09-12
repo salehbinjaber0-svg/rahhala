@@ -1723,7 +1723,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <div class="field">
       <label>اختر قالباً جاهزاً أو اكتب ملاحظتك</label>
       <div id="noteTemplates" class="noteTplRow"></div>
-      <textarea id="warningNoteInput" rows="3" placeholder="اكتب هنا..."></textarea>
+      <textarea id="warningNoteInput" name="warning-note-text" rows="3" placeholder="اكتب هنا..." autocomplete="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other"></textarea>
     </div>
     <button class="btn btn-gold" style="width:100%" onclick="submitWarningNote()">✅ تسجيل</button>
   </div>
@@ -3685,7 +3685,7 @@ function renderMyClassTable(){
             <div class="mcNotesList">${notesHtml}</div>
           </details>` : '<span class="mcNoteEmpty">لا ملاحظات بعد</span>'}
         <div class="mcNoteAdd">
-          <input class="mcNoteInput" id="mcNote-${r.id}" placeholder="اكتب ملاحظة…" type="text" autocomplete="off" autocorrect="off" spellcheck="false" data-lpignore="true"
+          <input class="mcNoteInput" id="mcNote-${r.id}" name="mc-note-${r.id}" placeholder="اكتب ملاحظة…" type="text" autocomplete="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other"
                  onkeydown="if(event.key==='Enter') mcQuickNote(${r.id}, 'warning')">
           <button class="mcNoteSend praise" onclick="mcQuickNote(${r.id}, 'praise')" title="حفظ كتكريم">🌟</button>
           <button class="mcNoteSend warn" onclick="mcQuickNote(${r.id}, 'warning')" title="حفظ كتنبيه">⚠️</button>
@@ -4295,7 +4295,7 @@ function renderStudentRow(r){
         </div>
       </div>
       <div class="srActions">
-        <input class="noteInput" id="note-${r.key}" placeholder="أضف ملاحظة عن هذا الطالب..." value="${noteVal}">
+        <input class="noteInput" id="note-${r.key}" name="note-${r.key}" type="text" placeholder="أضف ملاحظة عن هذا الطالب..." value="${noteVal}" autocomplete="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other">
         <button class="saveNoteBtn" onclick="saveNote('${r.key}', this)">💾 حفظ</button>
       </div>
     </div>`;
