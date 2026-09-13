@@ -3612,6 +3612,10 @@ function switchMyClass(cls, btn){
 async function refreshClassChallenge(){
   if(!isAdmin) return; // بيانات صفوفك — للمعلم فقط
   if(!requireDb()) return;
+  // ما نحدّث الجدول لو المعلم يكتب ملاحظة جديدة أو يعدّل ملاحظة موجودة حالياً —
+  // يمنع التحديث الدوري (كل 6 ثوانٍ) من مسح الكتابة وسحب التركيز من الحقل
+  const ae = document.activeElement;
+  if(ae && ae.classList && (ae.classList.contains('mcNoteInput') || ae.classList.contains('mcEditInput'))) return;
   const wrap = document.getElementById('myClassTableWrap');
   if(!wrap) return;
 
