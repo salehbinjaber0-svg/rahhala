@@ -427,6 +427,35 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .lsCard.reward{background:rgba(201,161,94,.22); border:2px solid var(--gold);}
   .lsCard.break{background:rgba(255,255,255,.07); border:2px solid rgba(255,255,255,.2);}
   .lsCardIcon{font-size:clamp(3rem, 7vw, 5rem); line-height:1;}
+  /* رسالة تشجيع عند الإجابة الصحيحة */
+  .lsCheer{
+    font-family:'Aref Ruqaa'; font-size:clamp(1.3rem,3vw,2.3rem); color:var(--gold-light);
+    text-shadow:0 0 22px rgba(201,161,94,.6); animation:cheerPop .55s ease-out; margin-top:10px;
+  }
+  @keyframes cheerPop{
+    0%{opacity:0; transform:scale(.7) translateY(14px);}
+    60%{transform:scale(1.08);}
+    100%{opacity:1; transform:scale(1);}
+  }
+  .lsConfetti{position:fixed; top:-24px; font-size:1.5rem; pointer-events:none; z-index:520; animation:confFall linear forwards;}
+  @keyframes confFall{
+    0%{opacity:1; transform:translateY(0) rotate(0);}
+    100%{opacity:0; transform:translateY(104vh) rotate(540deg);}
+  }
+  /* مؤقّت التفكير */
+  .lsTimer{
+    font-weight:700; font-size:1.3rem; color:var(--gold-light);
+    min-width:64px; text-align:center;
+  }
+  .lsTimer.warn{color:#ffa578; animation:tick .6s ease-in-out infinite;}
+  .lsTimer.done{color:#ff6b6b;}
+  @keyframes tick{50%{transform:scale(1.14);}}
+  .lsTimerBtn{
+    background:rgba(255,255,255,.1); color:var(--gold-light); cursor:pointer;
+    border:1.5px solid rgba(201,161,94,.45); border-radius:20px;
+    padding:7px 15px; font-family:'Tajawal'; font-weight:700; font-size:.84rem;
+  }
+  .lsTimerBtn:hover{background:rgba(201,161,94,.25);}
   .lsCardTxt{font-size:clamp(1rem, 2.2vw, 1.7rem); line-height:1.85; color:rgba(255,255,255,.9);}
   .lqEmpty{
     text-align:center; padding:34px 20px; color:#8a8a8a;
@@ -1624,7 +1653,11 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   <div class="lsHead">
     <button class="fmExit" onclick="closeLessonShow()">✕ إنهاء العرض</button>
     <div class="fmTitle">📝 حصة اليوم</div>
-    <div class="lsCount" id="lsCount"></div>
+    <div style="display:flex; align-items:center; gap:11px; flex-wrap:wrap;">
+      <div class="lsTimer" id="lsTimer"></div>
+      <button class="lsTimerBtn" id="lsTimerBtn" onclick="lsToggleTimer()">⏱️ ٣٠ ثانية</button>
+      <div class="lsCount" id="lsCount"></div>
+    </div>
   </div>
   <div class="lsStage">
     <div class="lsQ" id="lsQ"></div>
@@ -3962,24 +3995,40 @@ function switchMyClass(cls, btn){
 //  أسئلة عادية يعدّلها المعلم أو يحذفها كيف ما شاء.
 // ═══════════════════════════════════════════════════════════
 const AI_LESSON_BATCH = {
-  batch: 'aqalim-1-2026-09-13',
-  title: 'الأقاليم المناخية — جزء 1',
+  batch: 'aqalim-1-game-2026-09-13',
+  title: 'الأقاليم المناخية — تحدٍّ وتشويق',
   items: [
+    {kind:'break', q:'⚡ تحدي الأقاليم',
+     a:'نقسم الصف فريقين. كل إجابة صحيحة = نقطة للفريق. الفريق الفائز له مكافأة آخر الحصة. استعدوا!'},
+
     {kind:'mcq', q:'ما تعريف الإقليم المناخي؟',
      choices:['دولة لها حدود سياسية واضحة','منطقة واسعة تتشابه في خصائصها المناخية وتتميز عن الأقاليم المجاورة','خط وهمي يقسّم الأرض إلى نصفين'],
      correct_index:1, a:'الخصائص المقصودة: الحرارة والأمطار والرياح والرطوبة.'},
+
     {kind:'mcq', q:'تقع دولة قطر ضمن أي إقليم مناخي؟',
      choices:['إقليم البحر المتوسط','الإقليم الصحراوي','الإقليم المداري'],
      correct_index:1, a:'بين دائرتي عرض 18° و30° — صيف حار جاف طويل، وشتاء بارد نسبياً قليل الأمطار.'},
+
+    {kind:'game', q:'🎮 لعبة: خمّن الإقليم',
+     a:'أصف إقليماً بثلاث إشارات والفريق يخمّن. مثال: «حيوانات ضخمة… حشائش طويلة… صيف ممطر طويل» — الجواب: المداري. من يخمّن من أول إشارة له نقطتان.'},
+
     {kind:'mcq', q:'أي الأقاليم يتميز بارتفاع درجة الحرارة وغزارة الأمطار طوال العام؟',
      choices:['الإقليم الاستوائي','الإقليم اللورانسي','الإقليم القطبي البارد'],
      correct_index:0, a:'يمتد بين دائرتي عرض 0° و8°.'},
+
     {kind:'mcq', q:'إقليم البحر المتوسط والإقليم الصيني كلاهما بين 30° و40° — فما الفرق بينهما؟',
      choices:['المتوسط أبرد والصيني أدفأ','المتوسط غرب القارات وصيفه جاف، والصيني شرقها وأمطاره طوال العام','المتوسط لا تسقط فيه أمطار إطلاقاً'],
-     correct_index:1, a:'الموقع من القارة هو الفارق: غرب القارات مقابل شرقها، وتوزيع الأمطار تبع له.'},
+     correct_index:1, a:'الموقع من القارة هو الفارق: غرب القارات مقابل شرقها، وتوزيع الأمطار تبع له. هذا أكثر ما يلتبس على الطلاب.'},
+
     {kind:'mcq', q:'في أي إقليم تنمو حشائش السافانا وتعيش الأسود والفيلة والحُمُر الوحشية؟',
      choices:['الإقليم المداري','الإقليم الصحراوي','إقليم غرب أوروبا'],
-     correct_index:0, a:'بين 8° و18° — صيف طويل حار ممطر، وشتاء قصير دافئ جاف.'}
+     correct_index:0, a:'بين 8° و18° — صيف طويل حار ممطر، وشتاء قصير دافئ جاف.'},
+
+    {kind:'essay', q:'✍️ سؤال التميّز: لو انتقلت أسرة من قطر إلى إقليم غرب أوروبا — ما أكبر تغيّر سيواجهونه؟',
+     a:'انتقال من صيف حار جاف طويل إلى شتاء بارد وصيف معتدل مع أمطار تزداد صيفاً. أي تغيّر جذري بالملبس والسكن ونمط الحياة. (سؤال مفتوح — كافئ أي إجابة مبنية على خصائص الإقليمين.)'},
+
+    {kind:'reward', q:'🏆 الفريق الفائز',
+     a:'صفّقوا للفريق الفائز! ولهم اختيار: خمس نقاط مشاركة لكل فرد، أو بدء الحصة القادمة بلعبة يختارونها.'}
   ]
 };
 
@@ -4291,6 +4340,64 @@ async function clearLessonQs(){
 let lsIndex = 0;
 let lsSeen = new Set();
 
+// عبارات تشجيع تُختار عشوائياً — تظهر مع كشف الإجابة الصحيحة
+const LS_CHEERS = [
+  '🎉 أحسنتم! إجابة صحيحة',
+  '⭐ ممتاز — فهمتوا الدرس',
+  '👏 إجابة موفّقة، بارك الله فيكم',
+  '🔥 ما شاء الله، تركيز عالي',
+  '💡 صح! هذا هو المطلوب بالضبط',
+  '🏆 إجابة بطل — استمروا'
+];
+function lsCheerText(){ return LS_CHEERS[Math.floor(Math.random() * LS_CHEERS.length)]; }
+
+// قصاصات احتفال تتساقط على الشاشة
+function lsConfetti(n){
+  const marks = ['⭐','🎉','✨','🏅','🎊'];
+  for(let i = 0; i < (n || 14); i++){
+    const c = document.createElement('div');
+    c.className = 'lsConfetti';
+    c.textContent = marks[Math.floor(Math.random() * marks.length)];
+    c.style.left = Math.random() * 96 + 'vw';
+    c.style.animationDuration = (1.9 + Math.random() * 1.5) + 's';
+    c.style.animationDelay = (Math.random() * .45) + 's';
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(), 4000);
+  }
+}
+
+// ── مؤقّت التفكير: عنصر تشويق أمام الصف ──
+let lsTimerId = null, lsTimerLeft = 0;
+function lsToggleTimer(){
+  if(lsTimerId){ lsStopTimer(); return; }
+  lsTimerLeft = 30;
+  lsPaintTimer();
+  document.getElementById('lsTimerBtn').textContent = '⏹️ إيقاف';
+  lsTimerId = setInterval(()=>{
+    lsTimerLeft--;
+    lsPaintTimer();
+    if(lsTimerLeft <= 0){
+      clearInterval(lsTimerId); lsTimerId = null;
+      document.getElementById('lsTimerBtn').textContent = '⏱️ ٣٠ ثانية';
+      const t = document.getElementById('lsTimer');
+      t.className = 'lsTimer done'; t.textContent = '⏰ انتهى';
+    }
+  }, 1000);
+}
+function lsStopTimer(){
+  if(lsTimerId){ clearInterval(lsTimerId); lsTimerId = null; }
+  const b = document.getElementById('lsTimerBtn');
+  if(b) b.textContent = '⏱️ ٣٠ ثانية';
+  const t = document.getElementById('lsTimer');
+  if(t){ t.className = 'lsTimer'; t.textContent = ''; }
+}
+function lsPaintTimer(){
+  const t = document.getElementById('lsTimer');
+  if(!t) return;
+  t.className = 'lsTimer' + (lsTimerLeft <= 10 ? ' warn' : '');
+  t.textContent = lsTimerLeft + 'ث';
+}
+
 function openLessonShow(){
   if(!isAdmin || !lessonQs.length) return;
   lsIndex = 0; lsSeen = new Set();
@@ -4301,6 +4408,7 @@ function openLessonShow(){
 }
 
 function closeLessonShow(){
+  lsStopTimer();
   document.getElementById('lessonShow').classList.remove('show');
   document.body.style.overflow = '';
   document.removeEventListener('keydown', lsKeys);
@@ -4380,14 +4488,17 @@ function lsReveal(){
     const shown = wrap.querySelector('.lsCh.correct');
     if(shown){
       cells.forEach(c=>c.classList.remove('correct'));
-      wrap.querySelectorAll('.lsA').forEach(e=>e.remove());
+      wrap.querySelectorAll('.lsA, .lsCheer').forEach(e=>e.remove());
       rv.textContent = '💡 اكشف الإجابة';
       return;
     }
     const ok = wrap.querySelector(`.lsCh[data-i="${q.correct_index}"]`);
     if(ok) ok.classList.add('correct');
+    wrap.insertAdjacentHTML('beforeend', `<div class="lsCheer">${lsCheerText()}</div>`);
     if(q.a) wrap.insertAdjacentHTML('beforeend', `<div class="lsA">${esc(q.a)}</div>`);
     rv.textContent = '🙈 أخفِ الإجابة';
+    lsConfetti(14);
+    lsStopTimer();
   } else {
     if(!q.a) return;
     if(wrap.innerHTML){ wrap.innerHTML = ''; rv.textContent = '💡 اكشف الإجابة'; return; }
