@@ -381,6 +381,53 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .lqOps button:active{transform:scale(.9);}
   .lqOps button:disabled{opacity:.25; cursor:not-allowed;}
   .lqOps .lqDel:hover{background:#fbe9e9; border-color:var(--maroon);}
+  /* أنواع الفقرات */
+  .lqKinds{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:4px;}
+  .lqKindBtn{
+    padding:9px 15px; border-radius:22px; border:2px solid #dcd4c0; background:#fff;
+    color:#6a6458; font-weight:700; font-size:.84rem; cursor:pointer; font-family:'Tajawal';
+  }
+  .lqKindBtn.on{background:var(--grad-navy); color:var(--gold-light); border-color:var(--navy);}
+  .lqChoiceRow{display:flex; gap:8px; align-items:center;}
+  .lqChoiceRow input[type=text]{flex:1;}
+  .lqCorrect{
+    display:flex; align-items:center; gap:5px; font-size:.8rem; color:#6a6458;
+    white-space:nowrap; cursor:pointer; font-weight:700;
+  }
+  .lqCorrect input{width:18px; height:18px; accent-color:var(--teal); cursor:pointer;}
+  .lqItem.kind-mcq{border-inline-start-color:#2a6b8a;}
+  .lqItem.kind-game{border-inline-start-color:#7a4fa3;}
+  .lqItem.kind-reward{border-inline-start-color:var(--gold-deep);}
+  .lqItem.kind-break{border-inline-start-color:#9a9384;}
+  .lqChoices{margin-top:6px; display:flex; flex-direction:column; gap:3px;}
+  .lqCh{font-size:.85rem; color:#6a6458;}
+  .lqCh.ok{color:var(--teal); font-weight:700;}
+  /* عرض الاختياري على البروجكتر */
+  .lsChoices{display:flex; flex-direction:column; gap:14px; width:100%; max-width:820px;}
+  .lsCh{
+    display:flex; align-items:center; gap:16px; padding:18px 26px; border-radius:16px;
+    background:rgba(255,255,255,.07); border:2px solid rgba(255,255,255,.15);
+    font-size:clamp(1rem, 2.1vw, 1.6rem); color:#fff; text-align:start;
+    transition:background .3s, border-color .3s;
+  }
+  .lsCh .lsChKey{
+    min-width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,.12);
+    display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;
+  }
+  .lsCh.correct{
+    background:rgba(47,150,110,.25); border-color:#2f966e; color:#b6f0d8;
+    animation:lsFade .4s ease-out;
+  }
+  .lsCh.correct .lsChKey{background:#2f966e; color:#fff;}
+  .lsCard{
+    display:flex; flex-direction:column; align-items:center; gap:18px;
+    padding:44px 40px; border-radius:26px; max-width:900px;
+  }
+  .lsCard.game{background:rgba(122,79,163,.2); border:2px solid rgba(160,120,200,.6);}
+  .lsCard.reward{background:rgba(201,161,94,.22); border:2px solid var(--gold);}
+  .lsCard.break{background:rgba(255,255,255,.07); border:2px solid rgba(255,255,255,.2);}
+  .lsCardIcon{font-size:clamp(3rem, 7vw, 5rem); line-height:1;}
+  .lsCardTxt{font-size:clamp(1rem, 2.2vw, 1.7rem); line-height:1.85; color:rgba(255,255,255,.9);}
   .lqEmpty{
     text-align:center; padding:34px 20px; color:#8a8a8a;
     background:#fff; border:1px dashed #dcd4c0; border-radius:14px;
@@ -1744,12 +1791,39 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <p class="lqHint">أسئلة ختامية تعرضها على البروجكتر لغلق الحصة. أضفها بنفسك أو اسحبها من بنك الأسئلة، ثم ابدأ العرض.</p>
 
       <div class="lqAddBox">
-        <input id="lqNewQ" placeholder="نص السؤال…" autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-form-type="other"
-               onkeydown="if(event.key==='Enter') document.getElementById('lqNewA').focus()">
+        <div class="lqKinds">
+          <button class="lqKindBtn on" data-k="essay"  onclick="setLqKind('essay', this)">📝 مقالي</button>
+          <button class="lqKindBtn"    data-k="mcq"    onclick="setLqKind('mcq', this)">☑️ اختياري</button>
+          <button class="lqKindBtn"    data-k="game"   onclick="setLqKind('game', this)">🎮 لعبة</button>
+          <button class="lqKindBtn"    data-k="reward" onclick="setLqKind('reward', this)">🎁 مكافأة</button>
+          <button class="lqKindBtn"    data-k="break"  onclick="setLqKind('break', this)">⏸️ فاصل</button>
+        </div>
+
+        <input id="lqNewQ" placeholder="نص السؤال…" autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-form-type="other">
         <input id="lqNewA" placeholder="الإجابة (اختيارية — تُكشف بضغطة أثناء العرض)" autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-form-type="other"
                onkeydown="if(event.key==='Enter') addLessonQ()">
+
+        <div id="lqMcqBox" style="display:none; flex-direction:column; gap:7px;">
+          <div class="lqChoiceRow">
+            <input type="text" id="lqC0" placeholder="الخيار الأول" autocomplete="off" data-lpignore="true">
+            <label class="lqCorrect"><input type="radio" name="lqCorrect" value="0" checked> صحيح</label>
+          </div>
+          <div class="lqChoiceRow">
+            <input type="text" id="lqC1" placeholder="الخيار الثاني" autocomplete="off" data-lpignore="true">
+            <label class="lqCorrect"><input type="radio" name="lqCorrect" value="1"> صحيح</label>
+          </div>
+          <div class="lqChoiceRow">
+            <input type="text" id="lqC2" placeholder="الخيار الثالث" autocomplete="off" data-lpignore="true">
+            <label class="lqCorrect"><input type="radio" name="lqCorrect" value="2"> صحيح</label>
+          </div>
+          <div class="lqChoiceRow">
+            <input type="text" id="lqC3" placeholder="الخيار الرابع (اختياري)" autocomplete="off" data-lpignore="true">
+            <label class="lqCorrect"><input type="radio" name="lqCorrect" value="3"> صحيح</label>
+          </div>
+        </div>
+
         <div class="lqAddRow">
-          <button class="lqBtn" onclick="addLessonQ()">➕ أضف السؤال</button>
+          <button class="lqBtn" onclick="addLessonQ()">➕ أضف</button>
           <select class="lqSelect" id="lqBankPick">
             <option value="">— أو اختر من بنك الأسئلة —</option>
           </select>
@@ -3867,6 +3941,25 @@ function switchMyClass(cls, btn){
 // ═══════ حصة اليوم — أسئلة ختامية تُعرض على البروجكتر ═══════
 let lessonQs = [];
 let lessonMode = false;
+let lqKind = 'essay';
+
+const LQ_KINDS = {
+  essay:  {icon:'📝', label:'مقالي',  qPlace:'نص السؤال…',            aPlace:'الإجابة النموذجية (اختيارية)'},
+  mcq:    {icon:'☑️', label:'اختياري', qPlace:'نص السؤال…',            aPlace:'شرح إضافي بعد كشف الإجابة (اختياري)'},
+  game:   {icon:'🎮', label:'لعبة',    qPlace:'اسم اللعبة…',           aPlace:'تعليمات اللعبة (اختيارية)'},
+  reward: {icon:'🎁', label:'مكافأة',  qPlace:'نص المكافأة…',          aPlace:'تفاصيل إضافية (اختيارية)'},
+  break:  {icon:'⏸️', label:'فاصل',    qPlace:'نص الفاصل أو التعليمات…', aPlace:'تفاصيل إضافية (اختيارية)'},
+};
+
+function setLqKind(k, btn){
+  lqKind = k;
+  document.querySelectorAll('.lqKindBtn').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  const cfg = LQ_KINDS[k];
+  document.getElementById('lqNewQ').placeholder = cfg.qPlace;
+  document.getElementById('lqNewA').placeholder = cfg.aPlace;
+  document.getElementById('lqMcqBox').style.display = (k === 'mcq') ? 'flex' : 'none';
+}
 
 async function openLessonToday(btn){
   if(!isAdmin){ showToast('هذي الأداة للمعلم فقط', 'error'); return; }
@@ -3912,11 +4005,21 @@ function renderLessonList(){
     box.innerHTML = '<div class="lqEmpty">ما فيه أسئلة بعد — أضف أول سؤال لحصة اليوم.</div>';
     return;
   }
-  box.innerHTML = lessonQs.map((q, i)=>`
-    <div class="lqItem ${q.source === 'bank' ? 'fromBank' : ''}">
+  box.innerHTML = lessonQs.map((q, i)=>{
+    const kind = q.kind || 'essay';
+    const cfg = LQ_KINDS[kind] || LQ_KINDS.essay;
+    let chHtml = '';
+    if(kind === 'mcq' && Array.isArray(q.choices)){
+      chHtml = '<div class="lqChoices">' + q.choices.map((c, ci)=>
+        `<div class="lqCh ${ci === q.correct_index ? 'ok' : ''}">${ci === q.correct_index ? '✔' : '•'} ${esc(c)}</div>`
+      ).join('') + '</div>';
+    }
+    return `
+    <div class="lqItem kind-${kind} ${q.source === 'bank' ? 'fromBank' : ''}">
       <div class="lqNum">${i + 1}</div>
       <div class="lqBody">
-        <div class="lqQ">${esc(q.q)}${q.source === 'bank' ? '<span class="lqTag">من البنك</span>' : ''}</div>
+        <div class="lqQ">${cfg.icon} ${esc(q.q)}<span class="lqTag">${cfg.label}</span>${q.source === 'bank' ? '<span class="lqTag">من البنك</span>' : ''}</div>
+        ${chHtml}
         ${q.a ? `<div class="lqA">✓ ${esc(q.a)}</div>` : ''}
       </div>
       <div class="lqOps">
@@ -3924,20 +4027,40 @@ function renderLessonList(){
         <button onclick="moveLessonQ(${q.id}, 1)" title="أسفل" ${i === lessonQs.length - 1 ? 'disabled' : ''}>▼</button>
         <button class="lqDel" onclick="delLessonQ(${q.id})" title="حذف">🗑️</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 async function addLessonQ(){
   if(!isAdmin || !requireDb()) return;
   const qi = document.getElementById('lqNewQ'), ai = document.getElementById('lqNewA');
   const q = qi.value.trim(), a = ai.value.trim();
-  if(!q){ showToast('اكتب نص السؤال أولاً', 'error'); qi.focus(); return; }
-  const pos = lessonQs.length ? Math.max(...lessonQs.map(x=>x.pos || 0)) + 1 : 0;
-  const { error } = await sb.from('lesson_questions').insert({q, a: a || null, source:'manual', pos});
+  if(!q){ showToast('اكتب النص أولاً', 'error'); qi.focus(); return; }
+
+  const row = {q, a: a || null, source:'manual', kind: lqKind,
+               pos: lessonQs.length ? Math.max(...lessonQs.map(x=>x.pos || 0)) + 1 : 0};
+
+  if(lqKind === 'mcq'){
+    const chs = ['lqC0','lqC1','lqC2','lqC3']
+      .map(id => document.getElementById(id).value.trim());
+    const filled = chs.filter(c => c);
+    if(filled.length < 2){ showToast('الاختياري يحتاج خيارين على الأقل', 'error'); return; }
+    const picked = parseInt((document.querySelector('input[name=lqCorrect]:checked') || {}).value, 10);
+    if(isNaN(picked) || !chs[picked]){ showToast('حدّد الخيار الصحيح (ولا يكون فارغاً)', 'error'); return; }
+    // نحذف الخيارات الفارغة مع تصحيح موضع الصحيح
+    const kept = [], map = {};
+    chs.forEach((c, i)=>{ if(c){ map[i] = kept.length; kept.push(c); } });
+    row.choices = kept;
+    row.correct_index = map[picked];
+  }
+
+  const { error } = await sb.from('lesson_questions').insert(row);
   if(error){ showToast('تعذر الحفظ: ' + error.message, 'error'); return; }
-  qi.value = ''; ai.value = ''; qi.focus();
+  qi.value = ''; ai.value = '';
+  ['lqC0','lqC1','lqC2','lqC3'].forEach(id=>{ const el = document.getElementById(id); if(el) el.value = ''; });
+  qi.focus();
   await loadLessonQs();
-  showToast('✅ أُضيف السؤال', 'info');
+  showToast('✅ أُضيفت الفقرة', 'info');
 }
 
 async function fillBankPicker(){
@@ -3967,8 +4090,13 @@ async function addLessonQFromBank(){
     ans = ch[data.correct_index] || null;
   }catch(err){ ans = null; }
   const pos = lessonQs.length ? Math.max(...lessonQs.map(x=>x.pos || 0)) + 1 : 0;
+  let chArr = [];
+  try{ chArr = Array.isArray(data.choices) ? data.choices : JSON.parse(data.choices); }catch(err){ chArr = []; }
   const { error } = await sb.from('lesson_questions')
-    .insert({q: data.q, a: ans, source:'bank', bank_id: data.id, pos});
+    .insert({q: data.q, a: ans, source:'bank', bank_id: data.id, pos,
+             kind: chArr.length ? 'mcq' : 'essay',
+             choices: chArr.length ? chArr : null,
+             correct_index: chArr.length ? data.correct_index : null});
   if(error){ showToast('تعذر الحفظ: ' + error.message, 'error'); return; }
   sel.value = '';
   await loadLessonQs();
@@ -4042,11 +4170,35 @@ function lsKeys(e){
 function renderLessonShow(){
   const q = lessonQs[lsIndex];
   if(!q) return;
-  document.getElementById('lsQ').textContent = q.q;
-  document.getElementById('lsAWrap').innerHTML = '';
-  document.getElementById('lsCount').textContent = `سؤال ${lsIndex + 1} من ${lessonQs.length}`;
+  const kind = q.kind || 'essay';
+  const cfg = LQ_KINDS[kind] || LQ_KINDS.essay;
+  const qEl = document.getElementById('lsQ');
+  const wrap = document.getElementById('lsAWrap');
+  wrap.innerHTML = '';
+
+  if(kind === 'game' || kind === 'reward' || kind === 'break'){
+    // بطاقة كاملة بدل صيغة سؤال/جواب
+    qEl.innerHTML = '';
+    wrap.innerHTML = `
+      <div class="lsCard ${kind}">
+        <div class="lsCardIcon">${cfg.icon}</div>
+        <div class="lsQ">${esc(q.q)}</div>
+        ${q.a ? `<div class="lsCardTxt">${esc(q.a)}</div>` : ''}
+      </div>`;
+  } else {
+    qEl.textContent = q.q;
+    if(kind === 'mcq' && Array.isArray(q.choices)){
+      const keys = ['أ','ب','ج','د'];
+      wrap.innerHTML = `<div class="lsChoices">${q.choices.map((c, i)=>
+        `<div class="lsCh" data-i="${i}"><span class="lsChKey">${keys[i] || (i+1)}</span><span>${esc(c)}</span></div>`
+      ).join('')}</div>`;
+    }
+  }
+
+  document.getElementById('lsCount').textContent = `${cfg.icon} ${lsIndex + 1} من ${lessonQs.length}`;
   const rv = document.getElementById('lsRevealBtn');
-  rv.style.display = q.a ? '' : 'none';
+  const hasReveal = (kind === 'mcq' && Array.isArray(q.choices)) || (kind === 'essay' && q.a);
+  rv.style.display = hasReveal ? '' : 'none';
   rv.textContent = '💡 اكشف الإجابة';
   document.getElementById('lsPrevBtn').disabled = lsIndex === 0;
   document.getElementById('lsNextBtn').disabled = lsIndex === lessonQs.length - 1;
@@ -4072,11 +4224,30 @@ function lsJump(i){
 
 function lsReveal(){
   const q = lessonQs[lsIndex];
-  if(!q || !q.a) return;
+  if(!q) return;
+  const kind = q.kind || 'essay';
   const wrap = document.getElementById('lsAWrap');
-  if(wrap.innerHTML){ wrap.innerHTML = ''; document.getElementById('lsRevealBtn').textContent = '💡 اكشف الإجابة'; return; }
-  wrap.innerHTML = `<div class="lsA">${esc(q.a)}</div>`;
-  document.getElementById('lsRevealBtn').textContent = '🙈 أخفِ الإجابة';
+  const rv = document.getElementById('lsRevealBtn');
+
+  if(kind === 'mcq' && Array.isArray(q.choices)){
+    const cells = wrap.querySelectorAll('.lsCh');
+    const shown = wrap.querySelector('.lsCh.correct');
+    if(shown){
+      cells.forEach(c=>c.classList.remove('correct'));
+      wrap.querySelectorAll('.lsA').forEach(e=>e.remove());
+      rv.textContent = '💡 اكشف الإجابة';
+      return;
+    }
+    const ok = wrap.querySelector(`.lsCh[data-i="${q.correct_index}"]`);
+    if(ok) ok.classList.add('correct');
+    if(q.a) wrap.insertAdjacentHTML('beforeend', `<div class="lsA">${esc(q.a)}</div>`);
+    rv.textContent = '🙈 أخفِ الإجابة';
+  } else {
+    if(!q.a) return;
+    if(wrap.innerHTML){ wrap.innerHTML = ''; rv.textContent = '💡 اكشف الإجابة'; return; }
+    wrap.innerHTML = `<div class="lsA">${esc(q.a)}</div>`;
+    rv.textContent = '🙈 أخفِ الإجابة';
+  }
   lsSeen.add(lsIndex);
   renderLessonShowDots();
 }
