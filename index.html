@@ -3955,6 +3955,60 @@ function switchMyClass(cls, btn){
   refreshClassChallenge();
 }
 
+// ═══════════════════════════════════════════════════════════
+//  دفعة أسئلة يكتبها المساعد ويرفعها للمستودع مباشرة.
+//  تُستورد لقاعدة البيانات تلقائياً أول ما يفتح المعلم «حصة اليوم».
+//  الاستيراد يتم مرة واحدة لكل دفعة (بمفتاح batch)، وبعدها تصير
+//  أسئلة عادية يعدّلها المعلم أو يحذفها كيف ما شاء.
+// ═══════════════════════════════════════════════════════════
+const AI_LESSON_BATCH = {
+  batch: 'aqalim-1-2026-09-13',
+  title: 'الأقاليم المناخية — جزء 1',
+  items: [
+    {kind:'mcq', q:'ما تعريف الإقليم المناخي؟',
+     choices:['دولة لها حدود سياسية واضحة','منطقة واسعة تتشابه في خصائصها المناخية وتتميز عن الأقاليم المجاورة','خط وهمي يقسّم الأرض إلى نصفين'],
+     correct_index:1, a:'الخصائص المقصودة: الحرارة والأمطار والرياح والرطوبة.'},
+    {kind:'mcq', q:'تقع دولة قطر ضمن أي إقليم مناخي؟',
+     choices:['إقليم البحر المتوسط','الإقليم الصحراوي','الإقليم المداري'],
+     correct_index:1, a:'بين دائرتي عرض 18° و30° — صيف حار جاف طويل، وشتاء بارد نسبياً قليل الأمطار.'},
+    {kind:'mcq', q:'أي الأقاليم يتميز بارتفاع درجة الحرارة وغزارة الأمطار طوال العام؟',
+     choices:['الإقليم الاستوائي','الإقليم اللورانسي','الإقليم القطبي البارد'],
+     correct_index:0, a:'يمتد بين دائرتي عرض 0° و8°.'},
+    {kind:'mcq', q:'إقليم البحر المتوسط والإقليم الصيني كلاهما بين 30° و40° — فما الفرق بينهما؟',
+     choices:['المتوسط أبرد والصيني أدفأ','المتوسط غرب القارات وصيفه جاف، والصيني شرقها وأمطاره طوال العام','المتوسط لا تسقط فيه أمطار إطلاقاً'],
+     correct_index:1, a:'الموقع من القارة هو الفارق: غرب القارات مقابل شرقها، وتوزيع الأمطار تبع له.'},
+    {kind:'mcq', q:'في أي إقليم تنمو حشائش السافانا وتعيش الأسود والفيلة والحُمُر الوحشية؟',
+     choices:['الإقليم المداري','الإقليم الصحراوي','إقليم غرب أوروبا'],
+     correct_index:0, a:'بين 8° و18° — صيف طويل حار ممطر، وشتاء قصير دافئ جاف.'}
+  ]
+};
+
+// يستورد الدفعة مرة واحدة فقط — يتعرّف عليها بحقل source
+async function syncAiBatch(){
+  if(!isAdmin || !requireDb()) return false;
+  const B = (typeof AI_LESSON_BATCH !== 'undefined') ? AI_LESSON_BATCH : null;
+  if(!B || !B.items || !B.items.length) return false;
+  const tag = 'ai:' + B.batch;
+  // نبحث بكل الصفوف (حتى المحذوفة) حتى لا تعود دفعة حذفها المعلم عمداً
+  const { data: seen, error: e1 } = await sb.from('lesson_questions')
+    .select('id').eq('source', tag).limit(1);
+  if(e1) return false;
+  if(seen && seen.length) return false;   // استُوردت سابقاً
+  const { data: cur } = await sb.from('lesson_questions')
+    .select('pos').order('pos', {ascending:false}).limit(1);
+  let pos = (cur && cur.length ? (cur[0].pos || 0) + 1 : 0);
+  const rows = B.items.map((it, i)=>({
+    kind: it.kind || 'essay', q: it.q, a: it.a || null,
+    choices: it.choices || null,
+    correct_index: (typeof it.correct_index === 'number') ? it.correct_index : null,
+    source: tag, pos: pos + i
+  }));
+  const { error } = await sb.from('lesson_questions').insert(rows);
+  if(error) return false;
+  showToast(`📥 وصلت دفعة جديدة: ${B.title} (${rows.length} فقرة)`, 'info');
+  return true;
+}
+
 // ═══════ حصة اليوم — أسئلة ختامية تُعرض على البروجكتر ═══════
 let lessonQs = [];
 let lessonMode = false;
@@ -3989,6 +4043,7 @@ async function openLessonToday(btn){
   document.getElementById('myClassTableWrap').style.display = 'none';
   document.getElementById('myClassSummary').style.display = 'none';
   document.querySelector('.mcFilters').style.display = 'none';
+  await syncAiBatch();
   await loadLessonQs();
   await fillBankPicker();
 }
