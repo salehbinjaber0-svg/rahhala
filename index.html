@@ -223,17 +223,6 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
     border-radius:14px; padding:11px 14px;
   }
-  .fmAtt{
-    display:flex; flex-direction:column; align-items:center; gap:2px;
-    min-width:74px; padding:9px 6px; border-radius:12px; cursor:pointer;
-    border:2px solid transparent; font-family:'Tajawal'; transition:.15s;
-  }
-  .fmAtt.present{background:rgba(47,150,110,.2); border-color:#2f966e; color:#7fe0b8;}
-  .fmAtt.late{background:rgba(201,161,94,.2); border-color:var(--gold); color:var(--gold-light);}
-  .fmAtt.absent{background:rgba(160,60,60,.22); border-color:#a03c3c; color:#f2a8a8;}
-  .fmAtt:active{transform:scale(.94);}
-  .fmAttIcon{font-size:1.15rem; line-height:1;}
-  .fmAttLbl{font-size:.72rem; font-weight:700;}
   .fmName{flex:1; font-size:1.05rem; font-weight:700; color:#fff;}
   .fmStars{font-size:.9rem; letter-spacing:1px; color:var(--gold-light); min-width:60px; text-align:center;}
   .fmPts{display:flex; gap:6px; align-items:center;}
@@ -4456,9 +4445,7 @@ function renderLessonShow(){
   rv.textContent = '💡 اكشف الإجابة';
   document.getElementById('lsPrevBtn').disabled = lsIndex === 0;
   document.getElementById('lsNextBtn').disabled = lsIndex === lessonQs.length - 1;
-  document.getElementById('lsDots').innerHTML = lessonQs.map((x, i)=>
-    `<button class="lsDot ${i === lsIndex ? 'on' : (lsSeen.has(i) ? 'done' : '')}" onclick="lsJump(${i})" title="سؤال ${i+1}"></button>`
-  ).join('');
+  renderLessonShowDots();
 }
 
 function lsGo(dir){
@@ -4511,7 +4498,7 @@ function lsReveal(){
 
 function renderLessonShowDots(){
   document.getElementById('lsDots').innerHTML = lessonQs.map((x, i)=>
-    `<button class="lsDot ${i === lsIndex ? 'on' : (lsSeen.has(i) ? 'done' : '')}" onclick="lsJump(${i})" title="سؤال ${i+1}"></button>`
+    `<button class="lsDot ${i === lsIndex ? 'on' : (lsSeen.has(i) ? 'done' : '')}" onclick="lsJump(${i})" title="فقرة ${i+1}"></button>`
   ).join('');
 }
 
@@ -4549,13 +4536,6 @@ async function refreshClassChallenge(){
     if(!myClassNotes[n.roster_id]) myClassNotes[n.roster_id] = [];
     myClassNotes[n.roster_id].push(n);
   });
-
-  // حضور اليوم
-  const today = new Date().toISOString().slice(0,10);
-  const { data: att } = await sb.from('roster_attendance')
-    .select('roster_id,status').in('roster_id', ids).eq('day', today);
-  mcAttendance = {};
-  (att || []).forEach(a=>{ mcAttendance[a.roster_id] = a.status; });
 
   renderMyClassTable();
 }
@@ -4657,10 +4637,8 @@ function renderMyClassTable(){
     `👥 <strong>${myClassData.length}</strong> طالب · ⭐ <strong>${totalP}</strong> نقطة مشاركة · 🌟 <strong>${totalPr}</strong> تكريم · ❌ <strong>${totalW}</strong> تنبيه`;
 }
 
-let mcAttendance = {}; // roster_id -> حالة حضور اليوم
 
 // تسجيل الحضور من جدول صفوفي مباشرة — بدون الذهاب للوحة المعلم
-const mcSetAtt = (id, status) => saveAttendance(id, status, renderMyClassTable);
 
 // تراجع عن نقطة مشاركة أُضيفت بالغلط
 const mcSubPoint = (id) => changePoints(id, -1, renderMyClassTable);
@@ -4691,12 +4669,6 @@ function closeFocusMode(){
   refreshClassChallenge(); // نحدّث الجدول الكامل بما سُجّل
 }
 
-const ATT_CYCLE = { present:'late', late:'absent', absent:'present' };
-const ATT_VIEW = {
-  present: ['🟢','حاضر','present'],
-  late:    ['🟡','متأخر','late'],
-  absent:  ['🔴','غائب','absent'],
-};
 
 // ترتيب العرض بوضع الحصة: بالأسماء (افتراضي) أو بالنقاط
 let fmSortByPoints = false;
@@ -4785,7 +4757,6 @@ function updateFmStats(){
 }
 
 // زر حضور واحد يتدوّر: حاضر ← متأخر ← غائب ← حاضر
-const fmCycleAtt = (id) => saveAttendance(id, ATT_CYCLE[mcAttendance[id] || 'present'], renderFocusMode);
 
 // منطق واحد لتعديل نقاط المشاركة — يستخدمه الجدول والوضع السريع معاً
 async function changePoints(id, delta, rerender){
@@ -4802,15 +4773,6 @@ async function changePoints(id, delta, rerender){
 }
 
 // منطق واحد لحفظ الحضور
-async function saveAttendance(id, status, rerender){
-  if(!isAdmin || !requireDb()) return;
-  mcAttendance[id] = status;
-  rerender();
-  const today = new Date().toISOString().slice(0,10);
-  const { error } = await sb.from('roster_attendance')
-    .upsert({ roster_id: id, status, day: today }, { onConflict: 'roster_id,day' });
-  if(error) showToast('تعذر حفظ الحضور: ' + error.message, 'error');
-}
 
 const fmAddPoint = (id) => changePoints(id, +1, () => { renderFocusMode(); fmCelebrate(id); });
 const fmSubPoint = (id) => changePoints(id, -1, renderFocusMode);
