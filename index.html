@@ -1157,6 +1157,21 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
   /* تقرير الأداء الأسبوعي */
   .reportActions{display:flex; gap:10px; margin:20px 0; flex-wrap:wrap;}
+  /* شريط تذكير النسخة الاحتياطية */
+  .bkBar{
+    display:none; align-items:center; gap:12px; flex-wrap:wrap;
+    padding:14px 18px; border-radius:14px; margin-bottom:20px;
+    background:#fdf4e3; border:1.5px solid var(--gold); color:var(--navy);
+    font-weight:700; font-size:.95rem;
+  }
+  .bkBar.show{display:flex;}
+  .bkBar.due{background:#fbe9e9; border-color:var(--maroon); color:var(--maroon);}
+  .bkBar button{
+    padding:9px 18px; border-radius:10px; border:none; cursor:pointer;
+    background:var(--grad-navy); color:var(--gold-light);
+    font-family:'Tajawal'; font-weight:700; font-size:.88rem;
+  }
+  .bkBar .bkDismiss{background:transparent; color:inherit; border:1.5px solid currentColor;}
   .repSection{background:#fff; border:1px solid #e8e0cd; border-radius:16px; padding:24px; margin-bottom:20px; overflow-x:auto;}
   .repSection h3{color:var(--navy); margin-bottom:16px; font-size:1.1rem;}
   .repTable{width:100%; min-width:420px; border-collapse:collapse; font-size:.9rem;}
@@ -1972,6 +1987,9 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <button class="btn btn-gold" style="margin-bottom:24px;" onclick="openClassDisplay()">🖥️ ابدأ وضع العرض الجماعي للحصة</button>
     <button class="btn" style="margin-bottom:24px; margin-inline-start:10px; background:transparent; border:2px solid var(--navy); color:var(--navy);" onclick="openReport()">📊 تقرير الأداء الأسبوعي</button>
     <button class="btn" style="margin-bottom:24px; margin-inline-start:10px; background:transparent; border:2px solid var(--navy); color:var(--navy);" onclick="showSiteQR()">📱 رمز QR للموقع</button>
+    <button class="btn" style="margin-bottom:24px; margin-inline-start:10px; background:transparent; border:2px solid var(--navy); color:var(--navy);" onclick="downloadBackup()">💾 نسخة احتياطية</button>
+
+    <div class="bkBar" id="bkBar"></div>
 
     <div class="adminTabs">
       <button class="adminTab active" data-tab="students">🌐 من دخل الموقع (<span id="activeCount">0</span> نشط)</button>
@@ -4047,6 +4065,89 @@ async function syncAiBatch(){
   return true;
 }
 
+// ═══════════════════════════════════════════════════════════
+//  النسخة الاحتياطية — تنزيل كل البيانات بملف واحد
+//  تذكير آخر كل شهر. الملف يخرج من النظام تماماً، فيحمي حتى
+//  من الخطأ البشري (مسح بالغلط) لا من عطل الخادم فقط.
+// ═══════════════════════════════════════════════════════════
+const BACKUP_TABLES = ['students','class_roster','roster_warnings','roster_attendance',
+                       'questions','answer_log','unanswered_questions','answer_feedback','lesson_questions'];
+
+async function downloadBackup(){
+  if(!isAdmin){ showToast('هذي الأداة للمعلم فقط','error'); return; }
+  if(!requireDb()) return;
+  showToast('⏳ جاري تجهيز النسخة…', 'info');
+  const dump = { app:'رحّالة', version:1, takenAt:new Date().toISOString(), tables:{}, notes:{} };
+  let total = 0, failed = [];
+  for(const t of BACKUP_TABLES){
+    const { data, error } = await sb.from(t).select('*');
+    if(error){ failed.push(t); dump.notes[t] = 'تعذر الجلب: ' + error.message; continue; }
+    dump.tables[t] = data || [];
+    total += (data || []).length;
+  }
+  if(total === 0){ showToast('ما فيه بيانات للنسخ', 'error'); return; }
+
+  const stamp = new Date().toISOString().slice(0,10);
+  // ملف الاستعادة الكامل
+  downloadFile(`رحالة-نسخة-احتياطية-${stamp}.json`,
+               JSON.stringify(dump, null, 1), 'application/json');
+  // ملف مقروء بإكسل: قائمة الطلاب وملاحظاتهم ونقاطهم
+  downloadFile(`رحالة-ملاحظات-${stamp}.csv`, buildBackupCSV(dump), 'text/csv;charset=utf-8');
+
+  localStorage.setItem('rahhala_last_backup', new Date().toISOString());
+  renderBackupBar();
+  showToast(failed.length
+    ? `💾 نُزّلت النسخة (${total} سجل) — تعذّر: ${failed.join('، ')}`
+    : `💾 نُزّلت النسخة بنجاح — ${total} سجل`, 'info');
+}
+
+function downloadFile(name, content, mime){
+  const blob = new Blob([mime.includes('csv') ? '\uFEFF' + content : content], {type: mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 4000);
+}
+
+function buildBackupCSV(dump){
+  const roster = dump.tables.class_roster || [];
+  const warns  = dump.tables.roster_warnings || [];
+  let csv = 'الصف,اسم الطالب,نقاط المشاركة,عدد التكريم,عدد التنبيه,الملاحظات (التاريخ + النص)\n';
+  roster.forEach(r=>{
+    const mine = warns.filter(n => n.roster_id === r.id);
+    const pr = mine.filter(n => n.kind === 'praise').length;
+    const wa = mine.length - pr;
+    const txt = mine.map(n => `[${(n.created_at||'').slice(0,10)}] ${(n.note||'').replace(/"/g,'""')}`).join(' | ');
+    csv += `${r.cls || ''},"${(r.student_name||'').replace(/"/g,'""')}",${r.participation_points || 0},${pr},${wa},"${txt}"\n`;
+  });
+  return csv;
+}
+
+// تذكير شهري — يظهر بلوحة المعلم لا كنافذة مزعجة
+function renderBackupBar(){
+  const bar = document.getElementById('bkBar');
+  if(!bar) return;
+  const last = localStorage.getItem('rahhala_last_backup');
+  const days = last ? Math.floor((Date.now() - new Date(last)) / 86400000) : null;
+  if(days !== null && days < 30){ bar.className = 'bkBar'; return; }
+  bar.className = 'bkBar show' + (days === null || days >= 45 ? ' due' : '');
+  const msg = days === null
+    ? '💾 ما أخذت نسخة احتياطية من بياناتك بعد — يفضّل تأخذ واحدة الآن.'
+    : `💾 آخر نسخة احتياطية قبل ${days} يوماً — وقت النسخة الشهرية.`;
+  bar.innerHTML = `<span>${msg}</span>
+    <button onclick="downloadBackup()">نزّلها الآن</button>
+    <button class="bkDismiss" onclick="snoozeBackupBar()">ذكّرني لاحقاً</button>`;
+}
+
+function snoozeBackupBar(){
+  // تأجيل أسبوع: نسجّل تاريخاً يجعل الشريط يظهر بعد 7 أيام
+  const d = new Date(Date.now() - 23 * 86400000);
+  localStorage.setItem('rahhala_last_backup', d.toISOString());
+  document.getElementById('bkBar').classList.remove('show');
+  showToast('تمام — أذكّرك بعد أسبوع', 'info');
+}
+
 // ═══════ حصة اليوم — أسئلة ختامية تُعرض على البروجكتر ═══════
 let lessonQs = [];
 let lessonMode = false;
@@ -5091,6 +5192,7 @@ async function adminLogout(btn){
 // يفتح لوحة المعلم وحدها بملء الشاشة — وصول سريع من الشريط العلوي
 function openAdminPanel(){
   if(!isAdmin){ openAdminLogin(); return; }
+  setTimeout(renderBackupBar, 0);
   document.querySelectorAll('section').forEach(s=>{
     s.style.display = (s.id === 'adminPanel') ? '' : 'none';
   });
