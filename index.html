@@ -307,9 +307,11 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .mcBadge.warn{background:var(--maroon); color:#fff; box-shadow:0 0 0 2px #f3cfcf; letter-spacing:.3px;}
   .mcBadge.ok{background:#f2f0ea; color:#9a9384; font-weight:600;}
   .mcAdd{
-    width:24px; height:24px; border-radius:50%; border:1.5px solid #dcd4c0; background:#fff;
-    color:var(--navy); cursor:pointer; font-size:.9rem; line-height:1; margin-inline-start:5px; font-weight:700;
+    width:34px; height:34px; border-radius:50%; border:1.5px solid #dcd4c0; background:#fff;
+    color:var(--navy); cursor:pointer; font-size:1.15rem; line-height:1; margin-inline-start:5px; font-weight:700;
+    transition:background .12s, border-color .12s, transform .12s;
   }
+  .mcAdd:active:not(:disabled){transform:scale(.9);}
   .mcAdd:hover:not(:disabled){background:var(--gold-light); border-color:var(--gold);}
   .mcAdd:disabled{opacity:.25; cursor:not-allowed;}
   /* خانات العدّادات: سطر واحد ثابت لا يلتف مهما كان الرقم */
@@ -319,31 +321,30 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     flex-wrap:nowrap; justify-content:center;
   }
   .mcCountBox .mcBadge{
-    min-width:52px; text-align:center; white-space:nowrap;
-    display:inline-block; padding:4px 8px;
+    min-width:56px; text-align:center; white-space:nowrap;
+    display:inline-block; padding:7px 10px; font-size:.86rem;
   }
   .mcCountBox .mcAdd{margin:0; flex-shrink:0;}
   /* أعمدة ثابتة العرض — لا تتحرك مع تغيّر الأرقام */
   .myClassTable{table-layout:fixed;}
-  .myClassTable th:nth-child(1), .myClassTable td:nth-child(1){width:42px;}
-  .myClassTable th:nth-child(2), .myClassTable td:nth-child(2){width:170px;}
-  .myClassTable th:nth-child(3), .myClassTable td:nth-child(3){width:118px;}
-  .myClassTable th:nth-child(4), .myClassTable td:nth-child(4){width:132px;}
-  .myClassTable th:nth-child(5), .myClassTable td:nth-child(5){width:104px;}
-  .myClassTable th:nth-child(6), .myClassTable td:nth-child(6){width:112px;}
-  .myClassTable th:nth-child(8), .myClassTable td:nth-child(8){width:44px;}
+  .myClassTable th:nth-child(1), .myClassTable td:nth-child(1){width:44px;}
+  .myClassTable th:nth-child(2), .myClassTable td:nth-child(2){width:185px;}
+  .myClassTable th:nth-child(3), .myClassTable td:nth-child(3){width:140px;}
+  .myClassTable th:nth-child(4), .myClassTable td:nth-child(4){width:140px;}
+  .myClassTable th:nth-child(5), .myClassTable td:nth-child(5){width:140px;}
+  /* عمود الملاحظات يأخذ كل المساحة المتبقية — أكثر عمود استخداماً */
+  .myClassTable th:nth-child(6), .myClassTable td:nth-child(6){width:auto;}
+  .myClassTable th:nth-child(7), .myClassTable td:nth-child(7){width:52px;}
   .mcAdd.minus{color:var(--maroon); border-color:#e8cccc;}
   .mcAdd.minus:hover{background:#fbe9e9; border-color:var(--maroon);}
-  .mcAttCell{white-space:nowrap; min-width:110px;}
-  .mcAttCell .attBtn{width:27px; height:27px; margin:0 1px; font-size:.78rem;}
-  .mcNoteCell{text-align:right !important; min-width:240px; max-width:300px;}
+  .mcNoteCell{text-align:right !important; min-width:320px;}
   .mcNotesBox{display:flex; flex-direction:column; gap:5px;}
   /* الملاحظات مطوية — الجدول يبقى مضغوطاً مهما كثرت */
-  .mcNotesFold{font-size:.76rem;}
+  .mcNotesFold{font-size:.85rem;}
   .mcNotesSummary{
-    cursor:pointer; list-style:none; display:flex; align-items:center; gap:5px;
-    padding:4px 9px; border-radius:16px; background:var(--cream);
-    border:1px solid #e0d8c4; color:var(--navy); font-weight:700; width:fit-content;
+    cursor:pointer; list-style:none; display:flex; align-items:center; gap:7px;
+    padding:8px 14px; border-radius:18px; background:var(--cream);
+    border:1.5px solid #e0d8c4; color:var(--navy); font-weight:700; width:fit-content;
   }
   .mcNotesSummary::-webkit-details-marker{display:none;}
   .mcNotesSummary:hover{background:var(--gold-light); border-color:var(--gold);}
@@ -353,24 +354,27 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .nfChip.bad{background:#fbe9e9; color:var(--maroon);}
   .mcNotesList{
     display:flex; flex-direction:column; gap:4px; margin-top:6px;
-    max-height:170px; overflow-y:auto; padding-inline-end:3px;
+    max-height:260px; overflow-y:auto; padding-inline-end:4px;
   }
   .mcNoteItem{
-    font-size:.76rem; line-height:1.6; padding:4px 8px; border-radius:6px;
-    background:var(--cream); border-inline-start:2px solid #dcd4c0;
+    font-size:.85rem; line-height:1.7; padding:8px 11px; border-radius:8px;
+    background:var(--cream); border-inline-start:3px solid #dcd4c0;
   }
   .mcNoteItem.good{border-inline-start-color:var(--teal); color:#2a6b5c;}
   .mcNoteItem.bad{border-inline-start-color:var(--maroon); color:#8a3838;}
   .mcNoteDate{color:#a8a08e; font-size:.68rem; margin-inline-end:4px;}
   .mcNoteItem{display:flex; align-items:flex-start; gap:4px;}
   .mcNoteTxt{flex:1;}
-  .mcNoteOps{display:flex; gap:2px; opacity:0; transition:opacity .15s; flex-shrink:0;}
-  .mcNoteItem:hover .mcNoteOps{opacity:1;}
+  /* أزرار التعديل والحذف ظاهرة دائماً — لا تحتاج تمرير الماوس لتجدها */
+  .mcNoteOps{display:flex; gap:4px; flex-shrink:0;}
   .mcNoteOps button{
-    background:none; border:none; cursor:pointer; font-size:.72rem;
-    padding:1px 3px; line-height:1; opacity:.65;
+    background:#fff; border:1px solid #e0d8c4; border-radius:7px; cursor:pointer;
+    font-size:.85rem; width:30px; height:30px; line-height:1; padding:0;
+    transition:background .12s, border-color .12s, transform .12s;
   }
-  .mcNoteOps button:hover{opacity:1;}
+  .mcNoteOps button:active{transform:scale(.9);}
+  .mcNoteOps .mcNoteDel:hover{background:#fbe9e9; border-color:var(--maroon);}
+  .mcNoteOps .mcNoteEdit:hover{background:var(--gold-light); border-color:var(--gold);}
   .mcEditBox{display:flex; gap:3px; width:100%; align-items:center;}
   .mcEditInput{
     flex:1; min-width:60px; padding:3px 7px; border-radius:5px;
@@ -384,16 +388,18 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .mcEditOk{background:var(--teal); color:#fff;}
   .mcEditNo{background:#e8e0cd; color:#7a8a8e;}
   @media(hover:none){ .mcNoteOps{opacity:1;} } /* على الجوال تظهر دائماً */
-  .mcNoteAdd{display:flex; gap:4px; margin-top:3px;}
+  .mcNoteAdd{display:flex; gap:6px; margin-top:6px;}
   .mcNoteInput{
-    flex:1; min-width:100px; padding:5px 9px; border-radius:7px;
-    border:1.5px solid #dcd4c0; font-family:'Tajawal'; font-size:.76rem;
+    flex:1; min-width:150px; padding:10px 13px; border-radius:9px;
+    border:1.5px solid #dcd4c0; font-family:'Tajawal'; font-size:.88rem;
   }
-  .mcNoteInput:focus{outline:none; border-color:var(--gold);}
+  .mcNoteInput:focus{outline:none; border-color:var(--gold); box-shadow:0 0 0 3px #f7ecd2;}
   .mcNoteSend{
-    border:1px solid #dcd4c0; border-radius:7px; background:#fff;
-    cursor:pointer; font-size:.8rem; padding:4px 7px; line-height:1;
+    border:1.5px solid #dcd4c0; border-radius:9px; background:#fff;
+    cursor:pointer; font-size:1.05rem; padding:0 13px; line-height:1; min-width:46px;
+    transition:background .12s, border-color .12s, transform .12s;
   }
+  .mcNoteSend:active{transform:scale(.93);}
   .mcNoteSend.praise:hover{background:#eaf4f1; border-color:var(--teal);}
   .mcNoteSend.warn:hover{background:#fbe9e9; border-color:var(--maroon);}
   .mcNote{font-size:.79rem; display:inline-block;}
@@ -3678,8 +3684,8 @@ function renderMyClassTable(){
            <span class="mcNoteDate" title="${new Date(n.created_at).toLocaleDateString('ar-QA', {weekday:'long', day:'numeric', month:'long'})}">${new Date(n.created_at).toLocaleDateString('ar-QA', {day:'numeric', month:'short'})}</span>
            <span class="mcNoteTxt">${n.kind === 'praise' ? '🌟' : '⚠️'} ${esc(n.note)}</span>
            <span class="mcNoteOps">
-             <button onclick="mcEditNote(${n.id}, ${r.id})" title="تعديل">✏️</button>
-             <button onclick="mcDeleteNote(${n.id}, ${r.id})" title="حذف">🗑️</button>
+             <button class="mcNoteEdit" onclick="mcEditNote(${n.id}, ${r.id})" title="تعديل الملاحظة">✏️</button>
+             <button class="mcNoteDel" onclick="mcDeleteNote(${n.id}, ${r.id})" title="حذف الملاحظة">🗑️</button>
            </span>
          </div>`).join('')
       : '';
