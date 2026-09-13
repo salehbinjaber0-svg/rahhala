@@ -252,6 +252,53 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .fmMinus:active{transform:scale(.92);}
   .fmMinus:disabled{opacity:.25; cursor:not-allowed;}
   .fmZero{color:rgba(246,241,230,.28); font-size:1rem;}
+  /* ===== إبراز المتميزين بوضع الحصة (معروض على البروجكتر) ===== */
+  .fmRank{
+    min-width:34px; font-size:1.35rem; text-align:center; line-height:1;
+    filter:drop-shadow(0 0 6px rgba(201,161,94,.5));
+  }
+  .fmRankBlank{min-width:34px;}
+  .fmRow.top1{
+    background:linear-gradient(90deg, rgba(201,161,94,.26), rgba(255,255,255,.06));
+    border-color:rgba(201,161,94,.75);
+    box-shadow:0 0 24px rgba(201,161,94,.3);
+  }
+  .fmRow.top2{background:rgba(196,196,208,.14); border-color:rgba(206,206,216,.5);}
+  .fmRow.top3{background:rgba(186,140,96,.14); border-color:rgba(198,150,104,.5);}
+  .fmRow{transition:background .35s, border-color .35s, box-shadow .35s, transform .18s;}
+  /* وميض عند كسب نقطة */
+  @keyframes fmPop{
+    0%{transform:scale(1);}
+    35%{transform:scale(1.035); box-shadow:0 0 34px rgba(201,161,94,.65);}
+    100%{transform:scale(1);}
+  }
+  .fmRow.fmCheer{animation:fmPop .6s ease-out;}
+  /* نجمة تطفو لأعلى عند كسب نقطة */
+  @keyframes fmFloat{
+    0%{opacity:0; transform:translateY(0) scale(.6);}
+    20%{opacity:1;}
+    100%{opacity:0; transform:translateY(-58px) scale(1.5);}
+  }
+  .fmSpark{
+    position:absolute; pointer-events:none; font-size:1.7rem;
+    animation:fmFloat 1s ease-out forwards; z-index:60;
+  }
+  /* شريط نجم الحصة */
+  .fmStarBar{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    margin:0 0 14px; padding:11px 18px; border-radius:16px;
+    background:linear-gradient(90deg, rgba(201,161,94,.28), rgba(201,161,94,.1));
+    border:1.5px solid rgba(201,161,94,.55); color:var(--gold-light);
+    font-weight:700; font-size:1.05rem; letter-spacing:.3px;
+  }
+  .fmStarBar .fmStarName{color:#fff; font-size:1.15rem;}
+  .fmStarBar.hidden{display:none;}
+  .fmSortBtn{
+    background:rgba(255,255,255,.08); color:var(--gold-light); cursor:pointer;
+    border:1.5px solid rgba(201,161,94,.4); border-radius:18px;
+    padding:5px 14px; font-family:'Tajawal'; font-weight:700; font-size:.82rem;
+  }
+  .fmSortBtn:hover{background:rgba(201,161,94,.22);}
   .fmBig{
     background:rgba(201,161,94,.2); border:1px solid rgba(201,161,94,.45);
     border-radius:14px; padding:3px 11px; font-size:.85rem; font-weight:700;
@@ -1379,7 +1426,9 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <button class="fmExit" onclick="closeFocusMode()">✕ إنهاء</button>
     <div class="fmTitle">⚡ <span id="fmCls">سابع 1</span></div>
     <div class="fmStats" id="fmStats"></div>
+    <button class="fmSortBtn" id="fmSortBtn" onclick="fmToggleSort()">↕️ ترتيب حسب النقاط</button>
   </div>
+  <div class="fmStarBar hidden" id="fmStarBar"></div>
   <div id="fmList" class="fmList"></div>
 </div>
 
@@ -3800,16 +3849,58 @@ const ATT_VIEW = {
   absent:  ['🔴','غائب','absent'],
 };
 
+// ترتيب العرض بوضع الحصة: بالأسماء (افتراضي) أو بالنقاط
+let fmSortByPoints = false;
+function fmToggleSort(){
+  fmSortByPoints = !fmSortByPoints;
+  const b = document.getElementById('fmSortBtn');
+  if(b) b.textContent = fmSortByPoints ? '🔤 ترتيب بالأسماء' : '↕️ ترتيب حسب النقاط';
+  renderFocusMode();
+}
+
 function renderFocusMode(){
   const list = document.getElementById('fmList');
-  list.innerHTML = myClassData.map(r=>{
+  // أوسمة المتميزين: تُمنح حسب النقاط، ولا تُمنح أبداً لمن نقاطه صفر
+  const scored = myClassData.filter(r => (r.participation_points || 0) > 0)
+                            .sort((a,b)=>(b.participation_points||0)-(a.participation_points||0));
+  const topScore = scored.length ? (scored[0].participation_points || 0) : 0;
+  const medals = {};
+  let place = 0, prev = null;
+  scored.forEach((r, i)=>{
+    const pts = r.participation_points || 0;
+    if(pts !== prev){ place = i + 1; prev = pts; }   // التعادل يأخذ نفس الوسام
+    if(place <= 3) medals[r.id] = place;
+  });
+
+  // شريط نجم الحصة — يظهر فقط لما يكون فيه متصدّر فعلي
+  const bar = document.getElementById('fmStarBar');
+  if(bar){
+    const leaders = scored.filter(r => (r.participation_points || 0) === topScore);
+    if(topScore > 0){
+      const names = leaders.map(r => esc(r.student_name)).join(' و ');
+      bar.innerHTML = `🌟 نجم الحصة: <span class="fmStarName">${names}</span> · ⭐ ${topScore}`;
+      bar.classList.remove('hidden');
+    } else {
+      bar.classList.add('hidden');
+    }
+  }
+
+  const ordered = fmSortByPoints
+    ? [...myClassData].sort((a,b)=>(b.participation_points||0)-(a.participation_points||0))
+    : myClassData;
+
+  list.innerHTML = ordered.map(r=>{
     const pts = r.participation_points || 0;
     // نعرض النجوم للنقاط القليلة، ورقماً واضحاً للكثيرة
     const stars = pts === 0 ? '<span class="fmZero">—</span>'
       : pts <= 5 ? '⭐'.repeat(pts)
       : `<span class="fmBig">⭐ ${pts}</span>`;
+    const m = medals[r.id];
+    const rankHtml = m ? `<div class="fmRank">${m === 1 ? '🥇' : m === 2 ? '🥈' : '🥉'}</div>`
+                       : '<div class="fmRankBlank"></div>';
     return `
-      <div class="fmRow">
+      <div class="fmRow${m ? ' top' + m : ''}" id="fmRow-${r.id}">
+        ${rankHtml}
         <div class="fmName">${esc(r.student_name)}</div>
         <div class="fmStars">${stars}</div>
         <div class="fmPts">
@@ -3819,6 +3910,23 @@ function renderFocusMode(){
       </div>`;
   }).join('');
   updateFmStats();
+}
+
+// احتفال قصير عند كسب نقطة — يراه الصف كله على البروجكتر
+function fmCelebrate(id){
+  const row = document.getElementById('fmRow-' + id);
+  if(!row) return;
+  row.classList.remove('fmCheer');
+  void row.offsetWidth; // إعادة تشغيل الأنيميشن
+  row.classList.add('fmCheer');
+  const rect = row.getBoundingClientRect();
+  const spark = document.createElement('div');
+  spark.className = 'fmSpark';
+  spark.textContent = '⭐';
+  spark.style.left = (rect.left + rect.width * 0.5) + 'px';
+  spark.style.top  = (rect.top + rect.height * 0.35) + 'px';
+  document.body.appendChild(spark);
+  setTimeout(()=>spark.remove(), 1000);
 }
 
 function updateFmStats(){
@@ -3855,7 +3963,7 @@ async function saveAttendance(id, status, rerender){
   if(error) showToast('تعذر حفظ الحضور: ' + error.message, 'error');
 }
 
-const fmAddPoint = (id) => changePoints(id, +1, renderFocusMode);
+const fmAddPoint = (id) => changePoints(id, +1, () => { renderFocusMode(); fmCelebrate(id); });
 const fmSubPoint = (id) => changePoints(id, -1, renderFocusMode);
 
 // ══════ الفلاتر الذكية ══════
