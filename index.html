@@ -1833,7 +1833,24 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
       <div class="lqAddRow" style="margin-bottom:16px;">
         <button class="lqBtn run" id="lqRunBtn" onclick="openLessonShow()">▶️ ابدأ العرض على البروجكتر</button>
+        <button class="lqBtn ghost" onclick="openBulkPaste()">📋 لصق دفعة أسئلة</button>
         <button class="lqBtn ghost" onclick="clearLessonQs()">🗑️ امسح كل الأسئلة</button>
+      </div>
+
+      <div class="lqAddBox" id="lqBulkBox" style="display:none;">
+        <div style="font-weight:700; color:var(--navy);">📋 الصق الأسئلة هنا — سطر السؤال ثم خياراته، وفاصل بين كل سؤال</div>
+        <div class="lqHint" style="margin:0;">
+          السؤال يبدأ بـ <strong>س:</strong> · الخيارات بـ <strong>أ) ب) ج) د)</strong> · ضع <strong>✓</strong> بعد الصحيح ·
+          <strong>ج:</strong> للإجابة أو الشرح · افصل بين الأسئلة بسطر <strong>---</strong>
+        </div>
+        <textarea id="lqBulkText" rows="10" placeholder="س: ما تعريف الإقليم المناخي؟&#10;أ) دولة لها حدود سياسية&#10;ب) منطقة تتشابه في خصائصها المناخية ✓&#10;ج) خط وهمي يقسّم الأرض&#10;ج: الخصائص: الحرارة والأمطار والرياح والرطوبة&#10;---&#10;س: اذكر ثلاثة من الأقاليم المناخية&#10;ج: الاستوائي، المداري، الصحراوي"
+          style="padding:13px; border-radius:10px; border:1.5px solid #dcd4c0; font-family:'Tajawal'; font-size:.9rem; line-height:1.9; resize:vertical;"
+          autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-form-type="other"></textarea>
+        <div class="lqAddRow">
+          <button class="lqBtn" onclick="runBulkPaste()">✅ أضف كل الأسئلة</button>
+          <button class="lqBtn ghost" onclick="closeBulkPaste()">إلغاء</button>
+          <span id="lqBulkInfo" style="color:#8a8a8a; font-size:.85rem;"></span>
+        </div>
       </div>
 
       <div class="lqList" id="lqList"></div>
@@ -4101,6 +4118,80 @@ async function addLessonQFromBank(){
   sel.value = '';
   await loadLessonQs();
   showToast('📚 أُضيف من البنك', 'info');
+}
+
+// ── لصق دفعة أسئلة: يحوّل نصاً بسيطاً إلى فقرات جاهزة ──
+function openBulkPaste(){
+  if(!isAdmin){ showToast('هذي الأداة للمعلم فقط','error'); return; }
+  document.getElementById('lqBulkBox').style.display = 'flex';
+  document.getElementById('lqBulkText').focus();
+}
+function closeBulkPaste(){
+  document.getElementById('lqBulkBox').style.display = 'none';
+  document.getElementById('lqBulkText').value = '';
+  document.getElementById('lqBulkInfo').textContent = '';
+}
+
+// يفهم: "س:" للسؤال · "أ) ب) ج) د)" أو "-" للخيارات · "✓" للصحيح · "ج:" للإجابة
+function parseBulkText(txt){
+  const blocks = txt.split(/\n\s*(?:---+|===+)\s*\n/).map(b=>b.trim()).filter(Boolean);
+  const out = [];
+  blocks.forEach(block=>{
+    const lines = block.split('\n').map(l=>l.trim()).filter(Boolean);
+    let q = '', a = '', choices = [], correct = -1;
+    lines.forEach(line=>{
+      const mChoice = line.match(/^(?:[أابتجدهـ]\s*[\)\.\-]|[-*•]|\d\s*[\)\.])\s*(.+)$/);
+      const isAns = /^(?:ج|الإجابة|الجواب|الشرح)\s*[:：]/.test(line);
+      const isQ = /^(?:س|سؤال|السؤال)\s*[:：]/.test(line);
+      if(isQ){
+        q = line.replace(/^(?:س|سؤال|السؤال)\s*[:：]\s*/, '').trim();
+      } else if(isAns){
+        a = line.replace(/^(?:ج|الإجابة|الجواب|الشرح)\s*[:：]\s*/, '').trim();
+      } else if(mChoice){
+        let t = mChoice[1].trim();
+        if(/[✓✔√]\s*$/.test(t) || /^\s*[✓✔√]/.test(t)){
+          correct = choices.length;
+          t = t.replace(/[✓✔√]/g, '').trim();
+        }
+        choices.push(t);
+      } else if(!q){
+        q = line;   // أول سطر بلا علامة = السؤال
+      } else if(!a){
+        a = line;
+      }
+    });
+    if(!q) return;
+    if(choices.length >= 2){
+      out.push({kind:'mcq', q, choices, correct_index: correct >= 0 ? correct : 0, a: a || null});
+    } else {
+      out.push({kind:'essay', q, a: a || null, choices:null, correct_index:null});
+    }
+  });
+  return out;
+}
+
+async function runBulkPaste(){
+  if(!isAdmin || !requireDb()) return;
+  const txt = document.getElementById('lqBulkText').value;
+  const info = document.getElementById('lqBulkInfo');
+  if(!txt.trim()){ showToast('الصق الأسئلة أولاً','error'); return; }
+  const parsed = parseBulkText(txt);
+  if(!parsed.length){ showToast('ما قدرت أفهم أي سؤال — تأكد من الصيغة','error'); return; }
+  const noCorrect = parsed.filter(p => p.kind === 'mcq' && !/[✓✔√]/.test(txt)).length;
+  let pos = lessonQs.length ? Math.max(...lessonQs.map(x=>x.pos || 0)) + 1 : 0;
+  const rows = parsed.map((p, i)=>({
+    kind: p.kind, q: p.q, a: p.a,
+    choices: p.choices, correct_index: p.correct_index,
+    source: 'manual', pos: pos + i
+  }));
+  info.textContent = 'جاري الإضافة…';
+  const { error } = await sb.from('lesson_questions').insert(rows);
+  if(error){ showToast('تعذر الحفظ: ' + error.message, 'error'); info.textContent = ''; return; }
+  const mcq = parsed.filter(p=>p.kind==='mcq').length;
+  const essay = parsed.length - mcq;
+  closeBulkPaste();
+  await loadLessonQs();
+  showToast(`✅ أُضيف ${parsed.length} سؤال (${mcq} اختياري · ${essay} مقالي)`, 'info');
 }
 
 async function delLessonQ(id){
