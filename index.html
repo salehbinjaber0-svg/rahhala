@@ -5101,6 +5101,10 @@ function startPolling(){
   let tick = 0;
   pollTimer = setInterval(()=>{
     if(document.hidden) return; // التبويب مخفي — نوقف الاستعلامات، يوفّر بطارية وبيانات الطالب
+    // المستخدم يكتب الآن؟ نؤجّل التحديث دورة واحدة. إعادة رسم DOM أثناء
+    // الكتابة تسحب التركيز وتغلق لوحة مفاتيح الجوال قبل أن يكمل جملته.
+    const ae = document.activeElement;
+    if(ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA')) return;
     tick++;
     // الطالب المنتظر للموافقة: فحص كل ثانيتين عشان الموافقة والطرد يوصلانه بسرعة
     const waiting = state && state.status !== 'approved';
@@ -6602,7 +6606,6 @@ function sendChat(){
   addChatMsg('user', text);
   input.value = '';
   chatBusy = true;
-  input.disabled = true;
   showTyping();
   setTimeout(()=>{
     const result = matchKnowledge(text);
@@ -6621,8 +6624,9 @@ function sendChat(){
       addChatMsg('bot', 'ما لقيت جواب دقيق لسؤالك 🤔 جرّب تسأل بكلمات مختلفة، أو راجع قسم «المنهج» بالموقع.');
     }
     chatBusy = false;
-    input.disabled = false;
-    input.focus();
+    // لا نستدعي focus() هنا: على الجوال لا يفتح الكيبورد برمجياً،
+    // وعلى سطح المكتب التركيز لم يغادر الحقل أصلاً لأننا لم نعطّله.
+
   }, 450);
 }
 
