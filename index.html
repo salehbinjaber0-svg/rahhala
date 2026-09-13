@@ -1510,8 +1510,6 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
     <div class="mcFilters">
       <button class="mcFilterBtn active" data-f="all" onclick="setMcFilter('all', this)">الكل</button>
-      <button class="mcFilterBtn" data-f="present" onclick="setMcFilter('present', this)">🟢 الحاضرون</button>
-      <button class="mcFilterBtn" data-f="absent" onclick="setMcFilter('absent', this)">🔴 الغائبون</button>
       <button class="mcFilterBtn" data-f="top" onclick="setMcFilter('top', this)">⭐ الأعلى مشاركة</button>
       <input id="mcSearch" class="mcSearchBox" placeholder="🔍 بحث باسم الطالب…" autocomplete="off" data-lpignore="true" oninput="renderMyClassTable()">
     </div>
@@ -3671,7 +3669,6 @@ function renderMyClassTable(){
     return;
   }
   const rows = filtered.map((r, i)=>{
-    const att = mcAttendance[r.id] || 'present';
     const all = myClassNotes[r.id] || [];
     const warns = all.filter(n => (n.kind || 'warning') === 'warning');
     const praises = all.filter(n => n.kind === 'praise');
@@ -3708,11 +3705,6 @@ function renderMyClassTable(){
       <tr>
         <td class="mcIdx">${i + 1}</td>
         <td class="mcName">${esc(r.student_name)}</td>
-        <td class="mcAttCell">
-          <button class="attBtn ${att==='present'?'on present':''}" onclick="mcSetAtt(${r.id},'present')" title="حاضر">✅</button>
-          <button class="attBtn ${att==='late'?'on late':''}" onclick="mcSetAtt(${r.id},'late')" title="متأخر">⏰</button>
-          <button class="attBtn ${att==='absent'?'on absent':''}" onclick="mcSetAtt(${r.id},'absent')" title="غائب">❌</button>
-        </td>
         <td class="mcCountCell"><div class="mcCountBox">
           <button class="mcAdd minus" onclick="mcSubPoint(${r.id})" title="تراجع عن نقطة" ${(r.participation_points || 0) === 0 ? 'disabled' : ''}>−</button>
           <span class="mcBadge points">⭐ ${r.participation_points || 0}</span>
@@ -3735,7 +3727,7 @@ function renderMyClassTable(){
   document.getElementById('myClassTableWrap').innerHTML = `
     <table class="myClassTable">
       <thead>
-        <tr><th>#</th><th>اسم الطالب</th><th>الحضور</th><th>المشاركة</th><th>التكريم</th><th>التنبيه</th><th>آخر ملاحظة</th><th></th></tr>
+        <tr><th>#</th><th>اسم الطالب</th><th>المشاركة</th><th>التكريم</th><th>التنبيه</th><th>آخر ملاحظة</th><th></th></tr>
       </thead>
       <tbody>${rows}</tbody>
     </table>`;
@@ -3757,12 +3749,8 @@ function renderMyClassTable(){
     totalW += arr.filter(n => (n.kind || 'warning') === 'warning').length;
     totalPr += arr.filter(n => n.kind === 'praise').length;
   });
-  const vals = Object.values(mcAttendance);
-  const absent = vals.filter(v=>v==='absent').length;
-  const late = vals.filter(v=>v==='late').length;
-  const present = myClassData.length - absent - late;
   document.getElementById('myClassSummary').innerHTML =
-    `👥 <strong>${myClassData.length}</strong> طالب · ✅ <strong>${present}</strong> حاضر · ⏰ <strong>${late}</strong> متأخر · ❌ <strong>${absent}</strong> غائب<br>⭐ <strong>${totalP}</strong> نقطة مشاركة · 🌟 <strong>${totalPr}</strong> تكريم · ⚠️ <strong>${totalW}</strong> تنبيه`;
+    `👥 <strong>${myClassData.length}</strong> طالب · ⭐ <strong>${totalP}</strong> نقطة مشاركة · 🌟 <strong>${totalPr}</strong> تكريم · ❌ <strong>${totalW}</strong> تنبيه`;
 }
 
 let mcAttendance = {}; // roster_id -> حالة حضور اليوم
@@ -3809,8 +3797,6 @@ const ATT_VIEW = {
 function renderFocusMode(){
   const list = document.getElementById('fmList');
   list.innerHTML = myClassData.map(r=>{
-    const st = mcAttendance[r.id] || 'present';
-    const [icon, label, cls] = ATT_VIEW[st];
     const pts = r.participation_points || 0;
     // نعرض النجوم للنقاط القليلة، ورقماً واضحاً للكثيرة
     const stars = pts === 0 ? '<span class="fmZero">—</span>'
@@ -3818,9 +3804,6 @@ function renderFocusMode(){
       : `<span class="fmBig">⭐ ${pts}</span>`;
     return `
       <div class="fmRow">
-        <button class="fmAtt ${cls}" onclick="fmCycleAtt(${r.id})" title="اضغط لتبديل الحضور">
-          <span class="fmAttIcon">${icon}</span><span class="fmAttLbl">${label}</span>
-        </button>
         <div class="fmName">${esc(r.student_name)}</div>
         <div class="fmStars">${stars}</div>
         <div class="fmPts">
@@ -3833,12 +3816,9 @@ function renderFocusMode(){
 }
 
 function updateFmStats(){
-  const vals = myClassData.map(r => mcAttendance[r.id] || 'present');
-  const p = vals.filter(v=>v==='present').length;
-  const l = vals.filter(v=>v==='late').length;
-  const a = vals.filter(v=>v==='absent').length;
+  const totalPts = myClassData.reduce((sum, r) => sum + (r.participation_points || 0), 0);
   document.getElementById('fmStats').innerHTML =
-    `<span class="fmStat green">🟢 ${p}</span><span class="fmStat amber">🟡 ${l}</span><span class="fmStat red">🔴 ${a}</span>`;
+    `<span class="fmStat green">👥 ${myClassData.length}</span><span class="fmStat amber">⭐ ${totalPts}</span>`;
 }
 
 // زر حضور واحد يتدوّر: حاضر ← متأخر ← غائب ← حاضر
@@ -3885,9 +3865,7 @@ function applyMcFilter(rows){
   const q = (document.getElementById('mcSearch')?.value || '').trim();
   let out = rows;
   if(q) out = out.filter(r => r.student_name.includes(q));
-  if(mcFilter === 'present') out = out.filter(r => (mcAttendance[r.id]||'present') === 'present');
-  else if(mcFilter === 'absent') out = out.filter(r => (mcAttendance[r.id]||'present') === 'absent');
-  else if(mcFilter === 'top') out = [...out].sort((a,b)=>(b.participation_points||0)-(a.participation_points||0)).slice(0,10);
+  if(mcFilter === 'top') out = [...out].sort((a,b)=>(b.participation_points||0)-(a.participation_points||0)).slice(0,10);
   return out;
 }
 
@@ -4046,8 +4024,7 @@ function exportMyClassCSV(){
   if(!myClassData.length){ showToast('ما فيه بيانات للتصدير', 'error'); return; }
   let csv = '\uFEFF';
   csv += `متابعة صف ${myClassCls} — رحّالة\n\n`;
-  csv += '#,اسم الطالب,الحضور,نقاط المشاركة,التكريم,التنبيهات,كل الملاحظات\n';
-  const attLabel = {present:'حاضر', late:'متأخر', absent:'غائب'};
+  csv += '#,اسم الطالب,نقاط المشاركة,التكريم,التنبيهات,كل الملاحظات\n';
   myClassData.forEach((r, i)=>{
     const all = myClassNotes[r.id] || [];
     const w = all.filter(n => (n.kind || 'warning') === 'warning').length;
@@ -4056,8 +4033,7 @@ function exportMyClassCSV(){
     const allNotes = all.map(n =>
       `${new Date(n.created_at).toLocaleDateString('ar-QA')} ${n.kind === 'praise' ? '[تكريم]' : '[تنبيه]'} ${n.note}`
     ).join(' | ').replace(/"/g, '""');
-    const a = attLabel[mcAttendance[r.id] || 'present'];
-    csv += `${i+1},${r.student_name},${a},${r.participation_points || 0},${p},${w},"${allNotes}"\n`;
+    csv += `${i+1},${r.student_name},${r.participation_points || 0},${p},${w},"${allNotes}"\n`;
   });
   const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
   const a = document.createElement('a');
