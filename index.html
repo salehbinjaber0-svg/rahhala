@@ -3655,6 +3655,10 @@ async function refreshClassChallenge(){
 
 function renderMyClassTable(){
   if(!isAdmin) return;
+  // حفظ حالة ما يكتبه المعلم الآن قبل إعادة الرسم — أي مسار كان
+  const _ae = document.activeElement;
+  const _keep = (_ae && _ae.id && (_ae.classList.contains('mcNoteInput') || _ae.classList.contains('mcEditInput')))
+    ? {id: _ae.id, value: _ae.value, start: _ae.selectionStart, end: _ae.selectionEnd} : null;
   const filtered = applyMcFilter(myClassData);
   if(filtered.length === 0){
     document.getElementById('myClassTableWrap').innerHTML =
@@ -3729,6 +3733,16 @@ function renderMyClassTable(){
       </thead>
       <tbody>${rows}</tbody>
     </table>`;
+
+  // استعادة ما كان المعلم يكتبه قبل إعادة الرسم (التركيز + النص + موضع المؤشر)
+  if(_keep){
+    const back = document.getElementById(_keep.id);
+    if(back){
+      back.value = _keep.value;
+      back.focus();
+      try{ back.setSelectionRange(_keep.start, _keep.end); }catch(e){}
+    }
+  }
 
   // ملخص الصف
   const totalP = myClassData.reduce((s, r) => s + (r.participation_points || 0), 0);
