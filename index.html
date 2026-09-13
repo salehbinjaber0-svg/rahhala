@@ -3718,7 +3718,8 @@ function renderMyClassTable(){
           <button class="mcAdd" onclick="mcOpenNote(${r.id}, 'praise')" title="أضف تكريماً">+</button>
         </div></td>
         <td class="mcCountCell"><div class="mcCountBox">
-          <span class="mcBadge ${warns.length ? 'warn' : 'ok'}" title="${warns.length ? 'عدد التنبيهات' : 'لا تنبيهات'}">${warns.length ? '⛔ ' + warns.length : '–'}</span>
+          <button class="mcAdd minus" onclick="mcSubWarn(${r.id})" title="تراجع عن آخر تنبيه" ${warns.length === 0 ? 'disabled' : ''}>−</button>
+          <span class="mcBadge ${warns.length ? 'warn' : 'ok'}" title="${warns.length ? 'عدد التنبيهات' : 'لا تنبيهات'}">❌ ${warns.length}</span>
           <button class="mcAdd" onclick="mcOpenNote(${r.id}, 'warning')" title="أضف تنبيهاً">+</button>
         </div></td>
         <td class="mcNoteCell">${noteTxt}</td>
@@ -3766,6 +3767,19 @@ const mcSetAtt = (id, status) => saveAttendance(id, status, renderMyClassTable);
 
 // تراجع عن نقطة مشاركة أُضيفت بالغلط
 const mcSubPoint = (id) => changePoints(id, -1, renderMyClassTable);
+
+// تراجع عن آخر تنبيه — يحذف أحدث تنبيه مسجّل لهذا الطالب
+async function mcSubWarn(id){
+  if(!isAdmin || !requireDb()) return;
+  const warns = (myClassNotes[id] || []).filter(n => (n.kind || 'warning') === 'warning');
+  if(!warns.length) return;
+  const latest = warns.reduce((a, b) => new Date(a.created_at) > new Date(b.created_at) ? a : b);
+  const { error } = await sb.from('roster_warnings').delete().eq('id', latest.id);
+  if(error){ showToast('تعذر التراجع: ' + error.message, 'error'); return; }
+  myClassNotes[id] = (myClassNotes[id] || []).filter(n => n.id !== latest.id);
+  renderMyClassTable();
+  showToast('↩️ تراجعت عن آخر تنبيه', 'info');
+}
 
 // ══════ وضع الحصة السريع ══════
 function openFocusMode(){
