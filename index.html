@@ -1203,6 +1203,52 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     .heroBtns{justify-content:center;}
     .hero h1{font-size:2.1rem;}
   }
+  /* ===== الجوال: صفوفي ووضع الحصة ===== */
+  @media(max-width:760px){
+    /* الجدول: أعمدة أضيق ليقل التمرير الأفقي، والأزرار تبقى كبيرة للّمس */
+    .myClassTable{min-width:520px; font-size:.82rem;}
+    .myClassTable thead th{padding:10px 5px; font-size:.75rem;}
+    .myClassTable tbody td{padding:9px 5px;}
+    .myClassTable th:nth-child(1), .myClassTable td:nth-child(1){width:30px;}
+    .myClassTable th:nth-child(2), .myClassTable td:nth-child(2){width:118px;}
+    .myClassTable th:nth-child(3), .myClassTable td:nth-child(3){width:108px;}
+    .myClassTable th:nth-child(4), .myClassTable td:nth-child(4){width:108px;}
+    .myClassTable th:nth-child(5), .myClassTable td:nth-child(5){width:108px;}
+    .myClassTable th:nth-child(7), .myClassTable td:nth-child(7){width:40px;}
+    .mcName{min-width:0; font-size:.84rem;}
+    .mcNoteCell{min-width:250px;}
+    .mcCountBox{gap:2px;}
+    .mcCountBox .mcBadge{min-width:40px; padding:6px 6px; font-size:.8rem;}
+    .mcAdd{width:32px; height:32px; font-size:1.05rem;}   /* ≥32px = مساحة لمس مريحة */
+    .mcNoteInput{min-width:0; padding:9px 11px; font-size:.85rem;}
+    .mcNoteSend{min-width:42px; padding:0 10px;}
+    .mcNotesList{max-height:220px;}
+    .mcFilters{gap:6px;}
+    .mcFilterBtn{font-size:.8rem; padding:7px 12px;}
+
+    /* وضع الحصة السريع */
+    .fmHead{flex-wrap:wrap; gap:8px; row-gap:10px;}
+    .fmTitle{font-size:1.15rem;}
+    .fmStat{padding:4px 10px; font-size:.78rem;}
+    .fmSortBtn{padding:5px 11px; font-size:.76rem;}
+    .fmStarBar{font-size:.9rem; padding:9px 12px; gap:6px; text-align:center; flex-wrap:wrap;}
+    .fmStarBar .fmStarName{font-size:1rem;}
+    .fmRow{gap:7px; padding:10px 10px; border-radius:12px;}
+    .fmRank{min-width:24px; font-size:1.1rem;}
+    .fmRankBlank{min-width:24px;}
+    .fmName{font-size:.95rem;}
+    .fmStars{min-width:0; font-size:.82rem;}
+    .fmPlus{min-width:50px; padding:12px 0;}   /* أزرار النقاط تبقى كبيرة — تُضغط كثيراً بالحصة */
+    .fmMinus{min-width:42px; padding:12px 0;}
+    .fmSpark{font-size:1.4rem;}
+  }
+  @media(max-width:430px){
+    .myClassTable{min-width:470px;}
+    .myClassTable th:nth-child(2), .myClassTable td:nth-child(2){width:100px;}
+    .mcNoteCell{min-width:225px;}
+    .fmName{font-size:.88rem;}
+    .fmRow{gap:5px; padding:9px 8px;}
+  }
 </style>
 </head>
 <body>
