@@ -6129,8 +6129,26 @@ function tryUnitSummary(query){
 let contextTokens = [];    // كلمات الموضوع — تُدمج بأسئلة المتابعة الناقصة
 
 // هل السؤال ناقص ويحتاج السياق؟ (قصير، أو فيه ضمير، أو يبدأ بأداة استفهام بلا موضوع)
+// مصطلحات المنهج المأخوذة من مفاتيح قاعدة المعرفة — تُبنى مرة واحدة عند أول استخدام
+let KB_TERMS = null;
+function buildKbTerms(){
+  KB_TERMS = new Set();
+  KNOWLEDGE_BASE.forEach(e => e.k.forEach(kw =>
+    tokenize(kw).forEach(t => { if(t.length >= 4) KB_TERMS.add(t); })
+  ));
+}
+// هل السؤال يحمل مصطلحاً منهجياً صريحاً؟ لو نعم فهو موضوع قائم بذاته، لا متابعة
+function hasCurriculumTerm(qTokens){
+  if(!KB_TERMS) buildKbTerms();
+  return qTokens.some(t => t.length >= 4 && KB_TERMS.has(t));
+}
+
 function needsContext(query, qTokens){
   const t = query.trim();
+  // سؤال يذكر مصطلحاً من المنهج = سؤال جديد مهما كان قصيراً.
+  // بدون هذا الشرط كان «الخلافة العباسية» بعد سؤال عن الأمن الوطني
+  // يُعامَل كمتابعة فيُجاب بجواب الأمن الوطني.
+  if(hasCurriculumTerm(qTokens)) return false;
   if(/(ها|ه|هم|هن)[\s؟?]*$/.test(t) && qTokens.length <= 3) return true;  // "وش سوى؟" "متى سقطت؟"
   if(qTokens.length <= 2) return true;                                     // "كم عددها" "مثال"
   if(/^(وش|ايش|كم|متى|وين|كيف|ليش|من|ما)\s/.test(t) && qTokens.length <= 3) return true;
