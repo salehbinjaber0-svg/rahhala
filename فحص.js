@@ -130,13 +130,22 @@ else ok('لا ثغرات حقن ظاهرة');
 // ═══════════════════════════════════════════
 // 5) اكتمال البيانات
 // ═══════════════════════════════════════════
-const unitCount = (mainScript.match(/subject:"/g) || []).length;
-if (unitCount !== 6) err(`عدد الوحدات ${unitCount} بدل 6`);
-else ok('الوحدات الست كاملة');
-
-const lessonCount = (mainScript.match(/\{title:"الدرس/g) || []).length;
-if (lessonCount !== 12) err(`عدد الدروس ${lessonCount} بدل 12`);
-else ok('الدروس الاثنا عشر كاملة');
+// المنهجان يُفحصان منفصلين: سابع وثامن، كل منهما 6 وحدات × درسين
+function sliceData(name){
+  const i = mainScript.indexOf(`const ${name} = {`);
+  if (i < 0) return '';
+  const j = mainScript.indexOf('\n};', i);
+  return j < 0 ? '' : mainScript.slice(i, j);
+}
+[['UNITS_DATA','سابع'], ['UNITS_DATA_8','ثامن']].forEach(([varName, label])=>{
+  const seg = sliceData(varName);
+  if (!seg) { err(`منهج ${label} غير موجود (${varName})`); return; }
+  const u = (seg.match(/subject:"/g) || []).length;
+  const l = (seg.match(/\{title:"الدرس/g) || []).length;
+  if (u !== 6) err(`وحدات ${label}: ${u} بدل 6`);
+  else if (l !== 12) err(`دروس ${label}: ${l} بدل 12`);
+  else ok(`منهج ${label} كامل (6 وحدات · 12 درساً)`);
+});
 
 const kbMatch = mainScript.match(/const KNOWLEDGE_BASE = \[([\s\S]*?)\n\];/);
 const kbCount = kbMatch ? (kbMatch[1].match(/\{k:\[/g) || []).length : 0;
