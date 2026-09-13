@@ -3600,6 +3600,11 @@ async function refreshLeaderboard(){
 let myClassCls = '7-1';
 let myClassData = [];
 let myClassNotes = {};
+// القوائم المنسدلة اللي فتحها المعلم — تبقى مفتوحة حتى يغلقها هو بنفسه
+const mcOpenFolds = new Set();
+function mcRememberFold(id, isOpen){
+  if(isOpen) mcOpenFolds.add(id); else mcOpenFolds.delete(id);
+}
 
 function switchMyClass(cls, btn){
   if(!isAdmin) return;
@@ -3684,7 +3689,7 @@ function renderMyClassTable(){
     const noteTxt = `
       <div class="mcNotesBox">
         ${all.length ? `
-          <details class="mcNotesFold">
+          <details class="mcNotesFold" id="mcFold-${r.id}"${mcOpenFolds.has(r.id) ? ' open' : ''} ontoggle="mcRememberFold(${r.id}, this.open)">
             <summary class="mcNotesSummary">
               📋 ${all.length} ملاحظة
               ${praises.length ? `<span class="nfChip good">🌟 ${praises.length}</span>` : ''}
