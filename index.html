@@ -121,6 +121,25 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     box-shadow:0 10px 30px rgba(0,0,0,.25); padding:8px; min-width:220px; z-index:120;
   }
   .navDrop.open .navDropMenu{display:block;}
+  .gradeTabs{
+    display:flex; gap:6px; padding:10px 12px; border-bottom:1px solid #eee;
+    background:var(--cream); position:sticky; top:0; z-index:2;
+  }
+  .gradeTab{
+    flex:1; padding:9px 12px; border-radius:9px; cursor:pointer; text-align:center;
+    border:1.5px solid #dcd4c0; background:#fff; color:#7a7365;
+    font-family:'Tajawal'; font-weight:700; font-size:.86rem;
+  }
+  .gradeTab.on{background:var(--grad-navy); color:var(--gold-light); border-color:var(--navy);}
+  .gradeNow{
+    display:inline-block; font-size:.78rem; font-weight:700; padding:4px 12px;
+    border-radius:14px; background:var(--cream); color:var(--navy-deep);
+    border:1px solid #e0d8c4; margin-inline-start:8px;
+  }
+  .soonNote{
+    padding:22px; text-align:center; color:#8a8a8a;
+    background:var(--cream); border:1px dashed #dcd4c0; border-radius:12px;
+  }
   .navDropMenu a{
     display:block; padding:10px 14px; border-radius:8px; color:var(--navy); font-size:.88rem;
     border-bottom:none; opacity:1; text-align:right;
@@ -1477,39 +1496,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <div class="navDrop">
         <button class="navDropBtn" id="curriculumDropBtn" type="button">المنهج <span class="caret">▾</span></button>
         <div class="navDropMenu curriculumMenu" id="curriculumDropMenu">
-          <div class="cmUnit">
-            <a class="cmUnitLink" href="#" onclick="openUnit(1); return false;">الوحدة الأولى · الأرض من حولي</a>
-            <a class="cmLesson" href="#" onclick="openLesson(1,0); return false;">الدرس الأول: عناصر المناخ والعوامل المؤثرة فيه</a>
-            <a class="cmLesson" href="#" onclick="openLesson(1,1); return false;">الدرس الثاني: الأقاليم المناخية</a>
-          </div>
-          <div class="cmUnit">
-            <a class="cmUnitLink" href="#" onclick="openUnit(2); return false;">الوحدة الثانية · حضارة بلاد الرافدين</a>
-            <a class="cmLesson" href="#" onclick="openLesson(2,0); return false;">الدرس الأول: حضارات بلاد الرافدين وعوامل قيامها</a>
-            <a class="cmLesson" href="#" onclick="openLesson(2,1); return false;">الدرس الثاني: مظاهر حضارات بلاد الرافدين</a>
-          </div>
-          <div class="cmUnit">
-            <a class="cmUnitLink" href="#" onclick="openUnit(3); return false;">الوحدة الثالثة · السلطات الدستورية</a>
-            <a class="cmLesson" href="#" onclick="openLesson(3,0); return false;">الدرس الأول: السلطة التشريعية والتنفيذية</a>
-            <a class="cmLesson" href="#" onclick="openLesson(3,1); return false;">الدرس الثاني: السلطة القضائية في دولة قطر</a>
-          </div>
-          <div class="cmUnit">
-            <a class="cmUnitLink" href="#" onclick="openUnit(4); return false;">الوحدة الرابعة · التوزيع الجغرافي للسكان</a>
-            <a class="cmLesson" href="#" onclick="openLesson(4,0); return false;">الدرس الأول: العوامل الطبيعية المؤثرة</a>
-            <a class="cmLesson" href="#" onclick="openLesson(4,1); return false;">الدرس الثاني: العوامل البشرية المؤثرة</a>
-          </div>
-          <div class="cmUnit">
-            <a class="cmUnitLink" href="#" onclick="openUnit(5); return false;">الوحدة الخامسة · الخلافة العباسية</a>
-            <a class="cmLesson" href="#" onclick="openLesson(5,0); return false;">الدرس الأول: نشأتها وأهم خلفائها</a>
-            <a class="cmLesson" href="#" onclick="openLesson(5,1); return false;">الدرس الثاني: فتوحاتها ونهايتها</a>
-          </div>
-          <div class="cmUnit">
-            <a class="cmUnitLink" href="#" onclick="openUnit(6); return false;">الوحدة السادسة · الأمن الوطني</a>
-            <a class="cmLesson" href="#" onclick="openLesson(6,0); return false;">الدرس الأول: الأمن الوطني وأبعاده</a>
-            <a class="cmLesson" href="#" onclick="openLesson(6,1); return false;">الدرس الثاني: مقوماته ومؤسساته</a>
-          </div>
-          <div class="cmTools">
-            <a class="cmToolLink" href="#" onclick="showSection('compareTool'); return false;">⚖️ أداة: قارن بين المفاهيم</a>
-          </div>
+          <!-- تُبنى ديناميكياً من UNITS حسب الصف النشط -->
         </div>
       </div>
       <div class="navDrop">
@@ -2133,6 +2120,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <button onclick="closeChat()" aria-label="إغلاق المحادثة" title="إغلاق">✕</button>
     </span>
   </div>
+  <div style="padding:9px 14px 0;"><span class="gradeNow">منهج الصف السابع</span></div>
   <div class="chatBody" id="chatBody"></div>
   <div class="chatInputRow">
     <input id="chatInput" placeholder="اسأل عن أي مفهوم بالمنهج..." autocomplete="off" data-lpignore="true" aria-label="اكتب سؤالك للمنقذ" onkeydown="if(event.key==='Enter') sendChat();">
@@ -2212,6 +2200,57 @@ const UNITS_DATA_8 = {
 
 // قاعدة معرفة المنقذ للصف الثامن — تُبنى مع محتوى كل وحدة
 const KNOWLEDGE_BASE_8 = [];
+
+// ═══════ الصف النشط: كل الأقسام تقرأ منه ═══════
+let GRADE = parseInt(localStorage.getItem('rahhala_grade') || '7', 10);
+if(GRADE !== 7 && GRADE !== 8) GRADE = 7;
+// UNITS: مرجع حي للمنهج النشط — كل القراءات تمر عبره
+let UNITS = {};
+let KB_ACTIVE = [];
+function applyGrade(g, rerender){
+  GRADE = (g === 8) ? 8 : 7;
+  localStorage.setItem('rahhala_grade', String(GRADE));
+  UNITS = (GRADE === 8) ? UNITS_DATA_8 : UNITS_DATA;
+  KB_ACTIVE = (GRADE === 8) ? KNOWLEDGE_BASE_8 : KNOWLEDGE_BASE;
+  CURRICULUM_CORPUS = null;   // نص البحث العميق يُعاد بناؤه للصف الجديد
+  KB_TERMS = null;            // مصطلحات السياق تُعاد كذلك
+  if(rerender){
+    buildCurriculumMenu();
+    updateGradeLabels();
+  }
+}
+function gradeName(){ return GRADE === 8 ? 'الثامن' : 'السابع'; }
+
+const AR_ORD = ['','الأولى','الثانية','الثالثة','الرابعة','الخامسة','السادسة'];
+function buildCurriculumMenu(){
+  const box = document.getElementById('curriculumDropMenu');
+  if(!box) return;
+  let html = `<div class="gradeTabs">
+      <button class="gradeTab ${GRADE===7?'on':''}" type="button" onclick="switchGrade(7)">سابع</button>
+      <button class="gradeTab ${GRADE===8?'on':''}" type="button" onclick="switchGrade(8)">ثامن</button>
+    </div>`;
+  Object.keys(UNITS).forEach(n=>{
+    const u = UNITS[n];
+    html += `<div class="cmUnit">
+      <a class="cmUnitLink" href="#" onclick="openUnit(${n}); return false;">الوحدة ${AR_ORD[n]||n} · ${esc(u.title)}</a>`;
+    u.lessons.forEach((ls, li)=>{
+      html += `<a class="cmLesson" href="#" onclick="openLesson(${n},${li}); return false;">${esc(ls.title)}</a>`;
+    });
+    html += `</div>`;
+  });
+  box.innerHTML = html;
+}
+
+// يعرض الصف النشط بوضوح داخل الأقسام فلا يلتبس السياق
+function updateGradeLabels(){
+  document.querySelectorAll('.gradeNow').forEach(el=>{
+    el.textContent = `منهج الصف ${gradeName()}`;
+  });
+}
+function switchGrade(g){
+  applyGrade(g, true);
+  showToast(`📚 صرت على منهج الصف ${gradeName()}`, 'info');
+}
 
 const UNITS_DATA = {
 
@@ -2830,13 +2869,13 @@ function printLesson(){
 
 // يعرض درساً واحداً فقط بدل الوحدة كاملة
 function openLesson(unitNum, lessonIdx){
-  const u = UNITS_DATA[unitNum];
+  const u = UNITS[unitNum];
   if(!u || !u.lessons[lessonIdx]) return;
   const l = u.lessons[lessonIdx];
   // نحسب الدرس السابق والتالي عبر الوحدات كلها — تسلسل متصل من أول درس لآخر درس
   const flat = [];
-  Object.keys(UNITS_DATA).forEach(un=>{
-    UNITS_DATA[un].lessons.forEach((ls,li)=> flat.push([parseInt(un,10), li, ls.title.replace(/^الدرس (الأول|الثاني): /,'')]));
+  Object.keys(UNITS).forEach(un=>{
+    UNITS[un].lessons.forEach((ls,li)=> flat.push([parseInt(un,10), li, ls.title.replace(/^الدرس (الأول|الثاني): /,'')]));
   });
   const pos = flat.findIndex(x => x[0] === unitNum && x[1] === lessonIdx);
   const prev = pos > 0 ? flat[pos-1] : null;
@@ -2872,7 +2911,7 @@ function openLesson(unitNum, lessonIdx){
 }
 
 function openUnit(n){
-  const u = UNITS_DATA[n];
+  const u = UNITS[n];
   if(!u) return;
   const lessonsHtml = u.lessons.map(l => `
     <div class="lessonBlock">
@@ -2909,7 +2948,7 @@ const ENRICH_DATA = {
 };
 
 function openEnrichment(n){
-  const u = UNITS_DATA[n];
+  const u = UNITS[n];
   const e = ENRICH_DATA[n];
   if(!u || !e) return;
   const cardsHtml = e.topics.map(t => `
@@ -3427,6 +3466,7 @@ function initSupabase(){
     if(typeof supabase === 'undefined'){
       throw new Error('مكتبة Supabase غير متوفرة بالصفحة');
     }
+    applyGrade(GRADE, true);   // تفعيل الصف المحفوظ وبناء قائمة المنهج
     sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     dbReady = true;
     document.getElementById('connBanner').style.display = 'none';
@@ -3556,13 +3596,13 @@ function renderJourneyMap(){
   if(!state){ section.classList.remove('show'); return; }
   section.classList.add('show');
   const pts = state.points || 0;
-  map.innerHTML = Object.keys(UNITS_DATA).map(n=>{
+  map.innerHTML = Object.keys(UNITS).map(n=>{
     const threshold = (parseInt(n,10) - 1) * JOURNEY_UNLOCK_STEP;
     const unlocked = pts >= threshold;
     return `
       <div class="jStop ${unlocked?'unlocked':''}">
         <div class="jCircle">${unlocked ? '🧭' : '🔒'}</div>
-        <div class="jLabel">${UNITS_DATA[n].title}</div>
+        <div class="jLabel">${UNITS[n].title}</div>
       </div>`;
   }).join('');
 }
@@ -6128,7 +6168,7 @@ function scoreEntry(entry, qTokens){
 // ونقبله فقط لو كان الوحيد بهذا المستوى من القوة (يمنع تكرار خلط "الشورى/الآشوريون" اللي صار قبل)
 function findShortQueryMatch(qTokens){
   const candidates = [];
-  KNOWLEDGE_BASE.forEach(entry=>{
+  KB_ACTIVE.forEach(entry=>{
     entry.k.forEach(kw=>{
       tokenize(kw).forEach(kt=>{
         if(kt.length >= 4 && qTokens.includes(kt)){
@@ -6147,8 +6187,8 @@ function findShortQueryMatch(qTokens){
 let CURRICULUM_CORPUS = null;
 function buildCurriculumCorpus(){
   const corpus = [];
-  Object.keys(UNITS_DATA).forEach(unitNum=>{
-    const u = UNITS_DATA[unitNum];
+  Object.keys(UNITS).forEach(unitNum=>{
+    const u = UNITS[unitNum];
     u.lessons.forEach(lesson=>{
       const chunks = lesson.html.match(/<(p|li)[^>]*>([\s\S]*?)<\/\1>/g) || [];
       chunks.forEach(chunk=>{
@@ -6192,8 +6232,8 @@ function searchCurriculumDeep(qTokens, boostWords){
 
 // يحوّل رقم الوحدة لنص صفحة جاهز يُضاف بآخر الجواب — يعتمد على أرقام الصفحات الحقيقية بالكتاب
 function pageRef(unit){
-  if(!unit || !UNITS_DATA[unit]) return '';
-  return `\n📄 صفحة ${UNITS_DATA[unit].pages} بالكتاب (الوحدة ${unit})`;
+  if(!unit || !UNITS[unit]) return '';
+  return `\n📄 صفحة ${UNITS[unit].pages} بالكتاب (الوحدة ${unit})`;
 }
 
 let lastTopic = null; // آخر مفهوم فهمه المنقذ، عشان يفهم أسئلة المتابعة القصيرة
@@ -6213,7 +6253,7 @@ function tryQuizRequest(query){
               'الرابعة':4,'رابعة':4,'4':4,'الخامسة':5,'خامسة':5,'5':5,'السادسة':6,'سادسة':6,'6':6};
   let un=null;
   for(const [w,n] of Object.entries(nums)) if(query.includes(w)){ un=n; break; }
-  const where = un && UNITS_DATA[un] ? `«${UNITS_DATA[un].title}»` : 'المنهج';
+  const where = un && UNITS[un] ? `«${UNITS[un].title}»` : 'المنهج';
   return {
     text: `📝 عندك أسئلة تدريب جاهزة على ${where}!\n\nروح لقسم «الألعاب» ← «🧠 مراجعة سريعة» — الأسئلة مأخوذة من الكتاب نفسه، وكل إجابة صحيحة تكسبك نقاطاً وطاقة.\n\nوفيه كمان: 🃏 لعبة المطابقة · 📜 رتّب الأحداث — تختبر فهمك بطريقة مختلفة.`,
     chips: []
@@ -6228,7 +6268,7 @@ function tryUnitContent(query){
   let un=null;
   for(const [word,n] of Object.entries(nums)) if(query.includes(word)){ un=n; break; }
   if(!un) return null;
-  const u=UNITS_DATA[un];
+  const u=UNITS[un];
   if(!u) return null;
   const lessons=u.lessons.map(l=>`• ${l.title.replace(/^الدرس (الأول|الثاني): /,'')} (ص ${l.pages})`).join('\n');
   return { text:`📖 الوحدة ${un}: ${u.title}\nالمادة: ${u.subject} · صفحات ${u.pages}\n\n${lessons}\n\nاسألني عن أي مفهوم منها.`, chips:[] };
@@ -6269,10 +6309,10 @@ function tryUnitSummary(query){
   }
   if(!unitNum){
     // ما حدد وحدة — نعرض القائمة عليه
-    const list = Object.keys(UNITS_DATA).map(n => `${n}. ${UNITS_DATA[n].title}`).join('\n');
+    const list = Object.keys(UNITS).map(n => `${n}. ${UNITS[n].title}`).join('\n');
     return { text: 'أي وحدة تبي ملخصها؟ 📚\n\n' + list + '\n\nاكتب مثلاً: "ملخص الوحدة الثانية"', chips: [] };
   }
-  const u = UNITS_DATA[unitNum];
+  const u = UNITS[unitNum];
   if(!u) return null;
   const lessons = u.lessons.map(l => `• ${l.title.replace(/^الدرس (الأول|الثاني): /, '')} (ص ${l.pages})`).join('\n');
   return {
@@ -6289,7 +6329,7 @@ let contextTokens = [];    // كلمات الموضوع — تُدمج بأسئ�
 let KB_TERMS = null;
 function buildKbTerms(){
   KB_TERMS = new Set();
-  KNOWLEDGE_BASE.forEach(e => e.k.forEach(kw =>
+  KB_ACTIVE.forEach(e => e.k.forEach(kw =>
     tokenize(kw).forEach(t => { if(t.length >= 4) KB_TERMS.add(t); })
   ));
 }
@@ -6315,7 +6355,7 @@ function matchKnowledge(query){
   let qTokens = tokenize(query);
 
   // لو السؤال يطابق مفهوماً مستقلاً بنفسه، فهو موضوع جديد — ما نلوّثه بسياق سابق
-  const standsAlone = KNOWLEDGE_BASE.some(e => scoreEntry(e, qTokens).full);
+  const standsAlone = KB_ACTIVE.some(e => scoreEntry(e, qTokens).full);
 
   // دمج السياق: لو السؤال ناقص فعلاً (ولا يقف بنفسه)، نضيف كلمات الموضوع السابق
   const usedContext = !standsAlone && contextTokens.length > 0 && needsContext(query, qTokens);
@@ -6326,7 +6366,7 @@ function matchKnowledge(query){
   // سؤال متابعة قصير ("ليش؟"، "مثال؟"، "وضح أكثر") على آخر موضوع
   // شرط مهم: لا نعتبره متابعة لو كان يطابق مفهوماً مستقلاً بقاعدة المعرفة —
   // وإلا "بيت الحكمة" بعد "حمورابي" يرجّع جواب حمورابي بالغلط
-  const matchesOwnTopic = KNOWLEDGE_BASE.some(e => scoreEntry(e, qTokens).full);
+  const matchesOwnTopic = KB_ACTIVE.some(e => scoreEntry(e, qTokens).full);
   const isFollowup = !matchesOwnTopic && qTokens.length <= 3 &&
                      qTokens.some(qt => FOLLOWUP_WORDS.some(fw => wordsClose(qt, fw)));
   if(isFollowup && lastTopic){
@@ -6374,7 +6414,7 @@ function matchKnowledge(query){
     return { text: 'بخصوص آخر موضوع تكلمنا عنه:\n' + lastTopic.a, chips: [] };
   }
 
-  const scored = KNOWLEDGE_BASE.map(entry => ({ entry, ...scoreEntry(entry, qTokens) }));
+  const scored = KB_ACTIVE.map(entry => ({ entry, ...scoreEntry(entry, qTokens) }));
   const fullMatches = scored.filter(s => s.full).sort((a,b)=> b.score - a.score);
 
   if(fullMatches.length > 0){
@@ -6467,7 +6507,9 @@ function matchKnowledge(query){
   // خارج نطاق المنهج تماماً — نوجّهه بلطف بدل الصمت
   logUnanswered(query);
   return {
-    text: 'هذا السؤال خارج منهج الدراسات الاجتماعية للصف السابع 📘\nأنا متخصص بمنهجك: المناخ، حضارة الرافدين، السلطات الدستورية، السكان، الدولة العباسية، والأمن الوطني.\n\nجرّب تسألني عن أي مفهوم منها!',
+    text: KB_ACTIVE.length === 0
+      ? `منهج الصف ${gradeName()} قيد الإضافة حالياً 📘\nتقدر تبدّل للصف السابع من قائمة «المنهج» وتسألني عن أي مفهوم فيه.`
+      : `هذا السؤال خارج منهج الدراسات الاجتماعية للصف ${gradeName()} 📘\nأنا متخصص بمنهجك: ${Object.keys(UNITS).map(n=>UNITS[n].title).join('، ')}.\n\nجرّب تسألني عن أي مفهوم منها!`,
     chips: ['المناخ', 'حمورابي', 'مجلس الشورى', 'الأمن الوطني']
   };
 }
