@@ -355,13 +355,17 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   /* عنوان حصة اليوم: خط Aref Ruqaa يحتاج سطراً أعلى وإلا قُصّت أطراف الحروف */
   #lessonToday h2{line-height:1.7; padding-top:6px; margin-bottom:6px;}
   #lessonToday .lead{margin-bottom:10px;}
-  .actGrid{
-    display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,300px));
-    gap:18px; justify-content:start; margin-top:26px;
+  .actCols{display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:26px;}
+  .actCol{min-width:0;}
+  .actColHead{
+    font-size:1.15rem; color:var(--navy); margin:0 0 14px; padding-bottom:9px;
+    border-bottom:2.5px solid var(--gold); font-weight:700;
   }
-  @media(max-width:620px){
-    .actGrid{grid-template-columns:1fr;}
+  .actColHead.g8{border-bottom-color:var(--teal);}
+  @media(max-width:860px){
+    .actCols{grid-template-columns:1fr; gap:26px;}
   }
+  .actGrid{display:grid; grid-template-columns:1fr; gap:16px;}
   .actCard{
     background:#fff; border:1.5px solid #e8e0cd; border-radius:16px; padding:20px;
     display:flex; flex-direction:column; gap:10px; transition:transform .15s, box-shadow .15s;
@@ -1784,9 +1788,17 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 <section id="lessonToday">
   <div class="wrap">
     <h2>📝 حصة اليوم</h2>
-    <p class="lead">أنشطة جاهزة للعرض على البروجكتر — اختر نشاطاً وابدأ.
-      <span class="gradeNow">منهج الصف السابع</span></p>
-    <div class="actGrid" id="actGrid"></div>
+    <p class="lead">أنشطة جاهزة للعرض على البروجكتر — اختر نشاطاً وابدأ.</p>
+    <div class="actCols">
+      <div class="actCol">
+        <h3 class="actColHead">الصف السابع</h3>
+        <div class="actGrid" id="actGrid7"></div>
+      </div>
+      <div class="actCol">
+        <h3 class="actColHead g8">الصف الثامن</h3>
+        <div class="actGrid" id="actGrid8"></div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -4598,20 +4610,23 @@ function openLessonFromNav(){
 }
 
 function renderActivities(){
-  const box = document.getElementById('actGrid');
-  if(!box) return;
-  const mine = ACTIVITIES.filter(a => a.grade === GRADE);
-  if(!mine.length){
-    box.innerHTML = `<div class="actEmpty">ما فيه أنشطة لمنهج الصف ${gradeName()} بعد.<br>بدّل الصف من قائمة «المنهج»، أو اطلب نشاطاً جديداً.</div>`;
-    return;
-  }
-  box.innerHTML = mine.map(a=>`
-    <div class="actCard">
-      <div class="actIcon">${a.icon}</div>
-      <div class="actTitle">${esc(a.title)}</div>
-      <div class="actMeta">${esc(a.desc)} · ${a.items.length} فقرات</div>
-      <button class="actGo" onclick="startActivity('${a.id}')">▶️ ابدأ العرض</button>
-    </div>`).join('');
+  // نعرض الصفين معاً — كل صف بعموده، فلا يحتاج المعلم تبديل المنهج
+  [7, 8].forEach(g=>{
+    const box = document.getElementById('actGrid' + g);
+    if(!box) return;
+    const mine = ACTIVITIES.filter(a => a.grade === g);
+    if(!mine.length){
+      box.innerHTML = `<div class="actEmpty">ما فيه أنشطة بعد لهذا الصف.</div>`;
+      return;
+    }
+    box.innerHTML = mine.map(a=>`
+      <div class="actCard">
+        <div class="actIcon">${a.icon}</div>
+        <div class="actTitle">${esc(a.title)}</div>
+        <div class="actMeta">${esc(a.desc)} · ${a.items.length} فقرات</div>
+        <button class="actGo" onclick="startActivity('${a.id}')">▶️ ابدأ العرض</button>
+      </div>`).join('');
+  });
 }
 
 function startActivity(id){
