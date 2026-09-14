@@ -1771,6 +1771,14 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   </div>
 </section>
 
+<section id="lessonToday">
+  <div class="wrap">
+    <h2>📝 حصة اليوم</h2>
+    <p class="lqHint">أنشطة جاهزة للعرض على البروجكتر — اختر نشاطاً وابدأ. <span class="gradeNow">منهج الصف السابع</span></p>
+    <div class="actGrid" id="actGrid"></div>
+  </div>
+</section>
+
 <section id="games" class="hasBgArt">
   <svg class="bgArtQatar" viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <path d="M96,8 C112,10 124,20 130,36 C137,54 141,74 143,94 C145,116 143,138 136,158
@@ -1847,7 +1855,6 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <button class="myClassBtn active" data-cls="7-1" onclick="switchMyClass('7-1', this)">سابع 1</button>
       <button class="myClassBtn" data-cls="7-2" onclick="switchMyClass('7-2', this)">سابع 2</button>
       <button class="myClassBtn" data-cls="8-6" onclick="switchMyClass('8-6', this)">ثامن 6</button>
-      <button class="myClassBtn lessonBtn" data-cls="lesson" onclick="openLessonToday(this)">📝 حصة اليوم</button>
       <button class="focusModeBtn" onclick="openFocusMode()">⚡ وضع الحصة السريع</button>
       <button class="myClassExport" onclick="exportMyClassCSV()">⬇️ تصدير الصف</button>
     </div>
@@ -1858,10 +1865,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <input id="mcSearch" class="mcSearchBox" placeholder="🔍 بحث باسم الطالب…" autocomplete="off" data-lpignore="true" oninput="renderMyClassTable()">
     </div>
 
-    <div id="lessonPanel">
-      <p class="lqHint">اختر نشاطاً وابدأ العرض على البروجكتر — الأسئلة جاهزة، والإجابة تظهر بضغطة منك.</p>
-      <div class="actGrid" id="actGrid"></div>
-    </div>
+    
     </div>
 
     <details class="mcManage">
@@ -3261,7 +3265,7 @@ const HOME_SECTIONS = ['hero'];
 
 // يعرض قسماً واحداً فقط ويخفي البقية — بدل تكديس كل الأقسام بالصفحة
 // أقسام خاصة بالمعلم فقط — ما يفتحها أي طالب
-const TEACHER_ONLY_SECTIONS = ['classchallenge', 'adminPanel', 'reportView'];
+const TEACHER_ONLY_SECTIONS = ['classchallenge', 'adminPanel', 'reportView', 'lessonToday'];
 
 function showSection(id){
   if(TEACHER_ONLY_SECTIONS.includes(id) && !isAdmin){
@@ -4355,7 +4359,6 @@ function mcRememberFold(id, isOpen){
 
 function switchMyClass(cls, btn){
   if(!isAdmin) return;
-  if(lessonMode) exitLessonToday();
   myClassCls = cls;
   document.querySelectorAll('.myClassBtn').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
@@ -4517,7 +4520,6 @@ function snoozeBackupBar(){
 
 // ═══════ حصة اليوم — أسئلة ختامية تُعرض على البروجكتر ═══════
 let lessonQs = [];
-let lessonMode = false;
 
 // أنواع الفقرات وعناوينها على شاشة العرض
 const LQ_KINDS = {
@@ -4554,32 +4556,12 @@ const ACTIVITIES = [
   }
 ];
 
-// فتح «حصة اليوم» مباشرة من الشريط الرئيسي
+// «حصة اليوم» قسم مستقل — يُفتح من الشريط الرئيسي كالألعاب
 function openLessonFromNav(){
   if(!isAdmin){ showToast('هذي الأداة للمعلم فقط', 'error'); return; }
-  showSection('classchallenge');
-  const btn = document.querySelector('.myClassBtn.lessonBtn');
-  setTimeout(()=>openLessonToday(btn), 60);
-}
-
-async function openLessonToday(btn){
-  if(!isAdmin){ showToast('هذي الأداة للمعلم فقط', 'error'); return; }
-  lessonMode = true;
-  document.querySelectorAll('.myClassBtn').forEach(b=>b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-  document.getElementById('lessonPanel').classList.add('show');
-  document.getElementById('myClassTableWrap').style.display = 'none';
-  document.getElementById('myClassSummary').style.display = 'none';
-  const f = document.querySelector('.mcFilters'); if(f) f.style.display = 'none';
+  showSection('lessonToday');
+  updateGradeLabels();
   renderActivities();
-}
-
-function exitLessonToday(){
-  lessonMode = false;
-  document.getElementById('lessonPanel').classList.remove('show');
-  document.getElementById('myClassTableWrap').style.display = '';
-  document.getElementById('myClassSummary').style.display = '';
-  const f = document.querySelector('.mcFilters'); if(f) f.style.display = '';
 }
 
 function renderActivities(){
@@ -4830,7 +4812,6 @@ function renderLessonShowDots(){
 
 async function refreshClassChallenge(){
   if(!isAdmin) return; // بيانات صفوفك — للمعلم فقط
-  if(lessonMode) return; // المعلم بلوحة حصة اليوم — لا نلمس الجدول
   if(!requireDb()) return;
   // ما نحدّث الجدول لو المعلم يكتب ملاحظة جديدة أو يعدّل ملاحظة موجودة حالياً —
   // يمنع التحديث الدوري (كل 6 ثوانٍ) من مسح الكتابة وسحب التركيز من الحقل
