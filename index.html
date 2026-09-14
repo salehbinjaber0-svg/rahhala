@@ -351,6 +351,25 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   /* ===== لوحة إدارة «حصة اليوم» ===== */
   #lessonPanel{display:none;}
   #lessonPanel.show{display:block;}
+  .actGrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px;}
+  .actCard{
+    background:#fff; border:1.5px solid #e8e0cd; border-radius:16px; padding:20px;
+    display:flex; flex-direction:column; gap:10px; transition:transform .15s, box-shadow .15s;
+  }
+  .actCard:hover{transform:translateY(-3px); box-shadow:0 8px 22px rgba(0,0,0,.09);}
+  .actIcon{font-size:2.1rem; line-height:1;}
+  .actTitle{font-weight:700; color:var(--navy); font-size:1.05rem;}
+  .actMeta{color:#8a8a8a; font-size:.84rem;}
+  .actGo{
+    margin-top:auto; padding:12px; border-radius:11px; border:none; cursor:pointer;
+    background:var(--grad-navy); color:var(--gold-light);
+    font-family:'Tajawal'; font-weight:700; font-size:.95rem;
+  }
+  .actGo:active{transform:scale(.97);}
+  .actEmpty{
+    grid-column:1/-1; text-align:center; padding:34px; color:#8a8a8a;
+    background:#fff; border:1px dashed #dcd4c0; border-radius:14px;
+  }
   .lqHint{color:#8a8a8a; font-size:.86rem; margin-bottom:14px;}
   .lqAddBox{
     display:flex; flex-direction:column; gap:9px; padding:16px;
@@ -1825,72 +1844,9 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     </div>
 
     <div id="lessonPanel">
-      <p class="lqHint">أسئلة ختامية تعرضها على البروجكتر لغلق الحصة. أضفها بنفسك أو اسحبها من بنك الأسئلة، ثم ابدأ العرض.</p>
-
-      <div class="lqAddBox">
-        <div class="lqKinds">
-          <button class="lqKindBtn on" data-k="essay"  onclick="setLqKind('essay', this)">📝 مقالي</button>
-          <button class="lqKindBtn"    data-k="mcq"    onclick="setLqKind('mcq', this)">☑️ اختياري</button>
-          <button class="lqKindBtn"    data-k="game"   onclick="setLqKind('game', this)">🎮 لعبة</button>
-          <button class="lqKindBtn"    data-k="reward" onclick="setLqKind('reward', this)">🎁 مكافأة</button>
-          <button class="lqKindBtn"    data-k="break"  onclick="setLqKind('break', this)">⏸️ فاصل</button>
-        </div>
-
-        <input id="lqNewQ" placeholder="نص السؤال…" autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-form-type="other">
-        <input id="lqNewA" placeholder="الإجابة (اختيارية — تُكشف بضغطة أثناء العرض)" autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-form-type="other"
-               onkeydown="if(event.key==='Enter') addLessonQ()">
-
-        <div id="lqMcqBox" style="display:none; flex-direction:column; gap:7px;">
-          <div class="lqChoiceRow">
-            <input type="text" id="lqC0" placeholder="الخيار الأول" autocomplete="off" data-lpignore="true">
-            <label class="lqCorrect"><input type="radio" name="lqCorrect" value="0" checked> صحيح</label>
-          </div>
-          <div class="lqChoiceRow">
-            <input type="text" id="lqC1" placeholder="الخيار الثاني" autocomplete="off" data-lpignore="true">
-            <label class="lqCorrect"><input type="radio" name="lqCorrect" value="1"> صحيح</label>
-          </div>
-          <div class="lqChoiceRow">
-            <input type="text" id="lqC2" placeholder="الخيار الثالث" autocomplete="off" data-lpignore="true">
-            <label class="lqCorrect"><input type="radio" name="lqCorrect" value="2"> صحيح</label>
-          </div>
-          <div class="lqChoiceRow">
-            <input type="text" id="lqC3" placeholder="الخيار الرابع (اختياري)" autocomplete="off" data-lpignore="true">
-            <label class="lqCorrect"><input type="radio" name="lqCorrect" value="3"> صحيح</label>
-          </div>
-        </div>
-
-        <div class="lqAddRow">
-          <button class="lqBtn" onclick="addLessonQ()">➕ أضف</button>
-          <select class="lqSelect" id="lqBankPick">
-            <option value="">— أو اختر من بنك الأسئلة —</option>
-          </select>
-          <button class="lqBtn ghost" onclick="addLessonQFromBank()">📚 أضف من البنك</button>
-        </div>
-      </div>
-
-      <div class="lqAddRow" style="margin-bottom:16px;">
-        <button class="lqBtn run" id="lqRunBtn" onclick="openLessonShow()">▶️ ابدأ العرض على البروجكتر</button>
-        <button class="lqBtn ghost" onclick="openBulkPaste()">📋 لصق دفعة أسئلة</button>
-        <button class="lqBtn ghost" onclick="clearLessonQs()">🗑️ امسح كل الأسئلة</button>
-      </div>
-
-      <div class="lqAddBox" id="lqBulkBox" style="display:none;">
-        <div style="font-weight:700; color:var(--navy);">📋 الصق الأسئلة هنا — سطر السؤال ثم خياراته، وفاصل بين كل سؤال</div>
-        <div class="lqHint" style="margin:0;">
-          السؤال يبدأ بـ <strong>س:</strong> · الخيارات بـ <strong>أ) ب) ج) د)</strong> · ضع <strong>✓</strong> بعد الصحيح ·
-          <strong>ج:</strong> للإجابة أو الشرح · افصل بين الأسئلة بسطر <strong>---</strong>
-        </div>
-        <textarea id="lqBulkText" rows="10" placeholder="س: ما تعريف الإقليم المناخي؟&#10;أ) دولة لها حدود سياسية&#10;ب) منطقة تتشابه في خصائصها المناخية ✓&#10;ج) خط وهمي يقسّم الأرض&#10;ج: الخصائص: الحرارة والأمطار والرياح والرطوبة&#10;---&#10;س: اذكر ثلاثة من الأقاليم المناخية&#10;ج: الاستوائي، المداري، الصحراوي"
-          style="padding:13px; border-radius:10px; border:1.5px solid #dcd4c0; font-family:'Tajawal'; font-size:.9rem; line-height:1.9; resize:vertical;"
-          autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-form-type="other"></textarea>
-        <div class="lqAddRow">
-          <button class="lqBtn" onclick="runBulkPaste()">✅ أضف كل الأسئلة</button>
-          <button class="lqBtn ghost" onclick="closeBulkPaste()">إلغاء</button>
-          <span id="lqBulkInfo" style="color:#8a8a8a; font-size:.85rem;"></span>
-        </div>
-      </div>
-
-      <div class="lqList" id="lqList"></div>
+      <p class="lqHint">اختر نشاطاً وابدأ العرض على البروجكتر — الأسئلة جاهزة، والإجابة تظهر بضغطة منك.</p>
+      <div class="actGrid" id="actGrid"></div>
+    </div>
     </div>
 
     <details class="mcManage">
@@ -4547,25 +4503,41 @@ function snoozeBackupBar(){
 // ═══════ حصة اليوم — أسئلة ختامية تُعرض على البروجكتر ═══════
 let lessonQs = [];
 let lessonMode = false;
-let lqKind = 'essay';
 
+// أنواع الفقرات وعناوينها على شاشة العرض
 const LQ_KINDS = {
-  essay:  {icon:'📝', label:'مقالي',  qPlace:'نص السؤال…',            aPlace:'الإجابة النموذجية (اختيارية)'},
-  mcq:    {icon:'☑️', label:'اختياري', qPlace:'نص السؤال…',            aPlace:'شرح إضافي بعد كشف الإجابة (اختياري)'},
-  game:   {icon:'🎮', label:'لعبة',    qPlace:'اسم اللعبة…',           aPlace:'تعليمات اللعبة (اختيارية)'},
-  reward: {icon:'🎁', label:'مكافأة',  qPlace:'نص المكافأة…',          aPlace:'تفاصيل إضافية (اختيارية)'},
-  break:  {icon:'⏸️', label:'فاصل',    qPlace:'نص الفاصل أو التعليمات…', aPlace:'تفاصيل إضافية (اختيارية)'},
+  mcq:    {label:'☑️ سؤال اختياري', icon:'☑️'},
+  essay:  {label:'📝 سؤال مقالي',   icon:'📝'},
+  game:   {label:'🎮 لعبة',         icon:'🎮'},
+  reward: {label:'🎁 مكافأة',       icon:'🎁'},
+  break:  {label:'⏸️ فاصل',         icon:'⏸️'}
 };
 
-function setLqKind(k, btn){
-  lqKind = k;
-  document.querySelectorAll('.lqKindBtn').forEach(b=>b.classList.remove('on'));
-  if(btn) btn.classList.add('on');
-  const cfg = LQ_KINDS[k];
-  document.getElementById('lqNewQ').placeholder = cfg.qPlace;
-  document.getElementById('lqNewA').placeholder = cfg.aPlace;
-  document.getElementById('lqMcqBox').style.display = (k === 'mcq') ? 'flex' : 'none';
-}
+// ═══════ أنشطة حصة اليوم — جاهزة بالكود، يضيفها المساعد بالطلب ═══════
+const ACTIVITIES = [
+  {
+    id:'aqalim-1', grade:7, unit:1, icon:'🌍',
+    title:'الأقاليم المناخية',
+    desc:'غلق ختامي — خمسة أسئلة اختيارية',
+    items:[
+      {kind:'mcq', q:'ما تعريف الإقليم المناخي؟',
+       choices:['دولة لها حدود سياسية واضحة','منطقة واسعة تتشابه في خصائصها المناخية وتتميز عن الأقاليم المجاورة','خط وهمي يقسّم الأرض إلى نصفين'],
+       correct_index:1, a:'الخصائص المقصودة: الحرارة والأمطار والرياح والرطوبة.'},
+      {kind:'mcq', q:'تقع دولة قطر ضمن أي إقليم مناخي؟',
+       choices:['إقليم البحر المتوسط','الإقليم الصحراوي','الإقليم المداري'],
+       correct_index:1, a:'بين دائرتي عرض 18° و30° — صيف حار جاف طويل، وشتاء بارد نسبياً قليل الأمطار.'},
+      {kind:'mcq', q:'أي الأقاليم يتميز بارتفاع درجة الحرارة وغزارة الأمطار طوال العام؟',
+       choices:['الإقليم الاستوائي','الإقليم اللورانسي','الإقليم القطبي البارد'],
+       correct_index:0, a:'يمتد بين دائرتي عرض 0° و8°.'},
+      {kind:'mcq', q:'إقليم البحر المتوسط والإقليم الصيني كلاهما بين 30° و40° — فما الفرق بينهما؟',
+       choices:['المتوسط أبرد والصيني أدفأ','المتوسط غرب القارات وصيفه جاف، والصيني شرقها وأمطاره طوال العام','المتوسط لا تسقط فيه أمطار إطلاقاً'],
+       correct_index:1, a:'الموقع من القارة هو الفارق — وهذا أكثر ما يلتبس على الطلاب.'},
+      {kind:'mcq', q:'في أي إقليم تنمو حشائش السافانا وتعيش الأسود والفيلة والحُمُر الوحشية؟',
+       choices:['الإقليم المداري','الإقليم الصحراوي','إقليم غرب أوروبا'],
+       correct_index:0, a:'بين 8° و18° — صيف طويل حار ممطر، وشتاء قصير دافئ جاف.'}
+    ]
+  }
+];
 
 // فتح «حصة اليوم» مباشرة من الشريط الرئيسي
 function openLessonFromNav(){
@@ -4577,18 +4549,14 @@ function openLessonFromNav(){
 
 async function openLessonToday(btn){
   if(!isAdmin){ showToast('هذي الأداة للمعلم فقط', 'error'); return; }
-  if(!requireDb()) return;
   lessonMode = true;
   document.querySelectorAll('.myClassBtn').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
-  // نخفي أدوات الجدول ونظهر لوحة الحصة
   document.getElementById('lessonPanel').classList.add('show');
   document.getElementById('myClassTableWrap').style.display = 'none';
   document.getElementById('myClassSummary').style.display = 'none';
-  document.querySelector('.mcFilters').style.display = 'none';
-  await syncAiBatch();
-  await loadLessonQs();
-  await fillBankPicker();
+  const f = document.querySelector('.mcFilters'); if(f) f.style.display = 'none';
+  renderActivities();
 }
 
 function exitLessonToday(){
@@ -4596,238 +4564,32 @@ function exitLessonToday(){
   document.getElementById('lessonPanel').classList.remove('show');
   document.getElementById('myClassTableWrap').style.display = '';
   document.getElementById('myClassSummary').style.display = '';
-  document.querySelector('.mcFilters').style.display = '';
+  const f = document.querySelector('.mcFilters'); if(f) f.style.display = '';
 }
 
-async function loadLessonQs(){
-  if(!isAdmin || !requireDb()) return;
-  const { data, error } = await sb.from('lesson_questions')
-    .select('*').is('deleted_at', null).order('pos');
-  if(error){
-    document.getElementById('lqList').innerHTML =
-      '<div class="lqEmpty">تعذر تحميل الأسئلة — تأكد من تشغيل كود قاعدة البيانات الخاص بحصة اليوم.</div>';
-    return;
-  }
-  lessonQs = data || [];
-  renderLessonList();
-}
-
-function renderLessonList(){
-  const box = document.getElementById('lqList');
+function renderActivities(){
+  const box = document.getElementById('actGrid');
   if(!box) return;
-  document.getElementById('lqRunBtn').disabled = lessonQs.length === 0;
-  if(!lessonQs.length){
-    box.innerHTML = '<div class="lqEmpty">ما فيه أسئلة بعد — أضف أول سؤال لحصة اليوم.</div>';
+  const mine = ACTIVITIES.filter(a => a.grade === GRADE);
+  if(!mine.length){
+    box.innerHTML = `<div class="actEmpty">ما فيه أنشطة لمنهج الصف ${gradeName()} بعد.<br>بدّل الصف من قائمة «المنهج»، أو اطلب نشاطاً جديداً.</div>`;
     return;
   }
-  box.innerHTML = lessonQs.map((q, i)=>{
-    const kind = q.kind || 'essay';
-    const cfg = LQ_KINDS[kind] || LQ_KINDS.essay;
-    let chHtml = '';
-    if(kind === 'mcq' && Array.isArray(q.choices)){
-      chHtml = '<div class="lqChoices">' + q.choices.map((c, ci)=>
-        `<div class="lqCh ${ci === q.correct_index ? 'ok' : ''}">${ci === q.correct_index ? '✔' : '•'} ${esc(c)}</div>`
-      ).join('') + '</div>';
-    }
-    return `
-    <div class="lqItem kind-${kind} ${q.source === 'bank' ? 'fromBank' : ''}">
-      <div class="lqNum">${i + 1}</div>
-      <div class="lqBody">
-        <div class="lqQ">${cfg.icon} ${esc(q.q)}<span class="lqTag">${cfg.label}</span>${q.source === 'bank' ? '<span class="lqTag">من البنك</span>' : ''}</div>
-        ${chHtml}
-        ${q.a ? `<div class="lqA">✓ ${esc(q.a)}</div>` : ''}
-      </div>
-      <div class="lqOps">
-        <button onclick="moveLessonQ(${q.id}, -1)" title="أعلى" ${i === 0 ? 'disabled' : ''}>▲</button>
-        <button onclick="moveLessonQ(${q.id}, 1)" title="أسفل" ${i === lessonQs.length - 1 ? 'disabled' : ''}>▼</button>
-        <button class="lqDel" onclick="delLessonQ(${q.id})" title="حذف">🗑️</button>
-      </div>
-    </div>`;
-  }).join('');
+  box.innerHTML = mine.map(a=>`
+    <div class="actCard">
+      <div class="actIcon">${a.icon}</div>
+      <div class="actTitle">${esc(a.title)}</div>
+      <div class="actMeta">${esc(a.desc)} · ${a.items.length} فقرات</div>
+      <button class="actGo" onclick="startActivity('${a.id}')">▶️ ابدأ العرض</button>
+    </div>`).join('');
 }
 
-async function addLessonQ(){
-  if(!isAdmin || !requireDb()) return;
-  const qi = document.getElementById('lqNewQ'), ai = document.getElementById('lqNewA');
-  const q = qi.value.trim(), a = ai.value.trim();
-  if(!q){ showToast('اكتب النص أولاً', 'error'); qi.focus(); return; }
-
-  const row = {q, a: a || null, source:'manual', kind: lqKind,
-               pos: lessonQs.length ? Math.max(...lessonQs.map(x=>x.pos || 0)) + 1 : 0};
-
-  if(lqKind === 'mcq'){
-    const chs = ['lqC0','lqC1','lqC2','lqC3']
-      .map(id => document.getElementById(id).value.trim());
-    const filled = chs.filter(c => c);
-    if(filled.length < 2){ showToast('الاختياري يحتاج خيارين على الأقل', 'error'); return; }
-    const picked = parseInt((document.querySelector('input[name=lqCorrect]:checked') || {}).value, 10);
-    if(isNaN(picked) || !chs[picked]){ showToast('حدّد الخيار الصحيح (ولا يكون فارغاً)', 'error'); return; }
-    // نحذف الخيارات الفارغة مع تصحيح موضع الصحيح
-    const kept = [], map = {};
-    chs.forEach((c, i)=>{ if(c){ map[i] = kept.length; kept.push(c); } });
-    row.choices = kept;
-    row.correct_index = map[picked];
-  }
-
-  const { error } = await sb.from('lesson_questions').insert(row);
-  if(error){ showToast('تعذر الحفظ: ' + error.message, 'error'); return; }
-  qi.value = ''; ai.value = '';
-  ['lqC0','lqC1','lqC2','lqC3'].forEach(id=>{ const el = document.getElementById(id); if(el) el.value = ''; });
-  qi.focus();
-  await loadLessonQs();
-  showToast('✅ أُضيفت الفقرة', 'info');
-}
-
-async function fillBankPicker(){
-  const sel = document.getElementById('lqBankPick');
-  if(!sel || sel.options.length > 1) return; // نملؤها مرة واحدة
-  const { data } = await sb.from('questions')
-    .select('id,q,choices,correct_index,unit').is('deleted_at', null).order('id');
-  (data || []).forEach(b=>{
-    const o = document.createElement('option');
-    o.value = b.id;
-    o.textContent = (b.unit ? b.unit + ' — ' : '') + (b.q.length > 70 ? b.q.slice(0,70) + '…' : b.q);
-    sel.appendChild(o);
-  });
-}
-
-async function addLessonQFromBank(){
-  if(!isAdmin || !requireDb()) return;
-  const sel = document.getElementById('lqBankPick');
-  const id = parseInt(sel.value, 10);
-  if(!id){ showToast('اختر سؤالاً من القائمة أولاً', 'error'); return; }
-  const { data, error: e1 } = await sb.from('questions')
-    .select('id,q,choices,correct_index').eq('id', id).single();
-  if(e1 || !data){ showToast('تعذر جلب السؤال', 'error'); return; }
-  let ans = null;
-  try{
-    const ch = Array.isArray(data.choices) ? data.choices : JSON.parse(data.choices);
-    ans = ch[data.correct_index] || null;
-  }catch(err){ ans = null; }
-  const pos = lessonQs.length ? Math.max(...lessonQs.map(x=>x.pos || 0)) + 1 : 0;
-  let chArr = [];
-  try{ chArr = Array.isArray(data.choices) ? data.choices : JSON.parse(data.choices); }catch(err){ chArr = []; }
-  const { error } = await sb.from('lesson_questions')
-    .insert({q: data.q, a: ans, source:'bank', bank_id: data.id, pos,
-             kind: chArr.length ? 'mcq' : 'essay',
-             choices: chArr.length ? chArr : null,
-             correct_index: chArr.length ? data.correct_index : null});
-  if(error){ showToast('تعذر الحفظ: ' + error.message, 'error'); return; }
-  sel.value = '';
-  await loadLessonQs();
-  showToast('📚 أُضيف من البنك', 'info');
-}
-
-// ── لصق دفعة أسئلة: يحوّل نصاً بسيطاً إلى فقرات جاهزة ──
-function openBulkPaste(){
-  if(!isAdmin){ showToast('هذي الأداة للمعلم فقط','error'); return; }
-  document.getElementById('lqBulkBox').style.display = 'flex';
-  document.getElementById('lqBulkText').focus();
-}
-function closeBulkPaste(){
-  document.getElementById('lqBulkBox').style.display = 'none';
-  document.getElementById('lqBulkText').value = '';
-  document.getElementById('lqBulkInfo').textContent = '';
-}
-
-// يفهم: "س:" للسؤال · "أ) ب) ج) د)" أو "-" للخيارات · "✓" للصحيح · "ج:" للإجابة
-function parseBulkText(txt){
-  const blocks = txt.split(/\n\s*(?:---+|===+)\s*\n/).map(b=>b.trim()).filter(Boolean);
-  const out = [];
-  blocks.forEach(block=>{
-    const lines = block.split('\n').map(l=>l.trim()).filter(Boolean);
-    let q = '', a = '', choices = [], correct = -1;
-    lines.forEach(line=>{
-      const mChoice = line.match(/^(?:[أابتجدهـ]\s*[\)\.\-]|[-*•]|\d\s*[\)\.])\s*(.+)$/);
-      const isAns = /^(?:ج|الإجابة|الجواب|الشرح)\s*[:：]/.test(line);
-      const isQ = /^(?:س|سؤال|السؤال)\s*[:：]/.test(line);
-      if(isQ){
-        q = line.replace(/^(?:س|سؤال|السؤال)\s*[:：]\s*/, '').trim();
-      } else if(isAns){
-        a = line.replace(/^(?:ج|الإجابة|الجواب|الشرح)\s*[:：]\s*/, '').trim();
-      } else if(mChoice){
-        let t = mChoice[1].trim();
-        if(/[✓✔√]\s*$/.test(t) || /^\s*[✓✔√]/.test(t)){
-          correct = choices.length;
-          t = t.replace(/[✓✔√]/g, '').trim();
-        }
-        choices.push(t);
-      } else if(!q){
-        q = line;   // أول سطر بلا علامة = السؤال
-      } else if(!a){
-        a = line;
-      }
-    });
-    if(!q) return;
-    if(choices.length >= 2){
-      out.push({kind:'mcq', q, choices, correct_index: correct >= 0 ? correct : 0, a: a || null});
-    } else {
-      out.push({kind:'essay', q, a: a || null, choices:null, correct_index:null});
-    }
-  });
-  return out;
-}
-
-async function runBulkPaste(){
-  if(!isAdmin || !requireDb()) return;
-  const txt = document.getElementById('lqBulkText').value;
-  const info = document.getElementById('lqBulkInfo');
-  if(!txt.trim()){ showToast('الصق الأسئلة أولاً','error'); return; }
-  const parsed = parseBulkText(txt);
-  if(!parsed.length){ showToast('ما قدرت أفهم أي سؤال — تأكد من الصيغة','error'); return; }
-  const noCorrect = parsed.filter(p => p.kind === 'mcq' && !/[✓✔√]/.test(txt)).length;
-  let pos = lessonQs.length ? Math.max(...lessonQs.map(x=>x.pos || 0)) + 1 : 0;
-  const rows = parsed.map((p, i)=>({
-    kind: p.kind, q: p.q, a: p.a,
-    choices: p.choices, correct_index: p.correct_index,
-    source: 'manual', pos: pos + i
-  }));
-  info.textContent = 'جاري الإضافة…';
-  const { error } = await sb.from('lesson_questions').insert(rows);
-  if(error){ showToast('تعذر الحفظ: ' + error.message, 'error'); info.textContent = ''; return; }
-  const mcq = parsed.filter(p=>p.kind==='mcq').length;
-  const essay = parsed.length - mcq;
-  closeBulkPaste();
-  await loadLessonQs();
-  showToast(`✅ أُضيف ${parsed.length} سؤال (${mcq} اختياري · ${essay} مقالي)`, 'info');
-}
-
-async function delLessonQ(id){
-  if(!isAdmin || !requireDb()) return;
-  if(!confirm('حذف هذا السؤال من حصة اليوم؟')) return;
-  const { error } = await sb.from('lesson_questions')
-    .update({deleted_at: new Date().toISOString()}).eq('id', id);
-  if(error){ showToast('تعذر الحذف: ' + error.message, 'error'); return; }
-  lessonQs = lessonQs.filter(q => q.id !== id);
-  renderLessonList();
-  showToast('🗑️ حُذف السؤال', 'info');
-}
-
-async function moveLessonQ(id, dir){
-  if(!isAdmin || !requireDb()) return;
-  const i = lessonQs.findIndex(q => q.id === id);
-  const j = i + dir;
-  if(i < 0 || j < 0 || j >= lessonQs.length) return;
-  const a = lessonQs[i], b = lessonQs[j];
-  const pa = a.pos || 0, pb = b.pos || 0;
-  await sb.from('lesson_questions').update({pos: pb}).eq('id', a.id);
-  await sb.from('lesson_questions').update({pos: pa}).eq('id', b.id);
-  a.pos = pb; b.pos = pa;
-  lessonQs[i] = b; lessonQs[j] = a;
-  renderLessonList();
-}
-
-async function clearLessonQs(){
-  if(!isAdmin || !requireDb()) return;
-  if(!lessonQs.length) return;
-  if(!confirm(`مسح كل أسئلة حصة اليوم (${lessonQs.length})؟ تقدر تبدأ حصة جديدة بعدها.`)) return;
-  const ids = lessonQs.map(q => q.id);
-  const { error } = await sb.from('lesson_questions')
-    .update({deleted_at: new Date().toISOString()}).in('id', ids);
-  if(error){ showToast('تعذر المسح: ' + error.message, 'error'); return; }
-  lessonQs = [];
-  renderLessonList();
-  showToast('🗑️ جاهز لحصة جديدة', 'info');
+function startActivity(id){
+  if(!isAdmin) return;
+  const act = ACTIVITIES.find(a => a.id === id);
+  if(!act){ showToast('ما لقيت النشاط', 'error'); return; }
+  lessonQs = act.items.map((it, i)=>({id:i+1, ...it, pos:i}));
+  openLessonShow();
 }
 
 // ── وضع العرض على البروجكتر ──
