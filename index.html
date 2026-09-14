@@ -4941,17 +4941,18 @@ async function refreshClassChallenge(){
 
 // ارتفاع شريط الصفوف يتغيّر لو التفّ لسطرين على شاشة أضيق،
 // فنقيسه فعلياً بدل قيمة ثابتة تختلّ ويختفي أول صف تحت الشريط.
+// شريط الصفوف يلتصق تحت ما هو مثبّت فوقه: الهيدر العلوي، ويليه شريط
+// الطلاب المنتظرين إن كان ظاهراً. بلا هذا الحساب ينزلق الشريط تحت
+// الهيدر ويختفي، ويبدو الهيدر وكأنه يغطّي أول صف بالجدول.
 function syncBarHeight(){
   const bar = document.querySelector('.myClassBar');
   if(!bar) return;
-  // شريط الطلاب المنتظرين مثبّت أعلى الصفحة كذلك — لو كان ظاهراً وجب
-  // أن يُزيح شريط الصفوف لأسفله بدل أن يتراكبا.
+  const head = document.querySelector('header');
+  const headH = head ? Math.round(head.getBoundingClientRect().height) : 0;
   const pend = document.getElementById('topPendingBar');
   const pendH = (pend && pend.offsetParent !== null)
     ? Math.round(pend.getBoundingClientRect().height) : 0;
-  bar.style.top = pendH + 'px';
-  const h = Math.round(bar.getBoundingClientRect().height);
-  if(h > 0) document.documentElement.style.setProperty('--mcBarH', (h + pendH) + 'px');
+  bar.style.top = (headH + pendH) + 'px';
 }
 window.addEventListener('resize', syncBarHeight);
 
