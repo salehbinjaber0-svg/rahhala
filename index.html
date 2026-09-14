@@ -351,7 +351,14 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   /* ===== لوحة إدارة «حصة اليوم» ===== */
   #lessonPanel{display:none;}
   #lessonPanel.show{display:block;}
-  .actGrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px;}
+  /* البطاقات بعرض ثابت معقول: لا تتمدد عبر الشاشة لو كان النشاط واحداً */
+  .actGrid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,300px));
+    gap:18px; justify-content:start; margin-top:26px;
+  }
+  @media(max-width:620px){
+    .actGrid{grid-template-columns:1fr;}
+  }
   .actCard{
     background:#fff; border:1.5px solid #e8e0cd; border-radius:16px; padding:20px;
     display:flex; flex-direction:column; gap:10px; transition:transform .15s, box-shadow .15s;
@@ -1774,7 +1781,8 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 <section id="lessonToday">
   <div class="wrap">
     <h2>📝 حصة اليوم</h2>
-    <p class="lqHint">أنشطة جاهزة للعرض على البروجكتر — اختر نشاطاً وابدأ. <span class="gradeNow">منهج الصف السابع</span></p>
+    <p class="lead">أنشطة جاهزة للعرض على البروجكتر — اختر نشاطاً وابدأ.
+      <span class="gradeNow">منهج الصف السابع</span></p>
     <div class="actGrid" id="actGrid"></div>
   </div>
 </section>
