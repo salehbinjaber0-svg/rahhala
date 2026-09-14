@@ -341,10 +341,20 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
   /* شريط الصفوف مثبّت أعلى الشاشة: أزرار الصفوف ووضع الحصة تبقى
      في متناول المعلم مهما نزل في قائمة الطلاب */
+  /* زر الصعود: بديل خفيف عن تثبيت الشريط — وصول سريع بلا مساحة محجوزة */
+  #toTopBtn{
+    display:none; position:fixed; inset-inline-start:22px; bottom:22px; z-index:40;
+    width:50px; height:50px; border-radius:50%; border:none; cursor:pointer;
+    background:var(--grad-navy); color:var(--gold-light); font-size:1.3rem;
+    box-shadow:0 5px 18px rgba(10,32,41,.3);
+    transition:transform .15s, opacity .2s;
+  }
+  #toTopBtn.show{display:block;}
+  #toTopBtn:hover{transform:translateY(-3px);}
+  #toTopBtn:active{transform:scale(.92);}
+
   .myClassBar{
     display:flex; gap:10px; flex-wrap:wrap; align-items:center;
-    position:sticky; top:0; z-index:30;
-    background:rgba(250,247,240,.97); backdrop-filter:blur(8px);
     padding:14px 0 12px; margin-bottom:18px;
     border-bottom:1.5px solid #e8e0cd;
   }
@@ -1744,6 +1754,8 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <div id="enrichViewContent"></div>
   </div>
 </section>
+
+<button id="toTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="رجوع لأعلى" aria-label="رجوع لأعلى">↑</button>
 
 <div id="lessonShow">
   <div class="lsHead">
@@ -4941,24 +4953,21 @@ async function refreshClassChallenge(){
 
 // ارتفاع شريط الصفوف يتغيّر لو التفّ لسطرين على شاشة أضيق،
 // فنقيسه فعلياً بدل قيمة ثابتة تختلّ ويختفي أول صف تحت الشريط.
-// شريط الصفوف يلتصق تحت ما هو مثبّت فوقه: الهيدر العلوي، ويليه شريط
-// الطلاب المنتظرين إن كان ظاهراً. بلا هذا الحساب ينزلق الشريط تحت
-// الهيدر ويختفي، ويبدو الهيدر وكأنه يغطّي أول صف بالجدول.
-function syncBarHeight(){
-  const bar = document.querySelector('.myClassBar');
-  if(!bar) return;
-  const head = document.querySelector('header');
-  const headH = head ? Math.round(head.getBoundingClientRect().height) : 0;
-  const pend = document.getElementById('topPendingBar');
-  const pendH = (pend && pend.offsetParent !== null)
-    ? Math.round(pend.getBoundingClientRect().height) : 0;
-  bar.style.top = (headH + pendH) + 'px';
-}
-window.addEventListener('resize', syncBarHeight);
+
+// زر الصعود: يظهر بعد النزول، بديل خفيف عن تثبيت شريط الصفوف.
+// تقييد المعدّل مرة كل 150 مللي ثانية بدل حساب مع كل بكسل تمرير.
+let _topTick = 0;
+window.addEventListener('scroll', ()=>{
+  if(_topTick) return;
+  _topTick = setTimeout(()=>{
+    _topTick = 0;
+    const b = document.getElementById('toTopBtn');
+    if(b) b.classList.toggle('show', (window.scrollY || window.pageYOffset || 0) > 420);
+  }, 150);
+}, {passive:true});
 
 function renderMyClassTable(){
   if(!isAdmin) return;
-  syncBarHeight();
   // حفظ حالة ما يكتبه المعلم الآن قبل إعادة الرسم — أي مسار كان
   const _ae = document.activeElement;
   const _keep = (_ae && _ae.id && (_ae.classList.contains('mcNoteInput') || _ae.classList.contains('mcEditInput')))
@@ -5591,7 +5600,6 @@ async function loadPendingStudents(){
   topCount.textContent = n;
   topBar.classList.toggle('show', n > 0); // الشريط يظهر تلقائياً بس لو فيه طلاب فعلاً بانتظار الموافقة
   topList.innerHTML = n > 0 ? data.map(renderPendingPill).join('') : '';
-  syncBarHeight(); // ظهور الشريط أو اختفاؤه يغيّر موضع شريط الصفوف تحته
 }
 async function approveStudent(key, btn){
   if(!isAdmin || !requireDb()) return;
