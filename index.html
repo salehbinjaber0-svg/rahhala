@@ -417,17 +417,17 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .lsChoices{display:flex; flex-direction:column; gap:14px; width:100%; max-width:820px;}
   .lsCh{
     display:flex; align-items:center; gap:16px; padding:16px 24px; border-radius:16px;
-    /* تباين عالٍ مقصود: السبورة تفقد التدرجات الخافتة تحت إضاءة الصف */
-    background:rgba(255,255,255,.16); border:2.5px solid rgba(255,255,255,.42);
-    font-size:clamp(1rem, 2vw, 1.5rem); color:#fff; text-align:start; font-weight:600;
+    /* خلفية صلبة لا شفافة: الشفافية تذوب على سبورة الصف مهما رُفعت */
+    background:#1c4257; border:3px solid #5b8ba3;
+    font-size:clamp(1.05rem, 2.1vw, 1.6rem); color:#fff; text-align:start; font-weight:700;
     transition:background .3s, border-color .3s;
   }
   .lsCh .lsChKey{
-    min-width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,.3);
+    min-width:48px; height:48px; border-radius:50%; background:var(--gold); color:var(--navy-deep);
     display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;
   }
   .lsCh.correct{
-    background:rgba(47,150,110,.42); border-color:#4ade80; color:#d8ffe9;
+    background:#1b7a4f; border-color:#5cf0a0; color:#fff;
     animation:lsFade .4s ease-out;
   }
   .lsCh.correct .lsChKey{background:#2f966e; color:#fff;}
@@ -441,9 +441,9 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .lsCardIcon{font-size:clamp(3rem, 7vw, 5rem); line-height:1;}
   /* رسالة تشجيع عند الإجابة الصحيحة */
   .lsCh.pick{cursor:pointer;}
-  .lsCh.pick:hover{background:rgba(255,255,255,.14); border-color:rgba(201,161,94,.55);}
+  .lsCh.pick:hover{background:#27596f; border-color:var(--gold);}
   .lsCh.wrong{
-    background:rgba(155,42,42,.22); border-color:#b94a4a; color:#ffb3b3;
+    background:#7d2230; border-color:#e06b6b; color:#fff;
     animation:shake .42s ease;
   }
   @keyframes shake{
