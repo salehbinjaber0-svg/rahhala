@@ -61,7 +61,7 @@ else ok('لا متغيرات مكررة');
 // ═══════════════════════════════════════════
 // 3) الترابط — كل مرجع يشير لشيء موجود
 // ═══════════════════════════════════════════
-const DYNAMIC_IDS = ['typingIndicator']; // تُنشأ وقت التشغيل
+const DYNAMIC_IDS = ['typingIndicator', 'lsAutoBar']; // تُنشأ وقت التشغيل
 const refs = [...new Set([...html.matchAll(/getElementById\('([^']+)'\)/g)].map(m => m[1]))];
 const missingRefs = refs.filter(id =>
   !html.includes(`id="${id}"`) && !DYNAMIC_IDS.includes(id) && !id.startsWith('note-')

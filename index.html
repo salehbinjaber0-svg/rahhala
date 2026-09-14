@@ -454,6 +454,24 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .lsCh.dim{opacity:.45;}
   /* رسالة الاستغراب: شريط عائم ثابت فوق أزرار التنقّل — كانت تُضاف
      أسفل الخيارات فتُقطع خلف النقاط والأزرار */
+  /* شريط الانتقال التلقائي بعد الإجابة الصحيحة */
+  .lsAuto{
+    position:fixed; inset-inline:0; bottom:104px; z-index:6;
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    background:#eaf7f0; border-top:2px solid #158a55; border-bottom:2px solid #158a55;
+    padding:9px 20px; color:#0d5c39; font-weight:700; font-size:1.02rem;
+    animation:cheerPop .35s ease-out;
+  }
+  .lsAutoNum{
+    min-width:32px; height:32px; border-radius:50%; background:#158a55; color:#fff;
+    display:inline-flex; align-items:center; justify-content:center; font-size:1rem;
+  }
+  .lsAutoStop{
+    background:#fff; border:2px solid #158a55; color:#0d5c39; border-radius:9px;
+    padding:5px 14px; cursor:pointer; font-family:'Tajawal'; font-weight:700; font-size:.88rem;
+  }
+  .lsAutoStop:hover{background:#d9f5e6;}
+
   .lsOops{
     position:fixed; inset-inline:0; bottom:104px; z-index:6;
     font-family:'Aref Ruqaa'; font-size:clamp(1.05rem,2.1vw,1.6rem);
@@ -4629,6 +4647,35 @@ const LS_OOPS = [
 function lsOopsText(){ return LS_OOPS[Math.floor(Math.random() * LS_OOPS.length)]; }
 
 // اختيار خيار: الصحيح يحتفل، والخطأ يهتزّ ويعطي فرصة جديدة
+// انتقال تلقائي للفقرة التالية بعد الإجابة الصحيحة — يمنح الصف
+// خمس ثوانٍ لقراءة الشرح، وللمعلم إيقافه لو أراد التوسّع بالشرح.
+let lsAutoTimer = null, lsAutoLeft = 0;
+function lsStartAuto(){
+  lsCancelAuto();
+  if(lsIndex >= lessonQs.length - 1) return;   // آخر فقرة: لا انتقال
+  lsAutoLeft = 5;
+  const bar = document.createElement('div');
+  bar.className = 'lsAuto';
+  bar.id = 'lsAutoBar';
+  document.getElementById('lessonShow').appendChild(bar);
+  const paint = ()=>{
+    bar.innerHTML = `<span class="lsAutoNum">${lsAutoLeft}</span>
+      <span>الفقرة التالية بعد ${lsAutoLeft} ثوانٍ</span>
+      <button class="lsAutoStop" onclick="lsCancelAuto()">⏸️ إيقاف</button>`;
+  };
+  paint();
+  lsAutoTimer = setInterval(()=>{
+    lsAutoLeft--;
+    if(lsAutoLeft <= 0){ lsCancelAuto(); lsGo(1); return; }
+    paint();
+  }, 1000);
+}
+function lsCancelAuto(){
+  if(lsAutoTimer){ clearInterval(lsAutoTimer); lsAutoTimer = null; }
+  const b = document.getElementById('lsAutoBar');
+  if(b) b.remove();
+}
+
 function lsPick(i){
   const q = lessonQs[lsIndex];
   if(!q || q.kind !== 'mcq') return;
@@ -4650,6 +4697,7 @@ function lsPick(i){
     lsStopTimer();
     lsSeen.add(lsIndex);
     renderLessonShowDots();
+    lsStartAuto();
     const rv = document.getElementById('lsRevealBtn');
     if(rv) rv.style.display = 'none';
   } else {
@@ -4722,6 +4770,7 @@ function openLessonShow(){
 
 function closeLessonShow(){
   lsStopTimer();
+  lsCancelAuto();
   document.getElementById('lessonShow').classList.remove('show');
   document.body.style.overflow = '';
   document.removeEventListener('keydown', lsKeys);
@@ -4773,6 +4822,7 @@ function renderLessonShow(){
 }
 
 function lsGo(dir){
+  lsCancelAuto();
   const n = lsIndex + dir;
   if(n < 0 || n >= lessonQs.length) return;
   lsSeen.add(lsIndex);
@@ -4781,6 +4831,7 @@ function lsGo(dir){
 }
 
 function lsJump(i){
+  lsCancelAuto();
   if(i < 0 || i >= lessonQs.length) return;
   lsSeen.add(lsIndex);
   lsIndex = i;
