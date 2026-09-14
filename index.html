@@ -1524,6 +1524,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       </div>
       <a href="#" onclick="showSection('games'); return false;">الألعاب</a>
       <a href="#" id="myClassesNavLink" style="display:none;" onclick="showSection('classchallenge'); return false;">📋 صفوفي</a>
+      <a href="#" id="lessonNavLink" style="display:none;" onclick="openLessonFromNav(); return false;">📝 حصة اليوم</a>
       <a href="#" onclick="showSection('leaderboard'); return false;">لوحة الصدارة</a>
       <a href="#" onclick="showSection('about'); return false;">عن المعلم</a>
       <a href="#" id="profileNavLink" style="display:none;" onclick="openProfile(); return false;">👤 ملفي</a>
@@ -4566,6 +4567,14 @@ function setLqKind(k, btn){
   document.getElementById('lqMcqBox').style.display = (k === 'mcq') ? 'flex' : 'none';
 }
 
+// فتح «حصة اليوم» مباشرة من الشريط الرئيسي
+function openLessonFromNav(){
+  if(!isAdmin){ showToast('هذي الأداة للمعلم فقط', 'error'); return; }
+  showSection('classchallenge');
+  const btn = document.querySelector('.myClassBtn.lessonBtn');
+  setTimeout(()=>openLessonToday(btn), 60);
+}
+
 async function openLessonToday(btn){
   if(!isAdmin){ showToast('هذي الأداة للمعلم فقط', 'error'); return; }
   if(!requireDb()) return;
@@ -5615,6 +5624,8 @@ function setAdminActive(active){
   if(navLink) navLink.style.display = active ? 'inline-block' : 'none';
   const myCls = document.getElementById('myClassesNavLink');
   if(myCls) myCls.style.display = active ? 'inline-block' : 'none';
+  const lsn = document.getElementById('lessonNavLink');
+  if(lsn) lsn.style.display = active ? 'inline-block' : 'none';
   if(active){
     document.getElementById('adminPanel').style.display = ''; // نتجاوز إخفاء الصفحة الرئيسية
     document.getElementById('adminPanel').scrollIntoView({behavior:'smooth'});
