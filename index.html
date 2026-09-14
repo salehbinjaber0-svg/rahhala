@@ -339,7 +339,15 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   }
   .mcSearchBox:focus{outline:none; border-color:var(--gold);}
 
-  .myClassBar{display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; align-items:center;}
+  /* شريط الصفوف مثبّت أعلى الشاشة: أزرار الصفوف ووضع الحصة تبقى
+     في متناول المعلم مهما نزل في قائمة الطلاب */
+  .myClassBar{
+    display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    position:sticky; top:0; z-index:30;
+    background:rgba(250,247,240,.97); backdrop-filter:blur(8px);
+    padding:14px 0 12px; margin-bottom:18px;
+    border-bottom:1.5px solid #e8e0cd;
+  }
   .myClassBtn{
     padding:10px 24px; border-radius:30px; border:2px solid var(--navy); background:transparent;
     color:var(--navy); font-weight:700; font-size:.9rem; cursor:pointer; font-family:'Tajawal';
@@ -1468,6 +1476,28 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     .heroBtns{justify-content:center;}
     .hero h1{font-size:2.1rem;}
   }
+  /* ===== مقاس معتدل للابتوب والكمبيوتر =====
+     الجدول كان يتمدد بعرض الشاشة كاملاً على الشاشات الكبيرة، فتتباعد
+     الأعمدة ويصعب ربط اسم الطالب بصفّه. نحدّه بعرض مريح للقراءة. */
+  @media(min-width:1100px){
+    #classchallenge .wrap{max-width:1240px;}
+    .myClassTable{font-size:.95rem;}
+    .myClassTable thead th{padding:15px 12px; font-size:.95rem;}
+    .myClassTable tbody td{padding:13px 12px;}
+    .mcName{font-size:1rem;}
+    .myClassTable th:nth-child(2), .myClassTable td:nth-child(2){width:230px;}
+    .myClassTable th:nth-child(3), .myClassTable td:nth-child(3){width:155px;}
+    .myClassTable th:nth-child(4), .myClassTable td:nth-child(4){width:155px;}
+    .myClassTable th:nth-child(5), .myClassTable td:nth-child(5){width:155px;}
+    .mcNoteInput{font-size:.92rem; padding:11px 14px;}
+    .mcNotesSummary{font-size:.9rem;}
+    .myClassBtn{padding:11px 26px; font-size:.95rem;}
+  }
+  /* شاشات عريضة جداً: لا نزيد العرض أكثر، نبقي السطر مريحاً للعين */
+  @media(min-width:1600px){
+    #classchallenge .wrap{max-width:1320px;}
+  }
+
   /* ===== الجوال: صفوفي ووضع الحصة ===== */
   @media(max-width:760px){
     /* الجدول: أعمدة أضيق ليقل التمرير الأفقي، والأزرار تبقى كبيرة للّمس */
