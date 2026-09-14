@@ -3770,6 +3770,7 @@ function initSupabase(){
       throw new Error('مكتبة Supabase غير متوفرة بالصفحة');
     }
     applyGrade(GRADE, true);   // تفعيل الصف المحفوظ وبناء قائمة المنهج
+    applyStudentLoginMode();
     sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     dbReady = true;
     document.getElementById('connBanner').style.display = 'none';
@@ -3978,7 +3979,29 @@ function studentLogout(){
   showToast('👋 تم تسجيل الخروج بنجاح', 'success');
 }
 
+// ═══════════════════════════════════════════════════════════
+//  دخول الطالب معطّل حالياً بقرار المعلم.
+//  للرجوع: غيّر هذا السطر إلى true — يعود كل شيء كما كان.
+//  الكود كله باقٍ سليماً، والمخفي هو المدخل فقط.
+//  الألعاب ولوحة الصدارة تبقى ظاهرة ويستخدمها المعلم مباشرة،
+//  فهي لا تشترط حساب طالب أصلاً.
+// ═══════════════════════════════════════════════════════════
+const STUDENT_LOGIN_ENABLED = false;
+
+function applyStudentLoginMode(){
+  if(STUDENT_LOGIN_ENABLED) return;
+  const chip = document.getElementById('userChip');
+  if(chip) chip.style.display = 'none';
+  const prof = document.getElementById('profileNavLink');
+  if(prof) prof.style.display = 'none';
+  const pend = document.getElementById('topPendingBar');
+  if(pend) pend.classList.remove('show');
+  const badge = document.getElementById('pendingBadge');
+  if(badge) badge.classList.remove('show');
+}
+
 function updateChip(){
+  if(!STUDENT_LOGIN_ENABLED){ applyStudentLoginMode(); return; }
   const chip = document.getElementById('userChip');
   chip.textContent = state ? `${state.name} · ${state.points} نقطة` : 'دخول الطالب';
   const notice = document.getElementById('pendingNotice');
@@ -4003,6 +4026,7 @@ async function restoreSession(){
 }
 
 document.getElementById('userChip').addEventListener('click', ()=>{
+  if(!STUDENT_LOGIN_ENABLED) return;
   if(!state) openLogin();
   else studentLogout();
 });
@@ -5469,7 +5493,7 @@ async function loadPendingStudents(){
   badge.textContent = n;
   badge.classList.toggle('show', n > 0);
   topCount.textContent = n;
-  topBar.classList.toggle('show', n > 0); // الشريط يظهر تلقائياً بس لو فيه طلاب فعلاً بانتظار الموافقة
+  topBar.classList.toggle('show', STUDENT_LOGIN_ENABLED && n > 0); // مغلق ما دام دخول الطالب معطّلاً
   topList.innerHTML = n > 0 ? data.map(renderPendingPill).join('') : '';
 }
 async function approveStudent(key, btn){
