@@ -418,32 +418,33 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .lsCh{
     display:flex; align-items:center; gap:16px; padding:16px 24px; border-radius:16px;
     /* خلفية صلبة لا شفافة: الشفافية تذوب على سبورة الصف مهما رُفعت */
-    background:#1c4257; border:3px solid #5b8ba3;
-    font-size:clamp(1.05rem, 2.1vw, 1.6rem); color:#fff; text-align:start; font-weight:700;
+    background:#fff; border:3px solid var(--navy);
+    font-size:clamp(1.05rem, 2.1vw, 1.6rem); color:var(--navy-deep); text-align:start; font-weight:700;
+    box-shadow:0 3px 10px rgba(10,32,41,.13);
     transition:background .3s, border-color .3s;
   }
   .lsCh .lsChKey{
-    min-width:48px; height:48px; border-radius:50%; background:var(--gold); color:var(--navy-deep);
+    min-width:48px; height:48px; border-radius:50%; background:var(--navy); color:#fff; font-size:1.15em;
     display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;
   }
   .lsCh.correct{
-    background:#1b7a4f; border-color:#5cf0a0; color:#fff;
+    background:#d9f5e6; border-color:#158a55; color:#0d5c39;
     animation:lsFade .4s ease-out;
   }
-  .lsCh.correct .lsChKey{background:#2f966e; color:#fff;}
+  .lsCh.correct .lsChKey{background:#158a55; color:#fff;}
   .lsCard{
     display:flex; flex-direction:column; align-items:center; gap:18px;
     padding:44px 40px; border-radius:26px; max-width:900px;
   }
-  .lsCard.game{background:rgba(122,79,163,.2); border:2px solid rgba(160,120,200,.6);}
-  .lsCard.reward{background:rgba(201,161,94,.22); border:2px solid var(--gold);}
-  .lsCard.break{background:rgba(255,255,255,.07); border:2px solid rgba(255,255,255,.2);}
+  .lsCard.game{background:#f2ebfa; border:3px solid #6b3fa0; color:#4a2775;}
+  .lsCard.reward{background:#fdf3dd; border:3px solid var(--gold-deep); color:#7a5a1e;}
+  .lsCard.break{background:var(--cream); border:3px solid var(--navy); color:var(--navy-deep);}
   .lsCardIcon{font-size:clamp(3rem, 7vw, 5rem); line-height:1;}
   /* رسالة تشجيع عند الإجابة الصحيحة */
   .lsCh.pick{cursor:pointer;}
-  .lsCh.pick:hover{background:#27596f; border-color:var(--gold);}
+  .lsCh.pick:hover{background:var(--cream); border-color:var(--gold-deep);}
   .lsCh.wrong{
-    background:#7d2230; border-color:#e06b6b; color:#fff;
+    background:#fadddd; border-color:#a32b2b; color:#7d1f1f;
     animation:shake .42s ease;
   }
   @keyframes shake{
@@ -452,12 +453,12 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   }
   .lsCh.dim{opacity:.45;}
   .lsOops{
-    font-family:'Aref Ruqaa'; font-size:clamp(1.2rem,2.6vw,2rem); color:#ffb3b3;
+    font-family:'Aref Ruqaa'; font-size:clamp(1.2rem,2.6vw,2rem); color:#a32b2b;
     animation:cheerPop .45s ease-out; margin-top:10px;
   }
   .lsCheer{
-    font-family:'Aref Ruqaa'; font-size:clamp(1.3rem,3vw,2.3rem); color:var(--gold-light);
-    text-shadow:0 0 22px rgba(201,161,94,.6); animation:cheerPop .55s ease-out; margin-top:10px;
+    font-family:'Aref Ruqaa'; font-size:clamp(1.3rem,3vw,2.3rem); color:var(--gold-deep);
+    text-shadow:none; animation:cheerPop .55s ease-out; margin-top:10px;
   }
   @keyframes cheerPop{
     0%{opacity:0; transform:scale(.7) translateY(14px);}
@@ -471,7 +472,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   }
   /* مؤقّت التفكير */
   .lsTimer{
-    font-weight:700; font-size:1.3rem; color:var(--gold-light);
+    font-weight:700; font-size:1.3rem; color:var(--navy-deep);
     min-width:64px; text-align:center;
   }
   .lsTimer.warn{color:#ffa578; animation:tick .6s ease-in-out infinite;}
@@ -483,7 +484,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     padding:7px 15px; font-family:'Tajawal'; font-weight:700; font-size:.84rem;
   }
   .lsTimerBtn:hover{background:rgba(201,161,94,.25);}
-  .lsCardTxt{font-size:clamp(1rem, 2.2vw, 1.7rem); line-height:1.85; color:rgba(255,255,255,.9);}
+  .lsCardTxt{font-size:clamp(1rem, 2.1vw, 1.6rem); line-height:1.85; color:inherit; font-weight:600;}
   .lqEmpty{
     text-align:center; padding:34px 20px; color:#8a8a8a;
     background:#fff; border:1px dashed #dcd4c0; border-radius:14px;
@@ -491,8 +492,10 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
   /* ===== شاشة عرض حصة اليوم (البروجكتر) ===== */
   #lessonShow{
-    display:none; position:fixed; inset:0; z-index:430; background:var(--navy-deep);
-    color:#fff; overflow-y:auto;
+    display:none; position:fixed; inset:0; z-index:430;
+    /* خلفية فاتحة: البروجكتر على السبورة البيضاء يطرح الضوء، فالداكن
+       يظهر رمادياً باهتاً بينما الفاتح يبقى ساطعاً وعالي التباين */
+    background:#fffdf8; color:var(--navy-deep); overflow-y:auto;
   }
   #lessonShow.show{display:flex; flex-direction:column;}
   .lsHead{
@@ -508,11 +511,11 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   }
   .lsQ{
     font-family:'Aref Ruqaa'; font-size:clamp(1.4rem, 3.4vw, 2.6rem); line-height:1.55;
-    color:#fff; max-width:1100px;
+    color:var(--navy-deep); max-width:1100px;
   }
   .lsA{
-    font-size:clamp(1.1rem, 2.4vw, 1.9rem); line-height:1.8; color:#7fe0b8;
-    background:rgba(47,150,110,.14); border:2px solid rgba(47,150,110,.5);
+    font-size:clamp(1.05rem, 2.1vw, 1.6rem); line-height:1.8; color:#0d5c39;
+    background:#eaf7f0; border:2px solid #158a55;
     border-radius:18px; padding:20px 34px; max-width:950px;
     animation:lsFade .4s ease-out;
   }
@@ -521,25 +524,25 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .lsNav{
     display:flex; align-items:center; justify-content:center; gap:14px;
     padding:13px 20px 16px; flex-wrap:wrap;
-    flex-shrink:0; background:var(--navy-deep);
-    border-top:1px solid rgba(255,255,255,.12);
+    flex-shrink:0; background:#fffdf8;
+    border-top:2px solid #e0d8c4;
   }
   .lsDots{flex-shrink:0; padding-bottom:4px;}
   .lsNavBtn{
     padding:14px 30px; border-radius:14px; cursor:pointer; font-family:'Tajawal';
-    font-weight:700; font-size:1rem; background:rgba(255,255,255,.1);
-    color:#fff; border:1.5px solid rgba(255,255,255,.3);
+    font-weight:700; font-size:1rem; background:#fff;
+    color:var(--navy-deep); border:2.5px solid var(--navy);
   }
-  .lsNavBtn:hover:not(:disabled){background:rgba(255,255,255,.2);}
+  .lsNavBtn:hover:not(:disabled){background:var(--cream);}
   .lsNavBtn:disabled{opacity:.25; cursor:not-allowed;}
   .lsNavBtn.reveal{background:var(--grad-gold); color:var(--navy-deep); border:none;}
   .lsDots{display:flex; gap:7px; justify-content:center; flex-wrap:wrap; padding:0 20px 8px;}
   .lsDot{
-    width:11px; height:11px; border-radius:50%; background:rgba(255,255,255,.2);
+    width:12px; height:12px; border-radius:50%; background:#d5cdb8;
     cursor:pointer; border:none; padding:0;
   }
   .lsDot.on{background:var(--gold); transform:scale(1.3);}
-  .lsDot.done{background:rgba(127,224,184,.6);}
+  .lsDot.done{background:#158a55;}
   .myClassExport{
     margin-inline-start:auto; padding:9px 18px; border-radius:10px; cursor:pointer;
     background:transparent; border:2px solid var(--gold-deep); color:var(--gold-deep);
