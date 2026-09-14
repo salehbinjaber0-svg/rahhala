@@ -148,10 +148,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .lessonTable td{padding:10px 12px; border-bottom:1px solid #eee; text-align:center;}
   .lessonTable tr:last-child td{border-bottom:none;}
   .lessonTable tr:nth-child(even) td{background:var(--cream);}
-  .soonNote{
-    padding:22px; text-align:center; color:#8a8a8a;
-    background:var(--cream); border:1px dashed #dcd4c0; border-radius:12px;
-  }
+
   .navDropMenu a{
     display:block; padding:10px 14px; border-radius:8px; color:var(--navy); font-size:.88rem;
     border-bottom:none; opacity:1; text-align:right;
@@ -174,8 +171,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     margin-inline-start:14px; border-inline-start:2px solid #ece5d4;
   }
   .curriculumMenu a.cmLesson:hover{background:#faf6ec; color:var(--navy); border-inline-start-color:var(--gold);}
-  /* أدوات المنهج داخل نفس القائمة — مفصولة بصرياً عن الوحدات */
-  .cmTools{margin-top:6px; padding-top:8px; border-top:2px solid var(--gold);}
+
   .curriculumMenu a.cmToolLink{
     display:block; padding:9px 12px; border-radius:8px; font-weight:700;
     color:var(--gold-deep); font-size:.85rem; background:#fdf6e8;
@@ -402,70 +398,14 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     grid-column:1/-1; text-align:center; padding:34px; color:#8a8a8a;
     background:#fff; border:1px dashed #dcd4c0; border-radius:14px;
   }
-  .lqHint{color:#8a8a8a; font-size:.86rem; margin-bottom:14px;}
-  .lqAddBox{
-    display:flex; flex-direction:column; gap:9px; padding:16px;
-    background:#fff; border:1px solid #e8e0cd; border-radius:14px; margin-bottom:16px;
-  }
-  .lqAddBox input{
-    padding:11px 13px; border-radius:9px; border:1.5px solid #dcd4c0;
-    font-family:'Tajawal'; font-size:.92rem;
-  }
-  .lqAddBox input:focus{outline:none; border-color:var(--gold); box-shadow:0 0 0 3px #f7ecd2;}
+
   .lqAddRow{display:flex; gap:9px; flex-wrap:wrap; align-items:center;}
-  .lqBtn{
-    padding:11px 20px; border-radius:10px; cursor:pointer; font-family:'Tajawal';
-    font-weight:700; font-size:.88rem; border:none; background:var(--grad-gold); color:var(--navy-deep);
-  }
-  .lqBtn:active{transform:scale(.96);}
+
   .lqBtn.ghost{background:transparent; border:2px solid var(--navy); color:var(--navy);}
   .lqBtn.run{background:var(--grad-navy); color:var(--gold-light); font-size:1rem; padding:13px 30px;}
-  .lqBtn:disabled{opacity:.4; cursor:not-allowed;}
-  .lqSelect{
-    padding:11px 13px; border-radius:9px; border:1.5px solid #dcd4c0;
-    font-family:'Tajawal'; font-size:.88rem; background:#fff; flex:1; min-width:200px;
-  }
-  .lqList{display:flex; flex-direction:column; gap:9px;}
-  .lqItem{
-    display:flex; align-items:flex-start; gap:11px; padding:13px 15px;
-    background:#fff; border:1px solid #e8e0cd; border-radius:12px;
-    border-inline-start:4px solid var(--gold);
-  }
-  .lqItem.fromBank{border-inline-start-color:var(--teal);}
-  .lqNum{
-    min-width:30px; height:30px; border-radius:50%; background:var(--cream);
-    color:var(--navy); font-weight:700; font-size:.85rem;
-    display:flex; align-items:center; justify-content:center; flex-shrink:0;
-  }
-  .lqBody{flex:1;}
-  .lqQ{font-weight:700; color:var(--navy); font-size:.95rem; line-height:1.7;}
-  .lqA{color:var(--teal); font-size:.86rem; margin-top:4px;}
-  .lqTag{
-    display:inline-block; font-size:.7rem; padding:2px 8px; border-radius:10px;
-    background:var(--cream); color:#8a8a8a; margin-inline-start:6px;
-  }
-  .lqOps{display:flex; gap:5px; flex-shrink:0;}
-  .lqOps button{
-    width:32px; height:32px; border-radius:8px; border:1px solid #e0d8c4;
-    background:#fff; cursor:pointer; font-size:.9rem; line-height:1; padding:0;
-  }
-  .lqOps button:active{transform:scale(.9);}
-  .lqOps button:disabled{opacity:.25; cursor:not-allowed;}
-  .lqOps .lqDel:hover{background:#fbe9e9; border-color:var(--maroon);}
-  /* أنواع الفقرات */
-  .lqKinds{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:4px;}
-  .lqKindBtn{
-    padding:9px 15px; border-radius:22px; border:2px solid #dcd4c0; background:#fff;
-    color:#6a6458; font-weight:700; font-size:.84rem; cursor:pointer; font-family:'Tajawal';
-  }
+
   .lqKindBtn.on{background:var(--grad-navy); color:var(--gold-light); border-color:var(--navy);}
-  .lqChoiceRow{display:flex; gap:8px; align-items:center;}
-  .lqChoiceRow input[type=text]{flex:1;}
-  .lqCorrect{
-    display:flex; align-items:center; gap:5px; font-size:.8rem; color:#6a6458;
-    white-space:nowrap; cursor:pointer; font-weight:700;
-  }
-  .lqCorrect input{width:18px; height:18px; accent-color:var(--teal); cursor:pointer;}
+
   .lqItem.kind-mcq{border-inline-start-color:#2a6b8a;}
   .lqItem.kind-game{border-inline-start-color:#7a4fa3;}
   .lqItem.kind-reward{border-inline-start-color:var(--gold-deep);}
@@ -4444,75 +4384,6 @@ function switchMyClass(cls, btn){
   refreshClassChallenge();
 }
 
-// ═══════════════════════════════════════════════════════════
-//  دفعة أسئلة يكتبها المساعد ويرفعها للمستودع مباشرة.
-//  تُستورد لقاعدة البيانات تلقائياً أول ما يفتح المعلم «حصة اليوم».
-//  الاستيراد يتم مرة واحدة لكل دفعة (بمفتاح batch)، وبعدها تصير
-//  أسئلة عادية يعدّلها المعلم أو يحذفها كيف ما شاء.
-// ═══════════════════════════════════════════════════════════
-const AI_LESSON_BATCH = {
-  batch: 'aqalim-1-game-2026-09-13',
-  title: 'الأقاليم المناخية — تحدٍّ وتشويق',
-  items: [
-    {kind:'break', q:'⚡ تحدي الأقاليم',
-     a:'نقسم الصف فريقين. كل إجابة صحيحة = نقطة للفريق. الفريق الفائز له مكافأة آخر الحصة. استعدوا!'},
-
-    {kind:'mcq', q:'ما تعريف الإقليم المناخي؟',
-     choices:['دولة لها حدود سياسية واضحة','منطقة واسعة تتشابه في خصائصها المناخية وتتميز عن الأقاليم المجاورة','خط وهمي يقسّم الأرض إلى نصفين'],
-     correct_index:1, a:'الخصائص المقصودة: الحرارة والأمطار والرياح والرطوبة.'},
-
-    {kind:'mcq', q:'تقع دولة قطر ضمن أي إقليم مناخي؟',
-     choices:['إقليم البحر المتوسط','الإقليم الصحراوي','الإقليم المداري'],
-     correct_index:1, a:'بين دائرتي عرض 18° و30° — صيف حار جاف طويل، وشتاء بارد نسبياً قليل الأمطار.'},
-
-    {kind:'game', q:'🎮 لعبة: خمّن الإقليم',
-     a:'أصف إقليماً بثلاث إشارات والفريق يخمّن. مثال: «حيوانات ضخمة… حشائش طويلة… صيف ممطر طويل» — الجواب: المداري. من يخمّن من أول إشارة له نقطتان.'},
-
-    {kind:'mcq', q:'أي الأقاليم يتميز بارتفاع درجة الحرارة وغزارة الأمطار طوال العام؟',
-     choices:['الإقليم الاستوائي','الإقليم اللورانسي','الإقليم القطبي البارد'],
-     correct_index:0, a:'يمتد بين دائرتي عرض 0° و8°.'},
-
-    {kind:'mcq', q:'إقليم البحر المتوسط والإقليم الصيني كلاهما بين 30° و40° — فما الفرق بينهما؟',
-     choices:['المتوسط أبرد والصيني أدفأ','المتوسط غرب القارات وصيفه جاف، والصيني شرقها وأمطاره طوال العام','المتوسط لا تسقط فيه أمطار إطلاقاً'],
-     correct_index:1, a:'الموقع من القارة هو الفارق: غرب القارات مقابل شرقها، وتوزيع الأمطار تبع له. هذا أكثر ما يلتبس على الطلاب.'},
-
-    {kind:'mcq', q:'في أي إقليم تنمو حشائش السافانا وتعيش الأسود والفيلة والحُمُر الوحشية؟',
-     choices:['الإقليم المداري','الإقليم الصحراوي','إقليم غرب أوروبا'],
-     correct_index:0, a:'بين 8° و18° — صيف طويل حار ممطر، وشتاء قصير دافئ جاف.'},
-
-    {kind:'essay', q:'✍️ سؤال التميّز: لو انتقلت أسرة من قطر إلى إقليم غرب أوروبا — ما أكبر تغيّر سيواجهونه؟',
-     a:'انتقال من صيف حار جاف طويل إلى شتاء بارد وصيف معتدل مع أمطار تزداد صيفاً. أي تغيّر جذري بالملبس والسكن ونمط الحياة. (سؤال مفتوح — كافئ أي إجابة مبنية على خصائص الإقليمين.)'},
-
-    {kind:'reward', q:'🏆 الفريق الفائز',
-     a:'صفّقوا للفريق الفائز! ولهم اختيار: خمس نقاط مشاركة لكل فرد، أو بدء الحصة القادمة بلعبة يختارونها.'}
-  ]
-};
-
-// يستورد الدفعة مرة واحدة فقط — يتعرّف عليها بحقل source
-async function syncAiBatch(){
-  if(!isAdmin || !requireDb()) return false;
-  const B = (typeof AI_LESSON_BATCH !== 'undefined') ? AI_LESSON_BATCH : null;
-  if(!B || !B.items || !B.items.length) return false;
-  const tag = 'ai:' + B.batch;
-  // نبحث بكل الصفوف (حتى المحذوفة) حتى لا تعود دفعة حذفها المعلم عمداً
-  const { data: seen, error: e1 } = await sb.from('lesson_questions')
-    .select('id').eq('source', tag).limit(1);
-  if(e1) return false;
-  if(seen && seen.length) return false;   // استُوردت سابقاً
-  const { data: cur } = await sb.from('lesson_questions')
-    .select('pos').order('pos', {ascending:false}).limit(1);
-  let pos = (cur && cur.length ? (cur[0].pos || 0) + 1 : 0);
-  const rows = B.items.map((it, i)=>({
-    kind: it.kind || 'essay', q: it.q, a: it.a || null,
-    choices: it.choices || null,
-    correct_index: (typeof it.correct_index === 'number') ? it.correct_index : null,
-    source: tag, pos: pos + i
-  }));
-  const { error } = await sb.from('lesson_questions').insert(rows);
-  if(error) return false;
-  showToast(`📥 وصلت دفعة جديدة: ${B.title} (${rows.length} فقرة)`, 'info');
-  return true;
-}
 
 // ═══════════════════════════════════════════════════════════
 //  النسخة الاحتياطية — تنزيل كل البيانات بملف واحد
