@@ -452,9 +452,14 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     45%{transform:translateX(8px);} 70%{transform:translateX(-5px);}
   }
   .lsCh.dim{opacity:.45;}
+  /* رسالة الاستغراب: شريط عائم ثابت فوق أزرار التنقّل — كانت تُضاف
+     أسفل الخيارات فتُقطع خلف النقاط والأزرار */
   .lsOops{
-    font-family:'Aref Ruqaa'; font-size:clamp(1.2rem,2.6vw,2rem); color:#a32b2b;
-    animation:cheerPop .45s ease-out; margin-top:10px;
+    position:fixed; inset-inline:0; bottom:104px; z-index:6;
+    font-family:'Aref Ruqaa'; font-size:clamp(1.05rem,2.1vw,1.6rem);
+    color:#7d1f1f; background:#fadddd; border-top:2px solid #a32b2b;
+    border-bottom:2px solid #a32b2b; padding:10px 20px; text-align:center;
+    animation:cheerPop .45s ease-out;
   }
   .lsCheer{
     font-family:'Aref Ruqaa'; font-size:clamp(1.15rem,2.4vw,1.8rem); color:var(--gold-deep);
@@ -507,7 +512,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .lsStage{
     flex:1; min-height:0; overflow-y:auto;
     display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
-    gap:16px; padding:18px 28px 12px; text-align:center;
+    gap:14px; padding:16px 28px 18px; text-align:center;
   }
   /* السؤال يبقى مرئياً أعلى المسرح مهما طال ما تحته */
   .lsQ{position:sticky; top:0; background:#fffdf8; padding:6px 0 10px; z-index:3; width:100%;}
