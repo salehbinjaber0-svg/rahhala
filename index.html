@@ -2526,8 +2526,8 @@ function buildCurriculumMenu(){
   const box = document.getElementById('curriculumDropMenu');
   if(!box) return;
   let html = `<div class="gradeTabs">
-      <button class="gradeTab ${GRADE===7?'on':''}" type="button" onclick="switchGrade(7)">سابع</button>
-      <button class="gradeTab ${GRADE===8?'on':''}" type="button" onclick="switchGrade(8)">ثامن</button>
+      <button class="gradeTab ${GRADE===7?'on':''}" type="button" onclick="switchGrade(7, event)">سابع</button>
+      <button class="gradeTab ${GRADE===8?'on':''}" type="button" onclick="switchGrade(8, event)">ثامن</button>
     </div>`;
   Object.keys(UNITS).forEach(n=>{
     const u = UNITS[n];
@@ -2547,8 +2547,16 @@ function updateGradeLabels(){
     el.textContent = `منهج الصف ${gradeName()}`;
   });
 }
-function switchGrade(g){
+function switchGrade(g, ev){
+  if(ev && ev.stopPropagation) ev.stopPropagation();
+  // القائمة تُعاد بناؤها فيُحذف الزر المضغوط، فيحسبه مستمع النقر العام
+  // نقرةً خارج القائمة ويغلقها. نُبقيها مفتوحة ليواصل المعلم التصفح.
+  const drop = document.getElementById('curriculumDropMenu')?.closest('.navDrop');
   applyGrade(g, true);
+  if(drop){
+    drop.classList.add('open');
+    setTimeout(()=>drop.classList.add('open'), 0);  // بعد انتهاء دورة الحدث
+  }
   showToast(`📚 صرت على منهج الصف ${gradeName()}`, 'info');
 }
 
