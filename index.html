@@ -352,6 +352,9 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   #lessonPanel{display:none;}
   #lessonPanel.show{display:block;}
   /* البطاقات بعرض ثابت معقول: لا تتمدد عبر الشاشة لو كان النشاط واحداً */
+  /* عنوان حصة اليوم: خط Aref Ruqaa يحتاج سطراً أعلى وإلا قُصّت أطراف الحروف */
+  #lessonToday h2{line-height:1.7; padding-top:6px; margin-bottom:6px;}
+  #lessonToday .lead{margin-bottom:10px;}
   .actGrid{
     display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,300px));
     gap:18px; justify-content:start; margin-top:26px;
