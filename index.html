@@ -1479,6 +1479,20 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   /* ===== مقاس معتدل للابتوب والكمبيوتر =====
      الجدول كان يتمدد بعرض الشاشة كاملاً على الشاشات الكبيرة، فتتباعد
      الأعمدة ويصعب ربط اسم الطالب بصفّه. نحدّه بعرض مريح للقراءة. */
+  /* ===== توفير مساحة الشاشة بقسم صفوفي =====
+     العنوان والوصف والفلاتر والملخص كانت تستهلك نصف الشاشة قبل أول
+     طالب، فلا يظهر إلا خمسة. نضغط كل ما ليس جدولاً، ونثبّت رأس الجدول
+     تحت شريط الصفوف فيبقى واضحاً مهما نزل المعلم. */
+  #classchallenge{padding:26px 0 50px;}
+  #classchallenge h2{margin-bottom:4px;}
+  #classchallenge .lead{margin-bottom:0; font-size:.92rem; max-width:none;}
+  .myClassBar{padding:10px 0 9px !important;}
+  .mcFilters{margin:10px 0 !important;}
+  #myClassSummary{padding:9px 14px !important; margin:0 0 10px !important; font-size:.88rem;}
+  #classchallenge .mcManage{margin:0 0 10px;}
+  /* رأس الجدول يثبت تحت شريط الصفوف */
+  .myClassTable thead th{position:sticky; top:62px; z-index:20;}
+
   @media(min-width:1100px){
     #classchallenge .wrap{max-width:1240px;}
     .myClassTable{font-size:.95rem;}
