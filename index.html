@@ -5516,6 +5516,9 @@ function renderPendingPill(r){
 
 async function loadPendingStudents(){
   if(!isAdmin || !requireDb()) return;
+  // دخول الطالب معطّل ⇒ لا تسجيلات جديدة ممكنة. الاستعلام كان يتكرر
+  // كل ثانيتين بلا فائدة (نحو 1800 استعلام بالساعة).
+  if(!STUDENT_LOGIN_ENABLED) return;
   const { data, error } = await sb.from('students').select('*').eq('status','pending').order('name');
   const topBar = document.getElementById('topPendingBar');
   const topList = document.getElementById('topPendingList');
