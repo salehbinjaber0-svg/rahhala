@@ -369,6 +369,24 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   /* عنوان حصة اليوم: خط Aref Ruqaa يحتاج سطراً أعلى وإلا قُصّت أطراف الحروف */
   #lessonToday h2{line-height:1.7; padding-top:6px; margin-bottom:6px;}
   #lessonToday .lead{margin-bottom:10px;}
+  .statsBox{
+    background:#fff; border:1px solid #e8e0cd; border-radius:14px;
+    padding:14px 18px; margin-top:20px;
+  }
+  .statsSummary{
+    cursor:pointer; list-style:none; font-weight:700; color:var(--navy); font-size:.98rem;
+  }
+  .statsSummary::-webkit-details-marker{display:none;}
+  .statsTable{width:100%; border-collapse:collapse; margin-top:14px; font-size:.88rem;}
+  .statsTable th{background:var(--cream); padding:9px 10px; text-align:start; color:var(--navy); font-weight:700;}
+  .statsTable td{padding:9px 10px; border-bottom:1px solid #f2ede0;}
+  .statsBar{height:9px; border-radius:5px; background:#eee; overflow:hidden; min-width:70px;}
+  .statsBar i{display:block; height:100%; border-radius:5px;}
+  .statsHard{color:var(--maroon); font-weight:700;}
+  .statsGood{color:var(--teal); font-weight:700;}
+  .statsEmpty{color:#8a8a8a; padding:16px 0; text-align:center;}
+  .statsHint{color:#8a8a8a; font-size:.85rem; margin:10px 0 0;}
+
   .actCols{display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:26px;}
   .actCol{min-width:0;}
   .actColHead{
@@ -1802,6 +1820,11 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   <div class="wrap">
     <h2>📝 حصة اليوم</h2>
     <p class="lead">أنشطة جاهزة للعرض على البروجكتر — اختر نشاطاً وابدأ.</p>
+    <details class="statsBox" id="statsBox">
+      <summary class="statsSummary">📊 أداء الصف بالأنشطة — أين يتعثّرون؟</summary>
+      <div id="statsBody"></div>
+    </details>
+
     <div class="actCols">
       <div class="actCol">
         <h3 class="actColHead">الصف السابع</h3>
@@ -4795,6 +4818,7 @@ function openLessonFromNav(){
   showSection('lessonToday');
   updateGradeLabels();
   renderActivities();
+  renderLessonStats();
 }
 
 function renderActivities(){
@@ -4817,17 +4841,112 @@ function renderActivities(){
   });
 }
 
+// ═══════════════════════════════════════════════════════════
+//  قياس الأثر — سجل استخدام حصة اليوم
+//  يُحفظ بمتصفح المعلم (localStorage) بلا حاجة لقاعدة البيانات.
+//  الهدف التربوي: الأسئلة التي يكثر الخطأ فيها تدل على ما يحتاج
+//  إعادة شرح — مؤشر أدق من انطباع المعلم.
+// ═══════════════════════════════════════════════════════════
+const LS_STATS_KEY = 'rahhala_lesson_stats';
+
+function lsStatsLoad(){
+  try{ return JSON.parse(localStorage.getItem(LS_STATS_KEY) || '{}'); }
+  catch(e){ return {}; }
+}
+function lsStatsSave(d){
+  try{ localStorage.setItem(LS_STATS_KEY, JSON.stringify(d)); }catch(e){}
+}
+// تسجيل عرض نشاط
+function lsStatRun(actId){
+  const d = lsStatsLoad();
+  d.runs = d.runs || {};
+  d.runs[actId] = (d.runs[actId] || 0) + 1;
+  d.lastRun = new Date().toISOString();
+  lsStatsSave(d);
+}
+// تسجيل محاولة على سؤال: صحيحة من أول مرة أم بعد خطأ
+function lsStatAnswer(actId, qIndex, firstTry){
+  const d = lsStatsLoad();
+  d.q = d.q || {};
+  const k = actId + '#' + qIndex;
+  const rec = d.q[k] || {right:0, wrong:0, firstRight:0};
+  if(firstTry === 'wrong') rec.wrong++;
+  else { rec.right++; if(firstTry === 'first') rec.firstRight++; }
+  d.q[k] = rec;
+  lsStatsSave(d);
+}
+// تقرير الأداء: يرتّب الأسئلة من الأصعب للأسهل حسب نسبة الإجابة
+// الصحيحة من أول محاولة — وهو المؤشر الذي يدل على ما يحتاج إعادة شرح.
+function renderLessonStats(){
+  const box = document.getElementById('statsBody');
+  if(!box) return;
+  const d = lsStatsLoad();
+  const q = d.q || {};
+  const keys = Object.keys(q);
+  if(!keys.length){
+    box.innerHTML = '<div class="statsEmpty">ما فيه بيانات بعد — شغّل نشاطاً مع صفك وسيظهر الأداء هنا.</div>';
+    return;
+  }
+  const rows = keys.map(k=>{
+    const [actId, idx] = k.split('#');
+    const act = ACTIVITIES.find(a => a.id === actId);
+    const item = act ? act.items[+idx] : null;
+    const r = q[k];
+    const total = r.right + r.wrong;
+    const pct = r.right ? Math.round((r.firstRight / r.right) * 100) : 0;
+    return {
+      title: act ? act.title : actId,
+      grade: act ? act.grade : '',
+      qText: item ? item.q : 'سؤال ' + (+idx + 1),
+      total, pct, wrong: r.wrong, right: r.right
+    };
+  }).sort((a,b)=> a.pct - b.pct);
+
+  const totalShown = rows.reduce((n,r)=>n + r.right, 0);
+  const avg = rows.length ? Math.round(rows.reduce((n,r)=>n + r.pct, 0) / rows.length) : 0;
+
+  box.innerHTML = `
+    <p class="statsHint">📈 <strong>${totalShown}</strong> إجابة صحيحة مسجّلة · متوسط الإجابة من أول محاولة <strong>${avg}%</strong></p>
+    <table class="statsTable">
+      <tr><th>السؤال</th><th>النشاط</th><th style="width:150px;">صح من أول محاولة</th><th>محاولات خاطئة</th></tr>
+      ${rows.map(r=>`
+        <tr>
+          <td>${esc(r.qText.length > 58 ? r.qText.slice(0,58) + '…' : r.qText)}</td>
+          <td>${esc(r.title)} <span style="color:#8a8a8a;">(${r.grade})</span></td>
+          <td>
+            <div class="statsBar"><i style="width:${r.pct}%; background:${r.pct < 50 ? 'var(--maroon)' : r.pct < 80 ? 'var(--gold-deep)' : 'var(--teal)'};"></i></div>
+            <span class="${r.pct < 50 ? 'statsHard' : r.pct >= 80 ? 'statsGood' : ''}">${r.pct}%</span>
+          </td>
+          <td>${r.wrong}</td>
+        </tr>`).join('')}
+    </table>
+    <p class="statsHint">الأسئلة بأعلى القائمة هي الأصعب على صفك — وهي المفاهيم التي تستحق إعادة الشرح.</p>
+    <button class="actGo" style="margin-top:12px; max-width:200px;" onclick="lsStatsReset()">🗑️ مسح السجل</button>`;
+}
+
+function lsStatsReset(){
+  if(!confirm('مسح سجل الاستخدام كاملاً؟ لا يؤثر على الأنشطة نفسها.')) return;
+  try{ localStorage.removeItem(LS_STATS_KEY); }catch(e){}
+  renderLessonStats();
+  showToast('🗑️ مُسح سجل الاستخدام', 'info');
+}
+
 function startActivity(id){
   if(!isAdmin) return;
   const act = ACTIVITIES.find(a => a.id === id);
   if(!act){ showToast('ما لقيت النشاط', 'error'); return; }
   lessonQs = act.items.map((it, i)=>({id:i+1, ...it, pos:i}));
+  lsCurrentAct = id;
+  lsWrongHere = new Set();
+  lsStatRun(id);
   openLessonShow();
 }
 
 // ── وضع العرض على البروجكتر ──
 let lsIndex = 0;
 let lsSeen = new Set();
+let lsCurrentAct = null;      // النشاط المعروض — لربط الإحصاء به
+let lsWrongHere = new Set();  // الفقرات التي أخطأ فيها الصف بهذا العرض
 
 // عبارات تشجيع تُختار عشوائياً — تظهر مع كشف الإجابة الصحيحة
 const LS_CHEERS = [
@@ -4880,6 +4999,7 @@ function lsPick(i){
     if(q.a) wrap.insertAdjacentHTML('beforeend', `<div class="lsA">${esc(q.a)}</div>`);
     lsConfetti(16);
     lsStopTimer();
+    if(lsCurrentAct) lsStatAnswer(lsCurrentAct, lsIndex, lsWrongHere.has(lsIndex) ? 'after' : 'first');
     lsSeen.add(lsIndex);
     renderLessonShowDots();
     lsStartAuto();
@@ -4887,6 +5007,10 @@ function lsPick(i){
     if(rv) rv.style.display = 'none';
   } else {
     cell.classList.add('wrong');
+    if(lsCurrentAct && !lsWrongHere.has(lsIndex)){
+      lsWrongHere.add(lsIndex);
+      lsStatAnswer(lsCurrentAct, lsIndex, 'wrong');
+    }
     wrap.insertAdjacentHTML('beforeend', `<div class="lsOops">${lsOopsText()}</div>`);
     setTimeout(()=>{
       const o = wrap.querySelector('.lsOops');
