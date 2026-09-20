@@ -590,6 +590,12 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .myClassTable tbody tr:nth-child(even){background:#fdfbf6;}
   .myClassTable tbody tr:hover{background:var(--cream);}
   .mcIdx{color:#a8a08e; font-size:.8rem; width:38px;}
+  .mcNameInput{
+    width:100%; padding:8px 11px; border-radius:8px; border:2px solid var(--gold);
+    font-family:'Tajawal'; font-size:.95rem; font-weight:700; color:var(--navy);
+    background:#fffdf5;
+  }
+  .mcNameInput:focus{outline:none; box-shadow:0 0 0 3px #f7ecd2;}
   .mcName{font-weight:700; color:var(--navy); text-align:right !important; min-width:130px;}
   .mcBadge{display:inline-block; padding:4px 11px; border-radius:16px; font-size:.8rem; font-weight:700;}
   .mcBadge.points{background:#eaf0f4; color:#2a6b8a;}
@@ -5286,7 +5292,8 @@ function renderMyClassTable(){
     return `
       <tr>
         <td class="mcIdx">${i + 1}</td>
-        <td class="mcName">${esc(r.student_name)}</td>
+        <td class="mcName" title="انقر مرتين لتعديل الاسم"
+            ondblclick="mcEditName(${r.id}, this)">${esc(r.student_name)}</td>
         <td class="mcCountCell"><div class="mcCountBox">
           <button class="mcAdd minus" onclick="mcSubPoint(${r.id})" title="تراجع عن نقطة" ${(r.participation_points || 0) === 0 ? 'disabled' : ''}>−</button>
           <span class="mcBadge points">⭐ ${r.participation_points || 0}</span>
@@ -5556,6 +5563,42 @@ async function mcSaveNote(noteId, rosterId){
 }
 
 // كتابة ملاحظة مباشرة من الجدول — بلا نافذة منبثقة
+// تعديل اسم الطالب بالنقر المزدوج عليه — الحقل يحل محل الخلية
+function mcEditName(id, cell){
+  if(!isAdmin){ showToast('هذي الأداة للمعلم فقط','error'); return; }
+  if(cell.querySelector('input')) return;           // جارٍ التعديل
+  const row = myClassData.find(r => r.id === id);
+  if(!row) return;
+  const old = row.student_name || '';
+  cell.innerHTML = `<input class="mcNameInput" id="mcNameEdit-${id}" value="${esc(old)}"
+      autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-form-type="other"
+      onkeydown="if(event.key==='Enter') mcSaveName(${id}); if(event.key==='Escape') renderMyClassTable();"
+      onblur="mcSaveName(${id})">`;
+  const inp = cell.querySelector('input');
+  inp.focus();
+  inp.select();
+}
+
+let mcNameSaving = false;
+async function mcSaveName(id){
+  if(mcNameSaving) return;                          // onblur و Enter قد يتزامنان
+  const inp = document.getElementById('mcNameEdit-' + id);
+  if(!inp) return;
+  const row = myClassData.find(r => r.id === id);
+  const name = inp.value.trim();
+  if(!row){ renderMyClassTable(); return; }
+  if(!name || name === row.student_name){ renderMyClassTable(); return; }
+  if(!isAdmin || !requireDb()){ renderMyClassTable(); return; }
+  mcNameSaving = true;
+  const { error } = await sb.from('class_roster').update({student_name: name}).eq('id', id);
+  mcNameSaving = false;
+  if(error){ showToast('تعذر حفظ الاسم: ' + error.message, 'error'); renderMyClassTable(); return; }
+  row.student_name = name;
+  rosterNameCache[id] = name;
+  renderMyClassTable();
+  showToast('✏️ عُدّل الاسم', 'info');
+}
+
 async function mcQuickNote(id, kind){
   if(!isAdmin || !requireDb()) return;
   const input = document.getElementById('mcNote-' + id);
