@@ -244,13 +244,21 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .fmStat.green{background:rgba(47,150,110,.22); color:#7fe0b8;}
   .fmStat.amber{background:rgba(201,161,94,.22); color:var(--gold-light);}
   .fmStat.red{background:rgba(160,60,60,.25); color:#f2a8a8;}
-  .fmList{max-width:760px; margin:0 auto; padding:18px 14px 40px; display:flex; flex-direction:column; gap:9px;}
+  /* عمودان على الشاشات الواسعة: الصف الواحد كان يمتد بعرض كامل ومحتواه
+     لا يشغل ثلثه، فيطول التمرير بلا داعٍ. عمود واحد على الجوال. */
+  .fmList{
+    max-width:1280px; margin:0 auto; padding:16px 18px 40px;
+    display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; align-items:stretch;
+  }
+  @media(max-width:900px){
+    .fmList{grid-template-columns:1fr; max-width:760px;}
+  }
   .fmRow{
     display:flex; align-items:center; gap:12px;
     background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
     border-radius:14px; padding:11px 14px;
   }
-  .fmName{flex:1; font-size:1.05rem; font-weight:700; color:#fff;}
+  .fmName{flex:1; min-width:0; font-size:1.05rem; font-weight:700; color:#fff; line-height:1.45;}
   .fmStars{font-size:.9rem; letter-spacing:1px; color:var(--gold-light); min-width:60px; text-align:center;}
   .fmPts{display:flex; gap:6px; align-items:center;}
   .fmPlus{
