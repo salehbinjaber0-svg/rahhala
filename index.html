@@ -643,10 +643,9 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .myClassTable th:nth-child(2), .myClassTable td:nth-child(2){width:185px;}
   .myClassTable th:nth-child(3), .myClassTable td:nth-child(3){width:140px;}
   .myClassTable th:nth-child(4), .myClassTable td:nth-child(4){width:140px;}
-  .myClassTable th:nth-child(5), .myClassTable td:nth-child(5){width:140px;}
   /* عمود الملاحظات يأخذ كل المساحة المتبقية — أكثر عمود استخداماً */
-  .myClassTable th:nth-child(6), .myClassTable td:nth-child(6){width:auto;}
-  .myClassTable th:nth-child(7), .myClassTable td:nth-child(7){width:52px;}
+  .myClassTable th:nth-child(5), .myClassTable td:nth-child(5){width:auto;}
+  .myClassTable th:nth-child(6), .myClassTable td:nth-child(6){width:52px;}
   .mcAdd.minus{color:var(--maroon); border-color:#e8cccc;}
   .mcAdd.minus:hover{background:#fbe9e9; border-color:var(--maroon);}
   .mcNoteCell{text-align:right !important; min-width:320px;}
@@ -1509,7 +1508,6 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     .myClassTable th:nth-child(2), .myClassTable td:nth-child(2){width:230px;}
     .myClassTable th:nth-child(3), .myClassTable td:nth-child(3){width:155px;}
     .myClassTable th:nth-child(4), .myClassTable td:nth-child(4){width:155px;}
-    .myClassTable th:nth-child(5), .myClassTable td:nth-child(5){width:155px;}
     .mcNoteInput{font-size:.92rem; padding:11px 14px;}
     .mcNotesSummary{font-size:.9rem;}
     .myClassBtn{padding:11px 26px; font-size:.95rem;}
@@ -1529,8 +1527,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     .myClassTable th:nth-child(2), .myClassTable td:nth-child(2){width:118px;}
     .myClassTable th:nth-child(3), .myClassTable td:nth-child(3){width:108px;}
     .myClassTable th:nth-child(4), .myClassTable td:nth-child(4){width:108px;}
-    .myClassTable th:nth-child(5), .myClassTable td:nth-child(5){width:108px;}
-    .myClassTable th:nth-child(7), .myClassTable td:nth-child(7){width:40px;}
+    .myClassTable th:nth-child(6), .myClassTable td:nth-child(6){width:40px;}
     .mcName{min-width:0; font-size:.84rem;}
     .mcNoteCell{min-width:250px;}
     .mcCountBox{gap:2px;}
@@ -5317,10 +5314,6 @@ function renderMyClassTable(){
           <button class="mcAdd" onclick="mcAddPoint(${r.id})" title="أضف نقطة مشاركة">+</button>
         </div></td>
         <td class="mcCountCell"><div class="mcCountBox">
-          <span class="mcBadge praise">🌟 ${praises.length}</span>
-          <button class="mcAdd" onclick="mcOpenNote(${r.id}, 'praise')" title="أضف تكريماً">+</button>
-        </div></td>
-        <td class="mcCountCell"><div class="mcCountBox">
           <button class="mcAdd minus" onclick="mcSubWarn(${r.id})" title="تراجع عن آخر تنبيه" ${warns.length === 0 ? 'disabled' : ''}>−</button>
           <span class="mcBadge ${warns.length ? 'warn' : 'ok'}" title="${warns.length ? 'عدد التنبيهات' : 'لا تنبيهات'}">❌ ${warns.length}</span>
           <button class="mcAdd" onclick="mcOpenNote(${r.id}, 'warning')" title="أضف تنبيهاً">+</button>
@@ -5333,7 +5326,7 @@ function renderMyClassTable(){
   document.getElementById('myClassTableWrap').innerHTML = `
     <table class="myClassTable">
       <thead>
-        <tr><th>#</th><th>اسم الطالب</th><th>المشاركة</th><th>التكريم</th><th>التنبيه</th><th>آخر ملاحظة</th><th></th></tr>
+        <tr><th>#</th><th>اسم الطالب</th><th>المشاركة</th><th>التنبيه</th><th>آخر ملاحظة</th><th></th></tr>
       </thead>
       <tbody>${rows}</tbody>
     </table>`;
