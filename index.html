@@ -7409,6 +7409,21 @@ function matchKnowledge(query){
   const scored = KB_ACTIVE.map(entry => ({ entry, ...scoreEntry(entry, qTokens) }));
   const fullMatches = confidentMatches(qTokens, scored);
 
+  // المفهوم المخصَّص أولى من مفهوم عام يذكره عرضاً: «دور المؤسسات التربوية في الأمن
+  // الاجتماعي» ← مدخل المؤسسات التربوية نفسه، لا قائمة المؤسسات الست التي تفسّر كلمات
+  // أكثر. المخصَّص = يفسّر كلمة هي مفتاح له وحده (لا يشاركه فيها مفهوم آخر) وليست
+  // بمفاتيح المفهوم الأول
+  if(fullMatches.length > 1){
+    if(!UNIT_LEX) buildUnitLex();
+    const firstKeys = fullMatches[0].entry.k.flatMap(kw => kwTokens(kw));
+    const onlyKeyOf = t => { let n = 0; for(const [k, ents] of KEY_ENTRIES){ if(k === t || sameStem(k, t)) n += ents.size; } return n === 1; };
+    const specIdx = fullMatches.findIndex((m, idx) => idx > 0 && [...m.explained].some(i => {
+      const t = qTokens[i];
+      return !firstKeys.some(k => k === t || sameStem(k, t)) && onlyKeyOf(t);
+    }));
+    if(specIdx > 0) fullMatches.unshift(fullMatches.splice(specIdx, 1)[0]);
+  }
+
   if(fullMatches.length > 0){
     // سؤال مركّب («الفرق بين الإقليم الاستوائي والصحراوي»): نضيف مفهوماً ثانياً
     // فقط لو فسّر كلمة من السؤال لم يفسّرها الأول — لا تكرار لنفس الجانب
