@@ -121,6 +121,22 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     box-shadow:0 10px 30px rgba(0,0,0,.25); padding:8px; min-width:220px; z-index:120;
   }
   .navDrop.open .navDropMenu{display:block;}
+  .cmSearchWrap{padding:10px 12px 4px;}
+  .cmSearch{
+    width:100%; padding:9px 13px; border-radius:9px; border:1.5px solid #dcd4c0;
+    font-family:'Tajawal'; font-size:.88rem; background:#fff;
+  }
+  .cmSearch:focus{outline:none; border-color:var(--gold); box-shadow:0 0 0 3px #f7ecd2;}
+  .cmHit{
+    display:block; padding:9px 14px; border-inline-start:3px solid var(--gold);
+    background:var(--cream); margin:5px 10px; border-radius:8px;
+    color:var(--navy); text-decoration:none; font-size:.85rem; line-height:1.6;
+  }
+  .cmHit:hover{background:var(--gold-light);}
+  .cmHit b{color:var(--gold-deep);}
+  .cmHit .cmHitWhere{display:block; color:#8a8a8a; font-size:.78rem; margin-top:2px;}
+  .cmNoHit{padding:12px 16px; color:#8a8a8a; font-size:.85rem;}
+
   .gradeTabs{
     display:flex; gap:6px; padding:10px 12px; border-bottom:1px solid #eee;
     background:var(--cream); position:sticky; top:0; z-index:2;
@@ -2583,7 +2599,13 @@ function buildCurriculumMenu(){
   let html = `<div class="gradeTabs">
       <button class="gradeTab ${GRADE===7?'on':''}" type="button" onclick="switchGrade(7, event)">سابع</button>
       <button class="gradeTab ${GRADE===8?'on':''}" type="button" onclick="switchGrade(8, event)">ثامن</button>
-    </div>`;
+    </div>
+    <div class="cmSearchWrap">
+      <input class="cmSearch" id="cmSearch" placeholder="🔍 ابحث عن مفهوم داخل المنهج…"
+        autocomplete="off" data-lpignore="true" data-1p-ignore="true" data-form-type="other"
+        oninput="cmSearchRun(this.value)" onclick="cmSearchFocus(event)">
+    </div>
+    <div id="cmResults"></div>`;
   Object.keys(UNITS).forEach(n=>{
     const u = UNITS[n];
     html += `<div class="cmUnit">
@@ -2594,6 +2616,46 @@ function buildCurriculumMenu(){
     html += `</div>`;
   });
   box.innerHTML = html;
+}
+
+// بحث داخل نص دروس الصف النشط: يقفز مباشرة للدرس الذي يحوي المفهوم،
+// بدل تصفّح الوحدات الست درساً درساً.
+function cmSearchFocus(ev){ if(ev && ev.stopPropagation) ev.stopPropagation(); }
+function cmSearchRun(q){
+  const box = document.getElementById('cmResults');
+  const units = document.querySelectorAll('#curriculumDropMenu .cmUnit');
+  if(!box) return;
+  const term = (q || '').trim();
+  if(term.length < 2){
+    box.innerHTML = '';
+    units.forEach(u => u.style.display = '');
+    return;
+  }
+  units.forEach(u => u.style.display = 'none');
+  const norm = t => t.replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/[ًٌٍَُِّْ]/g,'');
+  const nq = norm(term);
+  const hits = [];
+  Object.keys(UNITS).forEach(n=>{
+    const u = UNITS[n];
+    u.lessons.forEach((ls, li)=>{
+      const plain = norm((ls.html || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' '));
+      const at = plain.indexOf(nq);
+      if(at < 0) return;
+      const from = Math.max(0, at - 40);
+      let snip = plain.slice(from, at + nq.length + 60).trim();
+      if(from > 0) snip = '…' + snip;
+      hits.push({n, li, title: ls.title, unit: u.title, snip});
+    });
+  });
+  if(!hits.length){
+    box.innerHTML = `<div class="cmNoHit">ما لقيت «${esc(term)}» بمنهج الصف ${gradeName()}.</div>`;
+    return;
+  }
+  box.innerHTML = hits.slice(0, 8).map(h=>{
+    const safe = esc(h.snip).replace(new RegExp(esc(term), 'g'), m => '<b>' + m + '</b>');
+    return `<a class="cmHit" href="#" onclick="openLesson(${h.n},${h.li}); return false;">
+      ${safe}<span class="cmHitWhere">📘 ${esc(h.unit)} · ${esc(h.title)}</span></a>`;
+  }).join('') + (hits.length > 8 ? `<div class="cmNoHit">و${hits.length - 8} نتيجة أخرى — ضيّق البحث.</div>` : '');
 }
 
 // يعرض الصف النشط بوضوح داخل الأقسام فلا يلتبس السياق
