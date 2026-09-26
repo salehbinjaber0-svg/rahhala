@@ -1071,6 +1071,83 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     .heroIntroArt svg{max-width:270px;}
   }
 
+  /* ===== لوحة الواجهة المتغيّرة: خريطة أو لوحة من المنهج مع كل زيارة =====
+     (بعد قواعد .heroIntroArt العامة عمداً — القواعد الأخص تأتي بعدها) */
+  .heroPlate{
+    position:relative; margin:0 auto; max-width:500px; text-align:start;
+    background:linear-gradient(160deg, rgba(22,66,86,.55), rgba(10,32,41,.72));
+    border:1px solid rgba(201,161,94,.32); border-radius:18px;
+    padding:14px 16px 12px; box-shadow:0 18px 40px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04);
+    animation:hpIn .7s ease both;
+  }
+  .heroPlate.hpGlobe{background:none; border:none; box-shadow:none; padding:0;}
+  @keyframes hpIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+  .hpHead{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:8px;}
+  .hpEyebrow{color:var(--gold); font-size:.68rem; font-weight:700; letter-spacing:.3px; white-space:nowrap;}
+  .hpTitle{font-family:'Aref Ruqaa'; color:var(--gold-light); font-size:1.18rem; line-height:1.4; margin:0;}
+  .hpNext{
+    background:rgba(201,161,94,.12); color:var(--gold-light); border:1px solid rgba(201,161,94,.35);
+    border-radius:50%; width:28px; height:28px; flex:0 0 28px; cursor:pointer; font-size:.9rem; line-height:1;
+    transition:transform .3s ease, background .2s ease;
+  }
+  .hpNext:hover{background:rgba(201,161,94,.24); transform:rotate(-90deg);}
+  .hpNext:focus-visible{outline:2px solid var(--gold-light); outline-offset:2px;}
+  .hpMap{position:relative; width:100%; border-radius:10px; overflow:hidden;}
+  .hpMap img{display:block; width:100%; height:auto;}
+  /* أسماء المواقع نص حقيقي فوق الصورة — حادة بأي مقاس، مواضعها محسوبة من خطوط الطول والعرض */
+  .hpLbl{
+    position:absolute; transform:translate(-50%,-50%); white-space:nowrap; pointer-events:none;
+    font-size:.62rem; font-weight:700; color:#fdfbf6; letter-spacing:.2px;
+    text-shadow:0 0 3px rgba(10,32,41,.95), 0 0 6px rgba(10,32,41,.8);
+  }
+  .hpLbl.dim{color:rgba(246,241,230,.7); font-weight:500;}
+  .hpLbl.sea{color:#e7f3f8; font-style:normal; font-weight:500; text-shadow:0 0 4px rgba(10,40,60,.9);}
+  .hpQatar{position:absolute; transform:translate(-50%,-50%); pointer-events:none;}
+  .hpQatar i{display:block; width:8px; height:8px; border-radius:50%; background:#7a3030; border:1.5px solid #fff;
+    box-shadow:0 0 0 3px rgba(122,48,48,.35); animation:hpPulse 2.2s ease-in-out infinite;}
+  .hpQatar b{position:absolute; top:-3px; left:13px;   /* يمين النقطة فعلياً (اتجاه فيزيائي — الصفحة RTL) */ font-size:.62rem; color:#fff; white-space:nowrap;
+    text-shadow:0 0 3px #0a2029, 0 0 6px #0a2029;}
+  @keyframes hpPulse{0%,100%{box-shadow:0 0 0 2px rgba(122,48,48,.45);} 50%{box-shadow:0 0 0 6px rgba(122,48,48,.0);}}
+  /* .heroPlate p.hpNote أخص من «.hero p» العامة (السطر اللاحق بالورقة) التي كانت تكبّر الخط وتضيّق العرض */
+  .heroPlate p.hpNote{color:rgba(246,241,230,.85); font-size:.78rem; line-height:1.85; margin:10px 0 8px; max-width:none;}
+  .hpLegend{display:flex; flex-wrap:wrap; gap:6px 12px; margin-bottom:8px;}
+  .hpLegend span{display:inline-flex; align-items:center; gap:5px; color:rgba(246,241,230,.8); font-size:.66rem;}
+  .hpLegend i{width:10px; height:10px; border-radius:3px; display:inline-block; flex:0 0 10px;}
+  .hpRamp{display:flex; align-items:center; gap:8px; color:rgba(246,241,230,.75); font-size:.66rem; margin-bottom:8px;}
+  .hpRamp i{flex:1; height:7px; border-radius:4px; max-width:170px;
+    background:linear-gradient(to left, rgba(31,111,92,.2), #1f8c6e, #c9a15e, #e3c98b, #fff6dc);}   /* يمين خافت (تخلخل) ← يسار ساطع (تركّز) */
+  .hpFoot{display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px 10px; border-top:1px solid rgba(201,161,94,.18); padding-top:7px;}
+  .hpUnit{color:var(--gold-light); font-size:.68rem; font-weight:700;}
+  .hpSrc{color:rgba(246,241,230,.5); font-size:.6rem;}
+  /* لوحات مصمّمة من الكتاب */
+  .hpLayers{display:flex; align-items:center; gap:12px;}
+  .hpLayers svg{flex:0 0 46%; max-width:none; width:46%; height:auto; margin:0;}
+  .hpLayers ol{list-style:none; margin:0; padding:0; flex:1;}
+  .hpLayers li{display:flex; gap:7px; align-items:flex-start; color:rgba(246,241,230,.88); font-size:.7rem; line-height:1.6; margin-bottom:5px;}
+  .hpLayers li i{width:10px; height:10px; border-radius:50%; flex:0 0 10px; margin-top:4px;}
+  .hpLayers li b{color:#fff;}
+  .hpTimeline{display:flex; height:30px; border-radius:8px; overflow:hidden; margin:6px 0 10px; direction:rtl;}
+  .hpTimeline span{display:flex; align-items:center; justify-content:center; color:#fff; font-size:.62rem; font-weight:700; min-width:6px;}
+  .hpTlList{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:4px 12px;}
+  .hpTlList li{display:flex; gap:6px; align-items:center; color:rgba(246,241,230,.85); font-size:.7rem;}
+  .hpTlList li i{width:10px; height:10px; border-radius:3px; flex:0 0 10px;}
+  .hpTlList li small{color:rgba(246,241,230,.55); font-size:.64rem;}
+  @media(max-width:860px){
+    .heroPlate{max-width:440px;}
+  }
+  @media(max-width:520px){
+    .heroPlate{padding:12px 12px 10px;}
+    .hpTitle{font-size:1.02rem;}
+    .hpLbl{font-size:.52rem;}
+    .hpLbl.minor{display:none;}   /* على الجوال: الأهم فقط حتى لا تزدحم الخريطة */
+    .hpLayers{flex-direction:column;}
+    .hpLayers svg{width:62%;}
+    .hpTlList{grid-template-columns:1fr;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .heroPlate, .hpQatar i{animation:none;}
+  }
+
   .hero{
     background:linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
     color:var(--cream);
@@ -1702,6 +1779,8 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
     <div class="heroIntroArt">
       <div class="heroQuoteBadge">« بالتعليم نبني أجيالاً أكثر وعياً »</div>
+      <!-- لوحة متغيّرة مع كل زيارة (renderHeroPlate) — الكرة الأرضية هنا محتواها الافتراضي لو تعطّل السكربت -->
+      <figure class="heroPlate hpGlobe" id="heroPlate">
       <svg viewBox="0 0 320 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="كرة أرضية وكتب المواد الدراسية">
         <defs>
           <linearGradient id="hgG" x1="0" y1="0" x2="1" y2="1">
@@ -1739,6 +1818,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
           <text x="91" y="17" font-size="10.5" fill="#e3c98b" text-anchor="middle" font-weight="bold">الدراسات الاجتماعية</text>
         </g>
       </svg>
+      </figure>
     </div>
   </div>
 </section>
@@ -7894,6 +7974,135 @@ function showCompare(i){
 // qrcode
 //---------------------------------------------------------------------
 // ---------- رمز QR (يستخدم المكتبة المضمّنة بالأسفل) ----------
+// ═══════════════════════════════════════════════════════════
+//  لوحة الواجهة المتغيّرة — لوحة مختلفة مع كل زيارة
+//  الخرائط مولَّدة من بيانات علمية مفتوحة (maps/README.md يوثّق المصادر
+//  وطريقة إعادة التوليد): Natural Earth · تصنيف كوبن-جايجر · GeoNames.
+//  مواضع الأسماء نِسَب مئوية محسوبة بإسقاط Equal Earth نفسه الذي رُسمت به الصورة.
+//  اللوحات المصمَّمة (طبقات الأرض، مراحل الدولة الإسلامية) أرقامها من نص الكتاب حرفياً.
+// ═══════════════════════════════════════════════════════════
+const HP_KOPPEN = 'البيانات: تصنيف كوبن-جايجر للمناخ (Kottek وآخرون، 2006)';
+const HERO_PLATES = [
+  { id:'globe' },   // اللوحة الأصلية: الكرة الأرضية وكتب المواد
+  { id:'pop', img:'maps/pop.webp', title:'أين يعيش سكان العالم؟',
+    alt:'خريطة العالم تُظهر تجمعات السكان: أكثفها في جنوب آسيا وشرقها وأوروبا',
+    labels:[['شرق آسيا',79.01,25.33],['جنوب آسيا',70.81,42.61],['أوروبا',53.17,16.27],
+            ['الصحراء الكبرى',52.13,37.73,'dim'],['سيبيريا',71.08,8.62,'dim minor'],['شرق أمريكا الشمالية',30.52,23.14,'minor']],
+    ramp:['تخلخل','تركّز'],
+    note:'كل بقعة مضيئة تجمّع سكاني: أكثفها في جنوب آسيا وشرقها وأوروبا، وأخلاها الصحاري والمناطق شديدة البرودة.',
+    unit:'📚 سابع: التوزيع الجغرافي للسكان · ثامن: مناطق التركز السكاني',
+    src:'البيانات: مدن وبلدات العالم بعدد سكانها — GeoNames (CC BY 4.0)' },
+  { id:'deserts', img:'maps/deserts.webp', title:'صحاري العالم',
+    alt:'خريطة صحاري العالم الحارة والباردة',
+    labels:[['الصحراء الكبرى',50.6,36.13],['الربع الخالي',63.36,41.6],['صحراء غوبي',74.83,21.01],['كالاهاري',55.55,73.97,'minor'],
+            ['الصحراء الأسترالية',83.58,75.56],['أتاكاما',31.57,74.76,'minor']],
+    qatar:true,
+    legend:[['#e39a45','صحراء حارة'],['#d9c48f','صحراء باردة'],['rgba(214,180,120,.55)','شبه جافة']],
+    note:'تمتد أوسع الصحاري الحارة حول دائرتي عرض 18° و30° تقريباً — ودولة قطر ضمن الإقليم الصحراوي.',
+    unit:'📚 سابع: الأقاليم المناخية — الإقليم الصحراوي',
+    src:HP_KOPPEN },
+  { id:'rain', img:'maps/rain.webp', title:'الأمطار حول العالم',
+    alt:'خريطة أنظمة الأمطار في العالم',
+    labels:[['حوض الأمازون',32.99,58.38,'minor'],['حوض الكونغو',56.04,55.88,'minor']],
+    qatar:true,
+    legend:[['#12804f','غزيرة (استوائية)'],['#4a9fd6','على مدار العام'],['#8cc46c','موسم ممطر وموسم جاف'],
+            ['#c9bb57','شتاء ممطر وصيف جاف'],['#e3c992','شبه جافة'],['#e39a45','جافة (صحراوية)'],['#e8f0f3','ثلوج وجليد']],
+    note:'أغزر الأمطار قرب خط الاستواء، وأقلها في الصحاري — ولإقليم البحر المتوسط شتاء ممطر وصيف جاف.',
+    unit:'📚 سابع: الأقاليم المناخية',
+    src:HP_KOPPEN },
+  { id:'seas', img:'maps/seas.webp', title:'محيطات العالم وبحاره',
+    alt:'خريطة المحيطات والبحار',
+    labels:[['المحيط الهادئ',10.35,48.38,'sea'],['المحيط الأطلسي',39.8,40.16,'sea'],['المحيط الهندي',70.54,71.56,'sea'],
+            ['البحر المتوسط',54.26,26.82,'sea minor'],['البحر الأحمر',60.14,38.54,'sea minor'],['الخليج العربي',63.38,32.57,'sea']],
+    note:'يغطي الماء معظم سطح الأرض: ثلاثة محيطات كبرى، وبحار قريبة منا كالخليج العربي والبحر الأحمر والبحر المتوسط.',
+    unit:'📚 ثامن: أغلفة الأرض — الغلاف المائي',
+    src:'حدود اليابس والماء: Natural Earth' },
+  { id:'zones', img:'maps/zones.webp', title:'المناطق الحرارية',
+    alt:'خريطة المناطق الحرارية الأربع حسب دوائر العرض',
+    labels:[['خط الاستواء 0°',8.79,55.05,'dim'],['30°',8.88,30.63,'dim'],['40°',11.53,23.14,'dim'],['66.5°',20.97,6.88,'dim minor']],
+    legend:[['#d9663d','الحارة (0°–30°)'],['#e3b04f','المعتدلة الدافئة (30°–40°)'],['#4f9f86','المعتدلة الباردة (40°–66.5°)'],['#cfe6ee','الباردة القطبية (66.5°–90°)']],
+    note:'قسّم العلماء سطح الأرض إلى أربع مناطق حرارية حسب دوائر العرض — أكبرها امتداداً المنطقة الحارة.',
+    unit:'📚 سابع: عناصر المناخ — الحرارة',
+    src:'حدود اليابس: Natural Earth · حدود المناطق من الكتاب' },
+  { id:'layers', title:'طبقات باطن الأرض', unit:'📚 ثامن: تركيب باطن الأرض', src:'المصدر: كتاب الدراسات الاجتماعية — الصف الثامن',
+    note:'ترتفع الحرارة كلما اتجهنا نحو المركز، ويبقى باطن الأرض صلباً بسبب الضغط الهائل الواقع عليه.' },
+  { id:'timeline', title:'مراحل الدولة الإسلامية', unit:'📚 سابع: الخلافة العباسية', src:'المصدر: كتاب الدراسات الاجتماعية — الصف السابع',
+    note:'الدولة العباسية أطول هذه المراحل: 524 سنة، من 132 إلى 656هـ.' },
+];
+
+// طبقات باطن الأرض: أنصاف أقطار بنسبها الحقيقية (نصف قطر الأرض 6371 كم،
+// الوشاح 2900 كم حسب الكتاب، النواة الداخلية ≈1220 كم) — القشرة مكبّرة لتُرى
+function hpLayersSvg(){
+  const cx = 110, cy = 112, R = 104;
+  const r = { crust:R, mantle:R-6, outer:R*(6371-2900)/6371, inner:R*1220/6371 };
+  const half = (rad, fill) => `<path d="M${cx-rad},${cy} A${rad},${rad} 0 0 1 ${cx+rad},${cy} Z" fill="${fill}"/>`;
+  const tag = (n, x, y) => `<g><circle cx="${x}" cy="${y}" r="7" fill="#0a2029" stroke="#e3c98b" stroke-width="1"/><text x="${x}" y="${y+3}" font-size="8" fill="#e3c98b" text-anchor="middle" font-weight="bold">${n}</text></g>`;
+  return `<svg viewBox="0 0 220 118" role="img" aria-label="مقطع في طبقات باطن الأرض">
+    <defs><radialGradient id="hpMantle" cx="50%" cy="100%" r="100%"><stop offset="0%" stop-color="#e0773a"/><stop offset="100%" stop-color="#9c3b2a"/></radialGradient></defs>
+    ${half(r.crust,'#7a5a3a')}${half(r.mantle,'url(#hpMantle)')}${half(r.outer,'#e7a347')}${half(r.inner,'#fbe3a0')}
+    <line x1="4" y1="${cy}" x2="216" y2="${cy}" stroke="#e3c98b" stroke-width="1" opacity=".6"/>
+    ${tag('١', cx-R*0.72, cy-R*0.72)}${tag('٢', cx+R*0.55, cy-R*0.55)}${tag('٣', cx-r.outer*0.62, cy-r.outer*0.55)}${tag('٤', cx, cy-r.inner*0.5)}
+  </svg>`;
+}
+
+function hpBody(pl){
+  if(pl.id === 'layers'){
+    return `<div class="hpLayers">${hpLayersSvg()}<ol>
+      <li><i style="background:#7a5a3a"></i><span><b>١ القشرة الأرضية:</b> نعيش عليها، رقيقة السُّمك (قارية ومحيطية)</span></li>
+      <li><i style="background:#c85a33"></i><span><b>٢ الوشاح (الكسوة):</b> أسمك الطبقات — 2900 كم</span></li>
+      <li><i style="background:#e7a347"></i><span><b>٣ النواة الخارجية:</b> سائلة، 2200–5000°م</span></li>
+      <li><i style="background:#fbe3a0"></i><span><b>٤ النواة الداخلية:</b> صلبة، تصل إلى 5500°م</span></li>
+    </ol></div>`;
+  }
+  if(pl.id === 'timeline'){
+    const eras = [['العصر النبوي','1–11هـ',10,'#1f6f5c'],['الخلافة الراشدة','11–40هـ',29,'#4f9f86'],
+                  ['الدولة الأموية','40–132هـ',92,'#a8813f'],['الدولة العباسية','132–656هـ',524,'#7a3030']];
+    return `<div class="hpTimeline" role="img" aria-label="خط زمني نسبي لمراحل الدولة الإسلامية">${
+      eras.map(([n,,y,c]) => `<span style="flex:${y}; background:${c}" title="${esc(n)}">${y >= 90 ? esc(n.replace(/^(الدولة|العصر|الخلافة) /,'')) : ''}</span>`).join('')
+    }</div><ul class="hpTlList">${
+      eras.map(([n,d,,c]) => `<li><i style="background:${c}"></i>${esc(n)} <small>${d}</small></li>`).join('')
+    }</ul>`;
+  }
+  const lbl = (pl.labels || []).map(([t,x,y,cls]) =>
+    `<span class="hpLbl ${cls || ''}" style="left:${x}%;top:${y}%">${esc(t)}</span>`).join('');
+  const qatar = pl.qatar ? `<span class="hpQatar" style="left:63.42%;top:34.3%"><i></i><b>قطر</b></span>` : '';
+  const legend = pl.legend ? `<div class="hpLegend">${pl.legend.map(([c,t]) => `<span><i style="background:${c}"></i>${esc(t)}</span>`).join('')}</div>` : '';
+  const ramp = pl.ramp ? `<div class="hpRamp"><span>${esc(pl.ramp[0])}</span><i></i><span>${esc(pl.ramp[1])}</span></div>` : '';
+  return `<div class="hpMap" style="aspect-ratio:1100/488"><img src="${pl.img}" alt="${esc(pl.alt)}" width="1100" height="488" decoding="async"
+      onerror="renderHeroPlate(0)">${lbl}${qatar}</div>${legend}${ramp}`;
+}
+
+let HP_GLOBE_HTML = null;
+let hpCurrent = -1;
+// idx اختياري: بدونه نأخذ اللوحة التالية بالدور المحفوظ (لا تتكرر نفسها بزيارتين متتاليتين)
+function renderHeroPlate(idx){
+  const box = document.getElementById('heroPlate');
+  if(!box) return;
+  if(HP_GLOBE_HTML === null) HP_GLOBE_HTML = box.innerHTML;
+  if(typeof idx !== 'number'){
+    let last = -1;
+    try{ last = parseInt(localStorage.getItem('rahhala_hero_plate'), 10); }catch(e){}
+    idx = Number.isInteger(last) && last >= 0 ? (last + 1) % HERO_PLATES.length
+                                             : Math.floor(Math.random() * HERO_PLATES.length);
+  }
+  hpCurrent = idx;
+  try{ localStorage.setItem('rahhala_hero_plate', String(idx)); }catch(e){}
+  const pl = HERO_PLATES[idx];
+  const next = `<button class="hpNext" type="button" onclick="renderHeroPlate((hpCurrent+1)%HERO_PLATES.length)" title="لوحة أخرى" aria-label="عرض لوحة أخرى">↻</button>`;
+  box.classList.remove('hpGlobe');
+  box.style.animation = 'none'; void box.offsetWidth; box.style.animation = '';   // إعادة حركة الظهور
+  if(pl.id === 'globe'){
+    box.classList.add('hpGlobe');
+    box.innerHTML = HP_GLOBE_HTML + `<div style="text-align:center;margin-top:4px">${next}</div>`;
+    return;
+  }
+  box.innerHTML = `
+    <div class="hpHead"><div><div class="hpEyebrow">🧭 من أطلس رحّالة</div><h3 class="hpTitle">${esc(pl.title)}</h3></div>${next}</div>
+    ${hpBody(pl)}
+    <p class="hpNote">${esc(pl.note)}</p>
+    <div class="hpFoot"><span class="hpUnit">${esc(pl.unit)}</span><span class="hpSrc">${esc(pl.src)}</span></div>`;
+}
+
 // ---------- init ----------
 // إخفاء شاشة البداية أولاً ومستقلاً تماماً — ما نخليه معتمداً على نجاح أي كود ثاني،
 // عشان ما يعلق الطالب بشاشة تحميل لو صار أي خطأ بالتهيئة
@@ -7919,6 +8128,7 @@ try {
   if(src && head) head.src = src.src;
 } catch(e){}
 try { showCompare(0); } catch(e){ console.error('showCompare:', e); }
+try { renderHeroPlate(); } catch(e){ console.error('renderHeroPlate:', e); }
 try { initSupabase(); } catch(e){ console.error('initSupabase:', e); }
 </script>
 
