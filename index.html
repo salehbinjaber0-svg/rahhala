@@ -7001,7 +7001,9 @@ function buildUnitLex(){
 // الكلمة واردة بنص المفهوم نفسه (مفاتيحه أو جوابه أو شرحه الإضافي)
 function ownHas(entry, t){
   const own = normalizeArabic(entry.k.join(' ') + ' ' + entry.a + ' ' + (entry.extra || '')).split(/\s+/).map(stripPrefix).map(normalizeToken);
-  return own.some(w => w === t || sameStem(w, t));
+  // حرف الجر الملتصق بلا «ال»: «بقطر» = «قطر» (للمقارنة بنص المفهوم فقط)
+  const alt = own.filter(w => /^[بلك]/.test(w) && w.length >= 4).map(w => w.slice(1));
+  return own.concat(alt).some(w => w === t || sameStem(w, t));
 }
 // مصطلح مفتاحي مميّز لمفهوم آخر: يرد بمفاتيح أقل من 4 مفاهيم (فليس كلمة عامة كـ«السكان»
 // أو «قطر»)، ومفتاح ذلك المفهوم يطابق السؤال بنصفه على الأقل — فكلمة عابرة داخل مفتاح
@@ -7408,7 +7410,12 @@ function matchKnowledge(query){
   // سؤال قصير جداً (كلمة أو كلمتين) بدون تطابق كامل — نجرّب تطابق حرفي دقيق غير متنازع عليه
   if(qTokens.length <= 2){
     const shortMatch = findShortQueryMatch(qTokens);
-    if(shortMatch){
+    // كلمة واحدة تطابق حرفياً لا تكفي لو بقيت كلمة أخرى بلا تفسير:
+    // «أجهزة الإعلام» كانت تُجاب بالأجهزة القضائية لأن «أجهزة» وحدها تطابق
+    // (الكلمة الأخرى يجب أن ترد بنص المفهوم نفسه — لا يكفي ورودها بنص الوحدة)
+    const shortOk = shortMatch && qTokens.every(t =>
+      t.length < 3 || QUESTION_WORDS.has(t) || STOPWORDS.has(t) || ownHas(shortMatch, t));
+    if(shortOk){
       lastTopic = shortMatch;
       contextTokens = shortMatch.k.flatMap(k => tokenize(k)).filter(t => t.length >= 3).slice(0, 4);
       return { text: shortMatch.a + pageRef(shortMatch.unit), chips: [] };
