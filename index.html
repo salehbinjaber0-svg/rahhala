@@ -6964,7 +6964,8 @@ function scoreEntry(entry, qTokens){
 //  • مصطلح مفتاحي لمفهوم من وحدة أخرى، وليس في سياق هذا المفهوم ⇒ السؤال عن شيء آخر ⇒ رفض
 //  • غير ذلك (كلمة عامة أو غريبة) تُقبل ما دامت لا تغلب عدداً على ما فسّره المفتاح
 const QUESTION_WORDS = new Set(['ليش','ليه','لماذا','كيف','وين','متى','مين','شنو','ايش','وش','اين','اي','ايه',
-  'سوى','سوا','سوت','تسوي','يسوي','صار','صارت','حق','تبع','الحين','كانوا','كانت','عند','ولا','بس','طيب']
+  'سوى','سوا','سوت','تسوي','يسوي','صار','صارت','حق','تبع','الحين','كانوا','كانت','عند','ولا','بس','طيب',
+  'فهمت','افهم','فاهم','صعب','صعبه']
   .map(w => stripPrefix(normalizeArabic(w))));
 // كلمات «جوانب» عامة تُسأل عن أي مفهوم (سقوط، أسباب، أنواع…) — ليست موضوعاً منافساً
 // حتى لو كانت مفتاحاً بوحدة أخرى: «سبب سقوط الدولة البابلية» سؤال عن البابليين لا عن العباسيين
@@ -7305,9 +7306,15 @@ function matchKnowledge(query){
     return { text: 'خلّني أوضح أكثر: ' + lastTopic.a, chips: [] };
   }
 
-  // طالب محبط أو محتار — نشجّعه بدل ما نصمت
+  // طالب محبط أو محتار — نشجّعه بدل ما نصمت. لكن لو ذكر مفهوماً نعرفه
+  // («ما فهمت الرياح الموسمية»، «ليش التنقل صعب في الجبال») نشرحه له بدل
+  // عبارة تشجيع عامة — كانت كلمة «صعب» وحدها تحجب الجواب
+  let cheer = false;
   if(ENCOURAGE_PATTERNS.some(p => query.includes(p))){
-    return { text: ENCOURAGE_REPLIES[Math.floor(Math.random()*ENCOURAGE_REPLIES.length)], chips: [] };
+    if(confidentMatches(qTokens).length === 0){
+      return { text: ENCOURAGE_REPLIES[Math.floor(Math.random()*ENCOURAGE_REPLIES.length)], chips: [] };
+    }
+    cheer = ENCOURAGE_PATTERNS.some(p => p !== 'صعب' && query.includes(p)); // «صعب» قد تكون وصفاً لا إحباطاً
   }
 
   // سؤال عن محتوى وحدة
@@ -7368,6 +7375,7 @@ function matchKnowledge(query){
     if(fitDetails(first, qTokens, others).flag > 0 && top.length === 1){
       text = '📌 أقرب ما لقيته لسؤالك:\n' + text;
     }
+    if(cheer) text = 'ولا يهمك 💙 خلّني أوضحها لك:\n' + text;
     return { text, chips: [] };
   }
 
