@@ -1778,7 +1778,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     </div>
 
     <div class="heroIntroArt">
-      <div class="heroQuoteBadge">« بالتعليم نبني أجيالاً أكثر وعياً »</div>
+      <div class="heroQuoteBadge" id="heroQuote">« بالتعليم نبني أجيالاً أكثر وعياً »</div>
       <!-- لوحة متغيّرة مع كل زيارة (renderHeroPlate) — الكرة الأرضية هنا محتواها الافتراضي لو تعطّل السكربت -->
       <figure class="heroPlate hpGlobe" id="heroPlate">
       <svg viewBox="0 0 320 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="كرة أرضية وكتب المواد الدراسية">
@@ -8103,6 +8103,58 @@ function renderHeroPlate(idx){
     <div class="hpFoot"><span class="hpUnit">${esc(pl.unit)}</span><span class="hpSrc">${esc(pl.src)}</span></div>`;
 }
 
+// ---------- جملة تحفيزية بشارة الواجهة ----------
+// تتغيّر مع الدخول فقط إذا مرّت أكثر من ساعة على آخر تغيير — فالتحديث المتكرر لا يبدّلها
+const HERO_QUOTES = [
+  'بالتعليم نبني أجيالاً أكثر وعياً',
+  'كل سؤال تطرحه خطوة نحو فهم أعمق',
+  'الخطأ درس، والاستسلام وحده هو الخسارة',
+  'قليلٌ دائم خيرٌ من كثيرٍ منقطع',
+  'اقرأ اليوم لتقود غداً',
+  'العقل الذي يسأل لا يتوقف عن النمو',
+  'النجاح عادة تُبنى يوماً بعد يوم',
+  'لا تقارن نفسك بغيرك، بل بنفسك أمس',
+  'المعرفة زاد لا ينفد مهما أنفقت منه',
+  'من عرف ماضي وطنه أحسن بناء مستقبله',
+  'الطموح يبدأ بفكرة، ويكتمل بالعمل',
+  'كل صفحة تقرؤها نافذة على العالم',
+  'الصبر على التعلّم أوله مرّ وآخره حلو',
+  'ابدأ من حيث أنت، بما تملك، الآن',
+  'الفهم أبقى من الحفظ',
+  'اجتهد في صمت، ودع نجاحك يتحدث',
+  'الوطن يُبنى بعقول أبنائه',
+  'الخريطة تعلّمك أن للعالم أبواباً كثيرة',
+  'التاريخ ذاكرة الأمم، فكن من حرّاسها',
+  'لا يولد أحد عالماً، العلم بالتعلّم',
+  'خطوة صغيرة كل يوم تصنع فرقاً كبيراً',
+  'ثقتك بنفسك نصف الطريق إلى النجاح',
+  'التعلّم رحلة، فاستمتع بكل محطة فيها',
+  'الفضول بداية كل اكتشاف عظيم',
+  'احترم وقتك يحترمك مستقبلك',
+  'من جدّ وجد، ومن زرع حصد',
+  'العلم يرفع صاحبه حيث لا يرفعه غيره',
+  'كن سبباً في أن يتعلّم غيرك',
+  'السؤال الذكي نصف الإجابة',
+  'اجعل هدفك واضحاً، وخطواتك ثابتة'
+];
+function renderHeroQuote(){
+  const el = document.getElementById('heroQuote');
+  if(!el) return;
+  const KEY = 'rahhala_hero_quote', HOUR = 3600000, now = Date.now();
+  let rec = null;
+  try { rec = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e){}
+  let i;
+  if(rec && Number.isInteger(rec.i) && rec.i >= 0 && rec.i < HERO_QUOTES.length && typeof rec.t === 'number' && now - rec.t >= 0 && now - rec.t <= HOUR){
+    i = rec.i;                                  // أقل من ساعة: نفس الجملة
+  } else {
+    const last = rec && Number.isInteger(rec.i) ? rec.i : -1;
+    i = Math.floor(Math.random() * (HERO_QUOTES.length - (last >= 0 && last < HERO_QUOTES.length ? 1 : 0)));
+    if(last >= 0 && i >= last) i++;             // لا تتكرر الجملة السابقة
+    try { localStorage.setItem(KEY, JSON.stringify({ i, t: now })); } catch(e){}
+  }
+  el.textContent = '« ' + HERO_QUOTES[i] + ' »';
+}
+
 // ---------- init ----------
 // إخفاء شاشة البداية أولاً ومستقلاً تماماً — ما نخليه معتمداً على نجاح أي كود ثاني،
 // عشان ما يعلق الطالب بشاشة تحميل لو صار أي خطأ بالتهيئة
@@ -8129,6 +8181,7 @@ try {
 } catch(e){}
 try { showCompare(0); } catch(e){ console.error('showCompare:', e); }
 try { renderHeroPlate(); } catch(e){ console.error('renderHeroPlate:', e); }
+try { renderHeroQuote(); } catch(e){ console.error('renderHeroQuote:', e); }
 try { initSupabase(); } catch(e){ console.error('initSupabase:', e); }
 </script>
 
