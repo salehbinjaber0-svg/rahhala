@@ -7156,7 +7156,10 @@ function searchCurriculumDeep(qTokens, boostWords){
   let best = null, bestRank = 0, bestHits = 0;
   CURRICULUM_CORPUS.forEach(chunk=>{
     let hits = 0, lead = 0;
-    const head = chunk.tokens.slice(0, 4);
+    // «بداية المقطع» = أول كلمتين بعد الترقيم («4)»، «أ)»): المقطع الذي يبدأ بموضوع
+    // السؤال تعريف أو فقرة عنه. (كانت أول 4 كلمات، فقُبلت «4) وجود ضمانات دستورية»
+    // جواباً لـ«ما هو الدستور» على منهج الثامن)
+    const head = chunk.tokens.filter(t => !/^[\d٠-٩]+$/.test(t) && t.length > 1).slice(0, 2);
     // البحث العميق يقتبس نص الكتاب حرفياً، فلا تخمين إملائي فيه: تطابق حرفي أو صرفي فقط
     // (وقع: «اعطني نكتة» طابقت «نحته» بفرق حرف فاقتُبست فقرة النحت)
     meaningfulTokens.forEach(qt=>{
