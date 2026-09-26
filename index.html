@@ -7399,10 +7399,12 @@ function matchKnowledge(query){
     const top = [first.entry];
     // والكلمة الجديدة لا ترد أصلاً بنص المفهوم الأول: «التجارة في بلاد الرافدين»
     // تُجاب بالتجارة وحدها، لا بالتجارة + تعريف بلاد الرافدين
+    // (إلا في سؤال المقارنة الصريح «الفرق بين…/قارن»: المفهومان مطلوبان ولو ذكر الأول الثاني)
+    const isCompare = qTokens.some(t => ['فرق','قارن','مقارنه','يختلف','الفرق'].includes(t));
     const firstOwn = normalizeArabic(first.entry.k.join(' ') + ' ' + first.entry.a).split(/\s+/).map(stripPrefix);
     const second = fullMatches.find(m => m.entry.a !== first.entry.a && m.score >= 0.9 &&
                                           [...m.explained].some(i => !first.explained.has(i) &&
-                                            !firstOwn.some(w => w === qTokens[i] || sameStem(w, qTokens[i]))));
+                                            (isCompare || !firstOwn.some(w => w === qTokens[i] || sameStem(w, qTokens[i])))));
     if(second) top.push(second.entry);
     lastTopic = top[0];
     contextTokens = top[0].k.flatMap(k => tokenize(k)).filter(t => t.length >= 3).slice(0, 4);
