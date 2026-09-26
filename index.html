@@ -6958,11 +6958,13 @@ function isOtherUnitTerm(t, entry){
   }
   return false;
 }
-function fitsQuestion(m, qTokens){
+// others: كلمات فسّرها مفهوم آخر مطابق تماماً — سؤال مركّب («حمورابي وبيت الحكمة»)
+// فلا تُحسب ضد هذا المفهوم؛ كل مفهوم يجيب جزءه
+function fitsQuestion(m, qTokens, others){
   let unknown = 0;
   for(let i = 0; i < qTokens.length; i++){
     const t = qTokens[i];
-    if(m.explained.has(i) || t.length < 3 || QUESTION_WORDS.has(t) || STOPWORDS.has(t)) continue;
+    if(m.explained.has(i) || (others && others.has(i)) || t.length < 3 || QUESTION_WORDS.has(t) || STOPWORDS.has(t)) continue;
     if(entryHas(m.entry, t)) continue;
     if(!ASPECT_WORDS.has(t) && isOtherUnitTerm(t, m.entry)) return false;
     unknown++;
@@ -6970,10 +6972,13 @@ function fitsQuestion(m, qTokens){
   return unknown <= m.explained.size;
 }
 // المطابقات الكاملة الموثوقة، الأقوى أولاً
-function confidentMatches(qTokens){
-  return KB_ACTIVE.map(entry => ({ entry, ...scoreEntry(entry, qTokens) }))
-    .filter(m => m.full && fitsQuestion(m, qTokens))
-    .sort((a,b)=> b.score - a.score);
+function confidentMatches(qTokens, scored){
+  const full = (scored || KB_ACTIVE.map(entry => ({ entry, ...scoreEntry(entry, qTokens) }))).filter(m => m.full);
+  return full.filter(m=>{
+    const others = new Set();
+    full.forEach(o => { if(o !== m && o.entry.a !== m.entry.a) o.explained.forEach(i => others.add(i)); });
+    return fitsQuestion(m, qTokens, others);
+  }).sort((a,b)=> b.score - a.score);
 }
 
 // لسؤال قصير جداً (كلمة أو كلمتين) ما حقق تطابق كامل بعبارة multi-word:
@@ -7236,15 +7241,19 @@ function matchKnowledge(query){
   }
 
   const scored = KB_ACTIVE.map(entry => ({ entry, ...scoreEntry(entry, qTokens) }));
-  const fullMatches = scored.filter(s => s.full && fitsQuestion(s, qTokens)).sort((a,b)=> b.score - a.score);
+  const fullMatches = confidentMatches(qTokens, scored);
 
   if(fullMatches.length > 0){
     // سؤال مركّب («الفرق بين الإقليم الاستوائي والصحراوي»): نضيف مفهوماً ثانياً
     // فقط لو فسّر كلمة من السؤال لم يفسّرها الأول — لا تكرار لنفس الجانب
     const first = fullMatches[0];
     const top = [first.entry];
-    const second = fullMatches.find(m => m.entry.a !== first.entry.a && m.score >= first.score * 0.6 &&
-                                          [...m.explained].some(i => !first.explained.has(i)));
+    // والكلمة الجديدة لا ترد أصلاً بنص المفهوم الأول: «التجارة في بلاد الرافدين»
+    // تُجاب بالتجارة وحدها، لا بالتجارة + تعريف بلاد الرافدين
+    const firstOwn = normalizeArabic(first.entry.k.join(' ') + ' ' + first.entry.a).split(/\s+/).map(stripPrefix);
+    const second = fullMatches.find(m => m.entry.a !== first.entry.a && m.score >= 0.9 &&
+                                          [...m.explained].some(i => !first.explained.has(i) &&
+                                            !firstOwn.some(w => w === qTokens[i] || sameStem(w, qTokens[i]))));
     if(second) top.push(second.entry);
     lastTopic = top[0];
     contextTokens = top[0].k.flatMap(k => tokenize(k)).filter(t => t.length >= 3).slice(0, 4);
