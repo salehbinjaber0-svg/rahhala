@@ -7164,7 +7164,9 @@ function searchCurriculumDeep(qTokens, boostWords){
     });
     // سؤال بكلمة واحدة: نقبل فقط مقطعاً يبدأ بها (تعريف أو فقرة عنها)،
     // لا أي مقطع ذكرها عرضاً — «ما هي الرياح» كانت تُجاب بفقرة الرياح الموسمية
-    if(meaningfulTokens.length === 1 && lead === 0) return;
+    // (وكذلك الكلمتان: «بلاد الرافدين» على منهج الثامن كانت تُجاب بفقرة التجارة
+    // المصرية لأنها تذكرها عرضاً)
+    if(meaningfulTokens.length <= 2 && lead === 0) return;
     let rank = hits + lead * 0.3;   // المقطع الذي يبدأ بموضوع السؤال أولى
     // لأسئلة السبب: نرجّح المقاطع اللي فيها كلمات تعليل (بسبب، لأن، أدى...)
     if(boostWords && hits >= meaningfulTokens.length){
