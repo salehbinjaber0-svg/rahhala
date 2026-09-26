@@ -6939,7 +6939,9 @@ function scoreEntry(entry, qTokens){
 // القاعدة: كل كلمة لم يفسّرها المفتاح تُفحص:
 //  • مصطلح مفتاحي لمفهوم من وحدة أخرى، وليس في سياق هذا المفهوم ⇒ السؤال عن شيء آخر ⇒ رفض
 //  • غير ذلك (كلمة عامة أو غريبة) تُقبل ما دامت لا تغلب عدداً على ما فسّره المفتاح
-const QUESTION_WORDS = new Set(['ليش','ليه','لماذا','كيف','وين','متى','مين','شنو','ايش','وش','اين','اي','ايه']);
+const QUESTION_WORDS = new Set(['ليش','ليه','لماذا','كيف','وين','متى','مين','شنو','ايش','وش','اين','اي','ايه',
+  'سوى','سوا','سوت','تسوي','يسوي','صار','صارت','حق','تبع','الحين','كانوا','كانت','عند','ولا','بس','طيب']
+  .map(w => stripPrefix(normalizeArabic(w))));
 // كلمات «جوانب» عامة تُسأل عن أي مفهوم (سقوط، أسباب، أنواع…) — ليست موضوعاً منافساً
 // حتى لو كانت مفتاحاً بوحدة أخرى: «سبب سقوط الدولة البابلية» سؤال عن البابليين لا عن العباسيين
 const ASPECT_WORDS = new Set(['سقوط','قيام','نشاه','سبب','اسباب','عوامل','انواع','خصائص','مظاهر','اهميه','دور',
@@ -6948,7 +6950,7 @@ const ASPECT_WORDS = new Set(['سقوط','قيام','نشاه','سبب','اسب�
 let UNIT_LEX = null, KEY_UNITS = null;
 function buildUnitLex(){
   UNIT_LEX = {}; KEY_UNITS = new Map();
-  const add = (set, txt) => normalizeArabic(txt).split(/\s+/).forEach(w=>{ if(w){ set.add(w); set.add(stripPrefix(w)); } });
+  const add = (set, txt) => normalizeArabic(txt).split(/\s+/).forEach(w=>{ if(w){ set.add(w); const b = stripPrefix(w); set.add(b); set.add(normalizeToken(b)); } });
   Object.keys(UNITS).forEach(n=>{
     const set = UNIT_LEX[n] = new Set();
     const u = UNITS[n];
@@ -6969,7 +6971,7 @@ function buildUnitLex(){
 }
 function entryHas(entry, t){
   if(!UNIT_LEX) buildUnitLex();
-  const own = normalizeArabic(entry.k.join(' ') + ' ' + entry.a + ' ' + (entry.extra || '')).split(/\s+/).map(stripPrefix);
+  const own = normalizeArabic(entry.k.join(' ') + ' ' + entry.a + ' ' + (entry.extra || '')).split(/\s+/).map(stripPrefix).map(normalizeToken);
   if(own.some(w => w === t || sameStem(w, t))) return true;
   const set = entry.unit && UNIT_LEX[entry.unit];
   if(!set) return false;
@@ -6990,15 +6992,20 @@ function isOtherUnitTerm(t, entry){
 // others: كلمات فسّرها مفهوم آخر مطابق تماماً — سؤال مركّب («حمورابي وبيت الحكمة»)
 // فلا تُحسب ضد هذا المفهوم؛ كل مفهوم يجيب جزءه
 function fitsQuestion(m, qTokens, others){
-  let unknown = 0;
+  return fitDetails(m, qTokens, others).ok;
+}
+// unknown = كلمات مضمونية بقيت بلا تفسير — لو وُجدت نصرّح بأن الجواب «أقرب ما لقيته»
+function fitDetails(m, qTokens, others){
+  let unknown = 0, flag = 0;
   for(let i = 0; i < qTokens.length; i++){
     const t = qTokens[i];
     if(m.explained.has(i) || (others && others.has(i)) || t.length < 3 || QUESTION_WORDS.has(t) || STOPWORDS.has(t)) continue;
     if(entryHas(m.entry, t)) continue;
-    if(!ASPECT_WORDS.has(t) && isOtherUnitTerm(t, m.entry)) return false;
+    if(!ASPECT_WORDS.has(t) && isOtherUnitTerm(t, m.entry)) return {ok:false, unknown, flag};
     unknown++;
+    if(!ASPECT_WORDS.has(t)) flag++;   // «سبب/سقوط/أنواع» جوانب يغطيها المفهوم عادة — لا تستدعي التحفّظ
   }
-  return unknown <= m.explained.size;
+  return {ok: unknown <= m.explained.size, unknown, flag};
 }
 // المطابقات الكاملة الموثوقة، الأقوى أولاً
 function confidentMatches(qTokens, scored){
@@ -7286,7 +7293,12 @@ function matchKnowledge(query){
     if(second) top.push(second.entry);
     lastTopic = top[0];
     contextTokens = top[0].k.flatMap(k => tokenize(k)).filter(t => t.length >= 3).slice(0, 4);
-    const text = top.map(e=> e.a + pageRef(e.unit)).join('\n\n');
+    let text = top.map(e=> e.a + pageRef(e.unit)).join('\n\n');
+    // كلمات من السؤال لم يفسّرها المفهوم ⇒ لا ندّعي إجابة كاملة
+    const others = new Set(); fullMatches.forEach(o => { if(o !== first) o.explained.forEach(i => others.add(i)); });
+    if(fitDetails(first, qTokens, others).flag > 0 && top.length === 1){
+      text = '📌 أقرب ما لقيته لسؤالك:\n' + text;
+    }
     return { text, chips: [] };
   }
 
