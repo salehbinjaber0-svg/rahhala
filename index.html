@@ -7070,7 +7070,12 @@ function confidentMatches(qTokens, scored){
     const others = new Set();
     full.forEach(o => { if(o !== m && o.entry.a !== m.entry.a) o.explained.forEach(i => others.add(i)); });
     return fitsQuestion(m, qTokens, others);
-  }).sort((a,b)=> b.score - a.score);
+  }).map(m=>{
+    // فصل التعادل: المفهوم الذي يذكر نصُّه بقيةَ كلمات السؤال أولى
+    // («الساحل واعتدال الحرارة» ← توزيع اليابس والماء، لا تعريف الحرارة)
+    const cov = qTokens.filter(t => t.length >= 3 && ownHas(m.entry, t)).length;
+    return {...m, rank: m.score + 0.05 * cov};
+  }).sort((a,b)=> b.rank - a.rank);
 }
 
 // لسؤال قصير جداً (كلمة أو كلمتين) ما حقق تطابق كامل بعبارة multi-word:
