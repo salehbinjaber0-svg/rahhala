@@ -6859,12 +6859,19 @@ function pluralMatch(a, b){
 // «سومريون/سومريين» و«مناخي/مناخيه» و«سلطه/سلطات» دون تخمين إملائي
 // ـه وـي وحدهما يُشالان فقط لو بقي 4 أحرف فأكثر: «دوله» ليست «دول»، و«مدني» ليست «مدن»
 const STEM_SUFFIXES = ['يين','يون','ين','ون','ات','يه','وا','ه','ي','ا'];   // ـوا: «فصلوا» = «فصل» · ـا (تنوين): «شهراً» = «شهر»
-function stemOf(w){
+function stemOnce(w){
   for(const s of STEM_SUFFIXES){
     const min = (s === 'ه' || s === 'ي') ? 4 : 3;
     if(w.endsWith(s) && w.length - s.length >= min) return w.slice(0, -s.length);
   }
   return w;
+}
+// الضمير المتصل أولاً (ـهم ـها)، والتاء قبله تعود مربوطة: «عاصمتهم» ← «عاصمه»،
+// ثم مرحلتان من اللواحق: «اختصاصاته» ← «اختصاصات» ← «اختصاص»
+function stemOf(w){
+  const p = w.match(/^(.{3,})(هم|ها)$/);
+  if(p) w = p[1].replace(/ت$/, 'ه');
+  return stemOnce(stemOnce(w));
 }
 function sameStem(a, b){ return stemOf(a) === stemOf(b); }
 
