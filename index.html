@@ -2586,6 +2586,7 @@ function applyGrade(g, rerender){
   CURRICULUM_CORPUS = null;   // نص البحث العميق يُعاد بناؤه للصف الجديد
   KB_TERMS = null;            // مصطلحات السياق تُعاد كذلك
   LEXICON = null;             // معجم الصف: يمنع التخمين الإملائي بين كلمتين حقيقيتين
+  KW_TOKENS.clear();          // تقطيع المفاتيح يعتمد على المعجم (حسم واو العطف)
   UNIT_LEX = null; KEY_UNITS = null; // معاجم الوحدات لفحص الثقة
   if(rerender){
     buildCurriculumMenu();
@@ -6767,7 +6768,16 @@ function normalizeArabic(text){
 // يشيل "أل" التعريف والحروف الملتصقة بها (بال، وال، كال، لل...) عشان "بالضغط" تصير "ضغط"
 function stripPrefix(word){
   let w = word;
-  if(/^[وف]/.test(w) && w.length > 3) w = w.slice(1);       // و/ف الاستئنافية
+  // و/ف العطف: كانت تُحذف من أول أي كلمة، فصارت «فصلوا» «صلوا» و«فتحت» «تحت»
+  // و«وزارة» «زارة». الآن: «وال/فال» عطف دائماً، وغيرهما يُحسم بمعجم الصف:
+  // نحذف الحرف فقط إن كان الباقي كلمة معروفة والكلمة كاملة غير معروفة
+  // (ومع الواو نحذف أيضاً إن عُرفت الصيغتان — «وبيت» عطف غالباً).
+  if(/^[وف]ال/.test(w)) w = w.slice(1);
+  else if(/^[وف]/.test(w) && w.length > 3 && LEXICON){
+    const rest = w.slice(1);
+    const fullK = LEXICON.has(w), restK = LEXICON.has(rest) || LEXICON.has(stripPrefix(rest));
+    if(restK && (!fullK || w[0] === 'و')) w = rest;
+  }
   if(/^لل/.test(w) && w.length > 3) w = w.slice(2);          // لام الجر مدغمة بأل: للامن → امن
   if(/^[بكل]ال/.test(w)) w = w.slice(1);                     // بال / كال / لل → شيل الحرف الملتصق
   if(/^ال/.test(w) && w.length > 3) w = w.slice(2);           // شيل "ال" التعريف نفسها
@@ -6797,6 +6807,7 @@ function normalizeToken(t){
 }
 
 function tokenize(text){
+  if(!LEXICON && Object.keys(UNITS).length) buildLexicon();   // حسم العطف يحتاج المعجم
   const raw = normalizeArabic(text).split(/\s+/).filter(Boolean).map(stripPrefix).map(normalizeToken);
   const filtered = raw.filter(t => !STOPWORDS.has(t) && !NUMBER_WORDS.has(t));
   return filtered.length > 0 ? filtered : raw; // لو السؤال كله كلمات استفهام، نرجع الأصل بدل قائمة فاضية
@@ -6860,9 +6871,10 @@ function sameStem(a, b){ return stemOf(a) === stemOf(b); }
 // أجاب بتعريف الحضارة — ويتكرر الشيء نفسه مع «نابليون/بابليون» و«بركان/اركان».
 let LEXICON = null;
 function buildLexicon(){
-  LEXICON = new Set();
+  LEXICON = null;                 // يُبنى من الكلمات كما هي (بلا حسم العطف) ثم يُعتمد
+  const lex = new Set();
   const add = txt => normalizeArabic(txt).split(/\s+/).forEach(w=>{
-    if(w){ LEXICON.add(w); LEXICON.add(stripPrefix(w)); }
+    if(w){ lex.add(w); lex.add(stripPrefix(w)); }
   });
   Object.keys(UNITS).forEach(n=>{
     const u = UNITS[n];
@@ -6870,6 +6882,7 @@ function buildLexicon(){
     u.lessons.forEach(l=>{ add(l.title); add(l.html.replace(/<[^>]+>/g, ' ')); });
   });
   KB_ACTIVE.forEach(e=>{ e.k.forEach(add); add(e.a); if(e.extra) add(e.extra); });
+  LEXICON = lex;
 }
 function isKnownWord(w){
   if(!LEXICON) buildLexicon();
