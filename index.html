@@ -6939,8 +6939,9 @@ function scoreEntry(entry, qTokens){
       const s = sum + kw.length * 0.0001;   // الطول يفصل التعادل فقط
       if(s > score){ score = s; explained = used; }
       anyFullKeyword = true;
-    } else if(matched > 0){
-      partial = Math.max(partial, matched * 2); // تطابق جزئي — نتيجة أضعف، تفيد بس للاقتراحات
+    } else if(matched > 0 && matched * 2 > partial){
+      partial = matched * 2; // تطابق جزئي — نتيجة أضعف، تفيد بس للاقتراحات
+      if(!anyFullKeyword) explained = used;
     }
   });
   if(!anyFullKeyword) score = partial;
@@ -7383,22 +7384,49 @@ function matchKnowledge(query){
     }
   }
 
-  // ما فيه تطابق كامل — نقترح أقرب المواضيع بدل ما نسكت
-  const partial = scored.filter(s => s.score > 0).sort((a,b)=> b.score - a.score).slice(0,3);
-  if(partial.length > 0){
+  // ما فيه تطابق موثوق — نعترف صراحة، ونقترح مواضيع من نفس الوحدة الأقرب،
+  // ونوجّه لدرسها بقسم المنهج. (القديم كان يخلط اقتراحات من وحدات مختلفة)
+  const partial = scored.filter(s => s.score > 0).sort((a,b)=> b.score - a.score);
+  // الاقتراح يُعرض فقط لو التطابق الجزئي يغطي نصف كلمات السؤال على الأقل —
+  // كلمة عرضية واحدة («العالم» في «من فاز بكأس العالم») لا تجعل السؤال من المنهج
+  const content = qTokens.filter(t => t.length >= 3 && !QUESTION_WORDS.has(t));
+  if(partial.length > 0 && partial[0].explained.size * 2 >= content.length){
     logUnanswered(query); // نسجّله — تطابق جزئي يعني فجوة بقاعدة المعرفة
-    const chips = partial.map(p => p.entry.k[0]);
-    return { text: 'ما لقيت جواب دقيق 🤔 يمكن تقصد أحد هذي المواضيع:', chips };
+    const u = partial[0].entry.unit;
+    const near = partial.filter(p => p.entry.unit === u).slice(0, 3);
+    const where = u && UNITS[u]
+      ? `\n\n📚 تلقى الموضوع بالتفصيل في الوحدة ${u} «${UNITS[u].title}» (ص ${UNITS[u].pages}) بقسم «المنهج».`
+      : '';
+    return {
+      kind: 'unknown',
+      text: `ما لقيت جواب دقيق لسؤالك 🤔 وما أبي أعطيك معلومة غير مؤكدة.${where}\n\nيمكن تقصد أحد هذي المواضيع:`,
+      chips: near.map(p => chipLabel(p.entry))
+    };
   }
 
-  // خارج نطاق المنهج تماماً — نوجّهه بلطف بدل الصمت
+  // خارج نطاق المنهج تماماً — نعترف بوضوح ونقترح من منهج الصف النشط نفسه
   logUnanswered(query);
   return {
+    kind: 'unknown',
     text: KB_ACTIVE.length === 0
       ? `منهج الصف ${gradeName()} قيد الإضافة حالياً 📘\nتقدر تبدّل للصف السابع من قائمة «المنهج» وتسألني عن أي مفهوم فيه.`
-      : `هذا السؤال خارج منهج الدراسات الاجتماعية للصف ${gradeName()} 📘\nأنا متخصص بمنهجك: ${Object.keys(UNITS).map(n=>UNITS[n].title).join('، ')}.\n\nجرّب تسألني عن أي مفهوم منها!`,
-    chips: ['المناخ', 'حمورابي', 'مجلس الشورى', 'الأمن الوطني']
+      : `ما عندي جواب لهذا السؤال 🙏 أنا أجيب فقط من كتاب الدراسات الاجتماعية للصف ${gradeName()}، ولا أخمّن من خارجه.\n\nوحدات منهجك: ${Object.keys(UNITS).map(n=>UNITS[n].title).join('، ')}.\n\nجرّب تسألني عن مفهوم منها:`,
+    chips: gradeSampleChips()
   };
+}
+
+// اسم المفهوم كما يُعرض للطالب: المفتاح الأصحّ إملائياً (بالهمزة والتاء المربوطة) لا المفتاح المختصر
+function chipLabel(entry){
+  const score = k => (k.match(/[أإآة]/g) || []).length + (k.startsWith('ال') ? 0.5 : 0);
+  return entry.k.reduce((best, k) => score(k) > score(best) ? k : best, entry.k[0]);
+}
+// اقتراحات من منهج الصف النشط: أول مفهوم من كل وحدة (بحد أقصى أربعة)
+function gradeSampleChips(){
+  const seen = new Set(), chips = [];
+  KB_ACTIVE.forEach(e => {
+    if(e.unit && !seen.has(e.unit) && chips.length < 4){ seen.add(e.unit); chips.push(chipLabel(e)); }
+  });
+  return chips;
 }
 
 // يسجّل الأسئلة التي لم يجد لها المنقذ جواباً — تكشف للمعلم فجوات قاعدة المعرفة
@@ -7593,13 +7621,13 @@ function sendChat(){
     const result = matchKnowledge(text);
     hideTyping();
     if(result){
-      addChatMsg('bot', result.text.replace(/\n/g, '<br>'));
+      addChatMsg('bot', esc(result.text).replace(/\n/g, '<br>'));   // esc قبل العرض — قاعدة ثابتة
       if(result.chips && result.chips.length){
         const chipsHtml = '<div class="chatChips">' + result.chips.map(c=>`<button class="chatChip" onclick="askChip('${escAttr(c)}')">${esc(c)}</button>`).join('') + '</div>';
         document.getElementById('chatBody').insertAdjacentHTML('beforeend', chipsHtml);
       }
       // أزرار التقييم — تظهر فقط للإجابات الفعلية، لا للردود التوجيهية
-      const isRealAnswer = !result.text.includes('ما لقيت') && !result.text.includes('خارج منهج') && result.text.length > 60;
+      const isRealAnswer = result.kind !== 'unknown' && !result.text.includes('ما لقيت') && result.text.length > 60;
       if(isRealAnswer) addRatingButtons(text, result.text);
       document.getElementById('chatBody').scrollTop = document.getElementById('chatBody').scrollHeight;
     } else {
