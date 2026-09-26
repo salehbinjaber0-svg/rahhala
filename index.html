@@ -2609,6 +2609,9 @@ function applyGrade(g, rerender){
   LEXICON = null;             // معجم الصف: يمنع التخمين الإملائي بين كلمتين حقيقيتين
   KW_TOKENS.clear();          // تقطيع المفاتيح يعتمد على المعجم (حسم واو العطف)
   UNIT_LEX = null; KEY_UNITS = null; // معاجم الوحدات لفحص الثقة
+  // موضوع المحادثة يخص الصف السابق — بدونه كانت «ليش؟» بعد تبديل الصف
+  // تُجاب بشرح مفهوم من المنهج الآخر (الفصل بين المنهجين)
+  lastTopic = null; contextTokens = [];
   if(rerender){
     buildCurriculumMenu();
     updateGradeLabels();
