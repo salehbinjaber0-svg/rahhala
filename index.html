@@ -6001,8 +6001,8 @@ function renderPendingPill(r){
   return `
     <div class="pendingPill">
       <span class="pname">${esc(r.name)}</span><span class="pcls">${esc(r.cls)}</span>
-      <button class="pApprove" title="موافقة" onclick="approveStudent('${r.key}', this)">✅</button>
-      <button class="pReject" title="رفض" onclick="rejectStudent('${r.key}', this)">❌</button>
+      <button class="pApprove" title="موافقة" onclick="approveStudent('${escAttr(r.key)}', this)">✅</button>
+      <button class="pReject" title="رفض" onclick="rejectStudent('${escAttr(r.key)}', this)">❌</button>
     </div>`;
 }
 
@@ -6084,7 +6084,7 @@ function renderStudentRow(r){
         </div>
         <div class="srActions">
           <span class="srBadge ${r.kicked ? 'kicked' : (isActive?'active':'away')}">${r.kicked ? '🚫 مطرود' : (isActive?'🟢 نشط الآن':'⚪ غير متصل')}</span>
-          <button class="kickBtn" onclick="kickStudent('${r.key}', this)" title="ينهي جلسته الحالية فقط — يقدر يرجع يدخل">🚫 إنهاء الجلسة</button>
+          <button class="kickBtn" onclick="kickStudent('${escAttr(r.key)}', this)" title="ينهي جلسته الحالية فقط — يقدر يرجع يدخل">🚫 إنهاء الجلسة</button>
           <button class="kickBtn" style="background:#5a1f1f;" onclick="removeStudent('${r.key}', this)" title="يزيله نهائياً من المنصة ولوحة الصدارة">⛔ إزالة نهائية</button>
         </div>
       </div>
@@ -7276,6 +7276,12 @@ function clearChatHistory(){
 
 let chatMessages = [];   // {sender, html}
 
+// تهريب نص يوضع داخل خاصية onclick: يحمي من علامة التنصيص
+// والشرطة المائلة، ثم esc() للعرض داخل HTML.
+function escAttr(t){
+  return String(t).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
 function addChatMsg(sender, html, skipSave){
   const body = document.getElementById('chatBody');
   const div = document.createElement('div');
@@ -7307,7 +7313,7 @@ function openChat(){
 
   addChatMsg('bot', '👋 أنا المنقذ! أهلاً فيك. كيف أقدر أساعدك اليوم؟ اسألني عن أي مفهوم بمنهج الدراسات الاجتماعية وبساعدك أفهمه بأسرع وقت.');
   const chips = ['وش أنواع الرياح؟','من هو حمورابي؟','كم بعد للأمن الوطني؟','وش الفرق بين الطقس والمناخ؟'];
-  const chipsHtml = '<div class="chatChips">' + chips.map(c=>`<button class="chatChip" onclick="askChip('${c}')">${c}</button>`).join('') + '</div>';
+  const chipsHtml = '<div class="chatChips">' + chips.map(c=>`<button class="chatChip" onclick="askChip('${escAttr(c)}')">${esc(c)}</button>`).join('') + '</div>';
   document.getElementById('chatBody').insertAdjacentHTML('beforeend', chipsHtml);
 }
 function closeChat(){
@@ -7355,7 +7361,7 @@ function sendChat(){
   const input = document.getElementById('chatInput');
   const text = input.value.trim();
   if(!text) return;
-  addChatMsg('user', text);
+  addChatMsg('user', esc(text));   // نص المستخدم يُهرَّب: addChatMsg تعرض بـinnerHTML
   input.value = '';
   chatBusy = true;
   showTyping();
@@ -7365,7 +7371,7 @@ function sendChat(){
     if(result){
       addChatMsg('bot', result.text.replace(/\n/g, '<br>'));
       if(result.chips && result.chips.length){
-        const chipsHtml = '<div class="chatChips">' + result.chips.map(c=>`<button class="chatChip" onclick="askChip('${c}')">${c}</button>`).join('') + '</div>';
+        const chipsHtml = '<div class="chatChips">' + result.chips.map(c=>`<button class="chatChip" onclick="askChip('${escAttr(c)}')">${esc(c)}</button>`).join('') + '</div>';
         document.getElementById('chatBody').insertAdjacentHTML('beforeend', chipsHtml);
       }
       // أزرار التقييم — تظهر فقط للإجابات الفعلية، لا للردود التوجيهية
