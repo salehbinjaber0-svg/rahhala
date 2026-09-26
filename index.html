@@ -2586,6 +2586,7 @@ function applyGrade(g, rerender){
   CURRICULUM_CORPUS = null;   // نص البحث العميق يُعاد بناؤه للصف الجديد
   KB_TERMS = null;            // مصطلحات السياق تُعاد كذلك
   LEXICON = null;             // معجم الصف: يمنع التخمين الإملائي بين كلمتين حقيقيتين
+  UNIT_LEX = null; KEY_UNITS = null; // معاجم الوحدات لفحص الثقة
   if(rerender){
     buildCurriculumMenu();
     updateGradeLabels();
@@ -6858,19 +6859,117 @@ function wordsClose(a, b){
 
 const FOLLOWUP_WORDS = ["ليش","لماذا","سبب","مثال","امثله","امثلة","وضح","اشرح","اكثر","كيف","وين","متى","تفصيل","فصلها","بسطها","بسط"];
 
+// جودة تطابق كلمة من السؤال مع كلمة من المفتاح:
+// 1 حرفياً · 0.9 نفس الكلمة بلاحقة أو جمعها · 0.7 تصحيح إملائي · 0 لا تطابق
+function matchQuality(q, k){
+  if(q === k) return 1;
+  if(sameStem(q, k) || pluralMatch(q, k)) return 0.9;
+  return wordsClose(q, k) ? 0.7 : 0;
+}
+const KW_TOKENS = new Map(); // تقطيع المفاتيح مرة واحدة بدل كل سؤال
+function kwTokens(kw){
+  if(!KW_TOKENS.has(kw)) KW_TOKENS.set(kw, tokenize(kw));
+  return KW_TOKENS.get(kw);
+}
+
+// الترجيح بدقة المطابقة لا بطول نص المفتاح:
+// النتيجة = مجموع جودة تطابق كلمات المفتاح، أي كم كلمة من السؤال فسّرها المفتاح وبأي دقة.
+// الترجيح القديم (score = طول المفتاح) كان يفضّل مفتاحاً طويلاً طابق بالتخمين
+// على مفتاح قصير طابق حرفياً، ولا يفرّق بين كلمة شرحت السؤال وكلمة عرضية فيه.
+// explained = مواضع كلمات السؤال التي فسّرها أفضل مفتاح — تُستخدم لفحص الثقة.
 function scoreEntry(entry, qTokens){
-  let score = 0, anyFullKeyword = false;
+  let score = 0, anyFullKeyword = false, explained = new Set(), partial = 0;
   entry.k.forEach(kw=>{
-    const kwTokens = tokenize(kw);
-    const matchedCount = kwTokens.filter(kt => qTokens.some(qt => wordsClose(qt, kt))).length;
-    if(matchedCount === kwTokens.length){
-      score = Math.max(score, kw.length);
+    const kt = kwTokens(kw);
+    let sum = 0, matched = 0;
+    const used = new Set();
+    kt.forEach(t=>{
+      let bq = 0, bi = -1;
+      qTokens.forEach((qt, i)=>{ const m = matchQuality(qt, t); if(m > bq){ bq = m; bi = i; } });
+      if(bq > 0){ matched++; sum += bq; used.add(bi); }
+    });
+    if(kt.length && matched === kt.length){
+      const s = sum + kw.length * 0.0001;   // الطول يفصل التعادل فقط
+      if(s > score){ score = s; explained = used; }
       anyFullKeyword = true;
-    } else if(matchedCount > 0){
-      score = Math.max(score, matchedCount * 2); // تطابق جزئي — نتيجة أضعف، تفيد بس للاقتراحات
+    } else if(matched > 0){
+      partial = Math.max(partial, matched * 2); // تطابق جزئي — نتيجة أضعف، تفيد بس للاقتراحات
     }
   });
-  return {score, full: anyFullKeyword};
+  if(!anyFullKeyword) score = partial;
+  return {score, full: anyFullKeyword, explained};
+}
+
+// ── حدّ الثقة: هل المفهوم المطابق يجيب السؤال فعلاً؟ ──
+// المفتاح قد يطابق كلمة عرضية بينما بقية السؤال عن موضوع آخر.
+// وقع فعلاً: مفتاح «فرق» جعل «الفرق بين السلطة التشريعية والقضائية» يُجاب بالطقس والمناخ.
+// القاعدة: كل كلمة لم يفسّرها المفتاح تُفحص:
+//  • مصطلح مفتاحي لمفهوم من وحدة أخرى، وليس في سياق هذا المفهوم ⇒ السؤال عن شيء آخر ⇒ رفض
+//  • غير ذلك (كلمة عامة أو غريبة) تُقبل ما دامت لا تغلب عدداً على ما فسّره المفتاح
+const QUESTION_WORDS = new Set(['ليش','ليه','لماذا','كيف','وين','متى','مين','شنو','ايش','وش','اين','اي','ايه']);
+// كلمات «جوانب» عامة تُسأل عن أي مفهوم (سقوط، أسباب، أنواع…) — ليست موضوعاً منافساً
+// حتى لو كانت مفتاحاً بوحدة أخرى: «سبب سقوط الدولة البابلية» سؤال عن البابليين لا عن العباسيين
+const ASPECT_WORDS = new Set(['سقوط','قيام','نشاه','سبب','اسباب','عوامل','انواع','خصائص','مظاهر','اهميه','دور',
+  'عصور','مراحل','نتائج','اثار','اختصاصات','مقومات','ابعاد','مفهوم','فرق','اشهر','اهم','اول','عاصمه','ملوك',
+  'تاريخ','نهايه','مكونات','اقسام','فوائد','اهداف','صفات','اعمال','انجازات','مميزات']);
+let UNIT_LEX = null, KEY_UNITS = null;
+function buildUnitLex(){
+  UNIT_LEX = {}; KEY_UNITS = new Map();
+  const add = (set, txt) => normalizeArabic(txt).split(/\s+/).forEach(w=>{ if(w){ set.add(w); set.add(stripPrefix(w)); } });
+  Object.keys(UNITS).forEach(n=>{
+    const set = UNIT_LEX[n] = new Set();
+    const u = UNITS[n];
+    add(set, u.title);
+    u.lessons.forEach(l=>{ add(set, l.title); add(set, l.html.replace(/<[^>]+>/g, ' ')); });
+  });
+  KB_ACTIVE.forEach(e=>{
+    if(!e.unit || !UNIT_LEX[e.unit]) return;
+    e.k.forEach(kw => add(UNIT_LEX[e.unit], kw));
+    add(UNIT_LEX[e.unit], e.a);
+    if(e.extra) add(UNIT_LEX[e.unit], e.extra);
+    e.k.forEach(kw => kwTokens(kw).forEach(t=>{
+      if(t.length < 3) return;
+      if(!KEY_UNITS.has(t)) KEY_UNITS.set(t, new Set());
+      KEY_UNITS.get(t).add(String(e.unit));
+    }));
+  });
+}
+function entryHas(entry, t){
+  if(!UNIT_LEX) buildUnitLex();
+  const own = normalizeArabic(entry.k.join(' ') + ' ' + entry.a + ' ' + (entry.extra || '')).split(/\s+/).map(stripPrefix);
+  if(own.some(w => w === t || sameStem(w, t))) return true;
+  const set = entry.unit && UNIT_LEX[entry.unit];
+  if(!set) return false;
+  if(set.has(t)) return true;
+  for(const w of set){ if(sameStem(w, t)) return true; }
+  return false;
+}
+// هل الكلمة مصطلح مفتاحي لمفهوم في وحدة غير وحدة هذا المفهوم؟
+function isOtherUnitTerm(t, entry){
+  if(!UNIT_LEX) buildUnitLex();
+  for(const [k, units] of KEY_UNITS){
+    if(k === t || sameStem(k, t)){
+      for(const u of units){ if(u !== String(entry.unit)) return true; }
+    }
+  }
+  return false;
+}
+function fitsQuestion(m, qTokens){
+  let unknown = 0;
+  for(let i = 0; i < qTokens.length; i++){
+    const t = qTokens[i];
+    if(m.explained.has(i) || t.length < 3 || QUESTION_WORDS.has(t) || STOPWORDS.has(t)) continue;
+    if(entryHas(m.entry, t)) continue;
+    if(!ASPECT_WORDS.has(t) && isOtherUnitTerm(t, m.entry)) return false;
+    unknown++;
+  }
+  return unknown <= m.explained.size;
+}
+// المطابقات الكاملة الموثوقة، الأقوى أولاً
+function confidentMatches(qTokens){
+  return KB_ACTIVE.map(entry => ({ entry, ...scoreEntry(entry, qTokens) }))
+    .filter(m => m.full && fitsQuestion(m, qTokens))
+    .sort((a,b)=> b.score - a.score);
 }
 
 // لسؤال قصير جداً (كلمة أو كلمتين) ما حقق تطابق كامل بعبارة multi-word:
@@ -6915,26 +7014,34 @@ function searchCurriculumDeep(qTokens, boostWords){
   if(!CURRICULUM_CORPUS) CURRICULUM_CORPUS = buildCurriculumCorpus();
   const meaningfulTokens = qTokens.filter(t => t.length >= 3); // نتجاهل كلمات الربط القصيرة (عن، في، من...) اللي ما تحمل معنى بحثي
   if(meaningfulTokens.length === 0) return null;
-  let best = null, bestScore = 0;
+  let best = null, bestRank = 0, bestHits = 0;
   CURRICULUM_CORPUS.forEach(chunk=>{
-    let score = 0;
+    let hits = 0, lead = 0;
+    const head = chunk.tokens.slice(0, 4);
     meaningfulTokens.forEach(qt=>{
-      if(chunk.tokens.some(ct => wordsClose(ct, qt))) score++;
+      if(chunk.tokens.some(ct => wordsClose(ct, qt))){
+        hits++;
+        if(head.some(ct => wordsClose(ct, qt))) lead++;
+      }
     });
+    // سؤال بكلمة واحدة: نقبل فقط مقطعاً يبدأ بها (تعريف أو فقرة عنها)،
+    // لا أي مقطع ذكرها عرضاً — «ما هي الرياح» كانت تُجاب بفقرة الرياح الموسمية
+    if(meaningfulTokens.length === 1 && lead === 0) return;
+    let rank = hits + lead * 0.3;   // المقطع الذي يبدأ بموضوع السؤال أولى
     // لأسئلة السبب: نرجّح المقاطع اللي فيها كلمات تعليل (بسبب، لأن، أدى...)
-    if(boostWords && score >= meaningfulTokens.length){
-      const hits = boostWords.filter(bw => chunk.text.includes(bw)).length;
-      if(hits === 0) return; // ما فيه تعليل — نتجاهله بهذا الوضع
-      score += hits * 0.5;
+    if(boostWords && hits >= meaningfulTokens.length){
+      const bh = boostWords.filter(bw => chunk.text.includes(bw)).length;
+      if(bh === 0) return; // ما فيه تعليل — نتجاهله بهذا الوضع
+      rank += bh * 0.5;
     }
-    if(score > bestScore){ bestScore = score; best = chunk; }
+    if(rank > bestRank){ bestRank = rank; bestHits = hits; best = chunk; }
   });
   // لازم يطابق كل كلمات السؤال المهمة عشان نثق بالنتيجة.
   // ومع السياق (كلمات كثيرة)، نقبل تطابقاً عالياً بدل الكامل — لكن ليس أقل من 70%.
   const threshold = meaningfulTokens.length >= 5
     ? Math.ceil(meaningfulTokens.length * 0.7)
     : meaningfulTokens.length;
-  if(best && bestScore >= threshold){
+  if(best && bestHits >= threshold){
     return best;
   }
   return null;
@@ -7065,7 +7172,7 @@ function matchKnowledge(query){
   let qTokens = tokenize(query);
 
   // لو السؤال يطابق مفهوماً مستقلاً بنفسه، فهو موضوع جديد — ما نلوّثه بسياق سابق
-  const standsAlone = KB_ACTIVE.some(e => scoreEntry(e, qTokens).full);
+  const standsAlone = confidentMatches(qTokens).length > 0;
 
   // دمج السياق: لو السؤال ناقص فعلاً (ولا يقف بنفسه)، نضيف كلمات الموضوع السابق
   const usedContext = !standsAlone && contextTokens.length > 0 && needsContext(query, qTokens);
@@ -7076,7 +7183,7 @@ function matchKnowledge(query){
   // سؤال متابعة قصير ("ليش؟"، "مثال؟"، "وضح أكثر") على آخر موضوع
   // شرط مهم: لا نعتبره متابعة لو كان يطابق مفهوماً مستقلاً بقاعدة المعرفة —
   // وإلا "بيت الحكمة" بعد "حمورابي" يرجّع جواب حمورابي بالغلط
-  const matchesOwnTopic = KB_ACTIVE.some(e => scoreEntry(e, qTokens).full);
+  const matchesOwnTopic = confidentMatches(qTokens).length > 0;
   const isFollowup = !matchesOwnTopic && qTokens.length <= 3 &&
                      qTokens.some(qt => FOLLOWUP_WORDS.some(fw => wordsClose(qt, fw)));
   if(isFollowup && lastTopic){
@@ -7125,14 +7232,16 @@ function matchKnowledge(query){
   }
 
   const scored = KB_ACTIVE.map(entry => ({ entry, ...scoreEntry(entry, qTokens) }));
-  const fullMatches = scored.filter(s => s.full).sort((a,b)=> b.score - a.score);
+  const fullMatches = scored.filter(s => s.full && fitsQuestion(s, qTokens)).sort((a,b)=> b.score - a.score);
 
   if(fullMatches.length > 0){
-    // لو فيه أكثر من مفهوم مختلف مطابق تماماً (سؤال مركّب)، اجمعهم
-    const top = [fullMatches[0].entry];
-    if(fullMatches[1] && fullMatches[1].entry.a !== fullMatches[0].entry.a && fullMatches[1].score >= fullMatches[0].score * 0.6){
-      top.push(fullMatches[1].entry);
-    }
+    // سؤال مركّب («الفرق بين الإقليم الاستوائي والصحراوي»): نضيف مفهوماً ثانياً
+    // فقط لو فسّر كلمة من السؤال لم يفسّرها الأول — لا تكرار لنفس الجانب
+    const first = fullMatches[0];
+    const top = [first.entry];
+    const second = fullMatches.find(m => m.entry.a !== first.entry.a && m.score >= first.score * 0.6 &&
+                                          [...m.explained].some(i => !first.explained.has(i)));
+    if(second) top.push(second.entry);
     lastTopic = top[0];
     contextTokens = top[0].k.flatMap(k => tokenize(k)).filter(t => t.length >= 3).slice(0, 4);
     const text = top.map(e=> e.a + pageRef(e.unit)).join('\n\n');
