@@ -6792,7 +6792,9 @@ const NUMBER_WORDS = new Set(['واحد','اثنين','اثنان','ثلاث','�
 const STOPWORDS = new Set(['كم','عدد','ما','ماهي','ماهو','هي','هو','وش','ايش','هل','من','الى','على','في','عن','مع','هذا','هذي','هذه','ذلك','التي','الذي','يعني','قصد','المقصود','تعريف','معني','معنى','اذكر','عدد','بين','وضح','اشرح','عرف','لي','لنا','كان','هناك',
   // حشو عامّي شائع بأسئلة الطلاب («شنو»، «مين»، «ابي اعرف»…). أدوات مثل «ليش/كيف/متى»
   // لا تُحذف هنا لأنها إشارات أسئلة المتابعة.
-  'شنو','شو','مين','ماذا','اللي','الي','ابي','ابغى','ابغي','ممكن','عطني','اعطني','قولي','لو','سمحت','تكفى','اعرف','ودي']);
+  'شنو','شو','مين','ماذا','اللي','الي','ابي','ابغى','ابغي','ممكن','عطني','اعطني','قولي','لو','سمحت','تكفى','اعرف','ودي']
+  // تُطبَّع كما تُطبَّع كلمات السؤال: «على» تصير «علي» و«إلى» تصير «الي» — كانتا لا تُستبعدان أبداً
+  .flatMap(w => [normalizeArabic(w), stripPrefix(normalizeArabic(w))]));
 
 // أفعال يسأل بها الطالب ومصدرها الذي يرد بالمفاتيح ونص الكتاب:
 // «متى قامت الدولة العباسية» = «قيام» · «متى بنيت بغداد» = «بناء» · «سقطت» = «سقوط»
@@ -6856,10 +6858,10 @@ function pluralMatch(a, b){
 // جذع تقريبي: يشيل لواحق النسب والجمع (ـيون ـيين ـين ـون ـات ـيه ـه ـي) ليطابق
 // «سومريون/سومريين» و«مناخي/مناخيه» و«سلطه/سلطات» دون تخمين إملائي
 // ـه وـي وحدهما يُشالان فقط لو بقي 4 أحرف فأكثر: «دوله» ليست «دول»، و«مدني» ليست «مدن»
-const STEM_SUFFIXES = ['يين','يون','ين','ون','ات','يه','وا','ه','ي'];   // ـوا: «فصلوا» = «فصل»
+const STEM_SUFFIXES = ['يين','يون','ين','ون','ات','يه','وا','ه','ي','ا'];   // ـوا: «فصلوا» = «فصل» · ـا (تنوين): «شهراً» = «شهر»
 function stemOf(w){
   for(const s of STEM_SUFFIXES){
-    const min = s.length === 1 ? 4 : 3;
+    const min = (s === 'ه' || s === 'ي') ? 4 : 3;
     if(w.endsWith(s) && w.length - s.length >= min) return w.slice(0, -s.length);
   }
   return w;
@@ -6961,10 +6963,12 @@ const QUESTION_WORDS = new Set(['ليش','ليه','لماذا','كيف','وين'
 // حتى لو كانت مفتاحاً بوحدة أخرى: «سبب سقوط الدولة البابلية» سؤال عن البابليين لا عن العباسيين
 const ASPECT_WORDS = new Set(['سقوط','قيام','نشاه','سبب','اسباب','عوامل','انواع','خصائص','مظاهر','اهميه','دور',
   'عصور','مراحل','نتائج','اثار','اختصاصات','مقومات','ابعاد','مفهوم','فرق','اشهر','اهم','اول','عاصمه','ملوك',
-  'تاريخ','نهايه','مكونات','اقسام','فوائد','اهداف','صفات','اعمال','انجازات','مميزات']);
-let UNIT_LEX = null, KEY_UNITS = null;
+  'تاريخ','نهايه','مكونات','اقسام','فوائد','اهداف','صفات','اعمال','انجازات','مميزات',
+  // مصادر الأفعال (بناء، فتح…) وكلمات عامة (الملك، طول، العام) تُسأل عن أي موضوع
+  'بناء','تاسيس','فتح','ملك','طول','عام','سنه','يوم','كل','مثل','بعض','تاثير','علاقه']);
+let UNIT_LEX = null, KEY_UNITS = null, KEY_ENTRIES = null;
 function buildUnitLex(){
-  UNIT_LEX = {}; KEY_UNITS = new Map();
+  UNIT_LEX = {}; KEY_UNITS = new Map(); KEY_ENTRIES = new Map();
   const add = (set, txt) => normalizeArabic(txt).split(/\s+/).forEach(w=>{ if(w){ set.add(w); const b = stripPrefix(w); set.add(b); set.add(normalizeToken(b)); } });
   Object.keys(UNITS).forEach(n=>{
     const set = UNIT_LEX[n] = new Set();
@@ -6981,13 +6985,39 @@ function buildUnitLex(){
       if(t.length < 3) return;
       if(!KEY_UNITS.has(t)) KEY_UNITS.set(t, new Set());
       KEY_UNITS.get(t).add(String(e.unit));
+      if(!KEY_ENTRIES.has(t)) KEY_ENTRIES.set(t, new Set());
+      KEY_ENTRIES.get(t).add(e);
     }));
   });
 }
+// الكلمة واردة بنص المفهوم نفسه (مفاتيحه أو جوابه أو شرحه الإضافي)
+function ownHas(entry, t){
+  const own = normalizeArabic(entry.k.join(' ') + ' ' + entry.a + ' ' + (entry.extra || '')).split(/\s+/).map(stripPrefix).map(normalizeToken);
+  return own.some(w => w === t || sameStem(w, t));
+}
+// مصطلح مفتاحي مميّز لمفهوم آخر: يرد بمفاتيح أقل من 4 مفاهيم (فليس كلمة عامة كـ«السكان»
+// أو «قطر»)، ومفتاح ذلك المفهوم يطابق السؤال بنصفه على الأقل — فكلمة عابرة داخل مفتاح
+// طويل («بالنسبة» في «الموقع بالنسبة لدوائر العرض») لا تجعل السؤال عنه
+function isCompetingTerm(t, entry, qTokens){
+  if(!UNIT_LEX) buildUnitLex();
+  for(const [k, ents] of KEY_ENTRIES){
+    if(ents.size >= 4) continue;
+    if(k !== t && !sameStem(k, t)) continue;
+    for(const e of ents){
+      if(e === entry || e.a === entry.a) continue;
+      for(const kw of e.k){
+        const kt = kwTokens(kw);
+        if(!kt.some(x => x === k)) continue;
+        const hit = kt.filter(x => qTokens.some(q => matchQuality(q, x) > 0)).length;
+        if(hit * 2 >= kt.length) return true;
+      }
+    }
+  }
+  return false;
+}
 function entryHas(entry, t){
   if(!UNIT_LEX) buildUnitLex();
-  const own = normalizeArabic(entry.k.join(' ') + ' ' + entry.a + ' ' + (entry.extra || '')).split(/\s+/).map(stripPrefix).map(normalizeToken);
-  if(own.some(w => w === t || sameStem(w, t))) return true;
+  if(ownHas(entry, t)) return true;
   const set = entry.unit && UNIT_LEX[entry.unit];
   if(!set) return false;
   if(set.has(t)) return true;
@@ -7015,6 +7045,10 @@ function fitDetails(m, qTokens, others){
   for(let i = 0; i < qTokens.length; i++){
     const t = qTokens[i];
     if(m.explained.has(i) || (others && others.has(i)) || t.length < 3 || QUESTION_WORDS.has(t) || STOPWORDS.has(t)) continue;
+    if(ownHas(m.entry, t)) continue;
+    // مصطلح مميّز لمفهوم آخر بنفس الوحدة («منطقة حرارية باردة قطبية» لا تُجاب
+    // بتعريف الحرارة) ⇒ السؤال عن شيء آخر
+    if(!ASPECT_WORDS.has(t) && isCompetingTerm(t, m.entry, qTokens)) return {ok:false, unknown, flag};
     if(entryHas(m.entry, t)) continue;
     if(!ASPECT_WORDS.has(t) && isOtherUnitTerm(t, m.entry)) return {ok:false, unknown, flag};
     unknown++;
@@ -7063,7 +7097,13 @@ function buildCurriculumCorpus(){
       chunks.forEach(chunk=>{
         const text = chunk.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
         if(text.length > 20 && text.length < 500){
-          corpus.push({ unit: unitNum, unitTitle: u.title, lessonTitle: lesson.title, pages: lesson.pages, text, tokens: tokenize(text) });
+          // نضيف لكل كلمة تبدأ بواو/فاء صيغتها بلا الحرف: «وقسّموا» تطابق «قسموا» —
+          // الحسم بالمعجم يُبقيها أحياناً، وإضافة الصيغتين لا تضر بالبحث
+          const tokens = tokenize(text);
+          normalizeArabic(text).split(/\s+/).forEach(w=>{
+            if(/^[وف][^ا]/.test(w) && w.length > 3) tokens.push(normalizeToken(stripPrefix(w.slice(1))));
+          });
+          corpus.push({ unit: unitNum, unitTitle: u.title, lessonTitle: lesson.title, pages: lesson.pages, text, tokens });
         }
       });
     });
@@ -7078,10 +7118,12 @@ function searchCurriculumDeep(qTokens, boostWords){
   CURRICULUM_CORPUS.forEach(chunk=>{
     let hits = 0, lead = 0;
     const head = chunk.tokens.slice(0, 4);
+    // البحث العميق يقتبس نص الكتاب حرفياً، فلا تخمين إملائي فيه: تطابق حرفي أو صرفي فقط
+    // (وقع: «اعطني نكتة» طابقت «نحته» بفرق حرف فاقتُبست فقرة النحت)
     meaningfulTokens.forEach(qt=>{
-      if(chunk.tokens.some(ct => wordsClose(ct, qt))){
+      if(chunk.tokens.some(ct => matchQuality(ct, qt) >= 0.9)){
         hits++;
-        if(head.some(ct => wordsClose(ct, qt))) lead++;
+        if(head.some(ct => matchQuality(ct, qt) >= 0.9)) lead++;
       }
     });
     // سؤال بكلمة واحدة: نقبل فقط مقطعاً يبدأ بها (تعريف أو فقرة عنها)،
