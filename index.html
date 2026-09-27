@@ -592,6 +592,54 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   }
   .lsDot.on{background:var(--gold); transform:scale(1.3);}
   .lsDot.done{background:#158a55;}
+  /* ===== نقطة مشاركة من حصة اليوم إلى صفوفي ===== */
+  .lsClsSel{
+    padding:7px 12px; border-radius:10px; font-family:'Tajawal'; font-weight:700; font-size:.9rem;
+    background:rgba(255,255,255,.1); color:var(--gold-light); border:1.5px solid rgba(201,161,94,.6); cursor:pointer;
+  }
+  .lsClsSel option{color:var(--navy-deep); background:#fff;}
+  .lsAward{display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; animation:lsFade .4s ease-out;}
+  .lsAwardBtn{
+    padding:11px 24px; border-radius:30px; cursor:pointer; font-family:'Tajawal'; font-weight:700;
+    font-size:clamp(.95rem, 1.6vw, 1.15rem); background:var(--grad-gold); color:var(--navy-deep); border:none;
+    box-shadow:0 4px 14px rgba(201,161,94,.35);
+  }
+  .lsAwardDone{
+    font-weight:700; font-size:clamp(1rem, 1.8vw, 1.3rem); color:var(--gold-deep);
+    background:#fdf4e3; border:2px solid var(--gold); border-radius:30px; padding:9px 22px;
+  }
+  .lsAwardUndo{
+    padding:8px 14px; border-radius:30px; cursor:pointer; font-family:'Tajawal'; font-size:.85rem;
+    background:transparent; border:1.5px solid #cfc6b0; color:#8a8170;
+  }
+  .lsPicker{
+    position:fixed; inset:0; z-index:470; background:rgba(10,32,41,.55);
+    display:flex; align-items:center; justify-content:center; padding:18px;
+  }
+  .lsPicker[hidden]{display:none;}
+  .lsPickBox{
+    background:#fffdf8; border:2px solid var(--gold); border-radius:18px; width:min(980px, 100%);
+    max-height:88vh; display:flex; flex-direction:column; overflow:hidden;
+  }
+  .lsPickHead{
+    background:var(--grad-navy); color:var(--gold-light); padding:13px 18px; font-weight:700;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  .lsPickClose{background:transparent; border:1.5px solid rgba(201,161,94,.6); color:var(--gold-light); border-radius:10px; padding:6px 14px; cursor:pointer; font-family:'Tajawal'; font-weight:700;}
+  .lsPickGrid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(165px, 1fr)); gap:10px;
+    padding:16px; overflow-y:auto;
+  }
+  .lsPickName{
+    position:relative; padding:14px 10px; border-radius:12px; cursor:pointer; font-family:'Tajawal';
+    font-weight:700; font-size:1.02rem; color:var(--navy-deep); background:#fff; border:2px solid #e0d8c4;
+  }
+  .lsPickName:hover{border-color:var(--gold-deep); background:var(--cream);}
+  .lsPickName i{
+    position:absolute; top:-8px; left:-6px; font-style:normal; font-size:.75rem;
+    background:var(--gold); color:var(--navy-deep); border-radius:12px; padding:1px 7px;
+  }
+  .lsPickEmpty{padding:26px; text-align:center; color:#8a8170;}
   /* زر خطر: مظهره يختلف عن بقية الأزرار عمداً */
   .mcWipe{
     padding:10px 18px; border-radius:30px; cursor:pointer; font-family:'Tajawal';
@@ -1852,6 +1900,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <button class="fmExit" onclick="closeLessonShow()">✕ إنهاء العرض</button>
     <div class="fmTitle">📝 حصة اليوم</div>
     <div style="display:flex; align-items:center; gap:11px; flex-wrap:wrap;">
+      <select class="lsClsSel" id="lsCls" onchange="lsSetCls(this.value)" title="الإجابة الصحيحة تمنح نقطة مشاركة لطالب من هذا الصف"></select>
       <div class="lsTimer" id="lsTimer"></div>
       <button class="lsTimerBtn" id="lsTimerBtn" onclick="lsToggleTimer()">⏱️ ٣٠ ثانية</button>
       <div class="lsCount" id="lsCount"></div>
@@ -1866,6 +1915,12 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <button class="lsNavBtn" id="lsPrevBtn" onclick="lsGo(-1)">→ السابق</button>
     <button class="lsNavBtn reveal" id="lsRevealBtn" onclick="lsReveal()">💡 اكشف الإجابة</button>
     <button class="lsNavBtn" id="lsNextBtn" onclick="lsGo(1)">التالي ←</button>
+  </div>
+  <div class="lsPicker" id="lsPicker" hidden onclick="lsPickerBackdrop(event)">
+    <div class="lsPickBox">
+      <div class="lsPickHead"><span id="lsPickTitle">⭐ مَن أجاب؟</span><button class="lsPickClose" onclick="lsClosePicker()">✕ إلغاء</button></div>
+      <div class="lsPickGrid" id="lsPickGrid"></div>
+    </div>
   </div>
 </div>
 
@@ -5128,6 +5183,7 @@ function startActivity(id){
   lsCurrentAct = id;
   lsWrongHere = new Set();
   lsStatRun(id);
+  lsSetupCls(act.grade);
   openLessonShow();
 }
 
@@ -5191,7 +5247,9 @@ function lsPick(i){
     if(lsCurrentAct) lsStatAnswer(lsCurrentAct, lsIndex, lsWrongHere.has(lsIndex) ? 'after' : 'first');
     lsSeen.add(lsIndex);
     renderLessonShowDots();
-    lsStartAuto();
+    // مع صف للنقاط: الانتقال التلقائي ينتظر اختيار الطالب، وإلا سبق المعلمَ
+    if(lsCanAward()){ lsShowAward(); if(lsAwards[lsIndex]) lsStartAuto(); }
+    else lsStartAuto();
     const rv = document.getElementById('lsRevealBtn');
     if(rv) rv.style.display = 'none';
   } else {
@@ -5267,6 +5325,7 @@ function openLessonShow(){
 }
 
 function closeLessonShow(){
+  lsClosePicker();
   lsStopTimer();
   lsCancelAuto();
   document.getElementById('lessonShow').classList.remove('show');
@@ -5275,6 +5334,8 @@ function closeLessonShow(){
 }
 
 function lsKeys(e){
+  const pk = document.getElementById('lsPicker');
+  if(pk && !pk.hidden){ if(e.key === 'Escape') lsClosePicker(); return; }
   if(e.key === 'Escape') closeLessonShow();
   else if(e.key === 'ArrowLeft') lsGo(1);      // بالعربية: يسار = التالي
   else if(e.key === 'ArrowRight') lsGo(-1);
@@ -5364,6 +5425,7 @@ function lsReveal(){
     if(wrap.innerHTML){ wrap.innerHTML = ''; rv.textContent = '💡 اكشف الإجابة'; return; }
     wrap.innerHTML = `<div class="lsA">${esc(q.a)}</div>`;
     rv.textContent = '🙈 أخفِ الإجابة';
+    lsShowAward();
   }
   lsSeen.add(lsIndex);
   renderLessonShowDots();
@@ -5373,6 +5435,146 @@ function renderLessonShowDots(){
   document.getElementById('lsDots').innerHTML = lessonQs.map((x, i)=>
     `<button class="lsDot ${i === lsIndex ? 'on' : (lsSeen.has(i) ? 'done' : '')}" onclick="lsJump(${i})" title="فقرة ${i+1}"></button>`
   ).join('');
+}
+
+// ═══════ نقطة مشاركة: الإجابة الصحيحة بحصة اليوم تُحسب بصفوفي ═══════
+// المعلم يختار الطالب الذي أجاب (الشاشة لا تعرف من رفع يده) — نقطة واحدة لكل فقرة،
+// فالرجوع للفقرة لا يضاعفها، مع تراجع لو اختار الاسم الخطأ.
+let lsCls = '';          // صف النقاط الحالي — فارغ = بدون نقاط
+let lsRoster = [];       // [{id, student_name}]
+let lsAwards = {};       // رقم الفقرة ← {id, name}
+let lsRosterReq = 0;     // يمنع ردّاً متأخراً لصف سابق من الكتابة فوق الحالي
+
+function lsSetupCls(grade){
+  lsAwards = {};
+  const sel = document.getElementById('lsCls');
+  const classes = [...document.querySelectorAll('.myClassBtn')]
+    .map(b => ({cls: b.dataset.cls, label: b.textContent.trim()}))
+    .filter(c => c.cls && c.cls.startsWith(grade + '-'));
+  let saved = '';
+  try { saved = localStorage.getItem('rahhala_ls_cls_' + grade) || ''; } catch(e){}
+  const has = c => classes.some(x => x.cls === c);
+  lsCls = saved === 'none' ? '' : has(saved) ? saved : has(myClassCls) ? myClassCls : (classes[0] ? classes[0].cls : '');
+  if(sel){
+    sel.innerHTML = classes.map(c => `<option value="${esc(c.cls)}">⭐ ${esc(c.label)}</option>`).join('')
+      + '<option value="">بدون نقاط</option>';
+    sel.value = lsCls;
+    sel.dataset.grade = grade;
+  }
+  lsLoadRoster();
+}
+
+function lsSetCls(v){
+  lsCls = v;
+  const sel = document.getElementById('lsCls');
+  try { if(sel) localStorage.setItem('rahhala_ls_cls_' + sel.dataset.grade, v || 'none'); } catch(e){}
+  lsAwards = {};           // النقاط الممنوحة محفوظة بقاعدة البيانات؛ السجل المحلي يخص الصف السابق
+  lsLoadRoster();
+  lsRefreshAward();
+}
+
+async function lsLoadRoster(){
+  const req = ++lsRosterReq;
+  lsRoster = [];
+  if(!lsCls || !dbReady || !sb) return;
+  const { data, error } = await sb.from('class_roster').select('*').eq('cls', lsCls).order('student_name');
+  if(req !== lsRosterReq) return;
+  if(error){ showToast('تعذر تحميل أسماء الصف — النقاط معطّلة بهذا العرض', 'error'); return; }
+  lsRoster = (data || []).filter(r => !r.deleted_at).map(r => ({id: r.id, student_name: r.student_name}));
+  lsRefreshAward();
+}
+
+// هل للفقرة الحالية مكان لنقطة؟ صف مختار + أسماء محمّلة
+function lsCanAward(){ return !!(lsCls && lsRoster.length); }
+
+function lsAwardHtml(){
+  const a = lsAwards[lsIndex];
+  if(a) return `<span class="lsAwardDone">⭐ نقطة مشاركة لـ${esc(a.name)}</span>
+    <button class="lsAwardUndo" onclick="lsUndoAward()">↩️ تراجع</button>`;
+  return `<button class="lsAwardBtn" onclick="lsOpenPicker()">⭐ مَن أجاب؟ — نقطة مشاركة</button>`;
+}
+
+// يُستدعى بعد ظهور الإجابة الصحيحة
+function lsShowAward(){
+  const wrap = document.getElementById('lsAWrap');
+  if(!wrap || !lsCanAward()) return;
+  wrap.querySelectorAll('.lsAward').forEach(e => e.remove());
+  wrap.insertAdjacentHTML('beforeend', `<div class="lsAward">${lsAwardHtml()}</div>`);
+}
+// تحديث الشريط إن كان ظاهراً (بعد تحميل الأسماء أو منح/تراجع)
+function lsRefreshAward(){
+  const box = document.querySelector('#lsAWrap .lsAward');
+  if(!box) return;
+  if(!lsCanAward()){ box.remove(); return; }
+  box.innerHTML = lsAwardHtml();
+}
+
+function lsOpenPicker(){
+  if(!isAdmin || !lsCanAward()) return;
+  lsCancelAuto();
+  const count = {};
+  Object.values(lsAwards).forEach(a => { count[a.id] = (count[a.id] || 0) + 1; });
+  const sel = document.getElementById('lsCls');
+  const label = sel && sel.selectedOptions[0] ? sel.selectedOptions[0].textContent.replace('⭐', '').trim() : lsCls;
+  document.getElementById('lsPickTitle').textContent = '⭐ مَن أجاب؟ — ' + label;
+  document.getElementById('lsPickGrid').innerHTML = lsRoster.map(r =>
+    `<button class="lsPickName" onclick="lsGiveAward(${r.id})">${esc(r.student_name)}${count[r.id] ? `<i>⭐ ${count[r.id]}</i>` : ''}</button>`
+  ).join('');
+  document.getElementById('lsPicker').hidden = false;
+}
+// نقرة على الخلفية المعتمة خارج الصندوق = إلغاء
+function lsPickerBackdrop(e){ if(e.target === e.currentTarget) lsClosePicker(); }
+function lsClosePicker(){
+  const p = document.getElementById('lsPicker');
+  if(p) p.hidden = true;
+}
+
+// قراءة القيمة الحالية ثم الكتابة — فلا تُمسح نقطة أُضيفت من صفوفي بنفس الوقت
+async function lsBumpPoints(id, delta){
+  const { data, error } = await sb.from('class_roster').select('participation_points').eq('id', id).maybeSingle();
+  if(error) return error;
+  const next = Math.max(0, (data?.participation_points || 0) + delta);
+  const res = await sb.from('class_roster').update({participation_points: next}).eq('id', id);
+  if(!res.error){
+    const row = myClassData.find(r => r.id === id);
+    if(row) row.participation_points = next;
+  }
+  return res.error;
+}
+
+async function lsGiveAward(id){
+  if(!isAdmin || !requireDb()) return;
+  const idx = lsIndex;
+  if(lsAwards[idx]) return;
+  const r = lsRoster.find(x => x.id === id);
+  if(!r) return;
+  lsAwards[idx] = {id, name: r.student_name};   // استجابة فورية
+  lsClosePicker();
+  lsRefreshAward();
+  lsConfetti(10);
+  const err = await lsBumpPoints(id, +1);
+  if(err){
+    delete lsAwards[idx];
+    lsRefreshAward();
+    showToast('تعذر حفظ النقطة: ' + err.message, 'error');
+    return;
+  }
+  if(idx === lsIndex) lsStartAuto();
+}
+
+async function lsUndoAward(){
+  if(!isAdmin || !requireDb()) return;
+  const idx = lsIndex, a = lsAwards[idx];
+  if(!a) return;
+  lsCancelAuto();
+  delete lsAwards[idx];
+  lsRefreshAward();
+  const err = await lsBumpPoints(a.id, -1);
+  if(err){
+    lsAwards[idx] = a;
+    lsRefreshAward();
+    showToast('تعذر التراجع: ' + err.message, 'error');
+  }
 }
 
 async function refreshClassChallenge(){
