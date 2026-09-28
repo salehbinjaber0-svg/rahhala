@@ -556,6 +556,16 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     background:#fffdf8; color:var(--navy-deep); overflow-y:auto;
   }
   #lessonShow.show{display:flex; flex-direction:column;}
+  /* خلفية النشاط: رسم متجهي مضمّن (لا صورة خارجية) بشفافية منخفضة
+     جداً — تعطي طابعاً بصرياً بلا أن تضرّ وضوح النص على السبورة. */
+  #lessonShow.bg-egypt::before{
+    content:''; position:absolute; inset:0; pointer-events:none; z-index:0;
+    background:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 400'%3E%3Cdefs%3E%3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23c9a15e'/%3E%3Cstop offset='1' stop-color='%23e0c48f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='640' cy='108' r='52' fill='%23e8c87a'/%3E%3Cpath d='M120 320 L240 132 L360 320 Z' fill='url(%23s)'/%3E%3Cpath d='M240 132 L300 226 L240 320 Z' fill='%23b08a4a' opacity='.55'/%3E%3Cpath d='M330 320 L430 168 L530 320 Z' fill='url(%23s)'/%3E%3Cpath d='M430 168 L478 244 L430 320 Z' fill='%23b08a4a' opacity='.55'/%3E%3Cpath d='M520 320 L590 214 L660 320 Z' fill='url(%23s)'/%3E%3Cpath d='M0 322 L800 322 L800 342 L0 342 Z' fill='%23d9c9a3'/%3E%3Cpath d='M0 348 Q200 336 400 348 T800 348 L800 400 L0 400 Z' fill='%234a90a4' opacity='.5'/%3E%3Cpath d='M700 320 L700 250 M700 250 q-26-16-42-6 M700 250 q26-16 42-6 M700 258 q-30-6-44 8 M700 258 q30-6 44 8' stroke='%236a8a52' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat bottom center;
+    background-size:min(100%, 900px) auto;
+    opacity:.13;
+  }
+  #lessonShow.bg-egypt > *{position:relative; z-index:1;}
+
   .lsHead{
     background:var(--grad-navy); padding:15px 20px; border-bottom:2px solid var(--gold);
     display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
@@ -5059,6 +5069,61 @@ const ACTIVITIES = [
       {kind:'reward', q:'🏆 الفريق الفائز',
        a:'صفّقوا للفريق الفائز!\n\nاختيارهم: خمس نقاط مشاركة لكل فرد، أو بدء الحصة القادمة بلعبة يختارونها.\n\nوللفريق الآخر: نقطة مشاركة لكل من شارك بإجابة — المحاولة تُكافأ.'}
     ]
+  },
+  {
+    id:'misr-8-review', date:'2026-09-28', grade:8, unit:2, icon:'📜', bg:'egypt',
+    title:'مراجعة الوحدة: الحضارة المصرية',
+    desc:'مراجعة شاملة للدرسين — ١٣ سؤالاً',
+    items:[
+      {kind:'essay', q:'عدّد عوامل قيام الحضارة المصرية.',
+       a:'الموقع الجغرافي · نهر النيل · المناخ المعتدل · الموارد الطبيعية · العوامل البشرية.'},
+
+      {kind:'mcq', q:'ما تعريف الحضارة؟',
+       choices:['عدد سكان الدولة وقوة جيشها','جميع ما أنجزه الإنسان بتفاعله مع بيئته لتحسين حياته','المباني الضخمة والآثار القديمة'],
+       correct_index:1, a:'وتشمل الجوانب المعنوية والمادية معاً.'},
+
+      {kind:'mcq', q:'أي العوامل ساعد على استقرار المصريين وقيام الزراعة؟',
+       choices:['المناخ المعتدل','نهر النيل','الموارد المعدنية'],
+       correct_index:1, a:'ساعد على الاستقرار وقيام الزراعة ووفرة المحاصيل.'},
+
+      {kind:'mcq', q:'لماذا كانت مصر «حلقة اتصال بين حضارات العالم القديم»؟',
+       choices:['بسبب موقعها الجغرافي','لأنها أقدم حضارة','لأن لغتها كانت لغة التجارة'],
+       correct_index:0, a:'الموقع الجغرافي أول عوامل قيام الحضارة المصرية.'},
+
+      {kind:'essay', q:'اذكر عصور مصر القديمة الأربعة مع تاريخ كل عصر.',
+       a:'العتيق (3200–2800 ق.م) · الدولة القديمة (2800–2200 ق.م) · الدولة الوسطى (2065–1775 ق.م) · الدولة الحديثة (1570–1098 ق.م).'},
+
+      {kind:'mcq', q:'كم عاماً استمر العصر العتيق؟',
+       choices:['نحو 400 عام','نحو 600 عام','نحو 200 عام'],
+       correct_index:0, a:'من 3200 إلى 2800 ق.م، وحكمته الأسرتان الأولى والثانية.'},
+
+      {kind:'mcq', q:'ما نظام الحكم في مصر القديمة؟',
+       choices:['جمهوري بالانتخاب','ملكي وراثي','حكم مجلس الكهنة'],
+       correct_index:1, a:'ويرأس الدولةَ الفرعون، ويساعده الوزير.'},
+
+      {kind:'essay', q:'رتّب عناصر الحكم في مصر القديمة من الأعلى إلى الأسفل.',
+       a:'الفرعون ← الوزير ← الإدارة المركزية ← حكام الأقاليم.'},
+
+      {kind:'mcq', q:'كلمة «فرعون» — ما أصل معناها؟',
+       choices:['ابن الشمس','البيت الكبير أو القصر العالي','القائد الأعلى للجيش'],
+       correct_index:1, a:'وبمرور الزمن صارت تُطلق على مَن يسكن القصر وهو الملك الحاكم.'},
+
+      {kind:'mcq', q:'ما أهم المحاصيل الزراعية في مصر القديمة؟',
+       choices:['الأرز والذرة','القمح والشعير','القطن والكتان'],
+       correct_index:1, a:'واهتمّ المصري القديم بتربية الأبقار والأغنام وصيد الأسماك.'},
+
+      {kind:'mcq', q:'بمَ سبقت مصر العالم صناعياً؟',
+       choices:['أول من صنع الحديد','أول من صنعت الورق من نبات البردي','أول من صنع الزجاج'],
+       correct_index:1, a:'وعرفت الصناعات المعدنية كالأسلحة والخشبية كالسفن والأثاث.'},
+
+      {kind:'mcq', q:'التجارة في مصر القديمة كانت نوعين — ما هما؟',
+       choices:['برية وبحرية','داخلية بين القرى والمدن، وخارجية مع الدول المجاورة','رسمية وشعبية'],
+       correct_index:1, a:'ساعد موقع مصر المتميّز على اشتغال المصري القديم بالتجارة.'},
+
+      {kind:'mcq', q:'أي هذه من الدول التي تاجرت معها مصر؟',
+       choices:['الصين والهند','بلاد الرافدين وفينيقيا وبلاد بونت','روما واليونان'],
+       correct_index:1, a:'ومنها كذلك بلاد النوبة وليبيا.'}
+    ]
   }
 ];
 
@@ -5203,6 +5268,10 @@ function startActivity(id){
   if(!isAdmin) return;
   const act = ACTIVITIES.find(a => a.id === id);
   if(!act){ showToast('ما لقيت النشاط', 'error'); return; }
+  // خلفية بصرية اختيارية للنشاط
+  const show = document.getElementById('lessonShow');
+  show.className = show.className.replace(/\bbg-\S+/g, '').trim();
+  if(act.bg) show.classList.add('bg-' + act.bg);
   lessonQs = act.items.map((it, i)=>({id:i+1, ...it, pos:i}));
   lsCurrentAct = id;
   lsWrongHere = new Set();
