@@ -661,6 +661,97 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     background:var(--gold); color:var(--navy-deep); border-radius:12px; padding:1px 7px;
   }
   .lsPickEmpty{padding:26px; text-align:center; color:#8a8170;}
+  /* ===== عجلة الأسماء ===== */
+  .whModal{
+    position:fixed; inset:0; z-index:490; display:flex; align-items:center; justify-content:center;
+    padding:14px; overflow:hidden; background:rgba(6,20,26,.74); backdrop-filter:blur(3px);
+    --whS:min(56vh, 84vw, 470px);
+  }
+  .whModal[hidden]{display:none;}
+  .whBox{
+    width:min(780px, 100%); max-height:100%; overflow-y:auto; display:flex; flex-direction:column;
+    background:radial-gradient(ellipse at 50% 0%, var(--navy-soft), var(--navy-deep) 72%);
+    border:2px solid var(--gold); border-radius:22px; color:#fff; box-shadow:0 30px 80px rgba(0,0,0,.5);
+  }
+  .whHead{
+    display:flex; align-items:center; gap:9px; flex-wrap:wrap; padding:11px 16px;
+    border-bottom:1px solid rgba(201,161,94,.35);
+  }
+  .whTitle{font-family:'Aref Ruqaa'; color:var(--gold-light); font-size:1.4rem; line-height:1.7; margin-inline-end:auto;}
+  .whSel{
+    padding:7px 12px; border-radius:10px; font-family:'Tajawal'; font-weight:700; font-size:.9rem; cursor:pointer;
+    background:rgba(255,255,255,.08); color:var(--gold-light); border:1.5px solid rgba(201,161,94,.6);
+  }
+  .whSel option{color:var(--navy-deep); background:#fff;}
+  .whOpt{display:flex; align-items:center; gap:6px; font-size:.86rem; color:var(--gold-light); cursor:pointer; user-select:none;}
+  .whOpt input{accent-color:var(--gold); width:16px; height:16px;}
+  .whBtn{
+    padding:7px 14px; border-radius:10px; cursor:pointer; font-family:'Tajawal'; font-weight:700; font-size:.88rem;
+    background:rgba(255,255,255,.06); color:var(--gold-light); border:1.5px solid rgba(201,161,94,.6);
+  }
+  .whBtn:hover{background:rgba(201,161,94,.18);}
+  .whBtn.grow{background:var(--grad-gold); color:var(--navy-deep); border-color:transparent;}
+  .whStage{display:flex; flex-direction:column; align-items:center; gap:14px; padding:18px 16px 20px;}
+  .whWheel{position:relative; width:var(--whS); height:var(--whS); flex-shrink:0;}
+  .whWheel svg{width:100%; height:100%; display:block; overflow:visible; filter:drop-shadow(0 16px 30px rgba(0,0,0,.45));}
+  #whRot{transform-box:view-box; transform-origin:0 0; will-change:transform;}
+  .whSeg{stroke:rgba(10,32,41,.55); stroke-width:1.2;}
+  .whSeg.win{stroke:#fff6d8; stroke-width:4; filter:brightness(1.2);}
+  .whTxt{font-family:'Tajawal'; font-weight:800; pointer-events:none;}
+  .whBulb{fill:#6d5a35; transition:fill .2s;}
+  .whBulb.on{fill:#fff3cf;}
+  .whModal.spinning .whBulb{animation:whBlink .36s steps(1) infinite;}
+  .whModal.spinning .whBulb.alt{animation-delay:.18s;}
+  @keyframes whBlink{0%{fill:#fff3cf;} 50%{fill:#6d5a35;}}
+  .whPtr{transform-box:fill-box; transform-origin:50% 15%;}
+  .whPtr.tick{animation:whTick .13s ease-out;}
+  @keyframes whTick{40%{transform:rotate(-16deg);}}
+  .whHub{
+    position:absolute; left:50%; top:50%; width:23%; height:23%; transform:translate(-50%,-50%);
+    border-radius:50%; border:4px solid var(--gold-light); cursor:pointer;
+    background:radial-gradient(circle at 35% 28%, #fffaf0, var(--gold) 62%, var(--gold-deep));
+    color:var(--navy-deep); font-family:'Aref Ruqaa'; font-weight:700; font-size:calc(var(--whS) * .062);
+    box-shadow:0 5px 16px rgba(0,0,0,.4), inset 0 -4px 8px rgba(0,0,0,.18); transition:transform .15s;
+  }
+  .whHub:hover:not(:disabled){transform:translate(-50%,-50%) scale(1.06);}
+  .whHub:disabled{cursor:default; opacity:.85;}
+  .whResult{min-height:128px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:9px; text-align:center;}
+  .whWinLbl{color:var(--gold-light); font-size:1rem; letter-spacing:.3px;}
+  .whWinName{
+    font-family:'Aref Ruqaa'; font-size:clamp(1.9rem, 4.6vw, 3.1rem); line-height:1.5; color:#fff;
+    text-shadow:0 0 24px rgba(227,201,139,.6); animation:whPop .55s cubic-bezier(.2,1.6,.4,1);
+  }
+  @keyframes whPop{from{transform:scale(.4); opacity:0;} to{transform:none; opacity:1;}}
+  .whActs{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; align-items:center;}
+  .whPt{
+    padding:11px 24px; border-radius:30px; cursor:pointer; font-family:'Tajawal'; font-weight:800; font-size:1rem;
+    background:var(--grad-gold); color:var(--navy-deep); border:none; box-shadow:0 4px 14px rgba(201,161,94,.35);
+  }
+  .whPt:disabled{opacity:.6; cursor:wait;}
+  .whPtDone{font-weight:800; color:var(--gold-light); background:rgba(201,161,94,.16); border:1.5px solid var(--gold); border-radius:30px; padding:9px 20px;}
+  .whGhost{
+    padding:10px 20px; border-radius:30px; cursor:pointer; font-family:'Tajawal'; font-weight:700; font-size:.95rem;
+    background:transparent; color:#fff; border:1.5px solid rgba(255,255,255,.4);
+  }
+  .whGhost:hover{border-color:var(--gold-light); color:var(--gold-light);}
+  .whHint{color:rgba(255,255,255,.72); font-size:.92rem; line-height:1.8;}
+  .whHint b{color:var(--gold-light);}
+  .whErr{color:#ffb3a8;}
+  .whConf{position:absolute; top:-18px; width:10px; height:15px; border-radius:2px; pointer-events:none; z-index:6; animation:whFall linear forwards;}
+  @keyframes whFall{to{transform:translateY(112vh) rotate(760deg);}}
+  /* ملء الشاشة: العجلة بأقصى حجم تسمح به الشاشة */
+  .whModal.full{padding:0; background:var(--navy-deep); --whS:min(calc(100vh - 250px), 94vw);}
+  .whModal.full .whBox{width:100%; height:100%; max-height:none; border:none; border-radius:0;}
+  .whModal.full .whStage{flex:1; justify-content:center;}
+  .whModal.full .whWinName{font-size:clamp(2.3rem, 5.6vw, 4.6rem);}
+  @media (min-aspect-ratio: 5/4){
+    .whModal.full{--whS:min(calc(100vh - 100px), 62vw);}
+    .whModal.full .whStage{flex-direction:row; gap:4vw;}
+    .whModal.full .whResult{width:min(30vw, 440px);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .whModal *, .whModal.spinning .whBulb{animation:none !important;}
+  }
   /* زر خطر: مظهره يختلف عن بقية الأزرار عمداً */
   .mcWipe{
     padding:10px 18px; border-radius:30px; cursor:pointer; font-family:'Tajawal';
@@ -1923,6 +2014,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <div style="display:flex; align-items:center; gap:11px; flex-wrap:wrap;">
       <select class="lsClsSel" id="lsCls" onchange="lsSetCls(this.value)" title="الإجابة الصحيحة تمنح نقطة مشاركة لطالب من هذا الصف"></select>
       <div class="lsTimer" id="lsTimer"></div>
+      <button class="lsTimerBtn" onclick="openWheel(lsCls)" title="عجلة الأسماء">🎡 العجلة</button>
       <button class="lsTimerBtn" id="lsTimerBtn" onclick="lsToggleTimer()">⏱️ ٣٠ ثانية</button>
       <div class="lsCount" id="lsCount"></div>
     </div>
@@ -1941,6 +2033,34 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <div class="lsPickBox">
       <div class="lsPickHead"><span id="lsPickTitle">⭐ مَن أجاب؟</span><button class="lsPickClose" onclick="lsClosePicker()">✕ إلغاء</button></div>
       <div class="lsPickGrid" id="lsPickGrid"></div>
+    </div>
+  </div>
+</div>
+
+<div class="whModal" id="wheelModal" hidden>
+  <div class="whBox">
+    <div class="whHead">
+      <div class="whTitle">🎡 عجلة الأسماء</div>
+      <select class="whSel" id="whCls" onchange="whSetCls(this.value)" title="الصف"></select>
+      <label class="whOpt" title="من طلع اسمه ينشال من العجلة حتى يأخذ الجميع دورهم"><input type="checkbox" id="whNoRepeat" checked onchange="whPaint()"> بدون تكرار</label>
+      <button class="whBtn grow" id="whFullBtn" onclick="whToggleFull()">⛶ ملء الشاشة</button>
+      <button class="whBtn" onclick="closeWheel()" title="إغلاق">✕</button>
+    </div>
+    <div class="whStage">
+      <div class="whWheel">
+        <svg viewBox="-222 -222 444 444" aria-hidden="true">
+          <circle r="214" fill="#0a2029" stroke="#c9a15e" stroke-width="5"/>
+          <g id="whBulbs"></g>
+          <g id="whRot"></g>
+          <circle r="200" fill="none" stroke="#c9a15e" stroke-width="3"/>
+          <g class="whPtr" id="whPtr">
+            <path d="M-17,-226 L17,-226 L0,-186 Z" fill="#fff6dc" stroke="#a8813f" stroke-width="3" stroke-linejoin="round"/>
+            <circle cy="-222" r="6" fill="#a8813f"/>
+          </g>
+        </svg>
+        <button class="whHub" id="whHub" onclick="whSpin()">لِفّ</button>
+      </div>
+      <div class="whResult" id="whResult"></div>
     </div>
   </div>
 </div>
@@ -2106,6 +2226,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <button class="myClassBtn" data-cls="7-2" onclick="switchMyClass('7-2', this)">سابع 2</button>
       <button class="myClassBtn" data-cls="8-6" onclick="switchMyClass('8-6', this)">ثامن 6</button>
       <button class="focusModeBtn" onclick="openFocusMode()">⚡ وضع الحصة السريع</button>
+      <button class="focusModeBtn" onclick="openWheel(myClassCls)">🎡 عجلة الأسماء</button>
       <button class="myClassExport" onclick="exportMyClassCSV()">⬇️ تصدير الصف</button>
       <button class="mcWipe" onclick="mcWipeClass()" title="حذف كل طلاب هذا الصف">🗑️ حذف كل الأسماء</button>
     </div>
@@ -5482,6 +5603,7 @@ function closeLessonShow(){
 }
 
 function lsKeys(e){
+  if(whOpen()) return;                       // العجلة فوق العرض تستقبل المفاتيح وحدها
   const pk = document.getElementById('lsPicker');
   if(pk && !pk.hidden){ if(e.key === 'Escape') lsClosePicker(); return; }
   if(e.key === 'Escape') closeLessonShow();
@@ -5724,6 +5846,298 @@ async function lsUndoAward(){
     showToast('تعذر التراجع: ' + err.message, 'error');
   }
 }
+
+// ═══════ عجلة الأسماء ═══════
+// الفائز يُختار عشوائياً بعدالة قبل الدوران، ثم تُوجَّه العجلة لتقف عند منتصف شريحته
+// (مع إزاحة بسيطة داخلها كي لا يبدو التوقّف آلياً). الغائبون اليوم لا يدخلون العجلة.
+const WH_COLORS = [['#164256','#fff'], ['#c9a15e','#0a2029'], ['#1f6f5c','#fff'],
+                   ['#7a3030','#fff'], ['#2a6b8a','#fff'], ['#e3c98b','#0a2029']];
+const wh = {cls:'', all:[], pool:[], absent:0, pickedBy:{}, angle:0, spinning:false,
+            winner:null, winIdx:-1, awarded:false, req:0, timer:null, lastIdx:-1, lastTick:0, ac:null, msg:''};
+
+function openWheel(cls){
+  if(!isAdmin){ showToast('هذي الأداة للمعلم فقط', 'error'); return; }
+  if(!requireDb()) return;
+  const classes = [...document.querySelectorAll('.myClassBtn')]
+    .map(b => ({cls: b.dataset.cls, label: b.textContent.trim()})).filter(c => c.cls);
+  const sel = document.getElementById('whCls');
+  sel.innerHTML = classes.map(c => `<option value="${esc(c.cls)}">${esc(c.label)}</option>`).join('');
+  const target = classes.some(c => c.cls === cls) ? cls : (classes[0] ? classes[0].cls : '');
+  sel.value = target;
+  document.getElementById('wheelModal').hidden = false;
+  document.addEventListener('keydown', whKeys);
+  whBulbs();
+  whSetCls(target);
+  if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
+}
+
+function closeWheel(){
+  whStopSpin();
+  if(document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+  const m = document.getElementById('wheelModal');
+  m.classList.remove('full', 'spinning');
+  m.hidden = true;
+  whFullLabel();
+  document.removeEventListener('keydown', whKeys);
+}
+function whOpen(){ const m = document.getElementById('wheelModal'); return !!(m && !m.hidden); }
+
+function whKeys(e){
+  if(e.key === 'Escape'){ e.preventDefault(); closeWheel(); return; }
+  // عناصر التحكم داخل العجلة تتصرف طبيعياً؛ أي تركيز خارجها (زر العرض خلفها) لا يسرق المسافة
+  const t = e.target, inside = t && t.closest && t.closest('#wheelModal');
+  if((e.key === ' ' || e.key === 'Enter') && !(inside && /^(SELECT|INPUT|BUTTON)$/.test(t.tagName))){
+    e.preventDefault(); whSpin();
+  }
+}
+
+function whSetCls(cls){
+  if(wh.spinning){ document.getElementById('whCls').value = wh.cls; return; }
+  wh.cls = cls; wh.winner = null; wh.msg = '';
+  whLoad();
+}
+
+async function whLoad(){
+  const req = ++wh.req;
+  wh.all = []; wh.absent = 0; wh.msg = '⏳ تحميل الأسماء…';
+  whPaint();
+  if(!wh.cls){ wh.msg = ''; whPaint(); return; }
+  const { data, error } = await sb.from('class_roster').select('*').eq('cls', wh.cls).order('student_name');
+  if(req !== wh.req) return;
+  if(error){ wh.msg = 'تعذر تحميل الأسماء: ' + error.message; whPaint(); return; }
+  const rows = (data || []).filter(r => !r.deleted_at).map(r => ({id: r.id, name: r.student_name}));
+  // الغائب اليوم لا يدخل العجلة — لو تعذّرت قراءة الحضور نعرض الجميع
+  const absent = new Set();
+  if(rows.length){
+    const today = new Date().toISOString().slice(0,10);
+    const at = await sb.from('roster_attendance').select('roster_id,status').in('roster_id', rows.map(r => r.id)).eq('day', today);
+    if(req !== wh.req) return;
+    if(!at.error) (at.data || []).forEach(a => { if(a.status === 'absent') absent.add(a.roster_id); });
+  }
+  wh.absent = rows.filter(r => absent.has(r.id)).length;
+  wh.all = rows.filter(r => !absent.has(r.id));
+  wh.msg = '';
+  whPaint();
+}
+
+function whPicked(){ return wh.pickedBy[wh.cls] || (wh.pickedBy[wh.cls] = new Set()); }
+
+function whPt(a, r){ const t = a * Math.PI / 180; return (r * Math.sin(t)).toFixed(2) + ',' + (-r * Math.cos(t)).toFixed(2); }
+
+// رسم الشرائح: الزاوية ٠ = أعلى العجلة (موضع المؤشر)، وتزيد مع عقارب الساعة
+function whPaint(){
+  if(wh.spinning) return;
+  const noRep = document.getElementById('whNoRepeat').checked;
+  const picked = whPicked();
+  wh.pool = noRep ? wh.all.filter(r => !picked.has(r.id)) : wh.all.slice();
+  wh.winIdx = -1;
+  const n = wh.pool.length, R = 200;
+  let svg = '';
+  if(!n){
+    svg = `<circle r="${R}" fill="#164256"/>`;
+  } else {
+    const seg = 360 / n;
+    const fitW = R * 0.6;                                  // المسافة المتاحة للاسم على نصف القطر
+    const fitH = 2 * Math.PI * R * 0.6 / n * 0.7;          // عرض الشريحة عند موضع الاسم
+    wh.pool.forEach((r, i)=>{
+      let c = WH_COLORS[i % WH_COLORS.length];
+      if(i === n - 1 && n > 1 && i % WH_COLORS.length === 0) c = WH_COLORS[2];   // لا يتجاور لونان متطابقان
+      const shape = n === 1 ? `<circle class="whSeg" data-i="0" r="${R}" fill="${c[0]}"/>`
+        : `<path class="whSeg" data-i="${i}" fill="${c[0]}" d="M0,0 L${whPt(i*seg, R)} A${R},${R} 0 ${seg > 180 ? 1 : 0} 1 ${whPt((i+1)*seg, R)} Z"/>`;
+      const label = String(r.name).trim().split(/\s+/).slice(0, 2).join(' ');
+      const fs = Math.max(7, Math.min(26, fitH, fitW / (Math.max(label.length, 3) * 0.56)));
+      // نصف العجلة الأيسر يُقلب ١٨٠° فيُقرأ كل اسم معتدلاً لا مقلوباً
+      const mid = (i + 0.5) * seg, flip = n > 1 && mid > 180;
+      svg += shape + `<g transform="rotate(${flip ? mid + 90 : mid - 90})"><text class="whTxt" x="${flip ? -R * 0.6 : R * 0.6}" y="0" text-anchor="middle" dominant-baseline="central" font-size="${fs.toFixed(1)}" fill="${c[1]}">${esc(label)}</text></g>`;
+    });
+  }
+  document.getElementById('whRot').innerHTML = svg;
+  document.getElementById('whHub').disabled = !n;
+  whResult();
+}
+
+function whBulbs(){
+  const g = document.getElementById('whBulbs');
+  if(g.childElementCount) return;
+  let s = '';
+  for(let i = 0; i < 28; i++){
+    const [x, y] = whPt(i * 360 / 28, 207.5).split(',');
+    s += `<circle class="whBulb ${i % 2 ? 'alt' : 'on'}" cx="${x}" cy="${y}" r="3.6"/>`;
+  }
+  g.innerHTML = s;
+}
+
+function whResult(){
+  const box = document.getElementById('whResult');
+  const left = wh.pool.length, total = wh.all.length;
+  const absentTxt = wh.absent ? ` · استُبعد ${wh.absent} غائب اليوم` : '';
+  if(wh.msg){ box.innerHTML = `<div class="whHint ${wh.msg.startsWith('⏳') ? '' : 'whErr'}">${esc(wh.msg)}</div>`; return; }
+  if(wh.winner){
+    const pt = wh.awarded
+      ? `<span class="whPtDone">⭐ +١ نقطة مشاركة</span><button class="whGhost" onclick="whUndo()">↩️ تراجع</button>`
+      : `<button class="whPt" id="whPtBtn" onclick="whAward()">⭐ نقطة مشاركة</button>`;
+    box.innerHTML = `<div class="whWinLbl">🎯 الدور على</div>
+      <div class="whWinName">${esc(wh.winner.name)}</div>
+      <div class="whActs">${pt}<button class="whGhost" onclick="whSpin()">🎡 لفّة جديدة</button></div>`;
+    return;
+  }
+  if(!total){ box.innerHTML = `<div class="whHint">ما فيه أسماء بهذا الصف${absentTxt}.<br>أضف الطلاب من «صفوفي».</div>`; return; }
+  if(!left){
+    box.innerHTML = `<div class="whHint">🎉 كل الطلاب أخذوا دورهم</div>
+      <div class="whActs"><button class="whPt" onclick="whResetPicked()">↺ إعادة كل الأسماء</button></div>`;
+    return;
+  }
+  box.innerHTML = `<div class="whHint"><b>${left}</b> ${left === total ? 'اسماً على العجلة' : 'باقٍ من ' + total}${absentTxt}<br>اضغط «لِفّ» أو زر المسافة</div>`;
+}
+
+function whResetPicked(){ whPicked().clear(); wh.winner = null; whPaint(); }
+
+function whSpin(){
+  if(wh.spinning || !whOpen()) return;
+  if(wh.winner){ wh.winner = null; whPaint(); }      // من طلع اسمه ينشال قبل اللفّة الجديدة
+  const n = wh.pool.length;
+  if(!n) return;
+  const seg = 360 / n;
+  const w = Math.floor(Math.random() * n);
+  const jitter = (Math.random() - 0.5) * seg * 0.6;
+  const want = ((360 - ((w + 0.5) * seg + jitter)) % 360 + 360) % 360;   // الزاوية التي تضع الشريحة تحت المؤشر
+  const cur = wh.angle;
+  const target = cur - ((cur % 360) + 360) % 360 + 360 * 7 + want;
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const dur = reduce ? 900 : 6200;
+  const g = document.getElementById('whRot');
+  g.querySelectorAll('.whSeg.win').forEach(s => s.classList.remove('win'));
+  g.style.transition = `transform ${dur}ms cubic-bezier(.12,.72,.06,1)`;
+  g.style.transform = `rotate(${target}deg)`;
+  wh.angle = target;
+  wh.spinning = true;
+  wh.lastIdx = -1;
+  document.getElementById('wheelModal').classList.add('spinning');
+  document.getElementById('whHub').disabled = true;
+  document.getElementById('whCls').disabled = true;
+  document.getElementById('whResult').innerHTML = '<div class="whHint">🥁 …</div>';
+  requestAnimationFrame(()=>whTickLoop(seg));
+  wh.timer = setTimeout(()=>whDone(w), dur + 80);
+}
+
+function whStopSpin(){
+  if(wh.timer){ clearTimeout(wh.timer); wh.timer = null; }
+  if(wh.spinning){
+    wh.spinning = false;
+    document.getElementById('whCls').disabled = false;
+    // نثبّت العجلة حيث وصلت بدل أن تكمل الدوران في الخلفية
+    const g = document.getElementById('whRot');
+    const m = new DOMMatrix(getComputedStyle(g).transform);
+    wh.angle = Math.atan2(m.b, m.a) * 180 / Math.PI;
+    g.style.transition = 'none';
+    g.style.transform = `rotate(${wh.angle}deg)`;
+    wh.winner = null;
+    whPaint();
+  }
+}
+
+// صوت «تك» وارتداد المؤشر كلما عبرت شريحة تحته
+function whTickLoop(seg){
+  if(!wh.spinning) return;
+  const m = new DOMMatrix(getComputedStyle(document.getElementById('whRot')).transform);
+  const a = Math.atan2(m.b, m.a) * 180 / Math.PI;
+  const idx = Math.floor((((360 - a) % 360) + 360) % 360 / seg);
+  if(idx !== wh.lastIdx){
+    if(wh.lastIdx !== -1) whTick();
+    wh.lastIdx = idx;
+  }
+  requestAnimationFrame(()=>whTickLoop(seg));
+}
+function whTick(){
+  const p = document.getElementById('whPtr');
+  p.classList.remove('tick'); void p.getBoundingClientRect(); p.classList.add('tick');
+  const now = performance.now();
+  if(now - wh.lastTick < 45) return;
+  wh.lastTick = now;
+  try{
+    wh.ac = wh.ac || new (window.AudioContext || window.webkitAudioContext)();
+    const t = wh.ac.currentTime, o = wh.ac.createOscillator(), gn = wh.ac.createGain();
+    o.type = 'triangle'; o.frequency.value = 1250;
+    gn.gain.setValueAtTime(0.07, t); gn.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+    o.connect(gn); gn.connect(wh.ac.destination); o.start(t); o.stop(t + 0.05);
+  }catch(e){ /* الصوت اختياري */ }
+}
+
+function whDone(w){
+  wh.timer = null;
+  wh.spinning = false;
+  const m = document.getElementById('wheelModal');
+  m.classList.remove('spinning');
+  document.getElementById('whCls').disabled = false;
+  document.getElementById('whHub').disabled = false;
+  wh.winner = wh.pool[w];
+  wh.awarded = false;
+  whPicked().add(wh.winner.id);
+  const seg = document.querySelector(`#whRot .whSeg[data-i="${w}"]`) || document.querySelector('#whRot .whSeg');
+  if(seg) seg.classList.add('win');
+  whResult();
+  playSound('badge');
+  whConfetti();
+}
+
+function whConfetti(){
+  const m = document.getElementById('wheelModal');
+  const cols = ['#e3c98b', '#c9a15e', '#fff6dc', '#1f6f5c', '#2a6b8a', '#7a3030'];
+  for(let i = 0; i < 34; i++){
+    const c = document.createElement('div');
+    c.className = 'whConf';
+    c.style.left = Math.random() * 100 + '%';
+    c.style.background = cols[i % cols.length];
+    c.style.animationDuration = (2.2 + Math.random() * 1.6) + 's';
+    c.style.animationDelay = (Math.random() * .35) + 's';
+    m.appendChild(c);
+    setTimeout(()=>c.remove(), 4400);
+  }
+}
+
+async function whAward(){
+  if(!isAdmin || !requireDb() || !wh.winner || wh.awarded) return;
+  const who = wh.winner;
+  const b = document.getElementById('whPtBtn');
+  if(b){ b.disabled = true; b.textContent = '⏳'; }
+  const err = await lsBumpPoints(who.id, +1);
+  if(wh.winner !== who) return;
+  if(err){ whResult(); document.getElementById('whResult').insertAdjacentHTML('beforeend', `<div class="whHint whErr">تعذر الحفظ: ${esc(err.message)}</div>`); return; }
+  wh.awarded = true;
+  whResult();
+  if(myClassData.some(r => r.id === who.id)) renderMyClassTable();
+}
+async function whUndo(){
+  if(!isAdmin || !requireDb() || !wh.winner || !wh.awarded) return;
+  const who = wh.winner;
+  wh.awarded = false; whResult();
+  const err = await lsBumpPoints(who.id, -1);
+  if(err){ if(wh.winner === who){ wh.awarded = true; whResult(); } return; }
+  if(myClassData.some(r => r.id === who.id)) renderMyClassTable();
+}
+
+// زر واحد: يكبّر العجلة لملء الشاشة فعلياً، ويرجّعها. أجهزة لا تدعم ملء الشاشة
+// (كالآيفون) تأخذ نفس التكبير داخل الصفحة.
+function whToggleFull(){
+  const m = document.getElementById('wheelModal');
+  if(m.classList.contains('full')){
+    m.classList.remove('full');
+    if(document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+  } else {
+    m.classList.add('full');
+    if(m.requestFullscreen) m.requestFullscreen().catch(()=>{});
+  }
+  whFullLabel();
+}
+function whFullLabel(){
+  const m = document.getElementById('wheelModal'), b = document.getElementById('whFullBtn');
+  if(b) b.textContent = m && m.classList.contains('full') ? '↙️ تصغير' : '⛶ ملء الشاشة';
+}
+document.addEventListener('fullscreenchange', ()=>{
+  const m = document.getElementById('wheelModal');
+  // خروج من ملء الشاشة بزر Esc الخاص بالمتصفح ← نرجع للحجم العادي
+  if(m && !document.fullscreenElement && m.classList.contains('full')){ m.classList.remove('full'); whFullLabel(); }
+});
 
 async function refreshClassChallenge(){
   if(!isAdmin) return; // بيانات صفوفك — للمعلم فقط
