@@ -791,6 +791,40 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   @media (prefers-reduced-motion: reduce){
     .whModal *, .whModal.spinning .whBulb{animation:none !important;}
   }
+  /* ===== الطالب المحظوظ — يستعير إطار نافذة العجلة (whModal/whBox/whHead) ===== */
+  .lkCard{
+    position:relative; width:min(560px, 100%); min-height:270px; border-radius:26px; padding:26px 22px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; text-align:center;
+    background:radial-gradient(circle at 50% 28%, #fffaf0, #f3e0b3 78%); color:var(--navy-deep);
+    border:3px solid var(--gold-light);
+    box-shadow:0 0 0 6px rgba(201,161,94,.22), 0 22px 50px rgba(0,0,0,.42);
+  }
+  .lkQ{font-size:clamp(4rem, 10vw, 6.5rem); line-height:1; animation:lkBob 2.2s ease-in-out infinite;}
+  @keyframes lkBob{50%{transform:translateY(-8px) rotate(-4deg);}}
+  .lkLbl{font-weight:800; color:var(--gold-deep); font-size:1rem; letter-spacing:.3px;}
+  .lkName{font-family:'Aref Ruqaa'; font-size:clamp(2rem, 5.2vw, 3.5rem); line-height:1.5; min-height:1.5em; color:var(--navy-deep);}
+  .lkCard.rolling .lkName{color:#7a6538;}
+  .lkCard.win{
+    animation:lkWin .6s cubic-bezier(.2,1.6,.4,1);
+    box-shadow:0 0 0 6px rgba(201,161,94,.45), 0 0 70px rgba(227,201,139,.75), 0 22px 50px rgba(0,0,0,.42);
+  }
+  @keyframes lkWin{from{transform:scale(.92);} to{transform:none;}}
+  .lkReward{display:flex; flex-direction:column; align-items:center; gap:8px; min-height:5.2em;}
+  .lkNum{font-size:clamp(1.6rem, 4.2vw, 2.7rem); font-weight:900; color:var(--maroon); line-height:1.3;}
+  .lkNum.rolling{color:#9a7a45;}
+  .lkStarsRow{display:flex; gap:5px; flex-wrap:wrap; justify-content:center; font-size:clamp(1.3rem, 3.2vw, 2.1rem); line-height:1;}
+  .lkStarsRow span{animation:lkPop .38s cubic-bezier(.2,1.8,.4,1) both;}
+  @keyframes lkPop{from{transform:scale(0) rotate(-40deg); opacity:0;} to{transform:none; opacity:1;}}
+  .lkDone{font-weight:800; color:var(--teal); background:#e7f5ef; border:1.5px solid #9fd3bd; border-radius:30px; padding:8px 18px;}
+  .lkGo{font-size:1.08rem; padding:13px 30px;}
+  /* ملء الشاشة: البطاقة تكبر والعناصر تبقى عمودية */
+  #luckyModal.full .whStage{flex-direction:column;}
+  #luckyModal.full .lkCard{width:min(980px, 92vw); min-height:52vh;}
+  #luckyModal.full .lkName{font-size:clamp(3rem, 8vw, 6.4rem);}
+  #luckyModal.full .lkQ{font-size:clamp(6rem, 16vw, 11rem);}
+  #luckyModal.full .lkNum{font-size:clamp(2.2rem, 5.5vw, 4rem);}
+  #luckyModal.full .lkStarsRow{font-size:clamp(2rem, 4.5vw, 3.4rem);}
+  @media (prefers-reduced-motion: reduce){ .lkQ, .lkCard.win, .lkStarsRow span{animation:none !important;} }
   /* زر خطر: مظهره يختلف عن بقية الأزرار عمداً */
   .mcWipe{
     padding:10px 18px; border-radius:30px; cursor:pointer; font-family:'Tajawal';
@@ -2135,6 +2169,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <select class="lsClsSel" id="lsCls" onchange="lsSetCls(this.value)" title="الإجابة الصحيحة تمنح نقطة مشاركة لطالب من هذا الصف"></select>
       <div class="lsTimer" id="lsTimer"></div>
       <button class="lsTimerBtn" onclick="openWheel(lsCls)" title="عجلة الأسماء">🎡 العجلة</button>
+      <button class="lsTimerBtn" onclick="openLucky(lsCls)" title="الطالب المحظوظ">🍀 المحظوظ</button>
       <button class="lsTimerBtn" id="lsTimerBtn" onclick="lsToggleTimer()">⏱️ ٣٠ ثانية</button>
       <div class="lsCount" id="lsCount"></div>
     </div>
@@ -2185,6 +2220,18 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   </div>
 </div>
 
+<div class="whModal" id="luckyModal" hidden>
+  <div class="whBox">
+    <div class="whHead">
+      <div class="whTitle">🍀 الطالب المحظوظ</div>
+      <select class="whSel" id="lkCls" onchange="lkSetCls(this.value)" title="الصف"></select>
+      <button class="whBtn grow" id="lkFullBtn" onclick="lkToggleFull()">⛶ ملء الشاشة</button>
+      <button class="whBtn" onclick="closeLucky()" title="إغلاق">✕</button>
+    </div>
+    <div class="whStage" id="lkStage"></div>
+  </div>
+</div>
+
 <div id="focusMode">
   <div class="fmHead">
     <button class="fmExit" onclick="closeFocusMode()">✕ إنهاء</button>
@@ -2212,6 +2259,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <button class="cdBtn" onclick="cdStartTimer(30)">⏱️ مؤقت 30ث</button>
       <button class="cdBtn" onclick="cdStartTimer(60)">⏱️ مؤقت 60ث</button>
       <button class="cdBtn" onclick="openWheel(currentRosterCls)">🎡 عجلة الأسماء</button>
+      <button class="cdBtn" onclick="openLucky(currentRosterCls)">🍀 الطالب المحظوظ</button>
       <button class="cdBtn" onclick="cdRandom()">🎲 سؤال عشوائي</button>
     </div>
   </div>
@@ -2338,6 +2386,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <button class="myClassBtn" data-cls="8-6" onclick="switchMyClass('8-6', this)">ثامن 6</button>
       <button class="focusModeBtn" onclick="openFocusMode()">⚡ وضع الحصة السريع</button>
       <button class="focusModeBtn" onclick="openWheel(myClassCls)">🎡 عجلة الأسماء</button>
+      <button class="focusModeBtn" onclick="openLucky(myClassCls)">🍀 الطالب المحظوظ</button>
       <button class="myClassExport" onclick="exportMyClassCSV()">⬇️ تصدير الصف</button>
       <button class="mcWipe" onclick="mcWipeClass()" title="حذف كل طلاب هذا الصف">🗑️ حذف كل الأسماء</button>
     </div>
@@ -5825,7 +5874,7 @@ function closeLessonShow(){
 }
 
 function lsKeys(e){
-  if(whOpen()) return;                       // العجلة فوق العرض تستقبل المفاتيح وحدها
+  if(whOpen() || lkOpen()) return;           // العجلة/المحظوظ فوق العرض تستقبلان المفاتيح وحدهما
   const pk = document.getElementById('lsPicker');
   if(pk && !pk.hidden){ if(e.key === 'Escape') lsClosePicker(); return; }
   if(e.key === 'Escape') closeLessonShow();
@@ -6080,6 +6129,7 @@ const wh = {cls:'', all:[], pool:[], absent:0, pickedBy:{}, angle:0, spinning:fa
 function openWheel(cls){
   if(!isAdmin){ showToast('هذي الأداة للمعلم فقط', 'error'); return; }
   if(!requireDb()) return;
+  if(lkOpen()) closeLucky();
   // الصفوف من أزرار صفوفي ولوحة المعلم معاً — أي صف يُضاف هناك يظهر هنا تلقائياً
   const classes = [];
   document.querySelectorAll('.myClassBtn, .rosterClassBtn').forEach(b=>{
@@ -6329,8 +6379,10 @@ function whDone(w){
   whConfetti();
 }
 
-function whConfetti(){
-  const m = document.getElementById('wheelModal');
+function whConfetti(){ whConfettiIn(document.getElementById('wheelModal')); }
+// قصاصات داخل النافذة نفسها — في ملء الشاشة لا يظهر إلا ما بداخل العنصر المكبَّر
+function whConfettiIn(m){
+  if(!m) return;
   const cols = ['#e3c98b', '#c9a15e', '#fff6dc', '#1f6f5c', '#2a6b8a', '#7a3030'];
   for(let i = 0; i < 34; i++){
     const c = document.createElement('div');
@@ -6386,6 +6438,248 @@ document.addEventListener('fullscreenchange', ()=>{
   const m = document.getElementById('wheelModal');
   // خروج من ملء الشاشة بزر Esc الخاص بالمتصفح ← نرجع للحجم العادي
   if(m && !document.fullscreenElement && m.classList.contains('full')){ m.classList.remove('full'); whFullLabel(); }
+});
+
+// ═══════ الطالب المحظوظ ═══════
+// سحب طالب عشوائي ومكافأة ٣–١٠ نجوم بتوزيع متدرّج (العشرة نادرة). لا يُحفظ شيء إلا بـ«اعتماد».
+// العدالة: الغائب اليوم لا يدخل السحب، ومن فاز هذا الأسبوع (منذ الأحد) لا يدخل مرة ثانية.
+// سجل الفوز ملاحظة تكريم بـroster_warnings تبدأ بـLK_TAG — هي نفسها مصدر استبعاد الأسبوع،
+// فيعمل الاستبعاد على كل الأجهزة بلا جدول جديد؛ وحذف الملاحظة يعيد الطالب للسحب.
+const LK_TAG = '🍀 الطالب المحظوظ';
+const LK_WEIGHTS = [[3,20], [4,20], [5,18], [6,12], [7,10], [8,9], [9,6], [10,5]];   // مجموعها ١٠٠
+const lk = {cls:'', all:[], pool:[], absent:0, wonWeek:new Set(), phase:'loading', winner:null,
+            stars:0, newTotal:0, msg:'', req:0, timers:[], ac:null};
+
+function lkOpen(){ const m = document.getElementById('luckyModal'); return !!(m && !m.hidden); }
+
+function lkPickStars(){
+  let r = Math.random() * 100;
+  for(const [n, w] of LK_WEIGHTS){ if((r -= w) < 0) return n; }
+  return 3;
+}
+function lkWeekStart(){
+  const d = new Date(); d.setHours(0,0,0,0);
+  d.setDate(d.getDate() - d.getDay());          // الأحد — بداية أسبوع الدراسة في قطر
+  return d;
+}
+
+function openLucky(cls){
+  if(!isAdmin){ showToast('هذي الأداة للمعلم فقط', 'error'); return; }
+  if(!requireDb()) return;
+  if(whOpen()) closeWheel();
+  const classes = [];
+  document.querySelectorAll('.myClassBtn, .rosterClassBtn').forEach(b=>{
+    const c = b.dataset.cls;
+    if(c && !classes.some(x => x.cls === c)) classes.push({cls: c, label: b.textContent.trim()});
+  });
+  cls = cls || myClassCls;
+  const sel = document.getElementById('lkCls');
+  sel.innerHTML = classes.map(c => `<option value="${esc(c.cls)}">${esc(c.label)}</option>`).join('');
+  const target = classes.some(c => c.cls === cls) ? cls : (classes[0] ? classes[0].cls : '');
+  sel.value = target;
+  document.getElementById('luckyModal').hidden = false;
+  document.addEventListener('keydown', lkKeys);
+  if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  lkSetCls(target);
+}
+
+function closeLucky(){
+  lkStopRoll();
+  if(document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+  const m = document.getElementById('luckyModal');
+  m.classList.remove('full');
+  m.hidden = true;
+  lkFullLabel();
+  document.removeEventListener('keydown', lkKeys);
+}
+
+function lkKeys(e){
+  if(e.key === 'Escape'){ e.preventDefault(); closeLucky(); return; }
+  const t = e.target, inside = t && t.closest && t.closest('#luckyModal');
+  if((e.key === ' ' || e.key === 'Enter') && !(inside && /^(SELECT|INPUT|BUTTON)$/.test(t.tagName))){
+    e.preventDefault();
+    if(lk.phase === 'idle' || lk.phase === 'done') lkDraw();
+  }
+}
+
+function lkSetCls(cls){
+  if(lk.phase === 'rolling' || lk.phase === 'saving'){ document.getElementById('lkCls').value = lk.cls; return; }
+  lk.cls = cls;
+  lkLoad();
+}
+
+async function lkLoad(){
+  const req = ++lk.req;
+  lk.phase = 'loading'; lk.winner = null; lk.msg = '';
+  lkPaint();
+  if(!lk.cls){ lk.phase = 'idle'; lkPaint(); return; }
+  const { data, error } = await sb.from('class_roster').select('*').eq('cls', lk.cls).order('student_name');
+  if(req !== lk.req) return;
+  if(error){ lk.phase = 'idle'; lk.all = []; lk.msg = 'تعذر تحميل الأسماء: ' + error.message; lkPaint(); return; }
+  const rows = (data || []).filter(r => !r.deleted_at).map(r => ({id: r.id, name: r.student_name, pts: r.participation_points || 0}));
+  const absent = new Set(), won = new Set();
+  if(rows.length){
+    const ids = rows.map(r => r.id);
+    const today = new Date().toISOString().slice(0,10);
+    const [at, nt] = await Promise.all([
+      sb.from('roster_attendance').select('roster_id,status').in('roster_id', ids).eq('day', today),
+      sb.from('roster_warnings').select('roster_id,note,kind,created_at').in('roster_id', ids).gte('created_at', lkWeekStart().toISOString())
+    ]);
+    if(req !== lk.req) return;
+    if(!at.error) (at.data || []).forEach(a => { if(a.status === 'absent') absent.add(a.roster_id); });
+    if(!nt.error) (nt.data || []).forEach(n => { if(n.kind === 'praise' && String(n.note || '').startsWith(LK_TAG)) won.add(n.roster_id); });
+  }
+  lk.all = rows;
+  lk.absent = rows.filter(r => absent.has(r.id)).length;
+  lk.wonWeek = won;
+  lk.pool = rows.filter(r => !absent.has(r.id) && !won.has(r.id));
+  lk.phase = 'idle';
+  lkPaint();
+}
+
+function lkInfo(){
+  const bits = [`<b>${lk.pool.length}</b> في السحب`];
+  if(lk.absent) bits.push(`استُبعد ${lk.absent} غائب اليوم`);
+  const w = lk.all.filter(r => lk.wonWeek.has(r.id)).length;
+  if(w) bits.push(`${w} فاز هذا الأسبوع`);
+  return `<div class="whHint">${bits.join(' · ')}</div>`;
+}
+
+function lkPaint(){
+  const st = document.getElementById('lkStage');
+  if(!st) return;
+  const card = (cls, inner) => `<div class="lkCard ${cls}" id="lkCard">${inner}</div>`;
+  if(lk.phase === 'loading'){ st.innerHTML = card('', '<div class="lkQ">🍀</div><div class="whHint" style="color:var(--navy)">⏳ تحميل الأسماء…</div>'); return; }
+  if(lk.msg && !lk.all.length){ st.innerHTML = card('', `<div class="lkQ">⚠️</div><div class="lkLbl">${esc(lk.msg)}</div>`); return; }
+  if(lk.phase === 'idle'){
+    if(!lk.all.length){ st.innerHTML = card('', '<div class="lkQ">📋</div><div class="lkLbl">ما فيه أسماء بهذا الصف — أضفهم من «صفوفي».</div>'); return; }
+    if(!lk.pool.length){ st.innerHTML = card('', '<div class="lkQ">🎉</div><div class="lkLbl">كل الطلاب الحاضرين فازوا هذا الأسبوع</div><div class="whHint" style="color:var(--navy)">السحب يبدأ من جديد يوم الأحد</div>') + lkInfo(); return; }
+    st.innerHTML = card('', '<div class="lkQ">❓</div><div class="lkLbl">من سيكون المحظوظ اليوم؟</div>')
+      + `<div class="whActs"><button class="whPt lkGo" onclick="lkDraw()">🍀 اكشف الطالب المحظوظ</button></div>` + lkInfo();
+    return;
+  }
+  if(lk.phase === 'rolling'){
+    st.innerHTML = card('rolling', `<div class="lkLbl">🍀 الطالب المحظوظ</div><div class="lkName" id="lkName"></div>
+      <div class="lkReward"><div class="lkNum rolling" id="lkNum"></div><div class="lkStarsRow" id="lkStarsRow"></div></div>`)
+      + '<div class="whHint">🥁 …</div>';
+    return;
+  }
+  // result / saving / done
+  const n = lk.stars, w = lk.winner;
+  const stars = Array.from({length: n}, (_, i) => `<span style="animation-delay:${i * 70}ms">⭐</span>`).join('');
+  let acts;
+  if(lk.phase === 'result') acts = `<button class="whPt" onclick="lkApprove()">✅ اعتماد النجوم</button><button class="whGhost" onclick="lkCancel()">✖ إلغاء</button>`;
+  else if(lk.phase === 'saving') acts = `<button class="whPt" disabled>⏳ جارٍ الحفظ…</button>`;
+  else acts = `<span class="lkDone">✓ اعتُمدت — رصيد ${esc(w.name)} الآن ⭐ ${lk.newTotal}</span>`
+    + (lk.pool.length ? `<button class="whGhost" onclick="lkDraw()">🍀 سحبة جديدة</button>` : `<span class="whHint">🎉 كل الطلاب الحاضرين فازوا هذا الأسبوع</span>`);
+  st.innerHTML = card('win', `<div class="lkLbl">🍀 الطالب المحظوظ</div><div class="lkName">${esc(w.name)}</div>
+      <div class="lkReward"><div class="lkNum">🎁 ${n} نجوم</div><div class="lkStarsRow">${stars}</div></div>`)
+    + `<div class="whActs">${acts}</div>` + (lk.msg ? `<div class="whHint whErr">${esc(lk.msg)}</div>` : '');
+}
+
+function lkStopRoll(){
+  lk.timers.forEach(clearTimeout); lk.timers = [];
+  if(lk.phase === 'rolling'){ lk.phase = 'idle'; lk.winner = null; }
+}
+
+function lkTick(freq){
+  try{
+    lk.ac = lk.ac || new (window.AudioContext || window.webkitAudioContext)();
+    const t = lk.ac.currentTime, o = lk.ac.createOscillator(), g = lk.ac.createGain();
+    o.type = 'triangle'; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.06, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+    o.connect(g); g.connect(lk.ac.destination); o.start(t); o.stop(t + 0.06);
+  }catch(e){ /* الصوت اختياري */ }
+}
+
+// تسلسل متباطئ: كل خطوة أبطأ من سابقتها، والخطوة الأخيرة تُظهر القيمة المختارة سلفاً
+function lkRoll(steps, show, done){
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let delay = reduce ? 0 : 45, t = 0;
+  for(let i = 0; i < steps; i++){
+    const last = i === steps - 1;
+    t += delay;
+    lk.timers.push(setTimeout(()=>show(last), reduce ? 0 : t));
+    delay = Math.min(delay * 1.13, 420);
+  }
+  lk.timers.push(setTimeout(done, reduce ? 0 : t + 350));
+}
+
+function lkDraw(){
+  if(!lkOpen() || lk.phase === 'rolling' || lk.phase === 'saving') return;
+  if(!lk.pool.length){ lk.phase = 'idle'; lkPaint(); return; }
+  lk.msg = '';
+  lk.winner = lk.pool[Math.floor(Math.random() * lk.pool.length)];
+  lk.stars = lkPickStars();
+  lk.phase = 'rolling';
+  lkPaint();
+  const nameEl = document.getElementById('lkName'), numEl = document.getElementById('lkNum');
+  const names = lk.all.length > 1 ? lk.all : [lk.winner];
+  let k = Math.floor(Math.random() * names.length);
+  lkRoll(24, last=>{
+    k = (k + 1 + Math.floor(Math.random() * Math.max(1, names.length - 1))) % names.length;
+    nameEl.textContent = last ? lk.winner.name : names[k].name;
+    lkTick(last ? 880 : 1300);
+  }, ()=>{
+    // بعد الاسم: عدّاد النجوم يدور ويقف على المكافأة
+    let v = 3;
+    lkRoll(16, last=>{
+      v = last ? lk.stars : (v >= 10 ? 3 : v + 1);
+      numEl.textContent = `🎁 ${v} نجوم`;
+      lkTick(last ? 660 : 1000);
+    }, ()=>{
+      lk.timers = [];
+      lk.phase = 'result';
+      lkPaint();
+      playSound('badge');
+      whConfettiIn(document.getElementById('luckyModal'));
+    });
+  });
+}
+
+function lkCancel(){
+  if(lk.phase !== 'result') return;
+  lk.winner = null; lk.phase = 'idle';
+  lkPaint();
+}
+
+async function lkApprove(){
+  if(!isAdmin || !requireDb() || lk.phase !== 'result' || !lk.winner) return;
+  const w = lk.winner, n = lk.stars, cls = lk.cls;
+  lk.phase = 'saving'; lk.msg = ''; lkPaint();
+  const err = await lsBumpPoints(w.id, +n);
+  if(lk.winner !== w) return;
+  if(err){ lk.phase = 'result'; lk.msg = 'تعذر الحفظ: ' + err.message; lkPaint(); return; }
+  // سجل الفوز: ملاحظة تكريم — وهي أيضاً ما يمنع تكرار الفوز هذا الأسبوع
+  const { error: nErr } = await sb.from('roster_warnings').insert({roster_id: w.id, note: `${LK_TAG}: +${n} نجوم مشاركة`, kind: 'praise'});
+  const { data } = await sb.from('class_roster').select('participation_points').eq('id', w.id).maybeSingle();
+  lk.newTotal = data ? (data.participation_points || 0) : w.pts + n;
+  lk.wonWeek.add(w.id);
+  lk.pool = lk.pool.filter(r => r.id !== w.id);
+  lk.phase = 'done';
+  lk.msg = nErr ? 'أُضيفت النجوم، لكن تعذّر حفظ ملاحظة التكريم: ' + nErr.message : '';
+  lkPaint();
+  if(myClassCls === cls) refreshClassChallenge();
+}
+
+function lkToggleFull(){
+  const m = document.getElementById('luckyModal');
+  if(m.classList.contains('full')){
+    m.classList.remove('full');
+    if(document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+  } else {
+    m.classList.add('full');
+    if(m.requestFullscreen) m.requestFullscreen().catch(()=>{});
+  }
+  lkFullLabel();
+}
+function lkFullLabel(){
+  const m = document.getElementById('luckyModal'), b = document.getElementById('lkFullBtn');
+  if(b) b.textContent = m && m.classList.contains('full') ? '↙️ تصغير' : '⛶ ملء الشاشة';
+}
+document.addEventListener('fullscreenchange', ()=>{
+  const m = document.getElementById('luckyModal');
+  if(m && !document.fullscreenElement && m.classList.contains('full')){ m.classList.remove('full'); lkFullLabel(); }
 });
 
 async function refreshClassChallenge(){
@@ -8811,7 +9105,7 @@ document.addEventListener('keydown', (e)=>{
   if(e.key === 'Escape' && document.getElementById('chatPanel').classList.contains('show')){
     closeChat();
   }
-  if(document.getElementById('classDisplayView').classList.contains('show') && !whOpen()){
+  if(document.getElementById('classDisplayView').classList.contains('show') && !whOpen() && !lkOpen()){
     if(e.key === 'Escape') closeClassDisplay();
     else if(e.key === 'ArrowRight') cdPrev();  // يمين بالعربي = رجوع بصرياً
     else if(e.key === 'ArrowLeft') cdNext();   // يسار بالعربي = تقدم بصرياً
