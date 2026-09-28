@@ -1557,12 +1557,6 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   #cdTimer.show{display:block;}
   #cdTimer.urgent{color:#e39b9b; animation:cdPulse .6s ease-in-out infinite;}
   @keyframes cdPulse{0%,100%{transform:scale(1);} 50%{transform:scale(1.08);}}
-  #cdPickedStudent{
-    display:none; background:rgba(201,161,94,.15); border:2px solid var(--gold);
-    border-radius:16px; padding:16px 28px; margin-bottom:20px;
-    font-size:clamp(1.3rem,3vw,2rem); font-weight:700; color:var(--gold-light);
-  }
-  #cdPickedStudent.show{display:block; animation:badgePop .45s ease-out;}
   .cdQuestion{
     font-family:'Aref Ruqaa'; font-size:clamp(1.8rem, 4vw, 3rem); line-height:1.5;
     margin-bottom:50px; color:#fff;
@@ -2081,7 +2075,6 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   <div class="cdWrap">
     <div class="cdCounter" id="cdCounter">سؤال 1 من 1</div>
     <div id="cdTimer"></div>
-    <div id="cdPickedStudent"></div>
     <div class="cdQuestion" id="cdQuestion">...</div>
     <div class="cdChoices" id="cdChoices"></div>
     <div class="cdControls">
@@ -2092,7 +2085,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <div class="cdControls" style="margin-top:14px;">
       <button class="cdBtn" onclick="cdStartTimer(30)">⏱️ مؤقت 30ث</button>
       <button class="cdBtn" onclick="cdStartTimer(60)">⏱️ مؤقت 60ث</button>
-      <button class="cdBtn" onclick="cdPickStudent()">🎯 اختر طالباً</button>
+      <button class="cdBtn" onclick="openWheel(currentRosterCls)">🎡 عجلة الأسماء</button>
       <button class="cdBtn" onclick="cdRandom()">🎲 سؤال عشوائي</button>
     </div>
   </div>
@@ -3766,7 +3759,11 @@ function openClassDisplay(){
   cdIndex = 0;
   renderCdQuestion();
   closeChat(); // نسكّر نافذة المنقذ — ما نبيها تظل مفتوحة خلف شاشة العرض
-  document.getElementById('classDisplayView').classList.add('show');
+  // شاشة العرض «قسم» بالصفحة، وopenAdminPanel/showSection يخفيان كل الأقسام بـstyle مباشر
+  // يغلب صنف .show — فنزيله هنا، كما تفعل openAdminPanel مع لوحتها
+  const cdv = document.getElementById('classDisplayView');
+  cdv.style.display = '';
+  cdv.classList.add('show');
   window.scrollTo({top:0, behavior:'instant'});
 }
 function closeClassDisplay(){
@@ -3777,10 +3774,9 @@ function renderCdQuestion(){
   const item = QUESTIONS[cdIndex];
   document.getElementById('cdCounter').textContent = `سؤال ${cdIndex + 1} من ${QUESTIONS.length}`;
   document.getElementById('cdQuestion').textContent = item.q;
-  // نصفّر المؤقت والاسم المختار مع كل سؤال جديد
+  // نصفّر المؤقت مع كل سؤال جديد
   if(cdTimerInterval){ clearInterval(cdTimerInterval); cdTimerInterval = null; }
   document.getElementById('cdTimer').classList.remove('show','urgent');
-  document.getElementById('cdPickedStudent').classList.remove('show');
   document.getElementById('cdChoices').innerHTML = item.c.map((choice, i)=> `
     <div class="cdChoice" data-idx="${i}">
       <span class="cdLetter">${CD_LETTERS[i]}</span><span>${esc(choice)}</span>
@@ -3798,7 +3794,7 @@ function cdRandom(){
   cdIndex = Math.floor(Math.random() * QUESTIONS.length);
   renderCdQuestion();
 }
-// ---------- أدوات الحصة: المؤقت واختيار طالب عشوائي ----------
+// ---------- أدوات الحصة: المؤقت (اختيار الطالب صار بعجلة الأسماء) ----------
 let cdTimerInterval = null;
 
 function cdStartTimer(seconds){
@@ -3822,33 +3818,6 @@ function cdStartTimer(seconds){
   };
   tick();
   cdTimerInterval = setInterval(tick, 1000);
-}
-
-async function cdPickStudent(){
-  if(!isAdmin) return; // تسحب أسماء طلابك — للمعلم فقط
-  const el = document.getElementById('cdPickedStudent');
-  if(!requireDb()) return;
-  // نسحب من قائمة متابعة الحصة للصف المختار حالياً بلوحة المعلم
-  const { data, error } = await sb.from('class_roster')
-    .select('student_name').eq('cls', currentRosterCls).is('deleted_at', null);
-  if(error || !data || data.length === 0){
-    el.classList.add('show');
-    el.textContent = `⚠️ أضف طلاب الصف ${currentRosterCls} من تبويب «متابعة الحصة» أول`;
-    return;
-  }
-  el.classList.add('show');
-  // تأثير "قرعة" بصري سريع قبل ما يستقر على الاسم النهائي
-  let spins = 0;
-  const spinner = setInterval(()=>{
-    const temp = data[Math.floor(Math.random()*data.length)].student_name;
-    el.textContent = `🎯 ${temp}`;
-    if(++spins >= 12){
-      clearInterval(spinner);
-      const picked = data[Math.floor(Math.random()*data.length)].student_name;
-      el.textContent = `🎯 الدور على: ${picked}`;
-      playSound('badge');
-    }
-  }, 90);
 }
 
 function cdReveal(){
@@ -5858,8 +5827,13 @@ const wh = {cls:'', all:[], pool:[], absent:0, pickedBy:{}, angle:0, spinning:fa
 function openWheel(cls){
   if(!isAdmin){ showToast('هذي الأداة للمعلم فقط', 'error'); return; }
   if(!requireDb()) return;
-  const classes = [...document.querySelectorAll('.myClassBtn')]
-    .map(b => ({cls: b.dataset.cls, label: b.textContent.trim()})).filter(c => c.cls);
+  // الصفوف من أزرار صفوفي ولوحة المعلم معاً — أي صف يُضاف هناك يظهر هنا تلقائياً
+  const classes = [];
+  document.querySelectorAll('.myClassBtn, .rosterClassBtn').forEach(b=>{
+    const c = b.dataset.cls;
+    if(c && !classes.some(x => x.cls === c)) classes.push({cls: c, label: b.textContent.trim()});
+  });
+  cls = cls || myClassCls;                   // «بدون نقاط» بعرض الحصة ← صف صفوفي الحالي
   const sel = document.getElementById('whCls');
   sel.innerHTML = classes.map(c => `<option value="${esc(c.cls)}">${esc(c.label)}</option>`).join('');
   const target = classes.some(c => c.cls === cls) ? cls : (classes[0] ? classes[0].cls : '');
@@ -8560,7 +8534,7 @@ document.addEventListener('keydown', (e)=>{
   if(e.key === 'Escape' && document.getElementById('chatPanel').classList.contains('show')){
     closeChat();
   }
-  if(document.getElementById('classDisplayView').classList.contains('show')){
+  if(document.getElementById('classDisplayView').classList.contains('show') && !whOpen()){
     if(e.key === 'Escape') closeClassDisplay();
     else if(e.key === 'ArrowRight') cdPrev();  // يمين بالعربي = رجوع بصرياً
     else if(e.key === 'ArrowLeft') cdNext();   // يسار بالعربي = تقدم بصرياً
