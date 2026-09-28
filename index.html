@@ -1701,6 +1701,59 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     background:#fff; border:1px dashed #d8cfb8; border-radius:16px; padding:28px 20px;
     text-align:center; color:var(--navy); line-height:1.9;
   }
+  .lbBar{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:18px;}
+  .lbBar[hidden]{display:none;}
+  .lbFilters{display:flex; gap:8px; flex-wrap:wrap;}
+  .lbChip{
+    padding:8px 16px; border-radius:30px; cursor:pointer; font-family:'Tajawal'; font-weight:700; font-size:.88rem;
+    background:#fff; color:var(--navy); border:1.5px solid #dcd4c0;
+  }
+  .lbChip.on{background:var(--navy); color:var(--gold-light); border-color:var(--navy);}
+  .lbShowBtn{
+    padding:10px 20px; border-radius:12px; cursor:pointer; font-family:'Tajawal'; font-weight:800; font-size:.92rem;
+    background:var(--grad-gold); color:var(--navy-deep); border:none; box-shadow:0 3px 10px rgba(168,129,63,.3);
+  }
+  .lbGrid.single{max-width:560px; margin:0 auto;}
+  /* وضع العرض على الشاشة: خلفية داكنة وخط كبير يُقرأ من آخر الفصل */
+  #leaderboard.lbShowMode{
+    position:fixed; inset:0; z-index:480; overflow-y:auto; padding:3vh 3vw 4vh; display:block !important;
+    background:radial-gradient(ellipse at 50% 0%, var(--navy-soft), var(--navy-deep) 70%);
+  }
+  #leaderboard.lbShowMode .wrap{max-width:none; padding:0;}
+  #leaderboard.lbShowMode .bgArtGlobe, #leaderboard.lbShowMode .lead{display:none;}
+  #leaderboard.lbShowMode h2{
+    text-align:center; color:var(--gold-light); font-family:'Aref Ruqaa'; line-height:1.6;
+    font-size:clamp(2.2rem, 4.4vw, 3.8rem); margin-bottom:1vh;
+  }
+  #leaderboard.lbShowMode .lbBar{justify-content:center; margin-bottom:3vh;}
+  #leaderboard.lbShowMode .lbChip{background:rgba(255,255,255,.07); color:var(--gold-light); border-color:rgba(201,161,94,.5);}
+  #leaderboard.lbShowMode .lbChip.on{background:var(--grad-gold); color:var(--navy-deep); border-color:transparent;}
+  #leaderboard.lbShowMode .lbGrid{gap:2.4vw; grid-template-columns:repeat(auto-fit, minmax(min(400px, 100%), 1fr));}
+  #leaderboard.lbShowMode .lbGrid.single{max-width:min(980px, 100%);}
+  #leaderboard.lbShowMode .lbCard{border:2px solid var(--gold); box-shadow:0 20px 50px rgba(0,0,0,.35);}
+  #leaderboard.lbShowMode .lbHead{font-size:clamp(1.6rem, 2.6vw, 2.5rem); padding:1.6vh 1.6vw;}
+  #leaderboard.lbShowMode .lbHead small{font-size:clamp(.85rem, 1.1vw, 1.1rem);}
+  #leaderboard.lbShowMode .lbRow{padding:2vh max(14px, 1.6vw); gap:max(10px, 1.3vw);}
+  #leaderboard.lbShowMode .lbChamp span{white-space:normal;}
+  #leaderboard.lbShowMode .lbMedal{width:clamp(48px, 4.4vw, 74px); height:clamp(48px, 4.4vw, 74px); font-size:clamp(1.6rem, 2.6vw, 2.6rem);}
+  #leaderboard.lbShowMode .lbRow.champ .lbMedal{width:clamp(58px, 5.4vw, 92px); height:clamp(58px, 5.4vw, 92px); font-size:clamp(2rem, 3.2vw, 3.2rem);}
+  #leaderboard.lbShowMode .lbName{font-size:clamp(1.3rem, 2.2vw, 2.2rem);}
+  #leaderboard.lbShowMode .lbRow.champ .lbName{font-size:clamp(1.5rem, 2.6vw, 2.7rem);}
+  #leaderboard.lbShowMode .lbChamp span:first-child{font-size:clamp(1.15rem, 1.9vw, 1.9rem);}
+  #leaderboard.lbShowMode .lbChamp span:last-child{font-size:clamp(1rem, 1.6vw, 1.6rem);}
+  #leaderboard.lbShowMode .lbStars{font-size:clamp(1.1rem, 1.8vw, 1.8rem); padding:.6vh 1vw;}
+  #leaderboard.lbShowMode .lbEmpty{font-size:clamp(1rem, 1.5vw, 1.4rem);}
+  /* المقاس يتبع عرض البطاقة لا الشاشة: صف واحد = خط ضخم، ثلاثة صفوف = أصغر بلا تكسّر */
+  @supports (container-type:inline-size){
+    #leaderboard.lbShowMode .lbCard{container-type:inline-size;}
+    #leaderboard.lbShowMode .lbName{font-size:clamp(1.15rem, 5.6cqw, 2.4rem);}
+    #leaderboard.lbShowMode .lbRow.champ .lbName{font-size:clamp(1.3rem, 6.6cqw, 2.9rem);}
+    #leaderboard.lbShowMode .lbChamp span:first-child{font-size:clamp(1rem, 4.6cqw, 2rem);}
+    #leaderboard.lbShowMode .lbChamp span:last-child{font-size:clamp(.9rem, 3.8cqw, 1.65rem);}
+    #leaderboard.lbShowMode .lbStars{font-size:clamp(1rem, 4.2cqw, 1.8rem);}
+    #leaderboard.lbShowMode .lbMedal{width:clamp(44px, 11cqw, 76px); height:clamp(44px, 11cqw, 76px); font-size:clamp(1.5rem, 6.5cqw, 2.6rem);}
+    #leaderboard.lbShowMode .lbRow.champ .lbMedal{width:clamp(54px, 13.5cqw, 94px); height:clamp(54px, 13.5cqw, 94px); font-size:clamp(1.8rem, 8cqw, 3.2rem);}
+  }
 
   /* class challenge */
 
@@ -2308,6 +2361,10 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   <div class="wrap">
     <h2>لوحة الصدارة</h2>
     <p class="lead">أعلى ثلاثة طلاب في كل صف بنجوم المشاركة — تتحدث تلقائياً مع كل نجمة جديدة.</p>
+    <div class="lbBar" id="lbBar" hidden>
+      <div class="lbFilters" id="lbFilters"></div>
+      <button class="lbShowBtn" id="lbShowBtn" onclick="lbToggleShow()">🖥️ اعرض على الشاشة</button>
+    </div>
     <div id="leaderboardBody"></div>
   </div>
 </section>
@@ -3750,7 +3807,7 @@ function showSection(id){
   document.querySelectorAll('.navDrop').forEach(d=>d.classList.remove('open'));
   const target = document.getElementById(id);
   if(target) target.style.display = '';
-  if(id === 'leaderboard') refreshLeaderboard();
+  if(id === 'leaderboard') refreshLeaderboard(); else lbExitShow();
   window.scrollTo({top:0, behavior:'instant'});
 }
 
@@ -4801,26 +4858,73 @@ function finishMatchGame(){
 // لنقاط حسابات الطلاب. الأسماء محمية بقاعدة البيانات للمعلم فقط، فالزائر يرى رسالة لا أسماء.
 const LB_CHAMP_HTML = '<span>أنت البطل إلى هذه اللحظة</span><span>حافظ على مكانك 👑</span>';
 const LB_MEDALS = ['🥇', '🥈', '🥉'];
+let lbRows = [];            // آخر بيانات محمّلة — الفلتر يعيد الرسم منها بلا استعلام
+let lbFilter = 'all';      // 'all' أو رمز صف
 async function refreshLeaderboard(){
   const box = document.getElementById('leaderboardBody');
   if(!box) return;
   if(!isAdmin){
+    lbExitShow();
+    document.getElementById('lbBar').hidden = true;
     box.innerHTML = '<div class="lbLocked">🔒 لوحة الصدارة تظهر عند دخول المعلم<br><small>أسماء الطلاب لا تُعرض للعامة حفاظاً على خصوصيتهم</small></div>';
     return;
   }
   if(!dbReady || !sb) return;
   const { data, error } = await supaCall(() => sb.from('class_roster').select('*'), 2, 500);
   if(error){ console.error('تعذر تحميل لوحة الصدارة:', error); return; }
-  const rows = (data || []).filter(r => !r.deleted_at);
+  lbRows = (data || []).filter(r => !r.deleted_at);
+  lbRender();
+}
+
+function lbSetFilter(cls){ lbFilter = cls; lbRender(); }
+
+// عرض اللوحة على الشاشة: ملء الشاشة فعلياً إن أمكن، وإلا تغطي الصفحة كاملة
+function lbToggleShow(){
+  const sec = document.getElementById('leaderboard');
+  if(sec.classList.contains('lbShowMode')){ lbExitShow(); return; }
+  if(!isAdmin) return;
+  sec.classList.add('lbShowMode');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('lbShowBtn').textContent = '✕ إنهاء العرض';
+  document.addEventListener('keydown', lbShowKeys);
+  if(sec.requestFullscreen) sec.requestFullscreen().catch(()=>{});
+  refreshLeaderboard();
+}
+function lbExitShow(){
+  const sec = document.getElementById('leaderboard');
+  if(!sec || !sec.classList.contains('lbShowMode')) return;
+  sec.classList.remove('lbShowMode');
+  document.body.style.overflow = '';
+  document.getElementById('lbShowBtn').textContent = '🖥️ اعرض على الشاشة';
+  document.removeEventListener('keydown', lbShowKeys);
+  if(document.fullscreenElement === sec && document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+}
+function lbShowKeys(e){ if(e.key === 'Escape') lbExitShow(); }
+document.addEventListener('fullscreenchange', ()=>{
+  // خروج بزر Esc الخاص بالمتصفح ← نُنهي وضع العرض أيضاً
+  const sec = document.getElementById('leaderboard');
+  if(sec && !document.fullscreenElement && sec.classList.contains('lbShowMode')) lbExitShow();
+});
+
+function lbRender(){
+  const box = document.getElementById('leaderboardBody');
+  if(!box || !isAdmin) return;
+  const rows = lbRows;
   // ترتيب الصفوف كما في «صفوفي»، ثم أي صف آخر موجود بالبيانات
   const order = [];
   document.querySelectorAll('.myClassBtn, .rosterClassBtn').forEach(b=>{
     if(b.dataset.cls && !order.some(o => o.cls === b.dataset.cls)) order.push({cls: b.dataset.cls, label: b.textContent.trim()});
   });
   rows.forEach(r => { if(r.cls && !order.some(o => o.cls === r.cls)) order.push({cls: r.cls, label: r.cls}); });
+  if(!order.some(o => o.cls === lbFilter)) lbFilter = 'all';
+  document.getElementById('lbBar').hidden = false;
+  document.getElementById('lbFilters').innerHTML = [{cls: 'all', label: 'كل الصفوف'}, ...order].map(o =>
+    `<button class="lbChip${o.cls === lbFilter ? ' on' : ''}" data-cls="${esc(o.cls)}" onclick="lbSetFilter(this.dataset.cls)">${esc(o.label)}</button>`
+  ).join('');
   if(!order.length){ box.innerHTML = '<div class="lbLocked">ما فيه صفوف بعد — أضف الطلاب من «صفوفي».</div>'; return; }
+  const shown = lbFilter === 'all' ? order : order.filter(o => o.cls === lbFilter);
 
-  box.innerHTML = '<div class="lbGrid">' + order.map(o=>{
+  box.innerHTML = `<div class="lbGrid${shown.length === 1 ? ' single' : ''}">` + shown.map(o=>{
     const top = rows.filter(r => r.cls === o.cls && (r.participation_points || 0) > 0)
       .sort((a,b)=> (b.participation_points || 0) - (a.participation_points || 0) || String(a.student_name).localeCompare(String(b.student_name), 'ar'))
       .slice(0, 3);
