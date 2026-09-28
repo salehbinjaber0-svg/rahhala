@@ -422,6 +422,12 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     .actCols{grid-template-columns:1fr; gap:26px;}
   }
   .actGrid{display:grid; grid-template-columns:1fr; gap:16px;}
+  .actDate{color:#8a8a8a; font-size:.8rem;}
+  .actCard.isNew{border-color:var(--gold); box-shadow:0 0 0 3px #f7ecd2;}
+  .actNew{
+    align-self:flex-start; background:var(--grad-gold); color:var(--navy-deep);
+    font-size:.72rem; font-weight:700; padding:3px 11px; border-radius:12px;
+  }
   .actCard{
     background:#fff; border:1.5px solid #e8e0cd; border-radius:16px; padding:20px;
     display:flex; flex-direction:column; gap:10px; transition:transform .15s, box-shadow .15s;
@@ -470,10 +476,11 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;
   }
   .lsCh.correct{
-    background:#d9f5e6; border-color:#158a55; color:#0d5c39;
+    background:#158a55; border-color:#0d5c39; color:#fff;
+    box-shadow:0 0 0 4px #b6ebd2;
     animation:lsFade .4s ease-out;
   }
-  .lsCh.correct .lsChKey{background:#158a55; color:#fff;}
+  .lsCh.correct .lsChKey{background:#fff; color:#0d5c39;}
   .lsCard{
     display:flex; flex-direction:column; align-items:center; gap:18px;
     padding:44px 40px; border-radius:26px; max-width:900px;
@@ -503,9 +510,13 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     border-bottom:2px solid #a32b2b; padding:10px 20px; text-align:center;
     animation:cheerPop .45s ease-out;
   }
+  /* التعزيز يجب أن يُرى من آخر الصف: شريط صلب لا نص عارٍ يذوب بالخلفية */
   .lsCheer{
-    font-family:'Aref Ruqaa'; font-size:clamp(1.15rem,2.4vw,1.8rem); color:var(--gold-deep);
-    text-shadow:none; animation:cheerPop .55s ease-out; margin-top:10px;
+    font-family:'Aref Ruqaa'; font-size:clamp(1.5rem,3.2vw,2.6rem);
+    color:#fff; background:#158a55; border:3px solid #0d5c39;
+    border-radius:16px; padding:12px 34px; margin-top:12px;
+    box-shadow:0 6px 20px rgba(21,138,85,.35);
+    animation:cheerPop .55s ease-out;
   }
   @keyframes cheerPop{
     0%{opacity:0; transform:scale(.7) translateY(14px);}
@@ -545,6 +556,16 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     background:#fffdf8; color:var(--navy-deep); overflow-y:auto;
   }
   #lessonShow.show{display:flex; flex-direction:column;}
+  /* خلفية النشاط: رسم متجهي مضمّن (لا صورة خارجية) بشفافية منخفضة
+     جداً — تعطي طابعاً بصرياً بلا أن تضرّ وضوح النص على السبورة. */
+  #lessonShow.bg-egypt::before{
+    content:''; position:absolute; inset:0; pointer-events:none; z-index:0;
+    background:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 400'%3E%3Cdefs%3E%3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23c9a15e'/%3E%3Cstop offset='1' stop-color='%23e0c48f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='640' cy='108' r='52' fill='%23e8c87a'/%3E%3Cpath d='M120 320 L240 132 L360 320 Z' fill='url(%23s)'/%3E%3Cpath d='M240 132 L300 226 L240 320 Z' fill='%23b08a4a' opacity='.55'/%3E%3Cpath d='M330 320 L430 168 L530 320 Z' fill='url(%23s)'/%3E%3Cpath d='M430 168 L478 244 L430 320 Z' fill='%23b08a4a' opacity='.55'/%3E%3Cpath d='M520 320 L590 214 L660 320 Z' fill='url(%23s)'/%3E%3Cpath d='M0 322 L800 322 L800 342 L0 342 Z' fill='%23d9c9a3'/%3E%3Cpath d='M0 348 Q200 336 400 348 T800 348 L800 400 L0 400 Z' fill='%234a90a4' opacity='.5'/%3E%3Cpath d='M700 320 L700 250 M700 250 q-26-16-42-6 M700 250 q26-16 42-6 M700 258 q-30-6-44 8 M700 258 q30-6 44 8' stroke='%236a8a52' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat bottom center;
+    background-size:min(100%, 900px) auto;
+    opacity:.13;
+  }
+  #lessonShow.bg-egypt > *{position:relative; z-index:1;}
+
   .lsHead{
     background:var(--grad-navy); padding:15px 20px; border-bottom:2px solid var(--gold);
     display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
@@ -563,7 +584,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     color:var(--navy-deep); max-width:1100px;
   }
   .lsA{
-    font-size:clamp(.98rem, 1.8vw, 1.35rem); line-height:1.7; color:#0d5c39;
+    font-size:clamp(1.02rem, 1.9vw, 1.45rem); line-height:1.7; color:#0a4a2e; font-weight:600;
     background:#eaf7f0; border:2px solid #158a55;
     border-radius:14px; padding:13px 24px; max-width:950px;
     animation:lsFade .4s ease-out;
@@ -4791,7 +4812,7 @@ const LQ_KINDS = {
 // ═══════ أنشطة حصة اليوم — جاهزة بالكود، يضيفها المساعد بالطلب ═══════
 const ACTIVITIES = [
   {
-    id:'aqalim-1', grade:7, unit:1, icon:'🌍',
+    id:'aqalim-1', date:'2026-09-13', grade:7, unit:1, icon:'🌍',
     title:'الأقاليم المناخية',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -4813,7 +4834,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'batin-8-1', grade:8, unit:1, icon:'🌋',
+    id:'batin-8-1', date:'2026-09-13', grade:8, unit:1, icon:'🌋',
     title:'كوكب الأرض — الطبقات والأغلفة',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -4835,7 +4856,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'rafidain-7-2', grade:7, unit:2, icon:'🏛️',
+    id:'rafidain-7-2', date:'2026-09-14', grade:7, unit:2, icon:'🏛️',
     title:'حضارات بلاد الرافدين',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -4857,7 +4878,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'misr-8-2', grade:8, unit:2, icon:'🔺',
+    id:'misr-8-2', date:'2026-09-14', grade:8, unit:2, icon:'🔺',
     title:'الحضارة المصرية',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -4879,7 +4900,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'sultat-7-3', grade:7, unit:3, icon:'⚖️',
+    id:'sultat-7-3', date:'2026-09-14', grade:7, unit:3, icon:'⚖️',
     title:'السلطات الدستورية',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -4901,7 +4922,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'muwatana-8-3', grade:8, unit:3, icon:'🤝',
+    id:'muwatana-8-3', date:'2026-09-14', grade:8, unit:3, icon:'🤝',
     title:'المواطَنة والمشاركة المدنية',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -4923,7 +4944,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'sukkan-7-4', grade:7, unit:4, icon:'👥',
+    id:'sukkan-7-4', date:'2026-09-14', grade:7, unit:4, icon:'👥',
     title:'التوزيع الجغرافي للسكان',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -4945,7 +4966,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'sukkan-8-4', grade:8, unit:4, icon:'📊',
+    id:'sukkan-8-4', date:'2026-09-14', grade:8, unit:4, icon:'📊',
     title:'السكان ومصادر بياناتهم',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -4967,7 +4988,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'abbas-7-5', grade:7, unit:5, icon:'🕌',
+    id:'abbas-7-5', date:'2026-09-14', grade:7, unit:5, icon:'🕌',
     title:'الخلافة العباسية',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -4989,7 +5010,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'othman-8-5', grade:8, unit:5, icon:'🏰',
+    id:'othman-8-5', date:'2026-09-14', grade:8, unit:5, icon:'🏰',
     title:'الدولة العثمانية',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -5011,7 +5032,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'amn-7-6', grade:7, unit:6, icon:'🛡️',
+    id:'amn-7-6', date:'2026-09-14', grade:7, unit:6, icon:'🛡️',
     title:'الأمن الوطني',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -5033,7 +5054,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'taghayur-8-6', grade:8, unit:6, icon:'🏙️',
+    id:'taghayur-8-6', date:'2026-09-14', grade:8, unit:6, icon:'🏙️',
     title:'الأمن الوطني والتغيُّر الاجتماعي',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -5053,6 +5074,111 @@ const ACTIVITIES = [
        choices:['المؤسسات التربوية','الأجهزة القضائية والأمنية','النوادي والجمعيات الشبابية'],
        correct_index:1, a:'بما يكفل تحقيق العدالة في المجتمع وضمان الحقوق والحرّيات.'}
     ]
+  },
+  {
+    id:'misr-8-full', date:'2026-09-27', grade:8, unit:2, icon:'🏺',
+    title:'رحلة في الحضارة المصرية',
+    desc:'نشاط تفاعلي كامل — عشر دقائق بتحدٍّ جماعي',
+    items:[
+      {kind:'break', q:'🏺 رحلة في الحضارة المصرية',
+       a:'نقسم الصف فريقين: فريق «النيل» وفريق «الأهرام». كل إجابة صحيحة = نقطة. وفيه سؤالان ذهبيان بنقطتين. الفريق الفائز له مكافأة آخر الحصة.\n\nالقاعدة: من يجيب بلا إذن تُخصم نقطة من فريقه.'},
+
+      {kind:'mcq', q:'نبدأ بالأساس — ما تعريف الحضارة؟',
+       choices:['عدد سكان الدولة وقوة جيشها','جميع ما أنجزه الإنسان بتفاعله مع بيئته لتحسين حياته','المباني الضخمة والآثار القديمة'],
+       correct_index:1, a:'وتشمل الجوانب المعنوية والمادية معاً — لا الآثار وحدها.'},
+
+      {kind:'mcq', q:'عوامل قيام الحضارة المصرية خمسة. أيها ليس منها؟',
+       choices:['الموقع الجغرافي','نهر النيل','كثرة الحروب والفتوحات'],
+       correct_index:2, a:'العوامل: الموقع الجغرافي · نهر النيل · المناخ المعتدل · الموارد الطبيعية · العوامل البشرية.'},
+
+      {kind:'mcq', q:'⭐ سؤال ذهبي (نقطتان): لماذا وُصفت مصر بأنها «حلقة اتصال بين حضارات العالم القديم»؟',
+       choices:['لأن موقعها الجغرافي يتوسّط القارات','لأنها أقدم حضارة في التاريخ','لأن لغتها كانت لغة التجارة'],
+       correct_index:0, a:'الموقع الجغرافي كان أول عوامل قيام الحضارة — جعلها معبراً وملتقى.'},
+
+      {kind:'game', q:'🎮 توقّف — لعبة: ماذا لو؟',
+       a:'اسأل الصف: «لو جفّ نهر النيل فجأة في مصر القديمة — أي العوامل الخمسة ستنهار معه؟»\n\nاترك الفريقين يتناقشان دقيقة، ثم اسمع إجابة كل فريق.\nالإجابة المتوقّعة: الزراعة ووفرة المحاصيل، ومعها الاستقرار السكاني — وهذا يجرّ تراجع الأنشطة الاقتصادية كلها.'},
+
+      {kind:'mcq', q:'كم عدد عصور مصر القديمة التي قسّمها المؤرخون؟',
+       choices:['ثلاثة عصور','أربعة عصور','ستة عصور'],
+       correct_index:1, a:'العتيق · الدولة القديمة · الدولة الوسطى · الدولة الحديثة. ويتبع كلَّ عصر قوة عصرُ ضعف.'},
+
+      {kind:'mcq', q:'العصر العتيق — متى بدأ وكم استمر؟',
+       choices:['3200 ق.م ونحو 400 عام','2800 ق.م ونحو 600 عام','1570 ق.م ونحو 470 عاماً'],
+       correct_index:0, a:'من 3200 إلى 2800 ق.م، وحكمته الأسرتان الأولى والثانية.'},
+
+      {kind:'mcq', q:'رتّب هرم الحكم في مصر القديمة من الأعلى للأسفل:',
+       choices:['الفرعون ← الوزير ← الإدارة المركزية ← حكام الأقاليم','الوزير ← الفرعون ← حكام الأقاليم ← الإدارة المركزية','الفرعون ← حكام الأقاليم ← الوزير ← الإدارة المركزية'],
+       correct_index:0, a:'وكان نظام الحكم ملكياً وراثياً.'},
+
+      {kind:'mcq', q:'⭐ سؤال ذهبي (نقطتان): كلمة «فرعون» لم تكن تعني الملك أصلاً — فماذا كانت تعني؟',
+       choices:['ابن الشمس المقدّس','البيت الكبير أو القصر العالي','القائد الأعلى للجيش'],
+       correct_index:1, a:'وبمرور الزمن انتقل المعنى من المكان إلى ساكنه — من القصر إلى الملك الحاكم.'},
+
+      {kind:'mcq', q:'بمَ سبقت مصر القديمة العالم كله صناعياً؟',
+       choices:['أول من صنع الحديد','أول من صنع الورق من نبات البردي','أول من صنع الزجاج الملوّن'],
+       correct_index:1, a:'وعرفت كذلك الصناعات المعدنية كالأسلحة، والخشبية كالسفن والأثاث.'},
+
+      {kind:'essay', q:'✍️ سؤال التميّز: كانت تجارة مصر نوعين — داخلية وخارجية. برأيك، أيهما كان أثره أكبر في نشر حضارتها؟ ولماذا؟',
+       a:'سؤال مفتوح — كافئ أي إجابة مبنية على معلومة. التجارة الخارجية مع بلاد الرافدين وفينيقيا والنوبة وبونت وليبيا حملت المنتج المصري وأفكاره خارج الحدود، بينما الداخلية بين القرى والمدن قوّت الاقتصاد الداخلي ومكّنت الاستقرار الذي قامت عليه الحضارة. كلاهما صحيح إن عُلّل.'},
+
+      {kind:'reward', q:'🏆 الفريق الفائز',
+       a:'صفّقوا للفريق الفائز!\n\nاختيارهم: خمس نقاط مشاركة لكل فرد، أو بدء الحصة القادمة بلعبة يختارونها.\n\nوللفريق الآخر: نقطة مشاركة لكل من شارك بإجابة — المحاولة تُكافأ.'}
+    ]
+  },
+  {
+    id:'misr-8-review', date:'2026-09-28', grade:8, unit:2, icon:'📜', bg:'egypt',
+    title:'مراجعة الوحدة: الحضارة المصرية',
+    desc:'مراجعة شاملة للدرسين — ١٣ سؤالاً',
+    items:[
+      {kind:'essay', q:'عدّد عوامل قيام الحضارة المصرية.',
+       a:'الموقع الجغرافي · نهر النيل · المناخ المعتدل · الموارد الطبيعية · العوامل البشرية.'},
+
+      {kind:'mcq', q:'ما تعريف الحضارة؟',
+       choices:['عدد سكان الدولة وقوة جيشها','جميع ما أنجزه الإنسان بتفاعله مع بيئته لتحسين حياته','المباني الضخمة والآثار القديمة'],
+       correct_index:1, a:'وتشمل الجوانب المعنوية والمادية معاً.'},
+
+      {kind:'mcq', q:'أي العوامل ساعد على استقرار المصريين وقيام الزراعة؟',
+       choices:['المناخ المعتدل','نهر النيل','الموارد المعدنية'],
+       correct_index:1, a:'ساعد على الاستقرار وقيام الزراعة ووفرة المحاصيل.'},
+
+      {kind:'mcq', q:'لماذا كانت مصر «حلقة اتصال بين حضارات العالم القديم»؟',
+       choices:['بسبب موقعها الجغرافي','لأنها أقدم حضارة','لأن لغتها كانت لغة التجارة'],
+       correct_index:0, a:'الموقع الجغرافي أول عوامل قيام الحضارة المصرية.'},
+
+      {kind:'essay', q:'اذكر عصور مصر القديمة الأربعة مع تاريخ كل عصر.',
+       a:'العتيق (3200–2800 ق.م) · الدولة القديمة (2800–2200 ق.م) · الدولة الوسطى (2065–1775 ق.م) · الدولة الحديثة (1570–1098 ق.م).'},
+
+      {kind:'mcq', q:'كم عاماً استمر العصر العتيق؟',
+       choices:['نحو 400 عام','نحو 600 عام','نحو 200 عام'],
+       correct_index:0, a:'من 3200 إلى 2800 ق.م، وحكمته الأسرتان الأولى والثانية.'},
+
+      {kind:'mcq', q:'ما نظام الحكم في مصر القديمة؟',
+       choices:['جمهوري بالانتخاب','ملكي وراثي','حكم مجلس الكهنة'],
+       correct_index:1, a:'ويرأس الدولةَ الفرعون، ويساعده الوزير.'},
+
+      {kind:'essay', q:'رتّب عناصر الحكم في مصر القديمة من الأعلى إلى الأسفل.',
+       a:'الفرعون ← الوزير ← الإدارة المركزية ← حكام الأقاليم.'},
+
+      {kind:'mcq', q:'كلمة «فرعون» — ما أصل معناها؟',
+       choices:['ابن الشمس','البيت الكبير أو القصر العالي','القائد الأعلى للجيش'],
+       correct_index:1, a:'وبمرور الزمن صارت تُطلق على مَن يسكن القصر وهو الملك الحاكم.'},
+
+      {kind:'mcq', q:'ما أهم المحاصيل الزراعية في مصر القديمة؟',
+       choices:['الأرز والذرة','القمح والشعير','القطن والكتان'],
+       correct_index:1, a:'واهتمّ المصري القديم بتربية الأبقار والأغنام وصيد الأسماك.'},
+
+      {kind:'mcq', q:'بمَ سبقت مصر العالم صناعياً؟',
+       choices:['أول من صنع الحديد','أول من صنعت الورق من نبات البردي','أول من صنع الزجاج'],
+       correct_index:1, a:'وعرفت الصناعات المعدنية كالأسلحة والخشبية كالسفن والأثاث.'},
+
+      {kind:'mcq', q:'التجارة في مصر القديمة كانت نوعين — ما هما؟',
+       choices:['برية وبحرية','داخلية بين القرى والمدن، وخارجية مع الدول المجاورة','رسمية وشعبية'],
+       correct_index:1, a:'ساعد موقع مصر المتميّز على اشتغال المصري القديم بالتجارة.'},
+
+      {kind:'mcq', q:'أي هذه من الدول التي تاجرت معها مصر؟',
+       choices:['الصين والهند','بلاد الرافدين وفينيقيا وبلاد بونت','روما واليونان'],
+       correct_index:1, a:'ومنها كذلك بلاد النوبة وليبيا.'}
+    ]
   }
 ];
 
@@ -5065,21 +5191,39 @@ function openLessonFromNav(){
   renderLessonStats();
 }
 
+// تاريخ النشاط بصيغة عربية مقروءة، مع «اليوم» و«أمس» للقريب
+function fmtActDate(iso){
+  const d = new Date(iso + 'T00:00:00');
+  if(isNaN(d)) return iso;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const diff = Math.round((today - d) / 86400000);
+  if(diff === 0) return 'اليوم';
+  if(diff === 1) return 'أمس';
+  const m = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  return `${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()}`;
+}
+
 function renderActivities(){
   // نعرض الصفين معاً — كل صف بعموده، فلا يحتاج المعلم تبديل المنهج
   [7, 8].forEach(g=>{
     const box = document.getElementById('actGrid' + g);
     if(!box) return;
-    const mine = ACTIVITIES.filter(a => a.grade === g);
+    // الأحدث أولاً: النشاط المطلوب اليوم يظهر بأعلى العمود
+    const mine = ACTIVITIES.filter(a => a.grade === g)
+      .slice()
+      .sort((x, y) => (y.date || '').localeCompare(x.date || ''));
     if(!mine.length){
       box.innerHTML = `<div class="actEmpty">ما فيه أنشطة بعد لهذا الصف.</div>`;
       return;
     }
+    const today = new Date().toLocaleDateString('en-CA');   // YYYY-MM-DD بتوقيت الجهاز
     box.innerHTML = mine.map(a=>`
-      <div class="actCard">
+      <div class="actCard${a.date === today ? ' isNew' : ''}">
+        ${a.date === today ? '<span class="actNew">جديد اليوم</span>' : ''}
         <div class="actIcon">${a.icon}</div>
         <div class="actTitle">${esc(a.title)}</div>
         <div class="actMeta">${esc(a.desc)} · ${a.items.length} فقرات</div>
+        ${a.date ? `<div class="actDate">📅 ${fmtActDate(a.date)}</div>` : ''}
         <button class="actGo" onclick="startActivity('${a.id}')">▶️ ابدأ العرض</button>
       </div>`).join('');
   });
@@ -5179,6 +5323,10 @@ function startActivity(id){
   if(!isAdmin) return;
   const act = ACTIVITIES.find(a => a.id === id);
   if(!act){ showToast('ما لقيت النشاط', 'error'); return; }
+  // خلفية بصرية اختيارية للنشاط
+  const show = document.getElementById('lessonShow');
+  show.className = show.className.replace(/\bbg-\S+/g, '').trim();
+  if(act.bg) show.classList.add('bg-' + act.bg);
   lessonQs = act.items.map((it, i)=>({id:i+1, ...it, pos:i}));
   lsCurrentAct = id;
   lsWrongHere = new Set();
