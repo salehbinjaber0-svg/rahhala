@@ -6953,7 +6953,7 @@ async function adminLogin(btn){
     return;
   }
   closeAdminLogin();
-  setAdminActive(true);
+  setAdminActive(true, true);
   showToast('✅ تم تسجيل دخول المعلم بنجاح', 'success');
 }
 
@@ -6982,7 +6982,9 @@ function openAdminPanel(){
   window.scrollTo({top:0, behavior:'instant'});
 }
 
-function setAdminActive(active){
+// scrollToPanel: النزول للوحة المعلم فقط عند تسجيل الدخول اليدوي — استعادة الجلسة
+// المحفوظة عند فتح الموقع كانت تُنزل الصفحة لآخرها بدل الواجهة
+function setAdminActive(active, scrollToPanel){
   isAdmin = active;
   document.getElementById('adminChip').classList.toggle('active', active);
   document.getElementById('adminPanel').classList.toggle('show', active);
@@ -6996,7 +6998,7 @@ function setAdminActive(active){
   if(lsn) lsn.style.display = active ? 'inline-block' : 'none';
   if(active){
     document.getElementById('adminPanel').style.display = ''; // نتجاوز إخفاء الصفحة الرئيسية
-    document.getElementById('adminPanel').scrollIntoView({behavior:'smooth'});
+    if(scrollToPanel) document.getElementById('adminPanel').scrollIntoView({behavior:'smooth'});
     // الأهم أولاً: الطلاب المنتظرون للموافقة — يظهرون فوراً
     loadPendingStudents();
     loadStudentsList();
@@ -9076,6 +9078,9 @@ function renderHeroQuote(){
 }
 
 // ---------- init ----------
+// الدخول للموقع يبدأ من الواجهة دائماً — المتصفح افتراضياً يعيد آخر موضع تمرير عند التحديث
+try { if('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch(e){}
+window.scrollTo(0, 0);
 // إخفاء شاشة البداية أولاً ومستقلاً تماماً — ما نخليه معتمداً على نجاح أي كود ثاني،
 // عشان ما يعلق الطالب بشاشة تحميل لو صار أي خطأ بالتهيئة
 (function(){
