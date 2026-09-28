@@ -476,10 +476,11 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;
   }
   .lsCh.correct{
-    background:#d9f5e6; border-color:#158a55; color:#0d5c39;
+    background:#158a55; border-color:#0d5c39; color:#fff;
+    box-shadow:0 0 0 4px #b6ebd2;
     animation:lsFade .4s ease-out;
   }
-  .lsCh.correct .lsChKey{background:#158a55; color:#fff;}
+  .lsCh.correct .lsChKey{background:#fff; color:#0d5c39;}
   .lsCard{
     display:flex; flex-direction:column; align-items:center; gap:18px;
     padding:44px 40px; border-radius:26px; max-width:900px;
@@ -509,9 +510,13 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     border-bottom:2px solid #a32b2b; padding:10px 20px; text-align:center;
     animation:cheerPop .45s ease-out;
   }
+  /* التعزيز يجب أن يُرى من آخر الصف: شريط صلب لا نص عارٍ يذوب بالخلفية */
   .lsCheer{
-    font-family:'Aref Ruqaa'; font-size:clamp(1.15rem,2.4vw,1.8rem); color:var(--gold-deep);
-    text-shadow:none; animation:cheerPop .55s ease-out; margin-top:10px;
+    font-family:'Aref Ruqaa'; font-size:clamp(1.5rem,3.2vw,2.6rem);
+    color:#fff; background:#158a55; border:3px solid #0d5c39;
+    border-radius:16px; padding:12px 34px; margin-top:12px;
+    box-shadow:0 6px 20px rgba(21,138,85,.35);
+    animation:cheerPop .55s ease-out;
   }
   @keyframes cheerPop{
     0%{opacity:0; transform:scale(.7) translateY(14px);}
@@ -569,7 +574,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     color:var(--navy-deep); max-width:1100px;
   }
   .lsA{
-    font-size:clamp(.98rem, 1.8vw, 1.35rem); line-height:1.7; color:#0d5c39;
+    font-size:clamp(1.02rem, 1.9vw, 1.45rem); line-height:1.7; color:#0a4a2e; font-weight:600;
     background:#eaf7f0; border:2px solid #158a55;
     border-radius:14px; padding:13px 24px; max-width:950px;
     animation:lsFade .4s ease-out;
