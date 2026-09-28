@@ -411,16 +411,6 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .statsEmpty{color:#8a8a8a; padding:16px 0; text-align:center;}
   .statsHint{color:#8a8a8a; font-size:.85rem; margin:10px 0 0;}
 
-  .actCols{display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:26px;}
-  .actCol{min-width:0;}
-  .actColHead{
-    font-size:1.15rem; color:var(--navy); margin:0 0 14px; padding-bottom:9px;
-    border-bottom:2.5px solid var(--gold); font-weight:700;
-  }
-  .actColHead.g8{border-bottom-color:var(--teal);}
-  @media(max-width:860px){
-    .actCols{grid-template-columns:1fr; gap:26px;}
-  }
   .actGrid{display:grid; grid-template-columns:1fr; gap:16px;}
   .actDate{color:#8a8a8a; font-size:.8rem;}
   .actCard.isNew{border-color:var(--gold); box-shadow:0 0 0 3px #f7ecd2;}
@@ -445,6 +435,55 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .actEmpty{
     grid-column:1/-1; text-align:center; padding:34px; color:#8a8a8a;
     background:#fff; border:1px dashed #dcd4c0; border-radius:14px;
+  }
+  /* ===== حصة اليوم: تبويب لكل صف، ثم «أنشطة خاصة» منفصلة عن «أنشطة الوحدات» ===== */
+  .actTabs{display:flex; gap:10px; margin-top:24px; border-bottom:2px solid #e8e0cd; flex-wrap:wrap;}
+  .actTab{
+    position:relative; padding:12px 26px; margin-bottom:-2px; cursor:pointer; font-family:'Tajawal';
+    font-weight:800; font-size:1.02rem; color:#8a8170; background:transparent;
+    border:2px solid transparent; border-bottom:none; border-radius:14px 14px 0 0;
+  }
+  .actTab:hover{color:var(--navy);}
+  .actTab.on{color:var(--navy); background:#fff; border-color:#e8e0cd; border-bottom:2px solid #fff;}
+  .actTab small{font-weight:700; color:#a8a08e; font-size:.8rem; margin-inline-start:4px;}
+  .actTabToday{
+    display:inline-block; margin-inline-start:7px; background:var(--grad-gold); color:var(--navy-deep);
+    font-size:.7rem; padding:2px 9px; border-radius:10px; vertical-align:middle;
+  }
+  .actBody{padding-top:22px;}
+  .actSec{margin-bottom:34px;}
+  .actSecHead{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin:0 0 14px;}
+  .actSecHead h3{margin:0; font-size:1.2rem; color:var(--navy);}
+  .actSecHead span{color:#8a8a8a; font-size:.86rem;}
+  .actSec.special{
+    background:linear-gradient(135deg, #fffaf0, #fdf3dd); border:2px solid var(--gold);
+    border-radius:18px; padding:18px 18px 20px;
+  }
+  .actGrid.wide{grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));}
+  .actUnitHead{
+    display:flex; align-items:center; gap:10px; margin:22px 0 12px; padding-bottom:8px;
+    border-bottom:1.5px solid #e8e0cd; color:var(--navy); font-weight:800; font-size:1rem;
+  }
+  .actUnitHead:first-of-type{margin-top:4px;}
+  .actUnitNum{background:var(--navy); color:var(--gold-light); border-radius:9px; padding:2px 10px; font-size:.85rem;}
+  .actUnitSub{color:#8a8a8a; font-weight:600; font-size:.82rem;}
+  .actCard.special{border-color:#e3c98b;}
+  .actCard.special.isToday{border-color:var(--gold); box-shadow:0 0 0 3px #f7ecd2;}
+  .actChips{display:flex; gap:6px; flex-wrap:wrap;}
+  .actChip{font-size:.76rem; font-weight:700; padding:3px 10px; border-radius:12px; background:var(--cream); color:var(--navy);}
+  .actChip.cls{background:var(--navy); color:var(--gold-light);}
+  .actChip.today{background:var(--grad-gold); color:var(--navy-deep);}
+  .actNote{font-size:.85rem; color:var(--navy); background:#fff; border:1px dashed #d8cfb8; border-radius:10px; padding:7px 11px; line-height:1.7;}
+  .actNone{color:#8a8170; font-size:.9rem; padding:6px 2px;}
+  .actArchive{margin-top:16px;}
+  .actArchive summary{cursor:pointer; color:var(--gold-deep); font-weight:800; font-size:.92rem; padding:6px 2px;}
+  .actArchive .actGrid{margin-top:10px;}
+  .actArchive .actCard{opacity:.85;}
+  @media(max-width:520px){
+    .actTabs{flex-wrap:nowrap; gap:6px;}
+    .actTab{flex:1; padding:10px 6px; font-size:.9rem; text-align:center;}
+    .actTabToday{display:block; width:max-content; margin:4px auto 0;}
+    .actSec.special{padding:14px 12px 16px;}
   }
 
   .lqAddRow{display:flex; gap:9px; flex-wrap:wrap; align-items:center;}
@@ -2216,16 +2255,8 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <div id="statsBody"></div>
     </details>
 
-    <div class="actCols">
-      <div class="actCol">
-        <h3 class="actColHead">الصف السابع</h3>
-        <div class="actGrid" id="actGrid7"></div>
-      </div>
-      <div class="actCol">
-        <h3 class="actColHead g8">الصف الثامن</h3>
-        <div class="actGrid" id="actGrid8"></div>
-      </div>
-    </div>
+    <div class="actTabs" id="actTabs" role="tablist"></div>
+    <div class="actBody" id="actBody"></div>
   </div>
 </section>
 
@@ -5060,6 +5091,9 @@ const LQ_KINDS = {
 };
 
 // ═══════ أنشطة حصة اليوم — جاهزة بالكود، يضيفها المساعد بالطلب ═══════
+// نشاط عام لوحدة: {id, date, grade, unit, icon, title, desc, items} ← يظهر تحت «أنشطة الوحدات».
+// نشاط طلبه المعلم لحصة محددة بشروط: أضف special:{cls:'7-1', note:'الشروط'} و date = تاريخ
+// الحصة ← يظهر منفصلاً تحت «📌 أنشطة خاصة»، وبعد مرور تاريخه ينتقل لـ«أنشطة خاصة سابقة».
 const ACTIVITIES = [
   {
     id:'aqalim-1', date:'2026-09-13', grade:7, unit:1, icon:'🌍',
@@ -5326,7 +5360,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'misr-8-full', date:'2026-09-27', grade:8, unit:2, icon:'🏺',
+    id:'misr-8-full', date:'2026-09-27', grade:8, unit:2, icon:'🏺', special:{cls:'8-6'},
     title:'رحلة في الحضارة المصرية',
     desc:'نشاط تفاعلي كامل — عشر دقائق بتحدٍّ جماعي',
     items:[
@@ -5376,7 +5410,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'misr-8-review', date:'2026-09-28', grade:8, unit:2, icon:'📜', bg:'egypt',
+    id:'misr-8-review', date:'2026-09-28', grade:8, unit:2, icon:'📜', bg:'egypt', special:{cls:'8-6'},
     title:'مراجعة الوحدة: الحضارة المصرية',
     desc:'مراجعة شاملة للدرسين — ١٣ سؤالاً',
     items:[
@@ -5453,30 +5487,89 @@ function fmtActDate(iso){
   return `${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()}`;
 }
 
+// تبويب الصف المعروض — يُتذكّر، إلا إن كان لصف آخر نشاط خاص اليوم وليس لهذا
+let actGrade = null;
+function setActGrade(g){
+  actGrade = g;
+  try{ localStorage.setItem('rahhala_act_grade', String(g)); }catch(e){}
+  renderActivities();
+}
+
+function actClsLabel(cls){
+  const b = document.querySelector(`.myClassBtn[data-cls="${cls}"]`);
+  return b ? b.textContent.trim() : cls;
+}
+
+function actCardHtml(a, today){
+  const sp = a.special;
+  const isToday = a.date === today;
+  const chips = sp ? `<div class="actChips">
+      ${sp.cls ? `<span class="actChip cls">${esc(actClsLabel(sp.cls))}</span>` : ''}
+      ${a.date ? `<span class="actChip${isToday ? ' today' : ''}">📅 ${isToday ? 'حصة اليوم' : esc(fmtActDate(a.date))}</span>` : ''}
+    </div>` : '';
+  return `
+    <div class="actCard${sp ? ' special' : ''}${isToday ? (sp ? ' isToday' : ' isNew') : ''}">
+      ${!sp && isToday ? '<span class="actNew">جديد اليوم</span>' : ''}
+      ${chips}
+      <div class="actIcon">${a.icon}</div>
+      <div class="actTitle">${esc(a.title)}</div>
+      <div class="actMeta">${esc(a.desc)} · ${a.items.length} فقرات</div>
+      ${sp && sp.note ? `<div class="actNote">📋 ${esc(sp.note)}</div>` : ''}
+      ${!sp && a.date ? `<div class="actDate">📅 ${fmtActDate(a.date)}</div>` : ''}
+      <button class="actGo" onclick="startActivity('${a.id}')">▶️ ابدأ العرض</button>
+    </div>`;
+}
+
 function renderActivities(){
-  // نعرض الصفين معاً — كل صف بعموده، فلا يحتاج المعلم تبديل المنهج
-  [7, 8].forEach(g=>{
-    const box = document.getElementById('actGrid' + g);
-    if(!box) return;
-    // الأحدث أولاً: النشاط المطلوب اليوم يظهر بأعلى العمود
-    const mine = ACTIVITIES.filter(a => a.grade === g)
-      .slice()
-      .sort((x, y) => (y.date || '').localeCompare(x.date || ''));
-    if(!mine.length){
-      box.innerHTML = `<div class="actEmpty">ما فيه أنشطة بعد لهذا الصف.</div>`;
-      return;
-    }
-    const today = new Date().toLocaleDateString('en-CA');   // YYYY-MM-DD بتوقيت الجهاز
-    box.innerHTML = mine.map(a=>`
-      <div class="actCard${a.date === today ? ' isNew' : ''}">
-        ${a.date === today ? '<span class="actNew">جديد اليوم</span>' : ''}
-        <div class="actIcon">${a.icon}</div>
-        <div class="actTitle">${esc(a.title)}</div>
-        <div class="actMeta">${esc(a.desc)} · ${a.items.length} فقرات</div>
-        ${a.date ? `<div class="actDate">📅 ${fmtActDate(a.date)}</div>` : ''}
-        <button class="actGo" onclick="startActivity('${a.id}')">▶️ ابدأ العرض</button>
-      </div>`).join('');
-  });
+  const tabs = document.getElementById('actTabs'), body = document.getElementById('actBody');
+  if(!tabs || !body) return;
+  const today = new Date().toLocaleDateString('en-CA');   // YYYY-MM-DD بتوقيت الجهاز
+  const todaySpecial = g => ACTIVITIES.some(a => a.grade === g && a.special && a.date === today);
+  if(actGrade === null){
+    let saved = null;
+    try{ saved = parseInt(localStorage.getItem('rahhala_act_grade'), 10); }catch(e){}
+    actGrade = (saved === 7 || saved === 8) ? saved : 7;
+    // نشاط خاص اليوم لصف واحد فقط ← نفتح تبويبه مباشرة
+    const other = actGrade === 7 ? 8 : 7;
+    if(!todaySpecial(actGrade) && todaySpecial(other)) actGrade = other;
+  }
+  tabs.innerHTML = [7, 8].map(g => `
+    <button class="actTab${g === actGrade ? ' on' : ''}" onclick="setActGrade(${g})">
+      الصف ${g === 7 ? 'السابع' : 'الثامن'}<small>(${ACTIVITIES.filter(a => a.grade === g).length})</small>
+      ${todaySpecial(g) ? '<span class="actTabToday">حصة اليوم</span>' : ''}
+    </button>`).join('');
+
+  const mine = ACTIVITIES.filter(a => a.grade === actGrade);
+  const specials = mine.filter(a => a.special);
+  const regular = mine.filter(a => !a.special);
+  // القادمة: الأقرب أولاً (اليوم بالأعلى) · السابقة: الأحدث أولاً وتُطوى
+  const upcoming = specials.filter(a => (a.date || '') >= today).sort((x, y) => (x.date || '').localeCompare(y.date || ''));
+  const past = specials.filter(a => (a.date || '') < today).sort((x, y) => (y.date || '').localeCompare(x.date || ''));
+
+  const specialHtml = `
+    <div class="actSec special">
+      <div class="actSecHead"><h3>📌 أنشطة خاصة</h3><span>لحصص محددة بشروط خاصة</span></div>
+      ${upcoming.length
+        ? `<div class="actGrid wide">${upcoming.map(a => actCardHtml(a, today)).join('')}</div>`
+        : '<div class="actNone">ما فيه نشاط خاص لحصة قادمة.</div>'}
+      ${past.length ? `<details class="actArchive"><summary>📁 أنشطة خاصة سابقة (${past.length})</summary>
+        <div class="actGrid wide">${past.map(a => actCardHtml(a, today)).join('')}</div></details>` : ''}
+    </div>`;
+
+  const U = actGrade === 8 ? UNITS_DATA_8 : UNITS_DATA;
+  const units = [...new Set(regular.map(a => a.unit))].sort((a, b) => a - b);
+  const unitsHtml = `
+    <div class="actSec">
+      <div class="actSecHead"><h3>📚 أنشطة الوحدات</h3><span>مرتّبة حسب وحدات المنهج</span></div>
+      ${units.length ? units.map(n => {
+        const u = U[n];
+        const list = regular.filter(a => a.unit === n).sort((x, y) => (y.date || '').localeCompare(x.date || ''));
+        return `<div class="actUnitHead"><span class="actUnitNum">الوحدة ${n}</span>${u ? esc(u.title) : ''}${u ? `<span class="actUnitSub">· ${esc(u.subject)}</span>` : ''}</div>
+          <div class="actGrid wide">${list.map(a => actCardHtml(a, today)).join('')}</div>`;
+      }).join('') : '<div class="actEmpty">ما فيه أنشطة بعد لهذا الصف.</div>'}
+    </div>`;
+
+  body.innerHTML = specialHtml + unitsHtml;
 }
 
 // ═══════════════════════════════════════════════════════════
