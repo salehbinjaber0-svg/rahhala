@@ -422,6 +422,12 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     .actCols{grid-template-columns:1fr; gap:26px;}
   }
   .actGrid{display:grid; grid-template-columns:1fr; gap:16px;}
+  .actDate{color:#8a8a8a; font-size:.8rem;}
+  .actCard.isNew{border-color:var(--gold); box-shadow:0 0 0 3px #f7ecd2;}
+  .actNew{
+    align-self:flex-start; background:var(--grad-gold); color:var(--navy-deep);
+    font-size:.72rem; font-weight:700; padding:3px 11px; border-radius:12px;
+  }
   .actCard{
     background:#fff; border:1.5px solid #e8e0cd; border-radius:16px; padding:20px;
     display:flex; flex-direction:column; gap:10px; transition:transform .15s, box-shadow .15s;
@@ -4736,7 +4742,7 @@ const LQ_KINDS = {
 // ═══════ أنشطة حصة اليوم — جاهزة بالكود، يضيفها المساعد بالطلب ═══════
 const ACTIVITIES = [
   {
-    id:'aqalim-1', grade:7, unit:1, icon:'🌍',
+    id:'aqalim-1', date:'2026-09-13', grade:7, unit:1, icon:'🌍',
     title:'الأقاليم المناخية',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -4758,7 +4764,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'batin-8-1', grade:8, unit:1, icon:'🌋',
+    id:'batin-8-1', date:'2026-09-13', grade:8, unit:1, icon:'🌋',
     title:'كوكب الأرض — الطبقات والأغلفة',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -4780,7 +4786,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'rafidain-7-2', grade:7, unit:2, icon:'🏛️',
+    id:'rafidain-7-2', date:'2026-09-14', grade:7, unit:2, icon:'🏛️',
     title:'حضارات بلاد الرافدين',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -4802,7 +4808,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'misr-8-2', grade:8, unit:2, icon:'🔺',
+    id:'misr-8-2', date:'2026-09-14', grade:8, unit:2, icon:'🔺',
     title:'الحضارة المصرية',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -4824,7 +4830,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'sultat-7-3', grade:7, unit:3, icon:'⚖️',
+    id:'sultat-7-3', date:'2026-09-14', grade:7, unit:3, icon:'⚖️',
     title:'السلطات الدستورية',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -4846,7 +4852,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'muwatana-8-3', grade:8, unit:3, icon:'🤝',
+    id:'muwatana-8-3', date:'2026-09-14', grade:8, unit:3, icon:'🤝',
     title:'المواطَنة والمشاركة المدنية',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -4868,7 +4874,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'sukkan-7-4', grade:7, unit:4, icon:'👥',
+    id:'sukkan-7-4', date:'2026-09-14', grade:7, unit:4, icon:'👥',
     title:'التوزيع الجغرافي للسكان',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -4890,7 +4896,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'sukkan-8-4', grade:8, unit:4, icon:'📊',
+    id:'sukkan-8-4', date:'2026-09-14', grade:8, unit:4, icon:'📊',
     title:'السكان ومصادر بياناتهم',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -4912,7 +4918,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'abbas-7-5', grade:7, unit:5, icon:'🕌',
+    id:'abbas-7-5', date:'2026-09-14', grade:7, unit:5, icon:'🕌',
     title:'الخلافة العباسية',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -4934,7 +4940,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'othman-8-5', grade:8, unit:5, icon:'🏰',
+    id:'othman-8-5', date:'2026-09-14', grade:8, unit:5, icon:'🏰',
     title:'الدولة العثمانية',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -4956,7 +4962,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'amn-7-6', grade:7, unit:6, icon:'🛡️',
+    id:'amn-7-6', date:'2026-09-14', grade:7, unit:6, icon:'🛡️',
     title:'الأمن الوطني',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -4978,7 +4984,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'taghayur-8-6', grade:8, unit:6, icon:'🏙️',
+    id:'taghayur-8-6', date:'2026-09-14', grade:8, unit:6, icon:'🏙️',
     title:'الأمن الوطني والتغيُّر الاجتماعي',
     desc:'غلق ختامي — خمسة أسئلة اختيارية',
     items:[
@@ -5000,7 +5006,7 @@ const ACTIVITIES = [
     ]
   },
   {
-    id:'misr-8-full', grade:8, unit:2, icon:'🏺',
+    id:'misr-8-full', date:'2026-09-27', grade:8, unit:2, icon:'🏺',
     title:'رحلة في الحضارة المصرية',
     desc:'نشاط تفاعلي كامل — عشر دقائق بتحدٍّ جماعي',
     items:[
@@ -5060,21 +5066,39 @@ function openLessonFromNav(){
   renderLessonStats();
 }
 
+// تاريخ النشاط بصيغة عربية مقروءة، مع «اليوم» و«أمس» للقريب
+function fmtActDate(iso){
+  const d = new Date(iso + 'T00:00:00');
+  if(isNaN(d)) return iso;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const diff = Math.round((today - d) / 86400000);
+  if(diff === 0) return 'اليوم';
+  if(diff === 1) return 'أمس';
+  const m = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  return `${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()}`;
+}
+
 function renderActivities(){
   // نعرض الصفين معاً — كل صف بعموده، فلا يحتاج المعلم تبديل المنهج
   [7, 8].forEach(g=>{
     const box = document.getElementById('actGrid' + g);
     if(!box) return;
-    const mine = ACTIVITIES.filter(a => a.grade === g);
+    // الأحدث أولاً: النشاط المطلوب اليوم يظهر بأعلى العمود
+    const mine = ACTIVITIES.filter(a => a.grade === g)
+      .slice()
+      .sort((x, y) => (y.date || '').localeCompare(x.date || ''));
     if(!mine.length){
       box.innerHTML = `<div class="actEmpty">ما فيه أنشطة بعد لهذا الصف.</div>`;
       return;
     }
+    const today = new Date().toLocaleDateString('en-CA');   // YYYY-MM-DD بتوقيت الجهاز
     box.innerHTML = mine.map(a=>`
-      <div class="actCard">
+      <div class="actCard${a.date === today ? ' isNew' : ''}">
+        ${a.date === today ? '<span class="actNew">جديد اليوم</span>' : ''}
         <div class="actIcon">${a.icon}</div>
         <div class="actTitle">${esc(a.title)}</div>
         <div class="actMeta">${esc(a.desc)} · ${a.items.length} فقرات</div>
+        ${a.date ? `<div class="actDate">📅 ${fmtActDate(a.date)}</div>` : ''}
         <button class="actGo" onclick="startActivity('${a.id}')">▶️ ابدأ العرض</button>
       </div>`).join('');
   });
