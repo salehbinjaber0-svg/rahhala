@@ -4910,12 +4910,12 @@ function lbRender(){
   const box = document.getElementById('leaderboardBody');
   if(!box || !isAdmin) return;
   const rows = lbRows;
-  // ترتيب الصفوف كما في «صفوفي»، ثم أي صف آخر موجود بالبيانات
+  // صفوف المعلم الحالية فقط (أزرار «صفوفي» ولوحة المعلم) — أسماء باقية بقاعدة البيانات
+  // تحت صف قديم أو غير معتمد (كـ7-3) لا تظهر كبطاقة
   const order = [];
   document.querySelectorAll('.myClassBtn, .rosterClassBtn').forEach(b=>{
     if(b.dataset.cls && !order.some(o => o.cls === b.dataset.cls)) order.push({cls: b.dataset.cls, label: b.textContent.trim()});
   });
-  rows.forEach(r => { if(r.cls && !order.some(o => o.cls === r.cls)) order.push({cls: r.cls, label: r.cls}); });
   if(!order.some(o => o.cls === lbFilter)) lbFilter = 'all';
   document.getElementById('lbBar').hidden = false;
   document.getElementById('lbFilters').innerHTML = [{cls: 'all', label: 'كل الصفوف'}, ...order].map(o =>
