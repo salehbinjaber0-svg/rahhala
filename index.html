@@ -1668,6 +1668,40 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   tbody tr:nth-child(odd){background:#faf7ef;}
   tbody tr:first-child td{font-weight:700; color:var(--teal);}
 
+  /* ===== لوحة الصدارة: أعلى ثلاثة بنجوم المشاركة في كل صف ===== */
+  .lbGrid{display:grid; grid-template-columns:repeat(auto-fit, minmax(290px, 1fr)); gap:20px;}
+  .lbCard{
+    background:#fff; border-radius:18px; overflow:hidden; border:1px solid #e8e0cd;
+    box-shadow:0 6px 24px rgba(16,48,63,.08);
+  }
+  .lbHead{
+    background:var(--grad-navy); color:var(--gold-light); padding:13px 18px;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    font-family:'Aref Ruqaa'; font-size:1.3rem; line-height:1.7;
+  }
+  .lbHead small{font-family:'Tajawal'; font-size:.8rem; color:rgba(255,255,255,.7);}
+  .lbRow{display:flex; align-items:center; gap:13px; padding:13px 16px; border-bottom:1px solid #f2ede0;}
+  .lbRow:last-child{border-bottom:none;}
+  .lbMedal{
+    flex-shrink:0; width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:1.5rem; background:var(--cream);
+  }
+  .lbWho{flex:1; min-width:0;}
+  .lbName{font-weight:800; color:var(--navy-deep); font-size:1.02rem; overflow-wrap:anywhere;}
+  .lbStars{flex-shrink:0; font-weight:800; color:var(--gold-deep); background:#fdf4e3; border-radius:20px; padding:5px 12px; font-size:.92rem;}
+  .lbRow.champ{background:linear-gradient(135deg, #fff8e8, #fdf0d2); padding:17px 16px;}
+  .lbRow.champ .lbMedal{background:var(--grad-gold); box-shadow:0 0 0 3px #fff, 0 0 0 5px var(--gold); width:50px; height:50px; font-size:1.7rem;}
+  .lbRow.champ .lbName{font-size:1.15rem;}
+  .lbChamp{margin-top:4px; font-family:'Aref Ruqaa'; line-height:1.65;}
+  .lbChamp span{display:block; white-space:nowrap;}
+  .lbChamp span:first-child{color:var(--maroon); font-size:1.02rem;}
+  .lbChamp span:last-child{color:var(--gold-deep); font-size:.92rem;}
+  .lbEmpty{padding:22px 16px; text-align:center; color:#8a8a8a; font-size:.92rem;}
+  .lbLocked{
+    background:#fff; border:1px dashed #d8cfb8; border-radius:16px; padding:28px 20px;
+    text-align:center; color:var(--navy); line-height:1.9;
+  }
+
   /* class challenge */
 
   footer{background:var(--navy-deep); color:#a9b7bb; padding:36px 0; font-size:.85rem; text-align:center;}
@@ -2273,11 +2307,8 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   </svg>
   <div class="wrap">
     <h2>لوحة الصدارة</h2>
-    <p class="lead">أعلى الطلاب نقاطاً — بيانات حيّة تجمع كل الطلاب من كل الأجهزة، وتتحدث تلقائياً.</p>
-    <table>
-      <thead><tr><th>الترتيب</th><th>الاسم</th><th>الصف</th><th>النقاط</th></tr></thead>
-      <tbody id="leaderboardBody"></tbody>
-    </table>
+    <p class="lead">أعلى ثلاثة طلاب في كل صف بنجوم المشاركة — تتحدث تلقائياً مع كل نجمة جديدة.</p>
+    <div id="leaderboardBody"></div>
   </div>
 </section>
 
@@ -3719,6 +3750,7 @@ function showSection(id){
   document.querySelectorAll('.navDrop').forEach(d=>d.classList.remove('open'));
   const target = document.getElementById(id);
   if(target) target.style.display = '';
+  if(id === 'leaderboard') refreshLeaderboard();
   window.scrollTo({top:0, behavior:'instant'});
 }
 
@@ -4764,24 +4796,48 @@ function finishMatchGame(){
   if(newly.length) celebrateBadges(newly);
 }
 
-// ---------- leaderboard (تحدّث كل بضع ثوانٍ — مشتركة بين كل الطلاب والأجهزة) ----------
+// ---------- لوحة الصدارة: أعلى ثلاثة طلاب بنجوم المشاركة في كل صف ----------
+// المصدر نجوم «صفوفي» (class_roster.participation_points) — دخول الطالب معطّل، فلا معنى
+// لنقاط حسابات الطلاب. الأسماء محمية بقاعدة البيانات للمعلم فقط، فالزائر يرى رسالة لا أسماء.
+const LB_CHAMP_HTML = '<span>أنت البطل إلى هذه اللحظة</span><span>حافظ على مكانك 👑</span>';
+const LB_MEDALS = ['🥇', '🥈', '🥉'];
 async function refreshLeaderboard(){
-  if(!requireDb()) return;
-  const { data, error } = await supaCall(() => sb.from('students').select('*').eq('status','approved').order('points', {ascending:false}).limit(20), 2, 500);
-  if(error){ console.error('تعذر تحميل لوحة الصدارة:', error); return; }
-  const body = document.getElementById('leaderboardBody');
-  body.innerHTML = '';
-  // نستبعد المطرودين — ما يفترض يظهرون بلوحة الصدارة
-  const list = (data || []).filter(r => !r.kicked).slice(0, 10);
-  if(list.length === 0){
-    body.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#8a8a8a;">لا يوجد طلاب بعد — كن أول من يبدأ!</td></tr>';
+  const box = document.getElementById('leaderboardBody');
+  if(!box) return;
+  if(!isAdmin){
+    box.innerHTML = '<div class="lbLocked">🔒 لوحة الصدارة تظهر عند دخول المعلم<br><small>أسماء الطلاب لا تُعرض للعامة حفاظاً على خصوصيتهم</small></div>';
     return;
   }
-  list.forEach((r, i)=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td><td>${esc(r.name)}</td><td>${esc(r.cls)}</td><td>${r.points}</td>`;
-    body.appendChild(tr);
+  if(!dbReady || !sb) return;
+  const { data, error } = await supaCall(() => sb.from('class_roster').select('*'), 2, 500);
+  if(error){ console.error('تعذر تحميل لوحة الصدارة:', error); return; }
+  const rows = (data || []).filter(r => !r.deleted_at);
+  // ترتيب الصفوف كما في «صفوفي»، ثم أي صف آخر موجود بالبيانات
+  const order = [];
+  document.querySelectorAll('.myClassBtn, .rosterClassBtn').forEach(b=>{
+    if(b.dataset.cls && !order.some(o => o.cls === b.dataset.cls)) order.push({cls: b.dataset.cls, label: b.textContent.trim()});
   });
+  rows.forEach(r => { if(r.cls && !order.some(o => o.cls === r.cls)) order.push({cls: r.cls, label: r.cls}); });
+  if(!order.length){ box.innerHTML = '<div class="lbLocked">ما فيه صفوف بعد — أضف الطلاب من «صفوفي».</div>'; return; }
+
+  box.innerHTML = '<div class="lbGrid">' + order.map(o=>{
+    const top = rows.filter(r => r.cls === o.cls && (r.participation_points || 0) > 0)
+      .sort((a,b)=> (b.participation_points || 0) - (a.participation_points || 0) || String(a.student_name).localeCompare(String(b.student_name), 'ar'))
+      .slice(0, 3);
+    const best = top.length ? top[0].participation_points : 0;
+    const body = top.length ? top.map(r=>{
+      const pts = r.participation_points || 0;
+      // الترتيب بالتنافس: المتعادلون يأخذون نفس المركز والوسام
+      const rank = 1 + top.filter(x => (x.participation_points || 0) > pts).length;
+      const champ = pts === best;
+      return `<div class="lbRow${champ ? ' champ' : ''}">
+        <div class="lbMedal">${LB_MEDALS[rank - 1]}</div>
+        <div class="lbWho"><div class="lbName">${esc(r.student_name)}</div>${champ ? `<div class="lbChamp">${LB_CHAMP_HTML}</div>` : ''}</div>
+        <div class="lbStars">⭐ ${pts}</div>
+      </div>`;
+    }).join('') : '<div class="lbEmpty">ما فيه نجوم مشاركة بعد — أول نجمة تفتح السباق ⭐</div>';
+    return `<div class="lbCard"><div class="lbHead">${esc(o.label)}<small>أعلى ٣ بالمشاركة</small></div>${body}</div>`;
+  }).join('') + '</div>';
 }
 
 // ---------- class challenge (تجميع نقاط كل صف، تحدّث دوري) ----------
