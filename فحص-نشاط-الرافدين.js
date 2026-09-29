@@ -32,7 +32,7 @@ setTimeout(() => {
   t(by.mcq === 6,    `اختيار من متعدد ٦ (${by.mcq})`);
   t(by.essay === 15, `مقالي ١٥ (${by.essay})`);
   t(by.break === 3,  `فاصل ٣ (${by.break})`);
-  t(by.game === 3,   `نشاط ٣ (${by.game})`);
+  t(by.game === 3,   `نشاط ٣ — تهيئة Wordwall + نشاطان (${by.game})`);
   t(by.reward === 1, `مكافأة ١ (${by.reward})`);
 
   console.log('\n── مفاتيح الإجابة (correct_index يشير للصحيح فعلاً) ──');
@@ -59,6 +59,10 @@ setTimeout(() => {
   t(qs.every(i => i.a && i.a.length <= 130), 'كل الإجابات مختصرة (≤١٣٠ حرفاً)');
   t(act.items.filter(i => i.kind === 'mcq').every(i => i.noShuffle === true),
     'الخيارات لا تُخلط — ترتيب أ/ب/ج/د يطابق الكتاب');
+  t(qs.every(i => i.autoReveal === true),
+    'كل فرع يكشف إجابته تلقائياً — لا يكتب الطالب قبل ظهورها');
+  t(act.items.some(i => i.kind === 'game' && i.a.includes('wordwall.net')),
+    'نشاط التهيئة يحمل رابط Wordwall الجاهز');
 
   console.log('\n── التسلسل: ص٤٧ ← ص٤٨ ← ص٥٧ ← ص٥٨ ──');
   const pages = qs.map(i => parseInt(num(i.ref).match(/\d+/)[0], 10));
@@ -73,30 +77,38 @@ setTimeout(() => {
     const showEl = w.document.getElementById('lessonShow');
     t(showEl.classList.contains('bg-rafidain'), 'الخلفية طُبّقت على الشاشة');
 
-    let painted = 0, refsSeen = 0;
+    let painted = 0, refsSeen = 0, cues = 0;
     for (let i = 0; i < 28; i++) {
       w.lsJump(i);
       const q = w.document.getElementById('lsQ');
       const wrap = w.document.getElementById('lsAWrap');
       if (q.textContent.trim() || wrap.textContent.trim()) painted++;
       if (q.querySelector('.lsRef')) refsSeen++;
+      if (wrap.querySelector('.lsWrite')) cues++;
     }
     t(painted === 28, `كل الشرائح الـ٢٨ رُسمت بمحتوى (${painted})`);
     t(refsSeen === 21, `شارة المرجع ظهرت على ٢١ شريحة سؤال (${refsSeen})`);
+    t(cues === 21, `شارة «اكتبوا الآن» ظهرت على ٢١ شريحة (${cues})`);
 
-    // كشف إجابة مقالية فعلياً
+    // المسار المعكوس: الإجابة وشارة الكتابة تظهران بمجرد دخول الشريحة
     const idx = act.items.findIndex(i => i.q && i.q.startsWith('فسِّر: تمكَّن سرجون'));
     w.lsJump(idx);
-    w.lsReveal();
     const shown = w.document.querySelector('#lsAWrap .lsA');
     t(shown && shown.textContent.includes('الجيش النظامي'),
-      'زر «اكشف الإجابة» يعرض الإجابة المختصرة الصحيحة');
+      'الإجابة المقالية ظاهرة تلقائياً بلا ضغط زر');
+    t(!!w.document.querySelector('#lsAWrap .lsWrite'),
+      'شارة «اكتبوا الآن» ظاهرة مع الإجابة');
+    w.lsReveal();   // إخفاء
+    t(!w.document.querySelector('#lsAWrap .lsA') && !w.document.querySelector('#lsAWrap .lsWrite'),
+      'زر «أخفِ الإجابة» يخفي الإجابة والشارة معاً (لسؤال شفهي أولاً)');
 
-    // اختيار صحيح في سؤال اختياري
-    const m = act.items.findIndex(i => i.kind === 'mcq');
-    w.lsJump(m);
-    w.lsPick(w.eval('lessonQs')[m].correct_index);
-    t(!!w.document.querySelector('#lsAWrap .lsCh.correct'), 'الخيار الصحيح يُعلَّم عند الضغط');
+    // الاختياري كذلك: الصحيح معلّم وشارة الكتابة ظاهرة فور الدخول
+    const mi = act.items.findIndex(i => i.kind === 'mcq');
+    w.lsJump(mi);
+    t(!!w.document.querySelector('#lsAWrap .lsCh.correct'),
+      'الخيار الصحيح معلَّم تلقائياً في السؤال الاختياري');
+    t(!!w.document.querySelector('#lsAWrap .lsWrite'),
+      'شارة «اكتبوا الآن» تظهر في الاختياري أيضاً');
 
     // بطاقة فاصل: التفاف الأسطر
     const b = act.items.findIndex(i => i.kind === 'break');
