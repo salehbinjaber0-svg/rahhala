@@ -807,7 +807,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     .whModal.full .whResult{width:min(30vw, 440px);}
   }
   @media (prefers-reduced-motion: reduce){
-    .whModal *, .whModal.spinning .whBulb{animation:none !important;}
+    #wheelModal *, #wheelModal.spinning .whBulb{animation:none !important;}
   }
   /* ===== الطالب المحظوظ — يستعير إطار نافذة العجلة (whModal/whBox/whHead) ===== */
   .lkCard{
@@ -842,7 +842,35 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   #luckyModal.full .lkQ{font-size:clamp(6rem, 16vw, 11rem);}
   #luckyModal.full .lkNum{font-size:clamp(2.2rem, 5.5vw, 4rem);}
   #luckyModal.full .lkStarsRow{font-size:clamp(2rem, 4.5vw, 3.4rem);}
-  @media (prefers-reduced-motion: reduce){ .lkQ, .lkCard.win, .lkStarsRow span{animation:none !important;} }
+  /* شريط البطاقات: يتحرك ١٠ ثوانٍ ويتباطأ حتى يقف الفائز تحت المؤشر */
+  .lkReel{
+    position:relative; direction:ltr; width:min(780px, 100%); height:clamp(130px, 24vh, 200px); overflow:hidden;
+    border-radius:20px; border:3px solid var(--gold-light);
+    background:linear-gradient(180deg, #123746, #0a2029);
+    box-shadow:inset 0 0 34px rgba(0,0,0,.65), 0 18px 40px rgba(0,0,0,.4);
+  }
+  .lkReel::before, .lkReel::after{content:''; position:absolute; top:0; bottom:0; width:16%; z-index:2; pointer-events:none;}
+  .lkReel::before{left:0; background:linear-gradient(90deg, #0a2029, transparent);}
+  .lkReel::after{right:0; background:linear-gradient(-90deg, #0a2029, transparent);}
+  .lkTrack{position:relative; display:flex; align-items:center; gap:12px; height:100%; padding:0 12px; will-change:transform;}
+  .lkMini{
+    flex:0 0 clamp(118px, 17vw, 170px); height:70%; border-radius:14px; direction:rtl;
+    display:flex; align-items:center; justify-content:center; text-align:center; padding:8px;
+    font-weight:800; font-size:clamp(.95rem, 1.6vw, 1.2rem); line-height:1.4; overflow-wrap:anywhere;
+    background:radial-gradient(circle at 50% 28%, #fffaf0, #efd9a3); color:var(--navy-deep);
+    border:2px solid var(--gold); box-shadow:0 5px 14px rgba(0,0,0,.4);
+    transition:transform .35s cubic-bezier(.2,1.6,.4,1), box-shadow .35s;
+  }
+  .lkMini:nth-child(3n+2){background:radial-gradient(circle at 50% 28%, #f3fbf7, #cfe8dd); border-color:#6fb89c;}
+  .lkMini:nth-child(3n){background:radial-gradient(circle at 50% 28%, #f6f8fc, #d3dfeb); border-color:#7fa2c2;}
+  .lkMini.win{transform:scale(1.12); box-shadow:0 0 0 4px #fff6dc, 0 0 44px rgba(227,201,139,.95);}
+  .lkLine{position:absolute; left:50%; top:0; bottom:0; width:3px; transform:translateX(-50%); z-index:3; background:rgba(227,201,139,.6);}
+  .lkMark{position:absolute; left:50%; transform:translateX(-50%); z-index:4; width:0; height:0; border-left:15px solid transparent; border-right:15px solid transparent;}
+  .lkMark.top{top:0; border-top:20px solid var(--gold-light);}
+  .lkMark.bot{bottom:0; border-bottom:20px solid var(--gold-light);}
+  .lkCount{color:var(--gold-light); font-weight:800; font-size:1rem;}
+  #luckyModal.full .lkReel{width:min(1500px, 95vw); height:clamp(170px, 32vh, 300px);}
+  #luckyModal.full .lkMini{flex-basis:clamp(150px, 16vw, 250px); font-size:clamp(1.1rem, 1.9vw, 1.8rem);}
   /* زر خطر: مظهره يختلف عن بقية الأزرار عمداً */
   .mcWipe{
     padding:10px 18px; border-radius:30px; cursor:pointer; font-family:'Tajawal';
@@ -6480,7 +6508,7 @@ document.addEventListener('fullscreenchange', ()=>{
 // فيعمل الاستبعاد على كل الأجهزة بلا جدول جديد؛ وحذف الملاحظة يعيد الطالب للسحب.
 const LK_TAG = '🍀 الطالب المحظوظ';
 const LK_WEIGHTS = [[3,20], [4,20], [5,18], [6,12], [7,10], [8,9], [9,6], [10,5]];   // مجموعها ١٠٠
-const lk = {cls:'', all:[], pool:[], absent:0, wonWeek:new Set(), phase:'loading', winner:null,
+const lk = {cls:'', all:[], pool:[], absent:0, wonWeek:new Set(), phase:'loading', winner:null, reel:[], spinning:false,
             stars:0, newTotal:0, msg:'', req:0, timers:[], ac:null};
 
 function lkOpen(){ const m = document.getElementById('luckyModal'); return !!(m && !m.hidden); }
@@ -6536,7 +6564,7 @@ function lkKeys(e){
 }
 
 function lkSetCls(cls){
-  if(lk.phase === 'rolling' || lk.phase === 'saving'){ document.getElementById('lkCls').value = lk.cls; return; }
+  if(lk.phase === 'rolling' || lk.phase === 'stars' || lk.phase === 'saving'){ document.getElementById('lkCls').value = lk.cls; return; }
   lk.cls = cls;
   lkLoad();
 }
@@ -6592,9 +6620,16 @@ function lkPaint(){
     return;
   }
   if(lk.phase === 'rolling'){
-    st.innerHTML = card('rolling', `<div class="lkLbl">🍀 الطالب المحظوظ</div><div class="lkName" id="lkName"></div>
-      <div class="lkReward"><div class="lkNum rolling" id="lkNum"></div><div class="lkStarsRow" id="lkStarsRow"></div></div>`)
-      + '<div class="whHint">🥁 …</div>';
+    st.innerHTML = `<div class="lkReel" id="lkReel"><div class="lkTrack" id="lkTrack">${
+        lk.reel.map(r => `<div class="lkMini">${esc(r.name)}</div>`).join('')
+      }</div><div class="lkLine"></div><div class="lkMark top"></div><div class="lkMark bot"></div></div>
+      <div class="lkCount" id="lkCount">🥁 من سيكون المحظوظ؟</div>`;
+    return;
+  }
+  if(lk.phase === 'stars'){
+    st.innerHTML = card('win', `<div class="lkLbl">🍀 الطالب المحظوظ</div><div class="lkName">${esc(lk.winner.name)}</div>
+      <div class="lkReward"><div class="lkNum rolling" id="lkNum"></div><div class="lkStarsRow"></div></div>`)
+      + '<div class="whHint">🎁 كم نجمة؟</div>';
     return;
   }
   // result / saving / done
@@ -6612,7 +6647,8 @@ function lkPaint(){
 
 function lkStopRoll(){
   lk.timers.forEach(clearTimeout); lk.timers = [];
-  if(lk.phase === 'rolling'){ lk.phase = 'idle'; lk.winner = null; }
+  lk.spinning = false;
+  if(lk.phase === 'rolling' || lk.phase === 'stars'){ lk.phase = 'idle'; lk.winner = null; }
 }
 
 function lkTick(freq){
@@ -6626,48 +6662,86 @@ function lkTick(freq){
 }
 
 // تسلسل متباطئ: كل خطوة أبطأ من سابقتها، والخطوة الأخيرة تُظهر القيمة المختارة سلفاً
+// لا يُختصر عند «تقليل الحركة» بالجهاز: كان يُظهر النتيجة فوراً، والتشويق هو المطلوب هنا
 function lkRoll(steps, show, done){
-  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let delay = reduce ? 0 : 45, t = 0;
+  let delay = 45, t = 0;
   for(let i = 0; i < steps; i++){
     const last = i === steps - 1;
     t += delay;
-    lk.timers.push(setTimeout(()=>show(last), reduce ? 0 : t));
+    lk.timers.push(setTimeout(()=>show(last), t));
     delay = Math.min(delay * 1.13, 420);
   }
-  lk.timers.push(setTimeout(done, reduce ? 0 : t + 350));
+  lk.timers.push(setTimeout(done, t + 350));
 }
 
+const LK_REEL_MS = 10000;          // مدة حركة البطاقات قبل ظهور الاسم — بطلب المعلم
+const LK_REEL_LEN = 64, LK_REEL_WIN = 56;
+
 function lkDraw(){
-  if(!lkOpen() || lk.phase === 'rolling' || lk.phase === 'saving') return;
+  if(!lkOpen() || lk.phase === 'rolling' || lk.phase === 'stars' || lk.phase === 'saving') return;
   if(!lk.pool.length){ lk.phase = 'idle'; lkPaint(); return; }
   lk.msg = '';
   lk.winner = lk.pool[Math.floor(Math.random() * lk.pool.length)];
   lk.stars = lkPickStars();
+  // بطاقات الشريط من المؤهّلين، بلا اسمين متتاليين متطابقين ما أمكن؛ الفائز بموضع ثابت قرب النهاية
+  lk.reel = [];
+  for(let i = 0; i < LK_REEL_LEN; i++){
+    if(i === LK_REEL_WIN){ lk.reel.push(lk.winner); continue; }
+    let r, tries = 0;
+    do { r = lk.pool[Math.floor(Math.random() * lk.pool.length)]; }
+    while(lk.pool.length > 1 && tries++ < 5 && (r === lk.reel[i - 1] || (i === LK_REEL_WIN + 1 && r === lk.winner)));
+    lk.reel.push(r);
+  }
   lk.phase = 'rolling';
   lkPaint();
-  const nameEl = document.getElementById('lkName'), numEl = document.getElementById('lkNum');
-  const names = lk.all.length > 1 ? lk.all : [lk.winner];
-  let k = Math.floor(Math.random() * names.length);
-  lkRoll(24, last=>{
-    k = (k + 1 + Math.floor(Math.random() * Math.max(1, names.length - 1))) % names.length;
-    nameEl.textContent = last ? lk.winner.name : names[k].name;
-    lkTick(last ? 880 : 1300);
-  }, ()=>{
-    // بعد الاسم: عدّاد النجوم يدور ويقف على المكافأة
-    let v = 3;
-    lkRoll(16, last=>{
-      v = last ? lk.stars : (v >= 10 ? 3 : v + 1);
-      numEl.textContent = `🎁 ${v} نجوم`;
-      lkTick(last ? 660 : 1000);
-    }, ()=>{
-      lk.timers = [];
-      lk.phase = 'result';
+  const reel = document.getElementById('lkReel'), track = document.getElementById('lkTrack');
+  const cards = track.children, win = cards[LK_REEL_WIN];
+  const pitch = cards[1].offsetLeft - cards[0].offsetLeft;
+  // يقف الفائز تحت المؤشر مع إزاحة بسيطة داخل بطاقته كي لا يبدو التوقّف آلياً
+  const jitter = (Math.random() - 0.5) * win.offsetWidth * 0.5;
+  const target = win.offsetLeft + win.offsetWidth / 2 - reel.clientWidth / 2 + jitter;
+  track.style.transition = 'none';
+  track.style.transform = 'translateX(0px)';
+  void track.offsetWidth;
+  track.style.transition = `transform ${LK_REEL_MS}ms cubic-bezier(.08,.55,.1,1)`;
+  track.style.transform = `translateX(${-target}px)`;
+  lk.spinning = true;
+  let lastIdx = -1, lastT = 0;
+  const started = performance.now(), count = document.getElementById('lkCount');
+  (function loop(){
+    if(!lk.spinning) return;
+    const x = new DOMMatrix(getComputedStyle(track).transform).m41;
+    const idx = Math.floor((-x + reel.clientWidth / 2 - cards[0].offsetLeft + 6) / pitch);
+    const now = performance.now();
+    if(idx !== lastIdx){ lastIdx = idx; if(now - lastT > 40){ lastT = now; lkTick(1300); } }
+    const left = Math.ceil((LK_REEL_MS - (now - started)) / 1000);
+    if(count && left > 0) count.textContent = `🥁 من سيكون المحظوظ؟ … ${left}`;
+    requestAnimationFrame(loop);
+  })();
+  lk.timers.push(setTimeout(()=>{
+    lk.spinning = false;
+    win.classList.add('win');
+    if(count) count.textContent = '🍀 ' + lk.winner.name;
+    lkTick(880);
+    lk.timers.push(setTimeout(()=>{
+      // بعد الاسم: عدّاد النجوم يدور ويقف على المكافأة
+      lk.phase = 'stars';
       lkPaint();
-      playSound('badge');
-      whConfettiIn(document.getElementById('luckyModal'));
-    });
-  });
+      const numEl = document.getElementById('lkNum');
+      let v = 3;
+      lkRoll(16, last=>{
+        v = last ? lk.stars : (v >= 10 ? 3 : v + 1);
+        numEl.textContent = `🎁 ${v} نجوم`;
+        lkTick(last ? 660 : 1000);
+      }, ()=>{
+        lk.timers = [];
+        lk.phase = 'result';
+        lkPaint();
+        playSound('badge');
+        whConfettiIn(document.getElementById('luckyModal'));
+      });
+    }, 1100));
+  }, LK_REEL_MS + 120));
 }
 
 function lkCancel(){
