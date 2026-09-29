@@ -20,7 +20,7 @@ setTimeout(() => {
   if (!act) { bad('النشاط غير موجود'); return done(); }
 
   console.log('\n── بنية النشاط ──');
-  t(act.items.length === 28, `عدد الشرائح ٢٨ (وجدت ${act.items.length})`);
+  t(act.items.length === 24, `عدد الشرائح ٢٤ (وجدت ${act.items.length})`);
   t(act.grade === 7 && act.unit === 2, 'الصف السابع · الوحدة الثانية');
   t(act.special && act.special.cls === '7-2', 'مربوط بصف ٧-٢');
   t(act.date === '2026-09-30', 'تاريخ الحصة ٣٠/٩');
@@ -29,9 +29,10 @@ setTimeout(() => {
   console.log('\n── أنواع الشرائح ──');
   const by = {};
   act.items.forEach(i => by[i.kind] = (by[i.kind] || 0) + 1);
-  t(by.mcq === 6,    `اختيار من متعدد ٦ (${by.mcq})`);
-  t(by.essay === 15, `مقالي ١٥ (${by.essay})`);
-  t(by.break === 3,  `فاصل ٣ (${by.break})`);
+  t(by.tf === 7,     `صح أم خطأ ٧ (${by.tf})`);
+  t(by.mcq === 7,    `اختيار من متعدد ٧ (${by.mcq})`);
+  t(by.essay === 2,  `مقالي ٢ (${by.essay})`);
+  t(by.break === 4,  `فاصل ٤ (${by.break})`);
   t(by.game === 3,   `نشاط ٣ — تهيئة Wordwall + نشاطان (${by.game})`);
   t(by.reward === 1, `مكافأة ١ (${by.reward})`);
 
@@ -40,45 +41,62 @@ setTimeout(() => {
     'أول الشعوب التي سكنت بلاد الرافدين:': 'السومريُّون',
     'ثبَّتَ دعائم دولته من خلال التشريعات والقوانين:': 'حمورابي',
     'تمثَّلت الطبقة الوسطى في مجتمع بلاد الرافدين من:': 'العمال والفلاحين',
-    'من مميزات الحياة الدينيَّة عند سكان بلاد الرافدين:': 'تعدُّد المعبودات',
-    'سجَّل سكان بلاد الرافدين الوثائق الرسمية والعقود على ألواح:': 'طينيَّة',
-    'تُعَدُّ من روائع حضارة بلاد الرافدين في مجال النحت:': 'الثور المجنَّح'
+    'تُعَدُّ من روائع حضارة بلاد الرافدين في مجال النحت:': 'الثور المجنَّح',
+    'أيُّ ما يأتي ليس من عوامل قيام حضارة بلاد الرافدين؟': 'كثرة الحروب والفتوحات',
+    'تمكَّن سرجون الأول من بَسْط سيطرته على المدن السومريَّة بفضل:': 'قوة الجيش النظامي',
+    'ازدهرت التجارة في بلاد الرافدين بسبب:': 'الموقع المتميز واستتباب الأمن وتوافر المواصلات',
+    // صح أم خطأ — القيمة هي الصواب المتوقَّع
+    'بلاد الرافدين هي المنطقة الواقعة بين نهرَي دجلة والفرات.': 'صح',
+    'اتخذ الأكاديُّون مدينة «أكاد» عاصمةً لدولتهم.': 'صح',
+    'سقطت الدولة الآشوريَّة على يد الفرس.': 'خطأ',
+    'تكوَّن مجتمع بلاد الرافدين من طبقة واحدة.': 'خطأ',
+    'سجَّل سكان بلاد الرافدين وثائقهم الرسمية على ألواح خشبيَّة.': 'خطأ',
+    'اعتقد سكان بلاد الرافدين بوجود حياة بعد الموت.': 'صح',
+    'تُعَدُّ حدائق بابل المعلَّقة من أبرز إنجازات البابليِّين في مجال الزراعة.': 'صح'
   };
-  act.items.filter(i => i.kind === 'mcq').forEach(i => {
+  act.items.filter(i => i.kind === 'mcq' || i.kind === 'tf').forEach(i => {
     const picked = i.choices[i.correct_index];
-    t(picked === key[i.q], `«${i.q.slice(0, 34)}…» ← ${picked}`);
+    t(picked === key[i.q], `«${i.q.slice(0, 32)}…» ← ${picked}`);
   });
+  t(act.items.filter(i => i.kind === 'tf').every(i =>
+      i.choices.length === 2 && i.choices[0] === 'صح' && i.choices[1] === 'خطأ'),
+    'كل عبارات صح/خطأ خياراها «صح» ثم «خطأ» بهذا الترتيب');
+  t(act.items.filter(i => i.kind === 'tf' && i.correct_index === 1)
+      .every(i => i.a.includes('والصواب')), 'كل عبارة خاطئة تذكر التصويب');
 
   console.log('\n── وضوح المرجع والإجابات ──');
-  const qs = act.items.filter(i => i.kind === 'mcq' || i.kind === 'essay');
-  t(qs.length === 21, `٢١ فرعاً من التدريبات (${qs.length})`);
+  const qs = act.items.filter(i => ['mcq','tf','essay'].includes(i.kind));
+  t(qs.length === 16, `١٦ سؤالاً (${qs.length})`);
   // المراجع بالأرقام العربية الهندية (٤٧) لا اللاتينية — نحوّل قبل المقارنة
   const AR = '٠١٢٣٤٥٦٧٨٩';
   const num = t => t.replace(/[٠-٩]/g, d => AR.indexOf(d));
-  t(qs.every(i => i.ref && /^ص [٠-٩]+ · السؤال/.test(i.ref)), 'كل فرع يحمل مرجع الصفحة والسؤال والفرع');
+  t(qs.every(i => i.ref && /^ص [٠-٩]+ · /.test(i.ref)), 'كل سؤال يحمل مرجع الصفحة');
   t(qs.every(i => i.a && i.a.length <= 130), 'كل الإجابات مختصرة (≤١٣٠ حرفاً)');
-  t(act.items.filter(i => i.kind === 'mcq').every(i => i.noShuffle === true),
+  t(act.items.filter(i => i.kind === 'mcq' || i.kind === 'tf').every(i => i.noShuffle === true),
     'الخيارات لا تُخلط — ترتيب أ/ب/ج/د يطابق الكتاب');
   t(qs.every(i => i.autoReveal === true),
     'كل فرع يكشف إجابته تلقائياً — لا يكتب الطالب قبل ظهورها');
   t(act.items.some(i => i.kind === 'game' && i.a.includes('wordwall.net')),
     'نشاط التهيئة يحمل رابط Wordwall الجاهز');
 
-  console.log('\n── التسلسل: ص٤٧ ← ص٤٨ ← ص٥٧ ← ص٥٨ ──');
-  const pages = qs.map(i => parseInt(num(i.ref).match(/\d+/)[0], 10));
-  t(JSON.stringify(pages) === JSON.stringify([...pages].sort((a, b) => a - b)),
-    'الصفحات بترتيب تصاعدي: ' + [...new Set(pages)].join(' ← '));
+  console.log('\n── الترتيب: صح/خطأ ← اختياري ← مقالي ──');
+  const order = act.items.filter(i => ['mcq','tf','essay'].includes(i.kind)).map(i => i.kind);
+  const want = Array(7).fill('tf').concat(Array(7).fill('mcq'), Array(2).fill('essay'));
+  t(JSON.stringify(order) === JSON.stringify(want),
+    '٧ صح/خطأ ← ٧ اختياري ← ٢ مقالي');
+  const lessons = new Set(qs.map(i => parseInt(num(i.ref).match(/\d+/)[0], 10) < 49 ? 1 : 2));
+  t(lessons.size === 2, 'الأسئلة تغطي الدرسين معاً');
 
   console.log('\n── تشغيل فعلي: فتح العرض والمرور على ٢٨ شريحة ──');
   try {
     // isAdmin بنطاق السكربت أيضاً — يُضبط بـeval لا بالإسناد على window
     w.eval("isAdmin = true; startActivity('rafidain-7-review');");
-    t(w.eval('lessonQs').length === 28, 'المحرّك حمّل ٢٨ شريحة');
+    t(w.eval('lessonQs').length === 24, 'المحرّك حمّل ٢٤ شريحة');
     const showEl = w.document.getElementById('lessonShow');
     t(showEl.classList.contains('bg-rafidain'), 'الخلفية طُبّقت على الشاشة');
 
     let painted = 0, refsSeen = 0, cues = 0;
-    for (let i = 0; i < 28; i++) {
+    for (let i = 0; i < 24; i++) {
       w.lsJump(i);
       const q = w.document.getElementById('lsQ');
       const wrap = w.document.getElementById('lsAWrap');
@@ -86,15 +104,15 @@ setTimeout(() => {
       if (q.querySelector('.lsRef')) refsSeen++;
       if (wrap.querySelector('.lsWrite')) cues++;
     }
-    t(painted === 28, `كل الشرائح الـ٢٨ رُسمت بمحتوى (${painted})`);
-    t(refsSeen === 21, `شارة المرجع ظهرت على ٢١ شريحة سؤال (${refsSeen})`);
-    t(cues === 21, `شارة «اكتبوا الآن» ظهرت على ٢١ شريحة (${cues})`);
+    t(painted === 24, `كل الشرائح الـ٢٤ رُسمت بمحتوى (${painted})`);
+    t(refsSeen === 16, `شارة المرجع ظهرت على ١٦ شريحة سؤال (${refsSeen})`);
+    t(cues === 16, `شارة «اكتبوا الآن» ظهرت على ١٦ شريحة (${cues})`);
 
     // المسار المعكوس: الإجابة وشارة الكتابة تظهران بمجرد دخول الشريحة
-    const idx = act.items.findIndex(i => i.q && i.q.startsWith('فسِّر: تمكَّن سرجون'));
+    const idx = act.items.findIndex(i => i.kind === 'essay');
     w.lsJump(idx);
     const shown = w.document.querySelector('#lsAWrap .lsA');
-    t(shown && shown.textContent.includes('الجيش النظامي'),
+    t(shown && shown.textContent.includes('الهجرات البشرية'),
       'الإجابة المقالية ظاهرة تلقائياً بلا ضغط زر');
     t(!!w.document.querySelector('#lsAWrap .lsWrite'),
       'شارة «اكتبوا الآن» ظاهرة مع الإجابة');
@@ -103,12 +121,12 @@ setTimeout(() => {
       'زر «أخفِ الإجابة» يخفي الإجابة والشارة معاً (لسؤال شفهي أولاً)');
 
     // الاختياري كذلك: الصحيح معلّم وشارة الكتابة ظاهرة فور الدخول
-    const mi = act.items.findIndex(i => i.kind === 'mcq');
+    const mi = act.items.findIndex(i => i.kind === 'tf');
     w.lsJump(mi);
     t(!!w.document.querySelector('#lsAWrap .lsCh.correct'),
-      'الخيار الصحيح معلَّم تلقائياً في السؤال الاختياري');
+      'الخيار الصحيح معلَّم تلقائياً في عبارة صح/خطأ');
     t(!!w.document.querySelector('#lsAWrap .lsWrite'),
-      'شارة «اكتبوا الآن» تظهر في الاختياري أيضاً');
+      'شارة «اكتبوا الآن» تظهر في صح/خطأ أيضاً');
 
     // بطاقة فاصل: التفاف الأسطر
     const b = act.items.findIndex(i => i.kind === 'break');
