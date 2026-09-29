@@ -5228,110 +5228,86 @@ const ACTIVITIES = [
     id:'rafidain-7-review', date:'2026-09-30', grade:7, unit:2, icon:'🏛️', bg:'rafidain',
     special:{cls:'7-2', note:'حصة تكنولوجية — أنشطة إلكترونية ثم حل تدريبات الوحدة كاملة بالترتيب'},
     title:'مراجعة الوحدة الثانية وحل التدريبات',
-    desc:'نشاطان إلكترونيان ثم ١٦ سؤالاً: ٧ صح وخطأ · ٧ اختياري · ٢ مقالي',
+    desc:'١٦ سؤالاً — ٧ صح وخطأ · ٧ اختيار من متعدد · ٢ مقالي',
     items:[
-      {kind:'game', q:'🎮 التهيئة: مظاهر حضارة بلاد الرافدين',
-       a:'نشاط Wordwall الجاهز · ٦ دقائق\nhttps://wordwall.net/ar/resource/61243348\n\nيُفتح في تبويب مستقل قبل هذه الشاشة.\nيتشاور كل طالبين، ثم يصعد أحدهما إلى الشاشة الذكية.\n\n← يمهّد لـ: ص٥٧ السؤال الأول · ص٥٨ السؤال الثالث.'},
 
-      {kind:'break', q:'🏛️ مراجعة الوحدة الثانية — حضارة بلاد الرافدين',
-       a:'خطة الحصة:\n١) نشاطان إلكترونيان — ١٠ دقائق\n٢) ١٦ سؤالاً — ٢٤ دقيقة\n   ٧ صح وخطأ · ٧ اختيار من متعدد · ٢ مقالي\n\nمهم: الإجابة تظهر على الشاشة أولاً، ثم تكتبونها في كتبكم.\nلا يكتب أحد قبل ظهورها — حتى لا تبقى إجابة خاطئة في الكتاب.\n\nالعمل فردي، والمراجعة مع زميلك.'},
-
-      {kind:'game', q:'🎮 النشاط الأول: مَن حكم مَن؟',
-       a:'Wordwall — «المطابقة» · ٤ دقائق\n\nأورنمو ← الدولة السومرية\nسرجون الأول ← الدولة الأكادية\nحمورابي ← الدولة البابلية الأولى\nآشور بانيبال ← الدولة الآشورية\nنبوخذ نصر ← الدولة الكلدانية\n\n← يمهّد لـ: ص٤٧ السؤال الأول، والسؤال الثاني فرع ٣.'},
-
-      {kind:'game', q:'🎮 النشاط الثاني: السبب والنتيجة',
-       a:'Wordwall — «المطابقة» · ٦ دقائق\n\nقوة الجيش النظامي ← سيطرة سرجون على المدن السومرية\nضعف الملوك وكثرة الثورات ← انهيار البابلية الأولى\nالعنف وإهمال الاقتصاد ← سقوط الدولة الآشورية\nوفرة المياه وخصوبة التربة ← ازدهار الزراعة\nتوفُّر المواد الأولية ← تنوُّع الصناعات\nالموقع والأمن والمواصلات ← ازدهار التجارة\n\n← يمهّد لثمانية فروع: ص٤٨ س٣ و س٤ · ص٥٨ س٢.'},
-
-
-      {kind:'break', q:'✅ الجزء الأول: صح أم خطأ — سبع عبارات',
-       a:'الإجابة تظهر مع العبارة.\nاقرأها، ثم اكتب الصواب في كتابك.\nوإن كانت العبارة خطأ فاكتب التصويب.'},
-
-      {kind:'tf', autoReveal:true, ref:'ص ٣٩ · الدرس الأول', noShuffle:true,
+      {kind:'tf', writeCue:true, ref:'ص ٣٩ · الدرس الأول', noShuffle:true,
        q:'بلاد الرافدين هي المنطقة الواقعة بين نهرَي دجلة والفرات.',
        choices:['صح','خطأ'], correct_index:0,
        a:'صح — وتقع ضمن حدود العراق حالياً.'},
 
-      {kind:'tf', autoReveal:true, ref:'ص ٤١ · الدرس الأول', noShuffle:true,
+      {kind:'tf', writeCue:true, ref:'ص ٤١ · الدرس الأول', noShuffle:true,
        q:'اتخذ الأكاديُّون مدينة «أكاد» عاصمةً لدولتهم.',
        choices:['صح','خطأ'], correct_index:0,
        a:'صح — بقيادة سرجون الأول عام ٢٣٥٠ ق.م.'},
 
-      {kind:'tf', autoReveal:true, ref:'ص ٤٤ · الدرس الأول', noShuffle:true,
+      {kind:'tf', writeCue:true, ref:'ص ٤٤ · الدرس الأول', noShuffle:true,
        q:'سقطت الدولة الآشوريَّة على يد الفرس.',
        choices:['صح','خطأ'], correct_index:1,
        a:'خطأ — والصواب: على يد الكلدانيِّين نهاية القرن السابع ق.م.'},
 
-      {kind:'tf', autoReveal:true, ref:'ص ٥١ · الدرس الثاني', noShuffle:true,
+      {kind:'tf', writeCue:true, ref:'ص ٥١ · الدرس الثاني', noShuffle:true,
        q:'تكوَّن مجتمع بلاد الرافدين من طبقة واحدة.',
        choices:['صح','خطأ'], correct_index:1,
        a:'خطأ — والصواب: ثلاث طبقات (العليا والوسطى والدنيا).'},
 
-      {kind:'tf', autoReveal:true, ref:'ص ٥٤ · الدرس الثاني', noShuffle:true,
+      {kind:'tf', writeCue:true, ref:'ص ٥٤ · الدرس الثاني', noShuffle:true,
        q:'سجَّل سكان بلاد الرافدين وثائقهم الرسمية على ألواح خشبيَّة.',
        choices:['صح','خطأ'], correct_index:1,
        a:'خطأ — والصواب: على ألواح طينيَّة بالكتابة المسمارية.'},
 
-      {kind:'tf', autoReveal:true, ref:'ص ٥٢ · الدرس الثاني', noShuffle:true,
+      {kind:'tf', writeCue:true, ref:'ص ٥٢ · الدرس الثاني', noShuffle:true,
        q:'اعتقد سكان بلاد الرافدين بوجود حياة بعد الموت.',
        choices:['صح','خطأ'], correct_index:0,
        a:'صح — فدفنوا موتاهم مع أوانٍ للطعام والشراب.'},
 
-      {kind:'tf', autoReveal:true, ref:'ص ٥٣ · الدرس الثاني', noShuffle:true,
+      {kind:'tf', writeCue:true, ref:'ص ٥٣ · الدرس الثاني', noShuffle:true,
        q:'تُعَدُّ حدائق بابل المعلَّقة من أبرز إنجازات البابليِّين في مجال الزراعة.',
        choices:['صح','خطأ'], correct_index:0,
        a:'صح — حدائق مزروعة على شكل مُدَرَّجات جبليَّة.'},
 
-      {kind:'break', q:'☑️ الجزء الثاني: اختر الإجابة الصحيحة — سبعة أسئلة',
-       a:'ترتيب الخيارات على الشاشة هو نفسه في كتابك.\nالإجابة الصحيحة معلَّمة — اكتبها بعد أن تقرأها.'},
-
-      {kind:'mcq', autoReveal:true, ref:'ص ٤٧ · السؤال الأول · فرع ١', noShuffle:true,
+      {kind:'mcq', writeCue:true, ref:'ص ٤٧ · السؤال الأول · فرع ١', noShuffle:true,
        q:'أول الشعوب التي سكنت بلاد الرافدين:',
        choices:['البابليُّون','الأكاديُّون','الآشوريُّون','السومريُّون'],
        correct_index:3, a:'السومريون — نحو ٤٠٠٠ ق.م، وعاصمتهم مدينة أور.'},
 
-      {kind:'mcq', autoReveal:true, ref:'ص ٤٧ · السؤال الأول · فرع ٢', noShuffle:true,
+      {kind:'mcq', writeCue:true, ref:'ص ٤٧ · السؤال الأول · فرع ٢', noShuffle:true,
        q:'ثبَّتَ دعائم دولته من خلال التشريعات والقوانين:',
        choices:['سرجون الأول','آشور بانيبال','حمورابي','نبوخذ نصر'],
        correct_index:2, a:'حمورابي — أشهر ملوك الدولة البابلية الأولى.'},
 
-      {kind:'mcq', autoReveal:true, ref:'ص ٥٧ · السؤال الأول · فرع ١', noShuffle:true,
+      {kind:'mcq', writeCue:true, ref:'ص ٥٧ · السؤال الأول · فرع ١', noShuffle:true,
        q:'تمثَّلت الطبقة الوسطى في مجتمع بلاد الرافدين من:',
        choices:['العمال والفلاحين','أسرى الحروب والعبيد','الملك والكهنة','مُلّاك الأراضي وكبار التُّجار'],
        correct_index:0, a:'العمال والفلاحون — وسط الهرم الطبقي.'},
 
-      {kind:'mcq', autoReveal:true, ref:'ص ٥٧ · السؤال الأول · فرع ٤', noShuffle:true,
+      {kind:'mcq', writeCue:true, ref:'ص ٥٧ · السؤال الأول · فرع ٤', noShuffle:true,
        q:'تُعَدُّ من روائع حضارة بلاد الرافدين في مجال النحت:',
        choices:['قصر خورسباد','حدائق بابل','الثور المجنَّح','برج بابل'],
        correct_index:2, a:'الثور المجنَّح — شيَّده الملك الآشوري سرجون الثاني.'},
 
-      {kind:'mcq', autoReveal:true, ref:'ص ٣٩ · الدرس الأول', noShuffle:true,
+      {kind:'mcq', writeCue:true, ref:'ص ٣٩ · الدرس الأول', noShuffle:true,
        q:'أيُّ ما يأتي ليس من عوامل قيام حضارة بلاد الرافدين؟',
        choices:['الموقع الجغرافي','نهرا دجلة والفرات','الهجرات البشرية','كثرة الحروب والفتوحات'],
        correct_index:3, a:'العوامل ثلاثة: الموقع الجغرافي · النهران · الهجرات البشرية.'},
 
-      {kind:'mcq', autoReveal:true, ref:'ص ٤١ · الدرس الأول', noShuffle:true,
+      {kind:'mcq', writeCue:true, ref:'ص ٤١ · الدرس الأول', noShuffle:true,
        q:'تمكَّن سرجون الأول من بَسْط سيطرته على المدن السومريَّة بفضل:',
        choices:['قوة الجيش النظامي','كثرة عدد السكان','وفرة الذهب والفضة','قِصَر المسافة بين المدن'],
        correct_index:0, a:'قوة الجيش النظامي — فقامت بذلك الدولة الأكادية.'},
 
-      {kind:'mcq', autoReveal:true, ref:'ص ٥٣ · الدرس الثاني', noShuffle:true,
+      {kind:'mcq', writeCue:true, ref:'ص ٥٣ · الدرس الثاني', noShuffle:true,
        q:'ازدهرت التجارة في بلاد الرافدين بسبب:',
        choices:['الموقع المتميز واستتباب الأمن وتوافر المواصلات','قلَّة المنتجات الزراعية والصناعية','بُعد المدن عن الأنهار','ضعف العلاقات مع الدول المجاورة'],
        correct_index:0, a:'الموقع · توافر المنتجات · الأمن · المواصلات البرية والمائية.'},
 
-      {kind:'break', q:'📝 الجزء الثالث: سؤالان مقاليان — من الدرسين',
-       a:'الإجابة النموذجية أمامكم.\nاكتبوها كاملةً في كتبكم بخطٍّ واضح.'},
-
-      {kind:'essay', autoReveal:true, ref:'ص ٤٧ · السؤال الثاني · فرع ٢',
+      {kind:'essay', writeCue:true, ref:'ص ٤٧ · السؤال الثاني · فرع ٢',
        q:'ما عوامل قيام حضارة بلاد الرافدين؟',
        a:'١) الموقع الجغرافي · ٢) نهرا دجلة والفرات · ٣) الهجرات البشرية.'},
 
-      {kind:'essay', autoReveal:true, ref:'ص ٥٨ · السؤال الثالث · فرع ب',
+      {kind:'essay', writeCue:true, ref:'ص ٥٨ · السؤال الثالث · فرع ب',
        q:'عدِّد طبقات المجتمع في بلاد الرافدين.',
-       a:'ثلاث طبقات: العليا · الوسطى · الدنيا.'},
-
-      {kind:'reward', q:'🏆 أحسنتم — أنهينا تدريبات الوحدة كاملة',
-       a:'١٦ سؤالاً حللناها معاً من الدرسين.\n\nصفّقوا لأنفسكم! ونجوم المشاركة رُصدت في لوحة الصدارة.\n\nالواجب: متابعة وحل الواجبات على منصة قطر للتعليم.'}
+       a:'ثلاث طبقات: العليا · الوسطى · الدنيا.'}
     ]
   },
   {
@@ -5987,6 +5963,7 @@ function lsPick(i){
     cell.classList.add('correct');
     wrap.insertAdjacentHTML('beforeend', `<div class="lsCheer">${lsCheerText()}</div>`);
     if(q.a) wrap.insertAdjacentHTML('beforeend', `<div class="lsA">${esc(q.a)}</div>`);
+    lsWriteCue();
     lsConfetti(16);
     lsStopTimer();
     if(lsCurrentAct) lsStatAnswer(lsCurrentAct, lsIndex, lsWrongHere.has(lsIndex) ? 'after' : 'first');
@@ -6126,20 +6103,26 @@ function renderLessonShow(){
   document.getElementById('lsNextBtn').disabled = lsIndex === lessonQs.length - 1;
   renderLessonShowDots();
 
-  // autoReveal: الإجابة تُكشف مع ظهور الشريحة، فلا يكتب الطالب خطأً في كتابه
-  // ثم يشطبه. زر «أخفِ الإجابة» يبقى بيد المعلم إن أراد سؤالاً شفهياً أولاً.
+  // autoReveal: تكشف الإجابة مع ظهور الشريحة. متاحة للأنشطة التي تطلبها،
+  // ولا يستعملها نشاط المراجعة — المعلم يسأل أولاً ثم يكشف بنفسه.
   if(q.autoReveal && hasReveal){
     lsReveal();
     lsShowAward();   // lsReveal يستدعيه للمقالي فقط — والاختياري يستحق نجمة كذلك
-    const w2 = document.getElementById('lsAWrap');
-    if(w2 && !w2.querySelector('.lsWrite')){
-      const cue = document.createElement('div');
-      cue.className = 'lsWrite';
-      cue.textContent = '✍️ اكتبوا الإجابة الآن في كتبكم';
-      const aw = w2.querySelector('.lsAward');
-      aw ? w2.insertBefore(cue, aw) : w2.appendChild(cue);
-    }
   }
+}
+
+// إشارة «اكتبوا الآن»: تظهر مع الإجابة لا قبلها، فلا يكتب الطالب خطأً
+// في كتابه ثم يشطبه. تُطلب بالفقرة عبر writeCue.
+function lsWriteCue(){
+  const q = lessonQs[lsIndex];
+  if(!q || !q.writeCue) return;
+  const w = document.getElementById('lsAWrap');
+  if(!w || w.querySelector('.lsWrite')) return;
+  const cue = document.createElement('div');
+  cue.className = 'lsWrite';
+  cue.textContent = '✍️ اكتبوا الإجابة الآن في كتبكم';
+  const aw = w.querySelector('.lsAward');
+  aw ? w.insertBefore(cue, aw) : w.appendChild(cue);
 }
 
 function lsGo(dir){
@@ -6179,6 +6162,8 @@ function lsReveal(){
     if(ok) ok.classList.add('correct');
     wrap.insertAdjacentHTML('beforeend', `<div class="lsCheer">${lsCheerText()}</div>`);
     if(q.a) wrap.insertAdjacentHTML('beforeend', `<div class="lsA">${esc(q.a)}</div>`);
+    lsShowAward();
+    lsWriteCue();
     rv.textContent = '🙈 أخفِ الإجابة';
     lsConfetti(14);
     lsStopTimer();
@@ -6188,6 +6173,7 @@ function lsReveal(){
     wrap.innerHTML = `<div class="lsA">${esc(q.a)}</div>`;
     rv.textContent = '🙈 أخفِ الإجابة';
     lsShowAward();
+    lsWriteCue();
   }
   lsSeen.add(lsIndex);
   renderLessonShowDots();
