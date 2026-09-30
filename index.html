@@ -4273,6 +4273,14 @@ async function buildReport(){
     </div>`;
 }
 
+// خلية CSV آمنة: تُحاط بعلامتي تنصيص (الفاصلة في الاسم لا تزيح الأعمدة)،
+// وما يبدأ بـ = + - @ يُسبق بفاصلة عليا كي لا ينفّذه إكسل كمعادلة
+function csvCell(v){
+  let t = String(v ?? '');
+  if(/^[=+\-@\t\r]/.test(t)) t = "'" + t;
+  return '"' + t.replace(/"/g, '""') + '"';
+}
+
 function exportReportCSV(){
   if(!isAdmin) return;
   if(!lastReportData){ showToast('انتظر التقرير يخلص التحميل أول', 'error'); return; }
@@ -4282,11 +4290,11 @@ function exportReportCSV(){
   csv += `تاريخ الإنشاء,${d.generatedAt.toLocaleDateString('ar-QA')}\n\n`;
   csv += `إجمالي الطلاب,${d.studentsCount}\nبانتظار الموافقة,${d.pendingCount}\nإجابات هذا الأسبوع,${d.totalAnswers}\nنسبة الصحة,${d.accuracyRate}%\n\n`;
   csv += 'الأكثر نقاطاً\nالطالب,الصف,النقاط\n';
-  d.topByPoints.forEach(s=> csv += `${s.name},${s.cls},${s.points}\n`);
+  d.topByPoints.forEach(s=> csv += `${csvCell(s.name)},${csvCell(s.cls)},${s.points}\n`);
   csv += '\nالأكثر وقت استخدام\nالطالب,الصف,ثواني الاستخدام\n';
-  d.topByTime.forEach(s=> csv += `${s.name},${s.cls},${s.total_seconds||0}\n`);
+  d.topByTime.forEach(s=> csv += `${csvCell(s.name)},${csvCell(s.cls)},${s.total_seconds||0}\n`);
   csv += '\nالأسئلة الأكثر خطأ\nالسؤال,مرات الخطأ,الإجمالي\n';
-  d.mostMissed.forEach(m=> csv += `"${m.qText.replace(/"/g,'""')}",${m.wrong},${m.total}\n`);
+  d.mostMissed.forEach(m=> csv += `${csvCell(m.qText)},${m.wrong},${m.total}\n`);
 
   const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
@@ -7471,14 +7479,15 @@ function exportMyClassCSV(){
     // كل الملاحظات تراكمياً بالتصدير — لا آخر واحدة فقط
     const allNotes = all.map(n =>
       `${new Date(n.created_at).toLocaleDateString('ar-QA')} ${n.kind === 'praise' ? '[تكريم]' : '[تنبيه]'} ${n.note}`
-    ).join(' | ').replace(/"/g, '""');
-    csv += `${i+1},"${String(r.student_name || '').replace(/"/g, '""')}",${r.participation_points || 0},${p},${w},"${allNotes}"\n`;
+    ).join(' | ');
+    csv += `${i+1},${csvCell(r.student_name)},${r.participation_points || 0},${p},${w},${csvCell(allNotes)}\n`;
   });
   const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `متابعة-${myClassCls}-${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   showToast('✅ تم التصدير', 'success');
 }
 
