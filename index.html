@@ -2195,6 +2195,92 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     .lsiRays{animation:none;} .lsiKick, .lsiLine, .lsiTitle, .lsiSub, .lsiChips{animation:none;}
     .podWho, .podBlk{transition:none;}
   }
+
+  /* ═══════ المرحلة الثانية ٢-٣: رحلة الصف · الجواز · سؤال الأسبوع ═══════ */
+  .jrStrip{background:#ffffff; border:2px solid #eee3db; border-radius:20px; padding:16px 22px 12px; margin-top:16px;}
+  .jrHead{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;}
+  .jrHead h3{font-family:'Cairo'; font-weight:800; font-size:1.2rem; color:var(--navy); margin:0;}
+  .jrHead .jrActs{display:flex; gap:8px; align-items:center; color:#594a50; font-weight:700; font-size:.92rem;}
+  .jrHead .thOther{background:#fbedcf; color:var(--navy); border-color:rgba(220,167,58,.6);}
+  .jrTrack{display:flex; justify-content:space-between; position:relative; margin-top:30px;}
+  .jrTrack:before, .jrFill{content:""; position:absolute; top:27px; right:8%; left:8%; height:6px; border-radius:4px;
+    background:repeating-linear-gradient(90deg, #dfccbd 0 8px, transparent 8px 16px);}
+  .jrFill{background:var(--gold); left:auto;}
+  .jrSt{position:relative; z-index:1; text-align:center; width:16%; cursor:pointer; background:none; border:none; font-family:'Tajawal'; padding:0;}
+  .jrDot{width:58px; height:58px; margin:0 auto; border-radius:50%; background:#ffffff; border:4px solid #dfccbd; display:flex; align-items:center; justify-content:center; font-size:1.65rem;}
+  .jrSt.done .jrDot{border-color:var(--teal); background:#eaf4f1;}
+  .jrSt.now .jrDot{border-color:var(--gold); background:#fbf9f8; box-shadow:0 0 0 8px rgba(220,167,58,.25);}
+  .jrSt.next .jrDot{filter:grayscale(.7); opacity:.75;}
+  .jrSt b{display:block; font-family:'Cairo'; font-weight:800; font-size:.88rem; margin-top:6px; color:var(--ink); line-height:1.35;}
+  .jrSt.next b{color:#594a50;}
+  .jrSt em{position:absolute; top:-28px; left:50%; transform:translateX(-50%); font-family:'Cairo'; font-weight:800; font-style:normal; font-size:.78rem;
+    background:var(--navy); color:#ffffff; padding:1px 9px; border-radius:8px; white-space:nowrap;}
+  .jrSt em.other{background:var(--gold); color:var(--navy-deep);}
+
+  .journey{position:fixed; inset:0; z-index:505; background:radial-gradient(ellipse at 60% 40%, #fbf9f8, #f2ebe5); display:flex; flex-direction:column; overflow:hidden;}
+  .journey[hidden]{display:none;}
+  .journey:before{content:""; position:absolute; inset:0; background:url(maps/zones.webp) center 60%/78% no-repeat; opacity:.07; filter:grayscale(1); pointer-events:none;}
+  .jrTopBar{position:relative; display:flex; justify-content:space-between; align-items:flex-start; padding:2.4vh 3vw 0;}
+  .jrTitle{font-family:'Aref Ruqaa'; font-size:clamp(2.2rem,4vw,3.8rem); color:var(--navy); margin:0 0 1.2vh; line-height:1.75;}
+  .jrLead{font-weight:700; font-size:clamp(1rem,1.3vw,1.3rem); color:#594a50;}
+  .jrBtns{display:flex; gap:12px; align-items:center;}
+  .jrBtns .thOther{background:#fbedcf; color:var(--navy); border-color:rgba(220,167,58,.6); font-size:1.05rem; padding:9px 18px;}
+  .jrX{position:static; color:var(--navy); background:#ffffff;}
+  .jrMap{position:relative; flex:1; width:100%; min-height:0;}
+  .jrMap text{font-family:'Cairo', 'Tajawal', sans-serif;}
+  .jrStats{position:relative; display:flex; gap:14px; justify-content:center; padding:0 3vw 2.4vh;}
+  .jrStats div{background:#ffffff; border:2px solid #eee3db; border-radius:16px; padding:10px 22px; font-weight:700; font-size:1.05rem; text-align:center;}
+  .jrStats b{display:block; font-family:'Cairo'; font-size:1.7rem; color:var(--navy);}
+
+  .passport{position:fixed; inset:0; z-index:506; background:radial-gradient(ellipse at center, var(--navy-deep), #311d23); display:flex; align-items:center; justify-content:center; padding:3vh 3vw;}
+  .passport[hidden]{display:none;}
+  .ppX{color:#ffffff;}
+  .ppBook{display:flex; width:min(1500px,100%); height:min(820px,90vh); filter:drop-shadow(0 30px 60px rgba(0,0,0,.5));}
+  .ppPage{flex:1; position:relative; padding:3.5vh 3vw; background:linear-gradient(90deg, #f1e9e3, #faf7f4); overflow:hidden;}
+  .ppStamps{border-radius:26px 0 0 26px;}
+  .ppCover{border-radius:0 26px 26px 0; background:linear-gradient(270deg, #f1e9e3, #faf7f4); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:1.6vh;}
+  .ppSpine{width:12px; background:linear-gradient(90deg, #dfccbd, #f4ede8, #dfccbd);}
+  .ppHead{font-family:'Cairo'; font-weight:800; font-size:1.3rem; color:var(--navy);}
+  .ppHead small{display:block; font-family:'Tajawal'; font-size:.85rem; color:#594a50; font-weight:700;}
+  .ppGrid{display:grid; grid-template-columns:repeat(3,1fr); gap:3vh 1.2vw; margin-top:2.5vh; align-items:center; justify-items:center;}
+  .ppSlot{background:none; border:none; cursor:pointer; padding:0; font-family:'Tajawal';}
+  .ppRing{width:clamp(130px,11vw,190px); height:clamp(130px,11vw,190px); border-radius:50%; border:6px double var(--c); color:var(--c);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:12px; background:rgba(255,255,255,.4);}
+  .ppRing span{font-size:clamp(2rem,3vw,3rem);}
+  .ppRing b{font-family:'Cairo'; font-weight:800; font-size:clamp(.85rem,1.05vw,1.1rem); line-height:1.3;}
+  .ppRing small{font-weight:700; font-size:.8rem;}
+  .ppSlot.empty .ppRing{border:3px dashed #bbb1a9; color:#594a50; background:none;}
+  .ppCover .ppEm{font-size:clamp(4rem,7vw,7rem);}
+  .ppCover h1{font-family:'Aref Ruqaa'; font-size:clamp(2.8rem,4.6vw,4.6rem); color:var(--navy); margin:0; line-height:1.3;}
+  .ppCover h2{font-family:'Cairo'; font-weight:800; font-size:clamp(1.5rem,2.2vw,2.2rem); color:var(--gold-deep); margin:0;}
+  .ppRow{display:flex; gap:3vw; font-weight:700; color:#594a50; font-size:1.1rem;}
+  .ppRow b{display:block; font-family:'Cairo'; font-size:clamp(1.8rem,2.6vw,2.6rem); color:var(--navy);}
+  .ppMrz{font:700 1.05rem monospace; letter-spacing:4px; color:#594a50; direction:ltr;}
+  .ppNote{font-size:.85rem; color:#594a50;}
+
+  .stampToast{position:fixed; inset:0; z-index:515; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3vh; background:rgba(31,18,22,.55); cursor:pointer;}
+  .stampToast[hidden]{display:none;}
+  .stRing{width:clamp(220px,22vw,340px); height:clamp(220px,22vw,340px); border-radius:50%; border:10px double var(--c); color:var(--c); background:#faf7f4;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; transform:rotate(-8deg);
+    animation:stampDrop .55s cubic-bezier(.2,1.6,.4,1) both; box-shadow:0 20px 60px rgba(0,0,0,.4);}
+  .stRing span{font-size:clamp(3.5rem,5vw,5.5rem);} .stRing b{font-family:'Cairo'; font-weight:800; font-size:clamp(1.2rem,1.8vw,1.8rem); line-height:1.3;}
+  .stRing small{font-weight:800; font-size:1rem;}
+  .stTxt{font-family:'Cairo'; font-weight:800; font-size:clamp(1.4rem,2.6vw,2.6rem); color:var(--gold-light); text-shadow:0 4px 18px rgba(0,0,0,.5);}
+  @keyframes stampDrop{0%{transform:scale(2.4) rotate(-20deg); opacity:0;} 100%{transform:scale(1) rotate(-8deg); opacity:1;}}
+
+  .thQ{background:#ffffff; border:2px dashed var(--gold); border-radius:20px; padding:16px 20px;}
+  .thQ .thTag{color:var(--gold-deep);}
+  .thQ h3{font-family:'Cairo'; font-weight:800; font-size:1.35rem; color:var(--navy); margin:4px 0 8px; line-height:1.5;}
+  .thQ p{font-size:1.02rem; line-height:1.8; margin:0 0 8px; color:var(--ink);}
+  .thQ .thQBtns{display:flex; gap:8px;}
+  .thQ .thOther{background:#fbedcf; color:var(--navy); border-color:rgba(220,167,58,.6);}
+  .thQSrc{font-size:.82rem; color:#594a50;}
+  @media(max-width:620px){
+    .jrSt b{font-size:.7rem;} .jrDot{width:44px; height:44px; font-size:1.25rem;} .jrTrack:before, .jrFill{top:20px;}
+    .ppBook{flex-direction:column-reverse; height:auto; max-height:92vh; overflow-y:auto;} .ppStamps, .ppCover{border-radius:20px;} .ppSpine{display:none;}
+    .ppGrid{grid-template-columns:repeat(2,1fr);}
+  }
+  @media (prefers-reduced-motion: reduce){ .stRing{animation:none;} }
 </style>
 </head>
 <body>
@@ -2304,6 +2390,33 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   <div class="podSub" id="podSub">🥁 من هم أبطال المشاركة؟</div>
   <div class="podStage" id="podStage"></div>
   <div class="podHint">مسافة: الكشف التالي · Esc: إغلاق</div>
+</div>
+
+<!-- المرحلة الثانية ٢-٣: رحلة الصف على الخريطة -->
+<div id="journey" class="journey" hidden>
+  <div class="jrTopBar">
+    <div><h1 class="jrTitle" id="jrTitle"></h1><div class="jrLead">كل نشاط يُنجَز حتى آخر شريحة يمنح الصف ختم محطته</div></div>
+    <div class="jrBtns"><button type="button" class="thOther" onclick="openPassport(jrCls)">📘 الجواز</button><button type="button" class="podClose jrX" onclick="closeJourney()" aria-label="إغلاق">✕</button></div>
+  </div>
+  <svg class="jrMap" id="jrMap" viewBox="0 0 1920 900" preserveAspectRatio="xMidYMid meet" role="img" aria-label="خريطة رحلة الصف عبر وحدات المنهج"></svg>
+  <div class="jrStats" id="jrStats"></div>
+</div>
+
+<!-- المرحلة الثانية ٢-٣: جواز سفر الصف -->
+<div id="passport" class="passport" hidden onclick="ppBackdrop(event)">
+  <div class="ppBook">
+    <div class="ppPage ppStamps"><div class="ppHead">صفحة الأختام <small>اضغط خانة لمنح ختم أو سحبه يدوياً</small></div><div class="ppGrid" id="ppGrid"></div></div>
+    <div class="ppSpine" aria-hidden="true"></div>
+    <div class="ppPage ppCover"><div class="ppEm">🧭</div><h1>جواز رحّالة</h1><h2 id="ppCls"></h2><div class="ppRow" id="ppRow"></div>
+      <div class="ppMrz" id="ppMrz"></div><div class="ppNote">الأختام محفوظة على هذا الجهاز</div></div>
+  </div>
+  <button type="button" class="podClose ppX" onclick="closePassport()" aria-label="إغلاق">✕</button>
+</div>
+
+<!-- المرحلة الثانية ٢-٣: لحظة الختم عند إنهاء نشاط -->
+<div id="stampToast" class="stampToast" hidden onclick="this.hidden = true">
+  <div class="stRing" id="stRing"></div>
+  <div class="stTxt" id="stTxt"></div>
 </div>
 
 <!-- لوحة الأوامر السريعة (Ctrl+K أو /) — للمعلم فقط -->
@@ -4254,6 +4367,7 @@ function thSetCls(cls){
   thCls = cls;
   try{ localStorage.setItem('rahhala_th_cls', cls); }catch(e){}
   myClassCls = cls;   // صفوفي والعجلة والمحظوظ تفتح على نفس الصف
+  thQOpen = false;
   document.querySelectorAll('.myClassBtn').forEach(b => b.classList.toggle('active', b.dataset.cls === cls));
   renderTeacherHome();
 }
@@ -4302,6 +4416,8 @@ function renderTeacherHome(){
   thRenderBoard();
   if(Date.now() - thBoardAt > 60000) thLoadBoard();
   thPlateTeacher();
+  document.getElementById('thJourneySlot').innerHTML = jrStripHtml(cls);
+  document.getElementById('thQuestionSlot').innerHTML = thQuestionHtml(cls, thQOpen);
 }
 
 async function thLoadBoard(){
@@ -4478,6 +4594,168 @@ function flyStars(fromRect, n){
   }
 }
 
+// ═══════ المرحلة الثانية ٢-٣: رحلة الصف · جواز السفر · سؤال الأسبوع ═══════
+// المحطات = وحدات المنهج الست بترتيبها. الختم = إنهاء نشاط وحدة حتى آخر شريحة مع صفٍّ محدد.
+// الأختام محفوظة على هذا الجهاز (localStorage) — نقلها لقاعدة البيانات يحتاج جدولاً جديداً
+const JR_ICONS = {7:['🌍','🏛️','⚖️','👥','🕌','🛡️'], 8:['🌍','🏺','🤝','👥','🕌','🛡️']};
+const JR_INK = ['#175a4a', '#7a1232', '#1f5068', '#68430b', '#7a1232', '#175a4a'];
+let jrCls = '';
+function jrLoad(){ try{ return JSON.parse(localStorage.getItem('rahhala_journey_v1') || '{}') || {}; }catch(e){ return {}; } }
+function jrSave(d){ try{ localStorage.setItem('rahhala_journey_v1', JSON.stringify(d)); }catch(e){} }
+function jrStamps(cls){ return jrLoad()[cls] || {}; }
+function jrUnits(cls){ const U = thGrade(cls) === 8 ? UNITS_DATA_8 : UNITS_DATA; return Object.keys(U).map(n => ({n: +n, title: U[n].title})); }
+// المحطة الحالية = أول وحدة بلا ختم
+function jrNow(cls){ const st = jrStamps(cls); const u = jrUnits(cls).find(x => !st[x.n]); return u ? u.n : 0; }
+const jrAr = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+function jrDate(iso){ try{ return new Date(iso + 'T00:00:00').toLocaleDateString('ar-QA', {day:'numeric', month:'long'}); }catch(e){ return iso; } }
+
+function jrStampUnit(cls, unit, actId){
+  const d = jrLoad(); d[cls] = d[cls] || {};
+  if(d[cls][unit]) return false;
+  d[cls][unit] = {d: new Date().toLocaleDateString('en-CA'), a: actId || ''};
+  jrSave(d);
+  return true;
+}
+function jrUnstamp(cls, unit){ const d = jrLoad(); if(d[cls]){ delete d[cls][unit]; jrSave(d); } }
+
+// يُستدعى عند الوصول لآخر شريحة بعرض الحصة
+function jrMaybeStamp(){
+  if(!isAdmin || !lsCls || !lsCurrentAct) return;
+  const act = ACTIVITIES.find(a => a.id === lsCurrentAct);
+  if(!act || !act.unit || thGrade(lsCls) !== act.grade) return;
+  if(!jrStampUnit(lsCls, act.unit, act.id)) return;
+  const units = jrUnits(lsCls), u = units.find(x => x.n === act.unit);
+  const ring = document.getElementById('stRing');
+  ring.style.setProperty('--c', JR_INK[(act.unit - 1) % JR_INK.length]);
+  ring.innerHTML = `<span>${JR_ICONS[act.grade][act.unit - 1] || '🧭'}</span><b>${esc(u ? u.title : '')}</b><small>المحطة ${jrAr(act.unit)}<br>${esc(jrDate(new Date().toLocaleDateString('en-CA')))}</small>`;
+  document.getElementById('stTxt').textContent = `ختم جديد في جواز ${thClsLabel(lsCls)}! 🎉`;
+  const t = document.getElementById('stampToast');
+  t.hidden = false;
+  if(!window.matchMedia || !matchMedia('(prefers-reduced-motion: reduce)').matches) lsConfetti(24);
+  setTimeout(() => { t.hidden = true; }, 3200);
+  if(document.getElementById('teacherHome').style.display !== 'none') renderTeacherHome();
+}
+
+// شريط الرحلة بالصفحة الرئيسية
+function jrStripHtml(cls){
+  const units = jrUnits(cls), st = jrStamps(cls), now = jrNow(cls);
+  const others = thClasses().filter(c => c.cls !== cls && thGrade(c.cls) === thGrade(cls));
+  const done = units.filter(u => st[u.n]).length;
+  const nowIdx = now ? units.findIndex(u => u.n === now) : units.length - 1;
+  const fill = Math.max(0, nowIdx) / Math.max(1, units.length - 1) * 84;
+  return `<div class="jrStrip"><div class="jrHead"><h3>🧭 رحلة ${esc(thClsLabel(cls))} عبر المنهج</h3>
+    <div class="jrActs">${jrAr(done)} من ${jrAr(units.length)} محطات
+      <button type="button" class="thOther" onclick="openJourney()">🗺️ الخريطة</button>
+      <button type="button" class="thOther" onclick="openPassport()">📘 الجواز</button></div></div>
+    <div class="jrTrack"><div class="jrFill" style="width:${fill}%"></div>${units.map(u => {
+      const state = st[u.n] ? 'done' : u.n === now ? 'now' : 'next';
+      const here = u.n === now ? `<em>${esc(thClsLabel(cls))}</em>` : (others.find(o => jrNow(o.cls) === u.n) ? `<em class="other">${esc(others.find(o => jrNow(o.cls) === u.n).label)}</em>` : '');
+      return `<button type="button" class="jrSt ${state}" onclick="openJourney()" title="${esc(u.title)}">${here}<div class="jrDot">${JR_ICONS[thGrade(cls)][u.n - 1] || '🧭'}</div><b>${esc(u.title)}</b></button>`;
+    }).join('')}</div></div>`;
+}
+
+// خريطة الرحلة بملء الشاشة — SVG واحد يتحجّم مع الشاشة
+const JR_POS = [[1600,640],[1330,420],[1020,620],[760,330],[480,560],[250,260]];
+function openJourney(cls){
+  if(!isAdmin) return;
+  jrCls = cls || thCurrentCls();
+  const units = jrUnits(jrCls), st = jrStamps(jrCls), now = jrNow(jrCls), g = thGrade(jrCls);
+  const others = thClasses().filter(c => c.cls !== jrCls && thGrade(c.cls) === g);
+  document.getElementById('jrTitle').textContent = `رحلة ${thClsLabel(jrCls)} عبر المنهج`;
+  const P = JR_POS.slice(0, units.length);
+  const path = 'M' + P.map(p => p.join(',')).join(' L');
+  const nowIdx = now ? units.findIndex(u => u.n === now) : units.length - 1;
+  const donePath = 'M' + P.slice(0, Math.max(1, nowIdx + 1)).map(p => p.join(',')).join(' L');
+  let svg = `<path d="${path}" fill="none" stroke="#dfccbd" stroke-width="10" stroke-dasharray="2 22" stroke-linecap="round" stroke-linejoin="round"/>`
+    + (nowIdx > 0 ? `<path d="${donePath}" fill="none" stroke="#dca73a" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>` : '');
+  units.forEach((u, i) => {
+    const [x, y] = P[i], state = st[u.n] ? 'done' : u.n === now ? 'now' : 'next';
+    const r = state === 'now' ? 58 : 48;
+    const stroke = state === 'done' ? '#175a4a' : state === 'now' ? '#dca73a' : '#dfccbd';
+    const fill = state === 'done' ? '#eaf4f1' : '#ffffff';
+    svg += `<g opacity="${state === 'next' ? .72 : 1}">`
+      + (state === 'now' ? `<circle cx="${x}" cy="${y}" r="${r + 16}" fill="#dca73a" opacity=".22"/>` : '')
+      + `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="6"/>`
+      + `<text x="${x}" y="${y + 17}" text-anchor="middle" font-size="${state === 'now' ? 52 : 44}">${JR_ICONS[g][u.n - 1] || '🧭'}</text>`
+      + (state === 'done' ? `<g transform="translate(${x - 44},${y - 44}) rotate(-12)"><circle r="22" fill="#175a4a" stroke="#ffffff" stroke-width="3"/><text y="9" text-anchor="middle" font-size="26" fill="#ffffff" font-weight="900">✓</text></g>` : '')
+      + `<text x="${x}" y="${y + r + 30}" text-anchor="middle" font-size="18" font-weight="700" fill="#594a50">المحطة ${jrAr(u.n)}</text>`
+      + `<text x="${x}" y="${y + r + 62}" text-anchor="middle" font-size="27" font-weight="800" fill="${state === 'next' ? '#594a50' : '#1f1216'}">${esc(u.title)}</text></g>`;
+  });
+  const tag = (x, y, label, mine) => `<g transform="translate(${x},${y})"><rect x="-${label.length * 8 + 18}" y="-46" width="${label.length * 16 + 36}" height="40" rx="10" fill="${mine ? '#7a1232' : '#dba73c'}"/>`
+    + `<path d="M-10,-6 L10,-6 L0,6 Z" fill="${mine ? '#7a1232' : '#dba73c'}"/><text y="-18" text-anchor="middle" font-size="22" font-weight="800" fill="${mine ? '#ffffff' : '#420a1c'}">${esc(label)}</text></g>`;
+  if(now){ const [x, y] = P[units.findIndex(u => u.n === now)]; svg += tag(x, y - 82, thClsLabel(jrCls), true); }
+  others.forEach((o, k) => { const n = jrNow(o.cls); if(n){ const [x, y] = P[units.findIndex(u => u.n === n)]; svg += tag(x, y - 82 - (n === now ? 52 * (k + 1) : 0), o.label, false); } });
+  document.getElementById('jrMap').innerHTML = svg;
+  const done = units.filter(u => st[u.n]).length;
+  const stars = (lbRows || []).filter(r => r.cls === jrCls).reduce((a, r) => a + (r.participation_points || 0), 0);
+  document.getElementById('jrStats').innerHTML = `<div><b>${jrAr(done)} / ${jrAr(units.length)}</b>محطات مكتملة</div><div><b>${jrAr(stars)} ⭐</b>نجوم الصف</div>`
+    + `<div><b>${now ? esc(units.find(u => u.n === now).title) : 'اكتملت الرحلة 🎉'}</b>${now ? 'المحطة التالية' : 'كل المحطات'}</div>`;
+  document.getElementById('journey').hidden = false;
+  document.addEventListener('keydown', jrKeys);
+}
+function closeJourney(){ document.getElementById('journey').hidden = true; document.removeEventListener('keydown', jrKeys); }
+function jrKeys(e){ if(e.key === 'Escape' && document.getElementById('passport').hidden) closeJourney(); }
+
+// جواز السفر
+let ppCur = '';
+function openPassport(cls){
+  if(!isAdmin) return;
+  ppCur = cls || jrCls || thCurrentCls();
+  const units = jrUnits(ppCur), st = jrStamps(ppCur), g = thGrade(ppCur);
+  document.getElementById('ppGrid').innerHTML = units.map((u, i) => st[u.n]
+    ? `<button type="button" class="ppSlot" onclick="ppToggle(${u.n})" style="transform:rotate(${[-8, 6, -4, 5, -6, 4][i]}deg)"><div class="ppRing" style="--c:${JR_INK[i % JR_INK.length]}"><span>${JR_ICONS[g][i] || '🧭'}</span><b>${esc(u.title)}</b><small>محطة ${jrAr(u.n)}<br>${esc(jrDate(st[u.n].d))}</small></div></button>`
+    : `<button type="button" class="ppSlot empty" onclick="ppToggle(${u.n})"><div class="ppRing"><b>المحطة ${jrAr(u.n)}</b><small>${esc(u.title)}</small></div></button>`).join('');
+  const done = units.filter(u => st[u.n]).length;
+  const stars = (lbRows || []).filter(r => r.cls === ppCur).reduce((a, r) => a + (r.participation_points || 0), 0);
+  document.getElementById('ppCls').textContent = 'صف ' + thClsLabel(ppCur);
+  document.getElementById('ppRow').innerHTML = `<div><b>${jrAr(done)} / ${jrAr(units.length)}</b>محطات</div><div><b>${jrAr(stars)} ⭐</b>نجوم</div>`;
+  document.getElementById('ppMrz').textContent = `P<QAT<RAHHALA<<CLASS<${ppCur}<<<${new Date().getFullYear()}`;
+  document.getElementById('passport').hidden = false;
+  document.addEventListener('keydown', ppKeys);
+}
+function ppToggle(unit){
+  const st = jrStamps(ppCur), u = jrUnits(ppCur).find(x => x.n === unit);
+  if(st[unit]){ if(!confirm(`سحب ختم «${u ? u.title : unit}» من جواز ${thClsLabel(ppCur)}؟`)) return; jrUnstamp(ppCur, unit); }
+  else { if(!confirm(`منح ختم «${u ? u.title : unit}» لجواز ${thClsLabel(ppCur)} يدوياً؟`)) return; jrStampUnit(ppCur, unit, 'manual'); }
+  openPassport(ppCur);
+  if(!document.getElementById('journey').hidden) openJourney(jrCls);
+  if(document.getElementById('teacherHome').style.display !== 'none') renderTeacherHome();
+}
+function closePassport(){ document.getElementById('passport').hidden = true; document.removeEventListener('keydown', ppKeys); }
+function ppBackdrop(e){ if(e.target === e.currentTarget) closePassport(); }
+function ppKeys(e){ if(e.key === 'Escape') closePassport(); }
+
+// سؤال الأسبوع: من قاعدة معرفة المنقذ (إجاباتها محققة على نص الكتاب) — وحدة الصف الحالية
+function thWeekNo(){ const d = new Date(); const j = new Date(d.getFullYear(), 0, 1); return Math.floor(((d - j) / 86400000 + j.getDay()) / 7); }
+function thQuestion(cls){
+  const g = thGrade(cls), kb = g === 8 ? KNOWLEDGE_BASE_8 : KNOWLEDGE_BASE;
+  const pick = thPickActivity(cls), unit = pick ? pick.act.unit : 1;
+  let pool = kb.filter(e => e.unit === unit && e.a && e.a.length >= 40 && e.a.length <= 260 && Array.isArray(e.k) && e.k.length);
+  if(!pool.length) pool = kb.filter(e => e.a && e.a.length >= 40 && e.a.length <= 260 && Array.isArray(e.k) && e.k.length);
+  if(!pool.length) return null;
+  let off = 0;
+  try{ off = parseInt(localStorage.getItem('rahhala_q_off_' + thWeekNo()) || '0', 10) || 0; }catch(e){}
+  const e = pool[(thWeekNo() * 7 + off) % pool.length];
+  // أوضح مفتاح: المكتوب بالهمزة/التاء المربوطة أولاً ثم الأطول
+  const key = [...e.k].sort((a, b) => (/[أإآة]/.test(b) - /[أإآة]/.test(a)) || b.length - a.length)[0];
+  return {q: `ماذا تعرف عن «${key}»؟`, a: e.a, unit, g};
+}
+function thQuestionHtml(cls, open){
+  const Q = thQuestion(cls);
+  if(!Q) return '';
+  return `<div class="thQ"><div class="thTag">❓ سؤال الأسبوع · ${Q.g === 8 ? 'ثامن' : 'سابع'} · الوحدة ${jrAr(Q.unit)}</div><h3>${esc(Q.q)}</h3>`
+    + (open ? `<p>${esc(Q.a)}</p><div class="thQSrc">📖 من نص المنهج</div>` : '')
+    + `<div class="thQBtns">${open ? '' : '<button type="button" class="thOther" onclick="thQReveal()">💡 اكشف الإجابة</button>'}<button type="button" class="thOther" onclick="thQNext()">↻ سؤال آخر</button></div></div>`;
+}
+let thQOpen = false;
+function thQReveal(){ thQOpen = true; document.getElementById('thQuestionSlot').innerHTML = thQuestionHtml(thCurrentCls(), true); }
+function thQNext(){
+  const k = 'rahhala_q_off_' + thWeekNo();
+  try{ localStorage.setItem(k, String((parseInt(localStorage.getItem(k) || '0', 10) || 0) + 1)); }catch(e){}
+  thQOpen = false;
+  document.getElementById('thQuestionSlot').innerHTML = thQuestionHtml(thCurrentCls(), false);
+}
+
 // ═══════ الأوامر السريعة (Ctrl+K أو /) واختصارات جهاز التحكم ═══════
 let cmdAll = [], cmdShown = [], cmdSel = 0;
 const cmdNorm = t => String(t || '').toLowerCase()
@@ -4498,6 +4776,8 @@ function cmdBuild(){
     add('🍀', `الطالب المحظوظ — ${c.label}`, 'مكافأة نجوم', () => openLucky(c.cls), 'محظوظ');
     add('📋', `صفوفي — ${c.label}`, 'النقاط والملاحظات', () => { thCls = c.cls; thMyClass(); }, 'صفوفي صف');
     add('🎉', `كشف الأبطال — ${c.label}`, 'منصة التتويج بالتشويق', () => openPodium(c.cls), 'ابطال تتويج صداره');
+    add('🗺️', `رحلة ${c.label} عبر المنهج`, 'الخريطة والمحطات', () => openJourney(c.cls), 'رحله خريطه محطات');
+    add('📘', `جواز ${c.label}`, 'الأختام', () => openPassport(c.cls), 'جواز اختام سفر');
   });
   [[7, UNITS_DATA], [8, UNITS_DATA_8]].forEach(([g, U]) => Object.keys(U).forEach(n => {
     add('📖', `الوحدة ${n} — ${U[n].title}`, `المنهج · ${g === 8 ? 'ثامن' : 'سابع'}`, () => { if(GRADE !== g) applyGrade(g, true); openUnit(parseInt(n, 10)); }, 'وحده منهج');
@@ -4543,7 +4823,7 @@ document.addEventListener('keydown', e => {
   if((e.ctrlKey || e.metaKey) && e.code === 'KeyK'){ e.preventDefault(); document.getElementById('cmdPal').hidden ? openCmd() : closeCmd(); return; }
   const t = e.target, typing = t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable);
   if(typing || e.ctrlKey || e.metaKey || e.altKey) return;
-  if(!document.getElementById('cmdPal').hidden || whOpen() || lkOpen() || !document.getElementById('podium').hidden) return;
+  if(!document.getElementById('cmdPal').hidden || whOpen() || lkOpen() || ['podium', 'journey', 'passport'].some(id => !document.getElementById(id).hidden)) return;
   const showing = document.getElementById('lessonShow').classList.contains('show');
   if(e.key === '/' || e.code === 'Slash'){ e.preventDefault(); openCmd(); }
   else if(e.code === 'KeyW'){ e.preventDefault(); openWheel(showing && lsCls ? lsCls : thCurrentCls()); }
@@ -6639,6 +6919,7 @@ function lsKeys(e){
 function renderLessonShow(){
   const q = lessonQs[lsIndex];
   if(!q) return;
+  if(lsIndex === lessonQs.length - 1 && lessonQs.length > 1) jrMaybeStamp();   // ٢-٣: إنهاء النشاط = ختم المحطة
   const kind = q.kind || 'essay';
   const cfg = LQ_KINDS[kind] || LQ_KINDS.essay;
   const qEl = document.getElementById('lsQ');
