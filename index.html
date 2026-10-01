@@ -3076,11 +3076,6 @@ function showHome(){
   });
   document.getElementById('unitView').classList.remove('show');
   document.getElementById('enrichView').classList.remove('show');
-  // لوحة المعلم تظهر تلقائياً لو كان مسجّلاً دخوله
-  if(isAdmin){
-    const ap = document.getElementById('adminPanel');
-    if(ap) ap.style.display = '';
-  }
   window.scrollTo({top:0, behavior:'instant'});
 }
 
@@ -6296,7 +6291,7 @@ async function adminLogin(btn){
     return;
   }
   closeAdminLogin();
-  setAdminActive(true, true);
+  setAdminActive(true);
   showToast('✅ تم تسجيل دخول المعلم بنجاح', 'success');
 }
 
@@ -6304,6 +6299,7 @@ async function adminLogout(btn){
   setBtnLoading(btn, true, 'جاري تسجيل الخروج...');
   if(sb) await sb.auth.signOut();
   setAdminActive(false);
+  showHome();   // لو خرج وهو داخل قسم للمعلم (اللوحة، صفوفي…) لا تبقى صفحة فارغة
   setBtnLoading(btn, false);
   showToast('👋 تم تسجيل خروج المعلم بنجاح', 'success');
 }
@@ -6325,12 +6321,12 @@ function openAdminPanel(){
   window.scrollTo({top:0, behavior:'instant'});
 }
 
-// scrollToPanel: النزول للوحة المعلم فقط عند تسجيل الدخول اليدوي — استعادة الجلسة
-// المحفوظة عند فتح الموقع كانت تُنزل الصفحة لآخرها بدل الواجهة
-function setAdminActive(active, scrollToPanel){
+// لوحة المعلم لا تظهر بنفسها (بطلب المالك): تُفتح فقط من رابط «🎛️ لوحة المعلم» بالشريط
+// أو زر القفل (openAdminPanel). الدخول يحمّل بياناتها بالخلفية فقط
+function setAdminActive(active){
   isAdmin = active;
   document.getElementById('adminChip').classList.toggle('active', active);
-  document.getElementById('adminPanel').classList.toggle('show', active);
+  if(!active) document.getElementById('adminPanel').classList.remove('show');
   document.getElementById('adminLogoutTop').classList.toggle('show', active);
   // رابط لوحة المعلم بالشريط العلوي — يظهر لك وحدك بعد تسجيل الدخول
   const navLink = document.getElementById('adminNavLink');
@@ -6341,8 +6337,6 @@ function setAdminActive(active, scrollToPanel){
   if(lsn) lsn.style.display = active ? 'inline-block' : 'none';
   homeLbRender();
   if(active){
-    document.getElementById('adminPanel').style.display = ''; // نتجاوز إخفاء الصفحة الرئيسية
-    if(scrollToPanel) document.getElementById('adminPanel').scrollIntoView({behavior:'smooth'});
     // الأهم أولاً: الطلاب المنتظرون للموافقة — يظهرون فوراً
     loadPendingStudents();
     loadStudentsList();
@@ -6353,7 +6347,7 @@ function setAdminActive(active, scrollToPanel){
 
 document.getElementById('adminChip').addEventListener('click', ()=>{
   if(isAdmin){
-    document.getElementById('adminPanel').scrollIntoView({behavior:'smooth'});
+    openAdminPanel();
   } else {
     openAdminLogin();
   }
