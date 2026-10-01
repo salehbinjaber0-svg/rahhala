@@ -1340,10 +1340,6 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     .bgArtQatar, .bgArtGlobe{opacity:.03; height:60%;} /* أخف على الجوال حفاظاً على وضوح النص */
   }
 
-  .heroMapBg{
-    position:absolute; inset:0; width:100%; height:100%;
-    object-fit:cover; pointer-events:none; z-index:0;
-  }
   .heroIntroInner{
     position:relative; z-index:1;
     display:grid; grid-template-columns:1.22fr .95fr; gap:36px; align-items:center;
@@ -1389,7 +1385,6 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     padding:14px 16px 12px; box-shadow:0 18px 40px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04);
     animation:hpIn .7s ease both;
   }
-  .heroPlate.hpGlobe{background:none; border:none; box-shadow:none; padding:0;}
   @keyframes hpIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
   .hpHead{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:8px;}
   .hpEyebrow{color:var(--gold); font-size:.68rem; font-weight:700; letter-spacing:.3px; white-space:nowrap;}
@@ -1400,7 +1395,6 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     transition:transform .3s ease, background .2s ease;
   }
   .hpNext:hover{background:rgba(220,167,58,.24); transform:rotate(-90deg);}
-  .hpGlobe .hpNext{background:#fbedcf; color:var(--navy);}   /* لوحة الكرة بلا بطاقة: الزر على الخلفية البيضاء */
   .hpNext:focus-visible{outline:2px solid var(--gold-light); outline-offset:2px;}
   .hpMap{position:relative; width:100%; border-radius:10px; overflow:hidden;}
   .hpMap img{display:block; width:100%; height:auto;}
@@ -1464,7 +1458,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     color:var(--ink);
     position:relative;
     overflow:hidden;
-    padding:70px 0 110px;
+    padding:56px 0 64px;
   }
   .hero .wrap{display:grid; grid-template-columns:1.2fr .8fr; gap:40px; align-items:center;}
   .hero h1{font-size:2.9rem; line-height:1.25; color:var(--navy);}
@@ -1480,6 +1474,79 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .btn-outline{background:transparent; border-color:var(--gold-light); color:var(--cream);}
   .btn-outline:hover{background:rgba(220,167,58,.15);}
   .hero .btn-outline{border-color:var(--navy); color:var(--navy);}
+
+  /* ===== الواجهة: حافة العلم القطري وأفق الدوحة (بعد قواعد .hero العامة عمداً) ===== */
+  .heroFlag{position:absolute; inset-inline-end:0; top:0; width:64px; height:100%; color:var(--navy); pointer-events:none; z-index:0;}
+  .heroSky{position:absolute; bottom:0; inset-inline-end:8%; width:min(900px,70%); height:62%; color:var(--navy); opacity:.06; pointer-events:none; z-index:0;}
+  .heroGlobe{margin:0;}
+  .heroIntroArt .heroGlobe svg{max-width:430px;}
+  @media(max-width:760px){ .heroIntroArt .heroGlobe svg{max-width:290px;} }
+  @media(max-width:1260px){ .hero .wrap{padding-inline-end:84px;} }
+  @media(max-width:760px){
+    .heroFlag{width:24px;}
+    .heroSky{width:100%; inset-inline-end:0; height:34%;}
+    .hero .wrap{padding-inline-end:40px;}
+  }
+
+  /* ===== لوحة الصفحة الرئيسية ===== */
+  #homeDash{padding:34px 0 64px; background:var(--cream);}
+  .hdCards{display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:22px;}
+  .hdCard{
+    position:relative; overflow:hidden; display:flex; flex-direction:column; align-items:flex-start; gap:4px;
+    min-height:150px; padding:16px 20px 34px; border-radius:18px; text-align:start; cursor:pointer;
+    border:1px solid #eee3db; box-shadow:0 8px 24px rgba(66,10,28,.06); font-family:'Tajawal'; color:var(--ink);
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .hdCard[hidden]{display:none;}
+  .hdCard:hover{transform:translateY(-3px); box-shadow:0 14px 30px rgba(66,10,28,.12);}
+  .hdCard:focus-visible{outline:3px solid var(--gold); outline-offset:2px;}
+  .hdIco{width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; margin-bottom:4px;}
+  .hdCard b{font-family:'Cairo'; font-weight:800; font-size:1.3rem; position:relative;}
+  .hdCard small{font-size:.9rem; color:#594a50; font-weight:500; position:relative;}
+  .hdArr{position:absolute; bottom:10px; inset-inline-start:20px; font-style:normal; font-size:1.2rem;}
+  .hdBg{position:absolute; inset-inline-end:12px; bottom:-8px; font-size:5rem; opacity:.14; pointer-events:none;}
+  .hdC1{background:linear-gradient(135deg, #fbedcf, #ffffff);} .hdC1 .hdIco{background:var(--navy);}
+  .hdC2{background:linear-gradient(135deg, #eaf0f4, #ffffff);} .hdC2 .hdIco{background:#1f5068;}
+  .hdC3{background:linear-gradient(135deg, #f4eaf4, #ffffff);} .hdC3 .hdIco{background:#5a3d7a;}
+  .hdC4{background:linear-gradient(135deg, #fbedcf, #ffffff);} .hdC4 .hdIco{background:var(--gold-deep);}
+
+  .hdRow{display:flex; flex-wrap:wrap; gap:22px; margin-top:26px; align-items:flex-start;}
+  .hdPanel{background:#ffffff; border:1px solid #eee3db; border-radius:18px; box-shadow:0 8px 24px rgba(66,10,28,.06); overflow:hidden;}
+  .hdPanel[hidden]{display:none;}
+  .hdWx{flex:0 1 260px;}
+  .hdLb{flex:1 1 300px; padding:16px 20px 18px;}
+  .hdAtlas{flex:1.3 1 380px; min-width:0;}   /* مجموع الأسس + الفجوات < ١٠٦٠ (عرض .wrap) فتبقى الثلاث بسطر */
+  .hdAtlas .heroPlate{max-width:none; margin:0;}
+  .hdWxTop{background:linear-gradient(160deg, var(--navy-soft), var(--navy-deep)); color:#ffffff; padding:14px 16px; display:flex; flex-direction:column; align-items:center; font-weight:700;}
+  .hdWxTop b{font-family:'Cairo'; font-weight:800; font-size:2.8rem; line-height:1.15; color:var(--gold-light);}
+  .hdWxList{display:grid; grid-template-columns:1fr 1fr; gap:8px 12px; padding:12px 16px 4px; font-weight:700; font-size:.92rem;}
+  .hdWxNote{margin:4px 16px 14px; font-size:.82rem; color:#594a50; font-weight:700; line-height:1.7;}
+  .hdLb h3{font-family:'Cairo'; font-weight:800; font-size:1.2rem; color:var(--ink);}
+  .hdSub{font-size:.86rem; color:#594a50; font-weight:500; margin-top:2px;}
+  .hdChips{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 10px;}
+  .hdChips:empty{display:none;}
+  .hdChip{font-family:'Cairo'; font-weight:800; font-size:.95rem; padding:4px 14px; border-radius:20px; border:2px solid var(--navy); color:var(--navy); background:#ffffff; cursor:pointer;}
+  .hdChip.on{background:var(--navy); color:#ffffff;}
+  .hdHint{text-align:center; color:#594a50; font-weight:700; line-height:1.8; padding:14px 0 6px;}
+  .hdHint span{display:block; font-size:2.2rem;}
+  .hdHint small{display:block; font-weight:500; font-size:.8rem;}
+  .hdLbRow{display:flex; align-items:center; gap:10px; padding:9px 12px; margin-bottom:4px; border-radius:12px; font-family:'Cairo'; font-weight:800; font-size:1.05rem;}
+  .hdLbRow.r1{background:#fbedcf;}
+  .hdLbRow i{font-style:normal; width:26px; text-align:center;}
+  .hdLbRow span{margin-inline-start:auto; color:var(--gold-deep);}
+  @media(max-width:760px){
+    #homeDash{padding:22px 0 48px;}
+    .hdCards{grid-template-columns:1fr 1fr; gap:12px;}
+    .hdCard{min-height:132px; padding:12px 14px 30px;}
+    .hdIco{width:40px; height:40px; font-size:1.15rem;}
+    .hdCard b{font-size:1.1rem;}
+    .hdCard small{font-size:.8rem; line-height:1.5;}
+    .hdBg{font-size:3.4rem;}
+    .hdRow{gap:14px;}
+    .hdWx, .hdLb, .hdAtlas{flex:1 1 100%;}
+  }
+  /* الصفحة الرئيسية لها بطاقة طقس كاملة — الشريط الرفيع لباقي الصفحات فقط */
+  body:not(:has(#homeDash[style*="none"])) #weatherBar{display:none;}
 
   #journeySection{display:none;}
   #journeySection.show{display:block;}
@@ -2138,22 +2205,14 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 </div>
 
 <section id="hero" class="hero heroIntro">
-  <!-- خلفية: خريطة عالم باهتة تعطي عمقاً بصرياً -->
-  <svg class="heroMapBg" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <g fill="#dca73a" opacity="0.1">
-      <path d="M120,90 Q160,70 200,88 L230,120 Q210,165 175,180 L140,215 Q108,200 100,160 Q95,120 120,90 Z"/>
-      <path d="M180,235 Q215,225 235,250 L245,300 Q230,350 205,365 Q185,340 180,300 Q172,265 180,235 Z"/>
-      <path d="M380,80 Q430,62 470,80 L490,110 Q470,145 435,152 L395,145 Q368,115 380,80 Z"/>
-      <path d="M395,175 Q440,165 465,190 L470,245 Q450,300 420,325 Q395,290 392,240 Q385,205 395,175 Z"/>
-      <path d="M500,75 Q580,55 660,78 L700,120 Q680,175 620,185 L540,168 Q495,125 500,75 Z"/>
-      <path d="M640,255 Q690,240 720,265 L725,305 Q700,335 660,330 Q630,300 640,255 Z"/>
-    </g>
-    <g stroke="#dca73a" stroke-width="0.6" opacity="0.09" fill="none">
-      <line x1="0" y1="100" x2="800" y2="100"/><line x1="0" y1="200" x2="800" y2="200"/><line x1="0" y1="300" x2="800" y2="300"/>
-      <line x1="160" y1="0" x2="160" y2="400"/><line x1="320" y1="0" x2="320" y2="400"/>
-      <line x1="480" y1="0" x2="480" y2="400"/><line x1="640" y1="0" x2="640" y2="400"/>
-    </g>
-  </svg>
+  <!-- حافة العلم القطري المسنّنة (يسار الصفحة) وأفق الدوحة الباهت — زخرفة بلا تفاعل -->
+  <svg class="heroFlag" viewBox="0 0 120 330" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0 H120 V330 H0 L22 312 L0 294 L22 276 L0 258 L22 240 L0 222 L22 204 L0 186 L22 168 L0 150 L22 132 L0 114 L22 96 L0 78 L22 60 L0 42 L22 24 Z" fill="currentColor"/></svg>
+  <svg class="heroSky" viewBox="0 0 900 220" preserveAspectRatio="xMidYMax meet" aria-hidden="true"><g fill="currentColor">
+    <rect x="40" y="120" width="40" height="100"/><rect x="90" y="80" width="30" height="140"/><path d="M135 220 V70 Q150 40 165 70 V220Z"/>
+    <rect x="180" y="110" width="50" height="110"/><path d="M245 220 L255 60 Q262 20 269 60 L279 220Z"/><rect x="292" y="95" width="34" height="125"/>
+    <path d="M340 220 L350 120 L346 90 L360 60 L374 90 L370 120 L380 220Z"/><rect x="395" y="130" width="60" height="90"/><path d="M470 220 V40 Q482 10 494 40 V220Z"/>
+    <rect x="505" y="100" width="36" height="120"/><path d="M555 220 L565 85 L585 85 L595 220Z"/><rect x="610" y="140" width="70" height="80"/><rect x="690" y="115" width="28" height="105"/>
+    <path d="M730 220 V95 Q745 70 760 95 V220Z"/><rect x="772" y="135" width="60" height="85"/></g></svg>
 
   <div class="wrap heroIntroInner">
     <div class="heroIntroText">
@@ -2172,8 +2231,8 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
     <div class="heroIntroArt">
       <div class="heroQuoteBadge" id="heroQuote">« بالتعليم نبني أجيالاً أكثر وعياً »</div>
-      <!-- لوحة متغيّرة مع كل زيارة (renderHeroPlate) — الكرة الأرضية هنا محتواها الافتراضي لو تعطّل السكربت -->
-      <figure class="heroPlate hpGlobe" id="heroPlate">
+      <!-- الكرة الأرضية وكتب المواد — ثابتة؛ لوحة الأطلس المتغيّرة في بطاقتها أسفل الواجهة (#heroPlate) -->
+      <figure class="heroGlobe">
       <svg viewBox="0 0 320 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="كرة أرضية وكتب المواد الدراسية">
         <defs>
           <linearGradient id="hgG" x1="0" y1="0" x2="1" y2="1">
@@ -2212,6 +2271,39 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
         </g>
       </svg>
       </figure>
+    </div>
+  </div>
+</section>
+
+<!-- لوحة الصفحة الرئيسية: أربع بوابات + طقس الدوحة + متصدرو المشاركة (للمعلم بعد اختيار الصف) + الأطلس -->
+<section id="homeDash">
+  <div class="wrap">
+    <div class="hdCards">
+      <button class="hdCard hdC1" type="button" onclick="hdOpenMenu('curriculumDropBtn', event)">
+        <span class="hdIco">📖</span><b>المنهج</b><small>دروس الصفين السابع والثامن</small><i class="hdArr">←</i><span class="hdBg" aria-hidden="true">📚</span>
+      </button>
+      <button class="hdCard hdC2" type="button" id="hdLessonCard" hidden onclick="openLessonFromNav()">
+        <span class="hdIco">📝</span><b>حصة اليوم</b><small>أنشطة الحصة وعرضها على السبورة</small><i class="hdArr">←</i><span class="hdBg" aria-hidden="true">🗂️</span>
+      </button>
+      <button class="hdCard hdC3" type="button" onclick="showSection('games')">
+        <span class="hdIco">🎮</span><b>الألعاب</b><small>مراجعة وتحديات ممتعة</small><i class="hdArr">←</i><span class="hdBg" aria-hidden="true">🎯</span>
+      </button>
+      <button class="hdCard hdC4" type="button" onclick="hdOpenMenu('enrichDropBtn', event)">
+        <span class="hdIco">🎥</span><b>مصادر إثرائية</b><small>مقاطع وأنشطة لكل وحدة</small><i class="hdArr">←</i><span class="hdBg" aria-hidden="true">🎬</span>
+      </button>
+    </div>
+    <div class="hdRow">
+      <div class="hdPanel hdWx" id="hdWeather" hidden></div>
+      <div class="hdPanel hdLb">
+        <h3>🏆 متصدرو المشاركة</h3>
+        <p class="hdSub">تظهر الأسماء بعد اختيار الصف فقط</p>
+        <div class="hdChips" id="hdLbChips"></div>
+        <div id="hdLbBody"></div>
+      </div>
+      <div class="hdAtlas">
+        <!-- لوحة متغيّرة مع كل زيارة (renderHeroPlate): خريطة أو لوحة من المنهج -->
+        <figure class="heroPlate" id="heroPlate"></figure>
+      </div>
     </div>
   </div>
 </section>
@@ -3946,7 +4038,7 @@ function openEnrichment(n){
 
 // الصفحة الرئيسية تعرض قسم البطل فقط — والباقي يظهر بالضغط على رابطه بالقائمة
 let isAdmin = false; // يُعرّف مبكراً لأن showHome تستخدمه
-const HOME_SECTIONS = ['hero'];
+const HOME_SECTIONS = ['hero', 'homeDash'];
 
 // يعرض قسماً واحداً فقط ويخفي البقية — بدل تكديس كل الأقسام بالصفحة
 // أقسام خاصة بالمعلم فقط — ما يفتحها أي طالب
@@ -5115,6 +5207,68 @@ function lbRender(){
     }).join('') : '<div class="lbEmpty">ما فيه نجوم مشاركة بعد — أول نجمة تفتح السباق ⭐</div>';
     return `<div class="lbCard"><div class="lbHead">${esc(o.label)}<small>أعلى ٣ بالمشاركة</small></div>${body}</div>`;
   }).join('') + '</div>';
+}
+
+// ---------- بطاقة «متصدرو المشاركة» بالصفحة الرئيسية ----------
+// الأسماء لا تظهر إلا للمعلم وبعد اختيار صف صراحةً (السبورة أمام الطلاب) — ضغطة ثانية على الصف نفسه تخفيها
+let hdLbCls = null;
+function hdClasses(){
+  const order = [];
+  document.querySelectorAll('.myClassBtn').forEach(b=>{
+    if(b.dataset.cls && !order.some(o => o.cls === b.dataset.cls)) order.push({cls: b.dataset.cls, label: b.textContent.trim()});
+  });
+  return order;
+}
+function homeLbRender(rows){
+  const chips = document.getElementById('hdLbChips'), body = document.getElementById('hdLbBody');
+  if(!chips || !body) return;
+  if(!isAdmin){
+    hdLbCls = null;
+    chips.innerHTML = '';
+    body.innerHTML = '<div class="hdHint"><span>🔒</span>تظهر عند دخول المعلم<small>أسماء الطلاب لا تُعرض للعامة حفاظاً على خصوصيتهم</small></div>';
+    return;
+  }
+  chips.innerHTML = hdClasses().map(o =>
+    `<button class="hdChip${o.cls === hdLbCls ? ' on' : ''}" type="button" data-cls="${esc(o.cls)}" onclick="hdLbPick(this.dataset.cls)">${esc(o.label)}</button>`
+  ).join('');
+  if(!hdLbCls){ body.innerHTML = '<div class="hdHint"><span>👆</span>اختر صفاً لعرض المتصدرين</div>'; return; }
+  if(!rows){ body.innerHTML = '<div class="hdHint">⏳ جاري التحميل…</div>'; return; }
+  const top = rows.filter(r => !r.deleted_at && r.cls === hdLbCls && (r.participation_points || 0) > 0)
+    .sort((a,b)=> (b.participation_points || 0) - (a.participation_points || 0) || String(a.student_name).localeCompare(String(b.student_name), 'ar'))
+    .slice(0, 3);
+  if(!top.length){ body.innerHTML = '<div class="hdHint"><span>⭐</span>ما فيه نجوم مشاركة بهذا الصف بعد</div>'; return; }
+  body.innerHTML = top.map(r=>{
+    const pts = r.participation_points || 0;
+    // الترتيب بالتنافس كلوحة الصدارة: المتعادلون يأخذون نفس الوسام
+    const rank = 1 + top.filter(x => (x.participation_points || 0) > pts).length;
+    return `<div class="hdLbRow${rank === 1 ? ' r1' : ''}"><i>${LB_MEDALS[rank - 1]}</i><b>${esc(r.student_name)}</b><span>⭐ ${pts}</span></div>`;
+  }).join('');
+}
+async function hdLbPick(cls){
+  if(!isAdmin) return;
+  hdLbCls = (hdLbCls === cls) ? null : cls;
+  homeLbRender();
+  if(!hdLbCls || !dbReady || !sb) return;
+  const want = hdLbCls;
+  // استعلام جديد كل مرة: النجوم تتغير أثناء الحصة
+  const { data, error } = await supaCall(() => sb.from('class_roster').select('student_name, cls, participation_points, deleted_at').eq('cls', want), 2, 500);
+  if(want !== hdLbCls) return;   // غيّر الصف قبل وصول الرد
+  if(error){
+    console.error('تعذر تحميل المتصدرين:', error);
+    document.getElementById('hdLbBody').innerHTML = '<div class="hdHint">تعذر التحميل — اضغط الصف مرة ثانية</div>';
+    hdLbCls = null;
+    return;
+  }
+  homeLbRender(data || []);
+}
+
+// بطاقتا «المنهج» و«مصادر إثرائية» تفتحان قائمتيهما بالشريط العلوي (فيها وحدات الصف النشط)
+function hdOpenMenu(btnId, ev){
+  if(ev) ev.stopPropagation();   // وإلا أغلقها مستمع النقر العام فوراً
+  document.querySelectorAll('.navDrop').forEach(d=>d.classList.remove('open'));
+  document.getElementById('mainNav').classList.add('show');   // الجوال: القائمة مطوية خلف ☰
+  document.getElementById(btnId).closest('.navDrop').classList.add('open');
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 
 // ---------- class challenge (تجميع نقاط كل صف، تحدّث دوري) ----------
@@ -7653,6 +7807,9 @@ function setAdminActive(active, scrollToPanel){
   if(myCls) myCls.style.display = active ? 'inline-block' : 'none';
   const lsn = document.getElementById('lessonNavLink');
   if(lsn) lsn.style.display = active ? 'inline-block' : 'none';
+  const hdl = document.getElementById('hdLessonCard');
+  if(hdl) hdl.hidden = !active;
+  homeLbRender();
   if(active){
     document.getElementById('adminPanel').style.display = ''; // نتجاوز إخفاء الصفحة الرئيسية
     if(scrollToPanel) document.getElementById('adminPanel').scrollIntoView({behavior:'smooth'});
@@ -9466,11 +9623,11 @@ const WEATHER_CODES = {
   95:['⛈️','عاصفة رعدية'], 96:['⛈️','عاصفة مع برد'], 99:['⛈️','عاصفة مع برد شديد'],
 };
 
+// جلبة واحدة تملأ بطاقة الطقس بالصفحة الرئيسية والشريط الرفيع بباقي الصفحات
 async function initWeatherBar(){
   const bar = document.getElementById('weatherBar');
-  if(!bar) return;
-  // لو أغلقه اليوم، ما نزعجه مرة ثانية
-  if(localStorage.getItem('rahhala_weather_dismissed') === new Date().toISOString().slice(0,10)) return;
+  const card = document.getElementById('hdWeather');
+  if(!bar && !card) return;
   try{
     // خدمة مفتوحة بلا مفتاح — إحداثيات الدوحة
     const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=25.29&longitude=51.53&current=temperature_2m,relative_humidity_2m,wind_speed_10m,pressure_msl,weather_code&timezone=Asia%2FQatar');
@@ -9481,20 +9638,36 @@ async function initWeatherBar(){
     // العناصر الأربعة بترتيب الكتاب ورموزه (سابع، الوحدة ١، الدرس ١): 🌡️ الحرارة · 🔽 الضغط · 💨 الرياح · 💧 الرطوبة
     // الضغط: pressure_msl بالهكتوباسكال، وهو يساوي الملّيبار عددياً. أي قيمة ناقصة يُحذف عنصرها بدل عرض «—»
     const num = v => (typeof v === 'number' && isFinite(v)) ? Math.round(v) : null;
+    const t = num(cur.temperature_2m), p = num(cur.pressure_msl), w = num(cur.wind_speed_10m), h = num(cur.relative_humidity_2m);
     const parts = [
       desc,
-      num(cur.temperature_2m)      !== null && `🌡️ ${num(cur.temperature_2m)}°م`,
-      num(cur.pressure_msl)        !== null && `🔽 ضغط ${num(cur.pressure_msl)} ملّيبار`,
-      num(cur.wind_speed_10m)      !== null && `💨 رياح ${num(cur.wind_speed_10m)} كم/س`,
-      num(cur.relative_humidity_2m)!== null && `💧 رطوبة ${num(cur.relative_humidity_2m)}%`,
+      t !== null && `🌡️ ${t}°م`,
+      p !== null && `🔽 ضغط ${p} ملّيبار`,
+      w !== null && `💨 رياح ${w} كم/س`,
+      h !== null && `💧 رطوبة ${h}%`,
     ].filter(Boolean);
     if(parts.length < 2) throw new Error('incomplete data');
-    document.getElementById('weatherText').innerHTML =
-      `${icon} <strong>طقس الدوحة الآن:</strong> ${parts.join(' · ')}` +
-      ` <span class="wbHint">— الطقس حالة الجو المتغيرة يومياً (سابع: عناصر المناخ · ثامن: الغلاف الجوي)</span>`;
-    bar.classList.add('show');
+    if(card){
+      const items = [
+        p !== null && `<span>🔽 ${p} ملّيبار</span>`,
+        w !== null && `<span>💨 ${w} كم/س</span>`,
+        h !== null && `<span>💧 رطوبة ${h}%</span>`,
+      ].filter(Boolean).join('');
+      card.innerHTML = `<div class="hdWxTop"><span>${icon} طقس الدوحة الآن</span>` +
+        (t !== null ? `<b dir="ltr">${t}°</b>` : '') + `<span>${esc(desc)}</span></div>` +
+        `<div class="hdWxList">${items}</div>` +
+        `<p class="hdWxNote">الطقس حالة الجو المتغيرة يومياً — سابع: عناصر المناخ · ثامن: الغلاف الجوي</p>`;
+      card.hidden = false;
+    }
+    // الشريط: لو أغلقه اليوم، ما نزعجه مرة ثانية
+    if(bar && localStorage.getItem('rahhala_weather_dismissed') !== new Date().toISOString().slice(0,10)){
+      document.getElementById('weatherText').innerHTML =
+        `${icon} <strong>طقس الدوحة الآن:</strong> ${parts.join(' · ')}` +
+        ` <span class="wbHint">— الطقس حالة الجو المتغيرة يومياً (سابع: عناصر المناخ · ثامن: الغلاف الجوي)</span>`;
+      bar.classList.add('show');
+    }
   } catch(e){
-    // فشل الاتصال — ما نعرض شريطاً فاضياً أو رسالة خطأ مزعجة
+    // فشل الاتصال — ما نعرض بطاقة فاضية أو رسالة خطأ مزعجة؛ البطاقة تبقى مخفية
     console.warn('تعذر جلب الطقس:', e.message);
   }
 }
@@ -9571,8 +9744,7 @@ function showCompare(i){
 //  اللوحات المصمَّمة (طبقات الأرض، مراحل الدولة الإسلامية) أرقامها من نص الكتاب حرفياً.
 // ═══════════════════════════════════════════════════════════
 const HP_KOPPEN = 'البيانات: تصنيف كوبن-جايجر للمناخ (Kottek وآخرون، 2006)';
-const HERO_PLATES = [
-  { id:'globe' },   // اللوحة الأصلية: الكرة الأرضية وكتب المواد
+const HERO_PLATES = [   // الكرة الأرضية ليست هنا: صارت ثابتة بالواجهة نفسها
   { id:'pop', img:'maps/pop.webp', title:'أين يعيش سكان العالم؟',
     alt:'خريطة العالم تُظهر تجمعات السكان: أكثفها في جنوب آسيا وشرقها وأوروبا',
     labels:[['شرق آسيا',79.01,25.33],['جنوب آسيا',70.81,42.61],['أوروبا',53.17,16.27],
@@ -9658,16 +9830,16 @@ function hpBody(pl){
   const legend = pl.legend ? `<div class="hpLegend">${pl.legend.map(([c,t]) => `<span><i style="background:${c}"></i>${esc(t)}</span>`).join('')}</div>` : '';
   const ramp = pl.ramp ? `<div class="hpRamp"><span>${esc(pl.ramp[0])}</span><i></i><span>${esc(pl.ramp[1])}</span></div>` : '';
   return `<div class="hpMap" style="aspect-ratio:1100/488"><img src="${pl.img}" alt="${esc(pl.alt)}" width="1100" height="488" decoding="async"
-      onerror="renderHeroPlate(0)">${lbl}${qatar}</div>${legend}${ramp}`;
+      onerror="renderHeroPlate(HP_NO_IMG)">${lbl}${qatar}</div>${legend}${ramp}`;
 }
 
-let HP_GLOBE_HTML = null;
 let hpCurrent = -1;
+// لوحة مرسومة بلا صورة — بديل الخريطة إن تعذّر تحميلها (لا تُستدعى نفسها مرة أخرى)
+const HP_NO_IMG = HERO_PLATES.findIndex(p => p.id === 'layers');
 // idx اختياري: بدونه نأخذ اللوحة التالية بالدور المحفوظ (لا تتكرر نفسها بزيارتين متتاليتين)
 function renderHeroPlate(idx){
   const box = document.getElementById('heroPlate');
   if(!box) return;
-  if(HP_GLOBE_HTML === null) HP_GLOBE_HTML = box.innerHTML;
   if(typeof idx !== 'number'){
     let last = -1;
     try{ last = parseInt(localStorage.getItem('rahhala_hero_plate'), 10); }catch(e){}
@@ -9678,13 +9850,7 @@ function renderHeroPlate(idx){
   try{ localStorage.setItem('rahhala_hero_plate', String(idx)); }catch(e){}
   const pl = HERO_PLATES[idx];
   const next = `<button class="hpNext" type="button" onclick="renderHeroPlate((hpCurrent+1)%HERO_PLATES.length)" title="لوحة أخرى" aria-label="عرض لوحة أخرى">↻</button>`;
-  box.classList.remove('hpGlobe');
   box.style.animation = 'none'; void box.offsetWidth; box.style.animation = '';   // إعادة حركة الظهور
-  if(pl.id === 'globe'){
-    box.classList.add('hpGlobe');
-    box.innerHTML = HP_GLOBE_HTML + `<div style="text-align:center;margin-top:4px">${next}</div>`;
-    return;
-  }
   box.innerHTML = `
     <div class="hpHead"><div><div class="hpEyebrow">🧭 من أطلس رحّالة</div><h3 class="hpTitle">${esc(pl.title)}</h3></div>${next}</div>
     ${hpBody(pl)}
@@ -9773,6 +9939,7 @@ try {
 } catch(e){}
 try { showCompare(0); } catch(e){ console.error('showCompare:', e); }
 try { renderHeroPlate(); } catch(e){ console.error('renderHeroPlate:', e); }
+try { homeLbRender(); } catch(e){ console.error('homeLbRender:', e); }
 try { renderHeroQuote(); } catch(e){ console.error('renderHeroQuote:', e); }
 try { initSupabase(); } catch(e){ console.error('initSupabase:', e); }
 </script>
