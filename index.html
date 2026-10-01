@@ -1069,7 +1069,18 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   }
   #adminLogoutTop.show{display:inline-block;}
   #adminLogoutTop:hover{background:var(--maroon); border-color:var(--maroon); color:#ffffff;}
-  /* شريط طقس الدوحة */
+  .badge{
+    display:none; position:absolute; top:-6px; left:-6px; background:var(--maroon); color:#ffffff;
+    font-size:.65rem; font-weight:700; min-width:18px; height:18px; border-radius:50%;
+    align-items:center; justify-content:center; border:2px solid var(--navy);
+  }
+  .badge.show{display:flex;}
+
+  #lastUpdateBar{
+    display:none; background:var(--teal); color:#ffffff; text-align:center; padding:9px 20px;
+    font-size:.82rem; position:relative;
+  }
+  /* شريط طقس الدوحة — بنفس نمط شريط التحديث، بلون سماوي يناسب موضوعه */
   #weatherBar{
     display:none; background:linear-gradient(90deg,var(--navy-soft),var(--navy)); color:#ffffff;
     text-align:center; padding:9px 44px; font-size:.82rem; position:relative; /* 44px: مساحة زر الإغلاق كي لا يغطي النص */
@@ -1084,13 +1095,12 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   }
   #weatherBar button:hover{background:rgba(255,255,255,.3);}
   @media(max-width:620px){ #weatherBar .wbHint{display:none;} #weatherBar{font-size:.76rem; padding:8px 40px;} }
-  .badge{
-    display:none; position:absolute; top:-6px; left:-6px; background:var(--maroon); color:#ffffff;
-    font-size:.65rem; font-weight:700; min-width:18px; height:18px; border-radius:50%;
-    align-items:center; justify-content:center; border:2px solid var(--navy);
+  #lastUpdateBar.show{display:block;}
+  #lastUpdateBar button{
+    position:absolute; left:16px; top:50%; transform:translateY(-50%); background:none; border:none;
+    color:#ffffff; font-size:.9rem; cursor:pointer; opacity:.8;
   }
-  .badge.show{display:flex;}
-
+  #lastUpdateBar button:hover{opacity:1;}
 
   #topPendingBar{
     display:none; background:var(--gold-light); border-bottom:2px solid var(--gold);
@@ -1670,7 +1680,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .repStatCard .num{font-size:2rem; font-weight:700; color:var(--gold-light); font-family:'Aref Ruqaa';}
   .repStatCard .lbl{font-size:.8rem; opacity:.85; margin-top:4px;}
   @media print{
-    .noPrint, header, #topPendingBar, #chatFab, #chatPanel, footer{display:none !important;}
+    .noPrint, header, #topPendingBar, #lastUpdateBar, #chatFab, #chatPanel, footer{display:none !important;}
     section{display:none !important;}
     #reportView, #reportView .wrap{display:block !important;}
     /* طباعة صفحة الدرس كذلك لو كانت مفتوحة */
@@ -2038,249 +2048,6 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     .fmName{font-size:.88rem;}
     .fmRow{gap:5px; padding:9px 8px;}
   }
-
-  /* ═══════ المرحلة الثانية ٢-١: شريط علوي بسطر واحد · الصفحة الرئيسية للمعلم · الأوامر السريعة ═══════ */
-  /* شريط المعلم: الروابط الثانوية تنتقل لـ«المزيد» كي لا ينكسر الشريط لسطرين على السبورة */
-  .navMore{display:none;}
-  body.tch nav .navSecondary{display:none !important;}
-  body.tch .navMore{display:block;}
-  body.tch nav{gap:18px;}
-  body.tch header .wrap{padding-block:10px; justify-content:flex-start; gap:8px;}
-  body.tch nav{margin-inline-start:auto; margin-inline-end:10px;}   /* الأيقونات متجاورة يساراً بدل توزيعها على عرض الشريط */
-  body.tch #cmdBtn, body.tch #adminChip, body.tch #adminLogoutTop{margin-inline-start:0;}
-  .navMore .navDropMenu{min-width:250px;}
-  .moreHead{font-size:.8rem; font-weight:800; color:var(--gold-deep); padding:8px 12px 2px; border-top:1px solid #eee3db; margin-top:4px;}
-  #cmdBtn{
-    display:none; width:36px; height:36px; border-radius:50%; cursor:pointer; font-size:.95rem;
-    background:rgba(0,0,0,.2); border:1.5px solid rgba(220,167,58,.5); color:var(--gold-light); margin-inline-start:8px;
-  }
-  body.tch #cmdBtn{display:inline-block;}
-  body.tch #adminChip.active{background:rgba(0,0,0,.2); border-color:rgba(220,167,58,.5); color:var(--gold-light);}
-  #adminLogoutTop.show{width:36px; height:36px; padding:0; border-radius:50%; font-size:1rem; border-color:rgba(220,167,58,.5); background:rgba(0,0,0,.2);}
-  @media(max-width:760px){
-    body.tch nav .navSecondary{display:block !important;}
-    body.tch .navMore{display:none;}
-  }
-
-  /* الصفحة الرئيسية للمعلم */
-  #teacherHome{background:linear-gradient(180deg, var(--cream-warm), var(--cream)); padding:26px 0 44px;}
-  #teacherHome .wrap{max-width:1320px;}
-  .thGrid{display:grid; grid-template-columns:minmax(0,1fr) 400px; gap:22px 26px; align-items:start;}
-  .thTop{grid-column:1/-1; display:flex; align-items:center; gap:22px; flex-wrap:wrap;}
-  .thHello{font-family:'Aref Ruqaa'; font-size:2.6rem; color:var(--navy); line-height:1.4; margin:0;}
-  .thDate{font-family:'Cairo'; font-weight:800; font-size:1.15rem; color:var(--ink); line-height:1.45;}
-  .thDate small{display:block; font-family:'Tajawal'; font-size:.98rem; color:var(--gold-deep); font-weight:700;}
-  .thClasses{margin-inline-start:auto; display:flex; align-items:center; gap:10px; color:#594a50; font-weight:700;}
-  .thChips{display:flex; gap:8px; flex-wrap:wrap;}
-  .thChip{font-family:'Cairo'; font-weight:800; font-size:1.05rem; padding:6px 18px; border-radius:24px; border:2px solid var(--navy); background:#ffffff; color:var(--navy); cursor:pointer;}
-  .thChip.on{background:var(--navy); color:#ffffff;}
-  .thToday{
-    background:linear-gradient(150deg, var(--navy), var(--navy-deep)); color:#ffffff; border-radius:20px;
-    padding:24px 28px; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:4px 24px; align-items:center;
-    border-bottom:4px solid var(--gold); box-shadow:0 14px 34px rgba(66,10,28,.22);
-  }
-  .thTag{font-family:'Cairo'; font-weight:800; font-size:1.02rem; color:var(--gold-light);}
-  .thToday h2{font-family:'Cairo'; font-size:2rem; line-height:1.4; margin:0;}
-  .thToday p{margin:0; font-size:1.05rem; color:#ffffff;}
-  .thGo{grid-column:2; grid-row:1/4; display:flex; flex-direction:column; gap:10px; align-items:stretch;}
-  .thStart{font-family:'Cairo'; font-weight:800; font-size:1.6rem; padding:16px 34px; border-radius:16px; border:none; cursor:pointer;
-    background:var(--grad-gold); color:var(--navy-deep); box-shadow:0 6px 18px rgba(0,0,0,.25); white-space:nowrap;}
-  .thOther{font-family:'Tajawal'; font-weight:700; font-size:.95rem; background:rgba(0,0,0,.2); color:var(--gold-light);
-    border:1.5px solid rgba(220,167,58,.5); border-radius:12px; padding:7px 12px; cursor:pointer;}
-  .thTiles{display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:12px; margin-top:16px;}
-  .thTile{position:relative; background:#ffffff; border:2px solid #eee3db; border-radius:18px; padding:16px 8px 14px; text-align:center;
-    cursor:pointer; font-family:'Tajawal'; color:var(--ink); box-shadow:0 4px 14px rgba(66,10,28,.05); transition:border-color .15s, transform .15s;}
-  .thTile:hover{border-color:var(--gold); transform:translateY(-2px);}
-  .thTile i{display:block; font-style:normal; font-size:2.4rem; line-height:1.25;}
-  .thTile b{display:block; font-family:'Cairo'; font-size:1.08rem; margin-top:4px; white-space:nowrap;}
-  .thTile span{display:block; font-size:.88rem; color:#594a50; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .thTile kbd, .cmdBox kbd{font-family:'Cairo'; font-weight:800; font-size:.75rem; background:#f5efeb; color:#594a50; border-radius:6px; padding:1px 7px;}
-  .thTile kbd{position:absolute; top:8px; left:10px;}
-  .thSide{display:flex; flex-direction:column; gap:16px;}
-  .thBoard{background:linear-gradient(155deg, var(--navy-soft), var(--navy-deep)); border:2px solid var(--gold); border-radius:20px; padding:16px 22px; color:#ffffff;}
-  .thBoardHead{display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;}
-  .thBoardHead h3{font-family:'Aref Ruqaa'; font-size:1.7rem; color:var(--gold-light); margin:0;}
-  .thBoardHead span{font-size:.9rem; font-weight:700; background:rgba(0,0,0,.25); padding:3px 12px; border-radius:14px;}
-  .thLbRow{display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.12); font-family:'Cairo'; font-weight:800; font-size:1.15rem;}
-  .thLbRow:last-child{border-bottom:none;}
-  .thLbRow i{font-style:normal; font-size:1.4rem;}
-  .thLbRow span{margin-inline-start:auto; color:var(--gold-light);}
-  .thPod{width:100%; margin:6px 0 8px;}
-  .thEmpty{font-size:.98rem; padding:8px 0 4px; color:#ffffff;}
-  .thSide .heroPlate{max-width:none; margin:0;}
-  .thSide .hpTitle{font-size:1.35rem;}
-  .thSide .heroPlate p.hpNote{font-size:.92rem;}
-  .thSide .hpLegend span, .thSide .hpRamp, .thSide .hpLayers li, .thSide .hpTlList li, .thSide .hpEyebrow, .thSide .hpUnit{font-size:.8rem;}
-  .thSide .hpSrc{font-size:.72rem;}
-  @media(max-width:1100px){
-    .thGrid{grid-template-columns:minmax(0,1fr);}
-    .thTiles{grid-template-columns:repeat(3, minmax(0,1fr));}
-  }
-  @media(max-width:620px){
-    .thHello{font-size:1.9rem;}
-    .thClasses{margin-inline-start:0;}
-    .thToday{grid-template-columns:minmax(0,1fr); padding:20px;}
-    .thGo{grid-column:1; grid-row:auto; margin-top:10px;}
-    .thToday h2{font-size:1.4rem;}
-    .thTiles{grid-template-columns:repeat(2, minmax(0,1fr));}
-    .thTiles .thTile:last-child{grid-column:1/-1;}
-  }
-
-  /* الأوامر السريعة */
-  .cmdPal{position:fixed; inset:0; z-index:700; background:rgba(31,18,22,.55); display:flex; align-items:flex-start; justify-content:center; padding:12vh 16px 16px;}
-  .cmdPal[hidden]{display:none;}
-  .cmdBox{width:min(760px, 100%); background:#ffffff; border-radius:20px; border:2px solid var(--gold); box-shadow:0 30px 80px rgba(0,0,0,.4); overflow:hidden;}
-  .cmdIn{display:flex; align-items:center; gap:12px; padding:16px 20px; border-bottom:2px solid #eee3db; font-size:1.4rem;}
-  .cmdIn input{flex:1; min-width:0; border:none; outline:none; font-family:'Cairo'; font-weight:700; font-size:1.45rem; color:var(--ink); background:transparent;}
-  .cmdList{max-height:52vh; overflow-y:auto; padding:8px;}
-  .cmdItem{display:flex; align-items:center; gap:14px; padding:11px 14px; border-radius:12px; cursor:pointer; width:100%; text-align:start; background:none; border:none; font-family:'Tajawal'; color:var(--ink);}
-  .cmdItem i{font-style:normal; font-size:1.6rem; width:38px; text-align:center; flex:0 0 38px;}
-  .cmdItem b{display:block; font-size:1.12rem;}
-  .cmdItem small{display:block; font-size:.88rem; color:#594a50;}
-  .cmdItem.sel{background:#fbedcf; outline:2px solid var(--gold);}
-  .cmdNone{padding:18px; text-align:center; color:#594a50;}
-  .cmdFoot{padding:10px 18px; border-top:1px solid #eee3db; font-size:.85rem; color:#594a50; background:#faf7f4;}
-
-  /* ═══════ المرحلة الثانية ٢-٢: افتتاح الحصة · كشف الأبطال · النجوم الطائرة ═══════ */
-  .lsIntro{position:fixed; inset:0; z-index:500; overflow:hidden; cursor:pointer; color:#ffffff;
-    background:radial-gradient(ellipse at 50% 42%, var(--navy-soft) 0%, var(--navy-deep) 58%, #311d23 100%);
-    display:flex; align-items:center; justify-content:center; text-align:center; transition:opacity .45s ease;}
-  .lsIntro[hidden]{display:none;}
-  .lsIntro.out{opacity:0;}
-  .lsiRays{position:absolute; inset:-50%; background:repeating-conic-gradient(from 0deg at 50% 50%, rgba(246,220,150,.06) 0 6deg, transparent 6deg 18deg); animation:lsiSpin 40s linear infinite;}
-  @keyframes lsiSpin{to{transform:rotate(360deg);}}
-  .lsiIn{position:relative; display:flex; flex-direction:column; align-items:center; gap:2vh; padding:0 4vw;}
-  .lsiKick{font-family:'Cairo'; font-weight:800; font-size:clamp(1.1rem,2vw,1.9rem); color:var(--gold-light); animation:lsiUp .6s ease both;}
-  .lsiLine{width:min(280px,40vw); height:3px; background:linear-gradient(90deg, transparent, var(--gold), transparent); animation:lsiGrow .8s ease .2s both;}
-  .lsiTitle{font-family:'Aref Ruqaa'; font-size:clamp(3rem,7.4vw,7.4rem); line-height:1.35; margin:0; color:var(--gold-light); text-shadow:0 8px 30px rgba(0,0,0,.4); animation:lsiUp .8s ease .25s both;}
-  .lsiSub{font-family:'Cairo'; font-weight:700; font-size:clamp(1.1rem,2.1vw,2rem); color:#ffffff; animation:lsiUp .7s ease .45s both;}
-  .lsiChips{display:flex; gap:12px; flex-wrap:wrap; justify-content:center; animation:lsiUp .7s ease .6s both;}
-  .lsiChips span{background:rgba(0,0,0,.25); border:1.5px solid rgba(246,220,150,.5); border-radius:30px; padding:8px 20px; font-weight:700; font-size:clamp(.95rem,1.4vw,1.35rem); color:var(--gold-light);}
-  .lsiCount{margin-top:2vh; width:clamp(120px,11vw,190px); height:clamp(120px,11vw,190px); border-radius:50%; display:flex; align-items:center; justify-content:center;
-    border:8px solid rgba(246,220,150,.25); border-top-color:var(--gold); font-family:'Cairo'; font-weight:800; font-size:clamp(4rem,7vw,7rem); color:var(--gold-light);}
-  .lsiCount.tick{animation:lsiPop .5s ease;}
-  .lsiSkip{font-size:.95rem; color:#ffffff; opacity:.85;}
-  @keyframes lsiUp{from{opacity:0; transform:translateY(18px);} to{opacity:1; transform:none;}}
-  @keyframes lsiGrow{from{transform:scaleX(0);} to{transform:scaleX(1);}}
-  @keyframes lsiPop{0%{transform:scale(.6); opacity:.2;} 60%{transform:scale(1.12);} 100%{transform:scale(1); opacity:1;}}
-
-  .podium{position:fixed; inset:0; z-index:510; overflow:hidden; color:#ffffff; text-align:center;
-    background:radial-gradient(ellipse at 50% 28%, var(--navy-soft), #311d23 75%);}
-  .podium[hidden]{display:none;}
-  .podClose{position:absolute; top:18px; left:18px; width:44px; height:44px; border-radius:50%; border:1.5px solid rgba(220,167,58,.5); background:rgba(0,0,0,.25); color:#ffffff; font-size:1.1rem; cursor:pointer; z-index:2;}
-  .podTitle{font-family:'Aref Ruqaa'; font-size:clamp(2.6rem,5vw,4.8rem); color:var(--gold-light); margin:3vh 0 0; line-height:1.5;}
-  .podSub{font-family:'Cairo'; font-weight:700; font-size:clamp(1.1rem,2vw,1.8rem); color:#ffffff;}
-  .podStage{position:absolute; bottom:0; left:50%; transform:translateX(-50%); display:flex; align-items:flex-end; gap:2vw; width:min(1400px,96vw);}
-  .podCol{flex:1; display:flex; flex-direction:column; align-items:center;}
-  .podWho{opacity:0; transform:translateY(30px) scale(.9); transition:opacity .6s ease, transform .6s cubic-bezier(.2,1.4,.4,1); margin-bottom:2vh;}
-  .podCol.on .podWho{opacity:1; transform:none;}
-  .podMedal{width:clamp(90px,9vw,150px); height:clamp(90px,9vw,150px); margin:0 auto 1vh; border-radius:50%; display:flex; align-items:center; justify-content:center;
-    font-size:clamp(3rem,5vw,5rem); background:rgba(0,0,0,.25); border:5px solid var(--gold);}
-  .podName{font-family:'Cairo'; font-weight:800; font-size:clamp(1.8rem,3.4vw,3.4rem); line-height:1.3;}
-  .podStars{font-family:'Cairo'; font-weight:800; font-size:clamp(1.3rem,2.2vw,2.2rem); color:var(--gold-light);}
-  .podBlk{width:100%; border-radius:22px 22px 0 0; display:flex; justify-content:center; padding-top:2vh; font-family:'Cairo'; font-weight:800;
-    font-size:clamp(3rem,6vw,6rem); color:var(--navy-deep); transform-origin:bottom; transform:scaleY(.08); transition:transform .7s cubic-bezier(.2,1.2,.4,1);}
-  .podCol.on .podBlk{transform:none;}
-  .podCol.r1 .podBlk{height:36vh; background:linear-gradient(180deg, var(--gold-light), var(--gold));}
-  .podCol.r2 .podBlk{height:26vh; background:linear-gradient(180deg, #f4ede8, #bbb1a9);}
-  .podCol.r3 .podBlk{height:19vh; background:linear-gradient(180deg, #f2d498, #d98324);}
-  .podCol.r1 .podMedal{box-shadow:0 0 0 14px rgba(246,220,150,.22), 0 0 60px rgba(246,220,150,.45);}
-  .podCol.r1 .podName{font-size:clamp(2.2rem,4.2vw,4.2rem);}
-  .podHint{position:absolute; bottom:12px; right:18px; font-size:.9rem; color:#ffffff; z-index:2;}
-
-  .flyStar{position:fixed; z-index:600; pointer-events:none; font-size:2rem; line-height:1; will-change:transform, opacity;}
-  .flyPlus{position:fixed; z-index:601; pointer-events:none; font-family:'Cairo'; font-weight:900; font-size:1.5rem; color:var(--navy);
-    background:var(--gold-light); padding:2px 12px; border-radius:14px; box-shadow:0 6px 16px rgba(66,10,28,.25); white-space:nowrap;}
-  @media (prefers-reduced-motion: reduce){
-    .lsiRays{animation:none;} .lsiKick, .lsiLine, .lsiTitle, .lsiSub, .lsiChips{animation:none;}
-    .podWho, .podBlk{transition:none;}
-  }
-
-  /* ═══════ المرحلة الثانية ٢-٣: رحلة الصف · الجواز · سؤال الأسبوع ═══════ */
-  .jrStrip{background:#ffffff; border:2px solid #eee3db; border-radius:20px; padding:16px 22px 12px; margin-top:16px;}
-  .jrHead{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;}
-  .jrHead h3{font-family:'Cairo'; font-weight:800; font-size:1.2rem; color:var(--navy); margin:0;}
-  .jrHead .jrActs{display:flex; gap:8px; align-items:center; color:#594a50; font-weight:700; font-size:.92rem;}
-  .jrHead .thOther{background:#fbedcf; color:var(--navy); border-color:rgba(220,167,58,.6);}
-  .jrTrack{display:flex; justify-content:space-between; position:relative; margin-top:30px;}
-  .jrTrack:before, .jrFill{content:""; position:absolute; top:27px; right:8%; left:8%; height:6px; border-radius:4px;
-    background:repeating-linear-gradient(90deg, #dfccbd 0 8px, transparent 8px 16px);}
-  .jrFill{background:var(--gold); left:auto;}
-  .jrSt{position:relative; z-index:1; text-align:center; width:16%; cursor:pointer; background:none; border:none; font-family:'Tajawal'; padding:0;}
-  .jrDot{width:58px; height:58px; margin:0 auto; border-radius:50%; background:#ffffff; border:4px solid #dfccbd; display:flex; align-items:center; justify-content:center; font-size:1.65rem;}
-  .jrSt.done .jrDot{border-color:var(--teal); background:#eaf4f1;}
-  .jrSt.now .jrDot{border-color:var(--gold); background:#fbf9f8; box-shadow:0 0 0 8px rgba(220,167,58,.25);}
-  .jrSt.next .jrDot{filter:grayscale(.7); opacity:.75;}
-  .jrSt b{display:block; font-family:'Cairo'; font-weight:800; font-size:.88rem; margin-top:6px; color:var(--ink); line-height:1.35;}
-  .jrSt.next b{color:#594a50;}
-  .jrSt em{position:absolute; top:-28px; left:50%; transform:translateX(-50%); font-family:'Cairo'; font-weight:800; font-style:normal; font-size:.78rem;
-    background:var(--navy); color:#ffffff; padding:1px 9px; border-radius:8px; white-space:nowrap;}
-  .jrSt em.other{background:var(--gold); color:var(--navy-deep);}
-
-  .journey{position:fixed; inset:0; z-index:505; background:radial-gradient(ellipse at 60% 40%, #fbf9f8, #f2ebe5); display:flex; flex-direction:column; overflow:hidden;}
-  .journey[hidden]{display:none;}
-  .journey:before{content:""; position:absolute; inset:0; background:url(maps/zones.webp) center 60%/78% no-repeat; opacity:.07; filter:grayscale(1); pointer-events:none;}
-  .jrTopBar{position:relative; display:flex; justify-content:space-between; align-items:flex-start; padding:2.4vh 3vw 0;}
-  .jrTitle{font-family:'Aref Ruqaa'; font-size:clamp(2.2rem,4vw,3.8rem); color:var(--navy); margin:0 0 1.2vh; line-height:1.75;}
-  .jrLead{font-weight:700; font-size:clamp(1rem,1.3vw,1.3rem); color:#594a50;}
-  .jrBtns{display:flex; gap:12px; align-items:center;}
-  .jrBtns .thOther{background:#fbedcf; color:var(--navy); border-color:rgba(220,167,58,.6); font-size:1.05rem; padding:9px 18px;}
-  .jrX{position:static; color:var(--navy); background:#ffffff;}
-  .jrMap{position:relative; flex:1; width:100%; min-height:0;}
-  .jrMap text{font-family:'Cairo', 'Tajawal', sans-serif;}
-  .jrStats{position:relative; display:flex; gap:14px; justify-content:center; padding:0 3vw 2.4vh;}
-  .jrStats div{background:#ffffff; border:2px solid #eee3db; border-radius:16px; padding:10px 22px; font-weight:700; font-size:1.05rem; text-align:center;}
-  .jrStats b{display:block; font-family:'Cairo'; font-size:1.7rem; color:var(--navy);}
-
-  .passport{position:fixed; inset:0; z-index:506; background:radial-gradient(ellipse at center, var(--navy-deep), #311d23); display:flex; align-items:center; justify-content:center; padding:3vh 3vw;}
-  .passport[hidden]{display:none;}
-  .ppX{color:#ffffff;}
-  .ppBook{display:flex; width:min(1500px,100%); height:min(820px,90vh); filter:drop-shadow(0 30px 60px rgba(0,0,0,.5));}
-  .ppPage{flex:1; position:relative; padding:3.5vh 3vw; background:linear-gradient(90deg, #f1e9e3, #faf7f4); overflow:hidden;}
-  .ppStamps{border-radius:26px 0 0 26px;}
-  .ppCover{border-radius:0 26px 26px 0; background:linear-gradient(270deg, #f1e9e3, #faf7f4); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:1.6vh;}
-  .ppSpine{width:12px; background:linear-gradient(90deg, #dfccbd, #f4ede8, #dfccbd);}
-  .ppHead{font-family:'Cairo'; font-weight:800; font-size:1.3rem; color:var(--navy);}
-  .ppHead small{display:block; font-family:'Tajawal'; font-size:.85rem; color:#4c2d37; font-weight:700;}
-  .ppGrid{display:grid; grid-template-columns:repeat(3,1fr); gap:3vh 1.2vw; margin-top:2.5vh; align-items:center; justify-items:center;}
-  .ppSlot{background:none; border:none; cursor:pointer; padding:0; font-family:'Tajawal';}
-  .ppRing{width:clamp(130px,11vw,190px); height:clamp(130px,11vw,190px); border-radius:50%; border:6px double var(--c); color:var(--c);
-    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:12px; background:rgba(255,255,255,.4);}
-  .ppRing span{font-size:clamp(2rem,3vw,3rem);}
-  .ppRing b{font-family:'Cairo'; font-weight:800; font-size:clamp(.85rem,1.05vw,1.1rem); line-height:1.3;}
-  .ppRing small{font-weight:700; font-size:.8rem;}
-  .ppSlot.empty .ppRing{border:3px dashed #bbb1a9; color:#4c2d37; background:none;}
-  .ppCover .ppEm{font-size:clamp(4rem,7vw,7rem);}
-  .ppCover h1{font-family:'Aref Ruqaa'; font-size:clamp(2.8rem,4.6vw,4.6rem); color:var(--navy); margin:0; line-height:1.3;}
-  .ppCover h2{font-family:'Cairo'; font-weight:800; font-size:clamp(1.5rem,2.2vw,2.2rem); color:var(--gold-deep); margin:0;}
-  .ppRow{display:flex; gap:3vw; font-weight:700; color:#4c2d37; font-size:1.1rem;}
-  .ppRow b{display:block; font-family:'Cairo'; font-size:clamp(1.8rem,2.6vw,2.6rem); color:var(--navy);}
-  .ppMrz{font:700 1.05rem monospace; letter-spacing:4px; color:#4c2d37; direction:ltr;}
-  .ppNote{font-size:.85rem; color:#4c2d37;}
-
-  .stampToast{position:fixed; inset:0; z-index:515; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3vh; background:rgba(31,18,22,.86); cursor:pointer;}
-  .stampToast[hidden]{display:none;}
-  .stRing{width:clamp(220px,22vw,340px); height:clamp(220px,22vw,340px); border-radius:50%; border:10px double var(--c); color:var(--c); background:#faf7f4;
-    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; transform:rotate(-8deg);
-    animation:stampDrop .55s cubic-bezier(.2,1.6,.4,1) both; box-shadow:0 20px 60px rgba(0,0,0,.4);}
-  .stRing span{font-size:clamp(3.5rem,5vw,5.5rem);} .stRing b{font-family:'Cairo'; font-weight:800; font-size:clamp(1.2rem,1.8vw,1.8rem); line-height:1.3;}
-  .stRing small{font-weight:800; font-size:1rem;}
-  .stTxt{font-family:'Cairo'; font-weight:800; font-size:clamp(1.4rem,2.6vw,2.6rem); color:var(--gold-light); text-shadow:0 4px 18px rgba(0,0,0,.5);}
-  @keyframes stampDrop{0%{transform:scale(2.4) rotate(-20deg); opacity:0;} 100%{transform:scale(1) rotate(-8deg); opacity:1;}}
-
-  .thQ{background:#ffffff; border:2px dashed var(--gold); border-radius:20px; padding:16px 20px;}
-  .thQ .thTag{color:var(--gold-deep);}
-  .thQ h3{font-family:'Cairo'; font-weight:800; font-size:1.35rem; color:var(--navy); margin:4px 0 8px; line-height:1.5;}
-  .thQ p{font-size:1.02rem; line-height:1.8; margin:0 0 8px; color:var(--ink);}
-  .thQ .thQBtns{display:flex; gap:8px;}
-  .thQ .thOther{background:#fbedcf; color:var(--navy); border-color:rgba(220,167,58,.6);}
-  .thQSrc{font-size:.82rem; color:#594a50;}
-  @media(max-width:620px){
-    .jrSt b{font-size:.7rem;} .jrDot{width:44px; height:44px; font-size:1.25rem;} .jrTrack:before, .jrFill{top:20px;}
-    .ppBook{flex-direction:column-reverse; height:auto; max-height:92vh; overflow-y:auto;} .ppStamps, .ppCover{border-radius:20px;} .ppSpine{display:none;}
-    .ppGrid{grid-template-columns:repeat(2,1fr);}
-  }
-  @media (prefers-reduced-motion: reduce){ .stRing{animation:none;} }
 </style>
 </head>
 <body>
@@ -2326,9 +2093,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
           <!-- تُبنى ديناميكياً من UNITS حسب الصف النشط -->
         </div>
       </div>
-      <a href="#" id="lessonNavLink" style="display:none;" onclick="openLessonFromNav(); return false;">حصة اليوم</a>
-      <a href="#" id="myClassesNavLink" style="display:none;" onclick="showSection('classchallenge'); return false;">صفوفي</a>
-      <div class="navDrop navSecondary">
+      <div class="navDrop">
         <button class="navDropBtn" id="enrichDropBtn" type="button">مصادر إثرائية <span class="caret">▾</span></button>
         <div class="navDropMenu enrichMenu" id="enrichDropMenu">
           <a href="#" onclick="openEnrichment(1); return false;">🎥 وحدة ١ · الأرض من حولي</a>
@@ -2339,98 +2104,30 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
           <a href="#" onclick="openEnrichment(6); return false;">🎥 وحدة ٦ · الأمن الوطني</a>
         </div>
       </div>
-      <a href="#" class="navSecondary" onclick="showSection('games'); return false;">الألعاب</a>
+      <a href="#" onclick="showSection('games'); return false;">الألعاب</a>
+      <a href="#" id="myClassesNavLink" style="display:none;" onclick="showSection('classchallenge'); return false;">📋 صفوفي</a>
+      <a href="#" id="lessonNavLink" style="display:none;" onclick="openLessonFromNav(); return false;">📝 حصة اليوم</a>
       <a href="#" onclick="showSection('leaderboard'); return false;">لوحة الصدارة</a>
-      <a href="#" class="navSecondary" onclick="showSection('about'); return false;">عن المعلم</a>
+      <a href="#" onclick="showSection('about'); return false;">عن المعلم</a>
       <a href="#" id="profileNavLink" style="display:none;" onclick="openProfile(); return false;">👤 ملفي</a>
-      <a href="#" id="adminNavLink" class="adminNavLink navSecondary" style="display:none;" onclick="openAdminPanel(); return false;">🎛️ لوحة المعلم</a>
-      <!-- للمعلم: الروابط الثانوية تجتمع هنا كي يبقى الشريط سطراً واحداً -->
-      <div class="navDrop navMore">
-        <button class="navDropBtn" id="moreDropBtn" type="button">المزيد <span class="caret">▾</span></button>
-        <div class="navDropMenu" id="moreDropMenu">
-          <a href="#" onclick="showSection('games'); return false;">🎮 الألعاب</a>
-          <a href="#" onclick="showSection('about'); return false;">👤 عن المعلم</a>
-          <div class="moreHead">🎥 مصادر إثرائية</div>
-          <a href="#" onclick="openEnrichment(1); return false;">🎥 وحدة ١ · الأرض من حولي</a>
-          <a href="#" onclick="openEnrichment(2); return false;">🎥 وحدة ٢ · حضارة بلاد الرافدين</a>
-          <a href="#" onclick="openEnrichment(3); return false;">🎥 وحدة ٣ · السلطات الدستورية</a>
-          <a href="#" onclick="openEnrichment(4); return false;">🎥 وحدة ٤ · التوزيع الجغرافي للسكان</a>
-          <a href="#" onclick="openEnrichment(5); return false;">🎥 وحدة ٥ · الخلافة العباسية</a>
-          <a href="#" onclick="openEnrichment(6); return false;">🎥 وحدة ٦ · الأمن الوطني</a>
-        </div>
-      </div>
+      <a href="#" id="adminNavLink" class="adminNavLink" style="display:none;" onclick="openAdminPanel(); return false;">🎛️ لوحة المعلم</a>
     </nav>
     <button id="userChip">دخول الطالب</button>
     <div id="badgesRow" style="display:none;"></div>
-    <button id="cmdBtn" type="button" title="أوامر سريعة (Ctrl+K)" aria-label="أوامر سريعة" onclick="openCmd()">🔎</button>
     <button id="adminChip" title="دخول المعلم">🔒<span id="pendingBadge" class="badge">0</span></button>
-    <button id="adminLogoutTop" onclick="adminLogout(this)" title="خروج المعلم" aria-label="خروج المعلم">🚪</button>
+    <button id="adminLogoutTop" onclick="adminLogout(this)">خروج المعلم</button>
     <button class="menuBtn" id="menuBtn">☰</button>
   </div>
 </header>
 
-<!-- المرحلة الثانية ٢-٢: افتتاح الحصة — فوق العرض مباشرة، أي مفتاح أو نقرة يتخطاه -->
-<div id="lsIntro" class="lsIntro" hidden onclick="lsIntroEnd()">
-  <div class="lsiRays" aria-hidden="true"></div>
-  <div class="lsiIn">
-    <div class="lsiKick" id="lsiKick"></div>
-    <div class="lsiLine" aria-hidden="true"></div>
-    <h1 class="lsiTitle" id="lsiTitle"></h1>
-    <div class="lsiSub" id="lsiSub"></div>
-    <div class="lsiChips" id="lsiChips"></div>
-    <div class="lsiCount" id="lsiCount" aria-live="polite">٣</div>
-    <div class="lsiSkip">اضغط أي مفتاح للبدء فوراً</div>
-  </div>
-</div>
-
-<!-- المرحلة الثانية ٢-٢: كشف الأبطال — الثالث ثم الثاني ثم الأول -->
-<div id="podium" class="podium" hidden>
-  <button class="podClose" type="button" onclick="closePodium()" aria-label="إغلاق">✕</button>
-  <h1 class="podTitle">أبطال <span id="podCls"></span> 🏆</h1>
-  <div class="podSub" id="podSub">🥁 من هم أبطال المشاركة؟</div>
-  <div class="podStage" id="podStage"></div>
-  <div class="podHint">مسافة: الكشف التالي · Esc: إغلاق</div>
-</div>
-
-<!-- المرحلة الثانية ٢-٣: رحلة الصف على الخريطة -->
-<div id="journey" class="journey" hidden>
-  <div class="jrTopBar">
-    <div><h1 class="jrTitle" id="jrTitle"></h1><div class="jrLead">كل نشاط يُنجَز حتى آخر شريحة يمنح الصف ختم محطته</div></div>
-    <div class="jrBtns"><button type="button" class="thOther" onclick="openPassport(jrCls)">📘 الجواز</button><button type="button" class="podClose jrX" onclick="closeJourney()" aria-label="إغلاق">✕</button></div>
-  </div>
-  <svg class="jrMap" id="jrMap" viewBox="0 0 1920 900" preserveAspectRatio="xMidYMid meet" role="img" aria-label="خريطة رحلة الصف عبر وحدات المنهج"></svg>
-  <div class="jrStats" id="jrStats"></div>
-</div>
-
-<!-- المرحلة الثانية ٢-٣: جواز سفر الصف -->
-<div id="passport" class="passport" hidden onclick="ppBackdrop(event)">
-  <div class="ppBook">
-    <div class="ppPage ppStamps"><div class="ppHead">صفحة الأختام <small>اضغط خانة لمنح ختم أو سحبه يدوياً</small></div><div class="ppGrid" id="ppGrid"></div></div>
-    <div class="ppSpine" aria-hidden="true"></div>
-    <div class="ppPage ppCover"><div class="ppEm">🧭</div><h1>جواز رحّالة</h1><h2 id="ppCls"></h2><div class="ppRow" id="ppRow"></div>
-      <div class="ppMrz" id="ppMrz"></div><div class="ppNote">الأختام محفوظة على هذا الجهاز</div></div>
-  </div>
-  <button type="button" class="podClose ppX" onclick="closePassport()" aria-label="إغلاق">✕</button>
-</div>
-
-<!-- المرحلة الثانية ٢-٣: لحظة الختم عند إنهاء نشاط -->
-<div id="stampToast" class="stampToast" hidden onclick="this.hidden = true">
-  <div class="stRing" id="stRing"></div>
-  <div class="stTxt" id="stTxt"></div>
-</div>
-
-<!-- لوحة الأوامر السريعة (Ctrl+K أو /) — للمعلم فقط -->
-<div id="cmdPal" class="cmdPal" hidden onclick="cmdBackdrop(event)">
-  <div class="cmdBox" role="dialog" aria-label="أوامر سريعة">
-    <div class="cmdIn"><span aria-hidden="true">🔎</span><input id="cmdInput" type="text" autocomplete="off" placeholder="اكتب: عجلة سابع 2 · وحدة 3 · حصة اليوم…" oninput="cmdSel = 0; cmdRender()" onkeydown="cmdKeys(event)"><kbd>Esc</kbd></div>
-    <div class="cmdList" id="cmdList"></div>
-    <div class="cmdFoot">↑↓ تنقّل · Enter تنفيذ · <kbd>W</kbd> العجلة · <kbd>L</kbd> المحظوظ · بالعرض: <kbd>←</kbd> التالي · <kbd>مسافة</kbd> كشف الإجابة</div>
-  </div>
-</div>
-
 <div id="weatherBar">
   <span id="weatherText">🌤️ جاري جلب طقس الدوحة...</span>
   <button onclick="dismissWeatherBar()" title="إغلاق">✕</button>
+</div>
+
+<div id="lastUpdateBar">
+  🆕 آخر تحديث للموقع: <span id="lastUpdateText">...</span>
+  <button onclick="dismissUpdateBar()" title="إغلاق">✕</button>
 </div>
 
 <div id="topPendingBar">
@@ -2516,33 +2213,6 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       </svg>
       </figure>
     </div>
-  </div>
-</section>
-
-<!-- الصفحة الرئيسية للمعلم («غرفة القيادة») — المرحلة الثانية ٢-١: كل ما تحتاجه الحصة بشاشة واحدة -->
-<section id="teacherHome" style="display:none;">
-  <div class="wrap thGrid">
-    <div class="thTop">
-      <h1 class="thHello" id="thHello">أهلاً، أستاذ صالح</h1>
-      <div class="thDate" id="thDate"></div>
-      <div class="thClasses"><span>الصف الآن:</span><div class="thChips" id="thChips"></div></div>
-    </div>
-    <div class="thMain">
-      <div class="thToday" id="thToday"></div>
-      <div class="thTiles">
-        <button class="thTile" type="button" onclick="thWheel()"><kbd>W</kbd><i>🎡</i><b>عجلة الأسماء</b><span>اختيار عشوائي</span></button>
-        <button class="thTile" type="button" onclick="thLucky()"><kbd>L</kbd><i>🍀</i><b>الطالب المحظوظ</b><span>مكافأة نجوم</span></button>
-        <button class="thTile" type="button" onclick="thBoardShow()"><i>🏆</i><b>لوحة الصدارة</b><span>على الشاشة</span></button>
-        <button class="thTile" type="button" onclick="thMyClass()"><i>📋</i><b>صفوفي</b><span>النقاط والملاحظات</span></button>
-        <button class="thTile" type="button" onclick="thCurriculum()"><i>📖</i><b>المنهج</b><span id="thUnitSub">الوحدات والدروس</span></button>
-      </div>
-      <div id="thJourneySlot"></div>
-    </div>
-    <aside class="thSide">
-      <div class="thBoard" id="thBoard"></div>
-      <div id="thQuestionSlot"></div>
-      <div id="thPlateSlot"></div>
-    </aside>
   </div>
 </section>
 
@@ -2853,7 +2523,6 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <div class="lbBar" id="lbBar" hidden>
       <div class="lbFilters" id="lbFilters"></div>
       <button class="lbShowBtn" id="lbShowBtn" onclick="lbToggleShow()">🖥️ اعرض على الشاشة</button>
-      <button class="lbShowBtn" type="button" onclick="openPodium(lbFilter === 'all' ? '' : lbFilter)">🎉 كشف الأبطال</button>
     </div>
     <div id="leaderboardBody"></div>
   </div>
@@ -4281,7 +3950,7 @@ const HOME_SECTIONS = ['hero'];
 
 // يعرض قسماً واحداً فقط ويخفي البقية — بدل تكديس كل الأقسام بالصفحة
 // أقسام خاصة بالمعلم فقط — ما يفتحها أي طالب
-const TEACHER_ONLY_SECTIONS = ['classchallenge', 'adminPanel', 'reportView', 'lessonToday', 'teacherHome'];
+const TEACHER_ONLY_SECTIONS = ['classchallenge', 'adminPanel', 'reportView', 'lessonToday'];
 
 function sectionShown(id){
   const el = document.getElementById(id);
@@ -4309,12 +3978,9 @@ function showSection(id){
 
 // يرجّع للصفحة الرئيسية: البطل وبطاقات الوحدات فقط
 function showHome(){
-  // المعلم يرى «غرفة القيادة» بدل الواجهة التعريفية — الزائر يرى الواجهة كما هي
-  const home = isAdmin ? ['teacherHome'] : HOME_SECTIONS;
   document.querySelectorAll('section').forEach(s=>{
-    s.style.display = home.includes(s.id) ? '' : 'none';
+    s.style.display = HOME_SECTIONS.includes(s.id) ? '' : 'none';
   });
-  if(isAdmin) renderTeacherHome(); else thPlateHome();
   document.getElementById('unitView').classList.remove('show');
   document.getElementById('enrichView').classList.remove('show');
   // لوحة المعلم تظهر تلقائياً لو كان مسجّلاً دخوله
@@ -4336,499 +4002,6 @@ function goHome(){
   document.getElementById('mainNav').classList.remove('show'); // يسكّر قائمة الجوال لو كانت مفتوحة
   document.querySelectorAll('.navDrop').forEach(d=>d.classList.remove('open')); // يسكّر أي قائمة منسدلة مفتوحة
 }
-
-// ═══════ المرحلة الثانية ٢-١: الصفحة الرئيسية للمعلم («غرفة القيادة») ═══════
-let thCls = null;            // الصف المختار بالصفحة الرئيسية — تعمل عليه العجلة والمحظوظ ولوحة الصدارة
-let thBoardAt = 0;           // آخر تحميل للوحة الصدارة المصغّرة (لا نعيد الاستعلام بكل رجوع للرئيسية)
-const TH_MEDALS = ['🥇','🥈','🥉'];
-
-function thClasses(){
-  const out = [];
-  document.querySelectorAll('.myClassBtn, .rosterClassBtn').forEach(b=>{
-    const c = b.dataset.cls;
-    if(c && !out.some(x => x.cls === c)) out.push({cls: c, label: b.textContent.trim()});
-  });
-  return out;
-}
-function thCurrentCls(){
-  const cl = thClasses();
-  if(!thCls || !cl.some(c => c.cls === thCls)){
-    let saved = null;
-    try{ saved = localStorage.getItem('rahhala_th_cls'); }catch(e){}
-    thCls = cl.some(c => c.cls === saved) ? saved : cl.some(c => c.cls === myClassCls) ? myClassCls : (cl[0] ? cl[0].cls : '');
-  }
-  return thCls;
-}
-const thGrade = cls => String(cls || '').startsWith('8') ? 8 : 7;
-function thClsLabel(cls){ const c = thClasses().find(x => x.cls === cls); return c ? c.label : cls; }
-
-function thSetCls(cls){
-  if(!isAdmin) return;
-  thCls = cls;
-  try{ localStorage.setItem('rahhala_th_cls', cls); }catch(e){}
-  myClassCls = cls;   // صفوفي والعجلة والمحظوظ تفتح على نفس الصف
-  thQOpen = false;
-  document.querySelectorAll('.myClassBtn').forEach(b => b.classList.toggle('active', b.dataset.cls === cls));
-  renderTeacherHome();
-}
-
-// نشاط الحصة: الخاص بهذا الصف اليوم ← أي خاص لصفه اليوم ← أقرب خاص قادم ← أحدث نشاط لصفه
-function thPickActivity(cls){
-  const g = thGrade(cls), today = new Date().toLocaleDateString('en-CA');
-  const mine = ACTIVITIES.filter(a => a.grade === g);
-  const todays = mine.filter(a => a.special && a.date === today);
-  const t = todays.find(a => a.special.cls === cls) || todays[0];
-  if(t) return {act: t, kind: 'today'};
-  const up = mine.filter(a => a.special && (a.date || '') > today).sort((x, y) => x.date.localeCompare(y.date))[0];
-  if(up) return {act: up, kind: 'upcoming'};
-  const latest = [...mine].sort((x, y) => (y.date || '').localeCompare(x.date || ''))[0];
-  return latest ? {act: latest, kind: 'latest'} : null;
-}
-
-function renderTeacherHome(){
-  const sec = document.getElementById('teacherHome');
-  if(!sec || !isAdmin) return;
-  const cls = thCurrentCls(), g = thGrade(cls);
-  const now = new Date();
-  document.getElementById('thHello').textContent = (now.getHours() < 12 ? 'صباح الخير' : 'مساء الخير') + '، أستاذ صالح';
-  let hijri = '';
-  try{ hijri = now.toLocaleDateString('ar-SA-u-ca-islamic-umalqura', {day:'numeric', month:'long', year:'numeric'}); }catch(e){}
-  document.getElementById('thDate').innerHTML = esc(now.toLocaleDateString('ar-QA', {weekday:'long', day:'numeric', month:'long'}))
-    + (hijri ? `<small>${esc(hijri)}</small>` : '');
-  document.getElementById('thChips').innerHTML = thClasses().map(c =>
-    `<button type="button" class="thChip${c.cls === cls ? ' on' : ''}" data-cls="${esc(c.cls)}" onclick="thSetCls(this.dataset.cls)">${esc(c.label)}</button>`).join('');
-
-  const pick = thPickActivity(cls), box = document.getElementById('thToday');
-  const U = g === 8 ? UNITS_DATA_8 : UNITS_DATA;
-  if(pick){
-    const a = pick.act, u = U[a.unit];
-    const tag = pick.kind === 'today' ? '📝 حصة اليوم' : pick.kind === 'upcoming' ? `📅 الحصة القادمة · ${esc(fmtActDate(a.date))}` : '📚 نشاط مقترح';
-    box.innerHTML = `<div class="thTag">${tag} · ${g === 8 ? 'ثامن' : 'سابع'} · الوحدة ${esc(String(a.unit))}${u ? ` «${esc(u.title)}»` : ''}</div>
-      <h2>${esc(a.title)}</h2><p>${esc(a.desc || '')}</p>
-      <div class="thGo"><button type="button" class="thStart" data-id="${esc(a.id)}" onclick="thStart(this.dataset.id)">▶ ابدأ الحصة</button>
-      <button type="button" class="thOther" onclick="openLessonFromNav()">اختر نشاطاً آخر</button></div>`;
-    document.getElementById('thUnitSub').textContent = u ? `الوحدة ${a.unit} · ${u.title}` : 'الوحدات والدروس';
-  } else {
-    box.innerHTML = `<div class="thTag">📝 حصة اليوم</div><h2>ما فيه أنشطة لهذا الصف بعد</h2><p>أضف نشاطاً من قسم حصة اليوم.</p>
-      <div class="thGo"><button type="button" class="thStart" onclick="openLessonFromNav()">📝 حصة اليوم</button></div>`;
-    document.getElementById('thUnitSub').textContent = 'الوحدات والدروس';
-  }
-  thRenderBoard();
-  if(Date.now() - thBoardAt > 60000) thLoadBoard();
-  thPlateTeacher();
-  document.getElementById('thJourneySlot').innerHTML = jrStripHtml(cls);
-  document.getElementById('thQuestionSlot').innerHTML = thQuestionHtml(cls, thQOpen);
-}
-
-async function thLoadBoard(){
-  if(!isAdmin || !dbReady || !sb) return;
-  thBoardAt = Date.now();
-  await refreshLeaderboard();   // يملأ lbRows — نفس مصدر لوحة الصدارة الكاملة
-  thRenderBoard();
-}
-function thRenderBoard(){
-  const box = document.getElementById('thBoard');
-  if(!box) return;
-  const cls = thCurrentCls();
-  const top = (lbRows || []).filter(r => r.cls === cls && (r.participation_points || 0) > 0)
-    .sort((a, b) => (b.participation_points || 0) - (a.participation_points || 0)).slice(0, 3);
-  box.innerHTML = `<div class="thBoardHead"><h3>لوحة الصدارة</h3><span>${esc(thClsLabel(cls))}</span></div>`
-    + (top.length ? `<button type="button" class="thOther thPod" onclick="openPodium()">🎉 كشف الأبطال على الشاشة</button>` : '')
-    + (top.length ? top.map((r, i) => `<div class="thLbRow"><i>${TH_MEDALS[i]}</i>${esc(r.student_name)}<span>⭐ ${r.participation_points || 0}</span></div>`).join('')
-      : `<div class="thEmpty">${thBoardAt ? 'ما فيه نجوم مشاركة بعد — أول نجمة تفتح السباق ⭐' : '⏳ جاري التحميل…'}</div>`);
-}
-
-// بطاقة الأطلس: عنصر واحد يتنقل بين الواجهة التعريفية والصفحة الرئيسية للمعلم
-function thPlateTeacher(){
-  const plate = document.getElementById('heroPlate'), slot = document.getElementById('thPlateSlot');
-  if(plate && slot && plate.parentElement !== slot) slot.appendChild(plate);
-}
-function thPlateHome(){
-  const plate = document.getElementById('heroPlate'), quote = document.getElementById('heroQuote');
-  if(plate && quote && plate.previousElementSibling !== quote) quote.after(plate);
-}
-
-function thStart(id){
-  const a = ACTIVITIES.find(x => x.id === id);
-  // صف النقاط بالعرض = الصف المختار هنا (إن كان من نفس المرحلة)
-  if(a && thGrade(thCls) === a.grade){ try{ localStorage.setItem('rahhala_ls_cls_' + a.grade, thCls); }catch(e){} }
-  startActivity(id);
-}
-function thWheel(){ openWheel(thCurrentCls()); }
-function thLucky(){ openLucky(thCurrentCls()); }
-function thBoardShow(){
-  lbFilter = thCurrentCls();
-  showSection('leaderboard');
-  lbToggleShow();
-}
-function thMyClass(){
-  const cls = thCurrentCls();
-  myClassCls = cls;
-  document.querySelectorAll('.myClassBtn').forEach(b => b.classList.toggle('active', b.dataset.cls === cls));
-  showSection('classchallenge');
-}
-function thCurriculum(){
-  const cls = thCurrentCls(), g = thGrade(cls), pick = thPickActivity(cls);
-  if(GRADE !== g) applyGrade(g, true);
-  openUnit(pick ? pick.act.unit : 1);
-}
-
-// ═══════ المرحلة الثانية ٢-٢: افتتاح الحصة ═══════
-// العرض يُفتح تحته فوراً؛ الافتتاح طبقة فوقه تختفي بعد ٣·٢·١ — أو بأي مفتاح/نقرة
-let lsiTimer = null;
-const LSI_NUMS = ['٣', '٢', '١'];
-function lsIntroShow(act){
-  const el = document.getElementById('lsIntro');
-  if(!el || !act) return;
-  const U = act.grade === 8 ? UNITS_DATA_8 : UNITS_DATA, u = U[act.unit];
-  const today = new Date().toLocaleDateString('en-CA');
-  const sel = document.getElementById('lsCls');
-  const clsLabel = lsCls && sel && sel.selectedOptions[0] ? sel.selectedOptions[0].textContent.replace('⭐', '').trim() : (act.grade === 8 ? 'ثامن' : 'سابع');
-  document.getElementById('lsiKick').textContent = `📝 ${act.special && act.date === today ? 'حصة اليوم' : 'نشاط الحصة'} · ${clsLabel} · الوحدة ${act.unit}`;
-  document.getElementById('lsiTitle').textContent = u ? u.title : act.title;
-  document.getElementById('lsiSub').textContent = u ? act.title : '';
-  document.getElementById('lsiChips').innerHTML = String(act.desc || '').split(/\s+[—·]\s+/).filter(Boolean).slice(0, 5)
-    .map(t => `<span>${esc(t)}</span>`).join('');
-  const cnt = document.getElementById('lsiCount');
-  let i = 0;
-  cnt.textContent = LSI_NUMS[0];
-  el.classList.remove('out');
-  el.hidden = false;
-  clearInterval(lsiTimer);
-  document.addEventListener('keydown', lsIntroKey, true);
-  lsiTimer = setInterval(() => {
-    i++;
-    if(i < LSI_NUMS.length){ cnt.textContent = LSI_NUMS[i]; cnt.classList.remove('tick'); void cnt.offsetWidth; cnt.classList.add('tick'); }
-    else lsIntroEnd();
-  }, 950);
-}
-// المرحلة الالتقاط: المفتاح يُنهي الافتتاح ولا يصل لعرض النشاط (فلا يقلب سؤالاً تحته)
-function lsIntroKey(e){ e.preventDefault(); e.stopPropagation(); lsIntroEnd(); }
-function lsIntroEnd(){
-  const el = document.getElementById('lsIntro');
-  clearInterval(lsiTimer); lsiTimer = null;
-  document.removeEventListener('keydown', lsIntroKey, true);
-  if(!el || el.hidden) return;
-  el.classList.add('out');
-  setTimeout(() => { el.hidden = true; el.classList.remove('out'); }, 450);
-}
-
-// ═══════ المرحلة الثانية ٢-٢: كشف الأبطال ═══════
-let podCols = [], podStep = 0, podTimer = null;
-async function openPodium(cls){
-  if(!isAdmin) return;
-  cls = cls || thCurrentCls();
-  if(!(lbRows || []).length && dbReady && sb) await refreshLeaderboard();
-  const rows = (lbRows || []).filter(r => r.cls === cls && (r.participation_points || 0) > 0)
-    .sort((a, b) => (b.participation_points || 0) - (a.participation_points || 0)).slice(0, 3);
-  if(!rows.length){ showToast('ما فيه نجوم مشاركة لهذا الصف بعد ⭐', 'info'); return; }
-  const medal = ['🥇', '🥈', '🥉'], ar = ['١', '٢', '٣'];
-  // الترتيب بالتنافس: المتعادلون يأخذون نفس المركز والوسام
-  const rank = r => 1 + rows.filter(x => (x.participation_points || 0) > (r.participation_points || 0)).length;
-  const col = (r, pos) => r ? `<div class="podCol r${pos}"><div class="podWho"><div class="podMedal">${medal[rank(r) - 1]}</div>
-      <div class="podName">${esc(r.student_name)}</div><div class="podStars">⭐ ${r.participation_points || 0}</div></div><div class="podBlk">${ar[rank(r) - 1]}</div></div>`
-    : `<div class="podCol"></div>`;
-  // المنصة يميناً لليسار: الثاني · الأول · الثالث
-  document.getElementById('podStage').innerHTML = col(rows[1], 2) + col(rows[0], 1) + col(rows[2], 3);
-  document.getElementById('podCls').textContent = thClsLabel(cls);
-  document.getElementById('podSub').textContent = '🥁 من هم أبطال المشاركة؟';
-  const stage = document.getElementById('podStage');
-  podCols = [stage.querySelector('.r3'), stage.querySelector('.r2'), stage.querySelector('.r1')].filter(Boolean);
-  podStep = 0;
-  document.getElementById('podium').hidden = false;
-  document.addEventListener('keydown', podKeys);
-  clearInterval(podTimer);
-  podTimer = setInterval(podNext, 1700);
-}
-function podNext(){
-  const c = podCols[podStep++];
-  if(c) c.classList.add('on');
-  if(podStep >= podCols.length){
-    clearInterval(podTimer); podTimer = null;
-    const champ = podCols[podCols.length - 1];
-    if(champ){
-      document.getElementById('podSub').textContent = '👑 البطل: ' + champ.querySelector('.podName').textContent;
-      if(!window.matchMedia || !matchMedia('(prefers-reduced-motion: reduce)').matches) lsConfetti(60);
-    }
-  }
-}
-function podKeys(e){
-  if(e.key === 'Escape') closePodium();
-  else if(e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowLeft'){ e.preventDefault(); clearInterval(podTimer); podTimer = null; podNext(); }
-}
-function closePodium(){
-  clearInterval(podTimer); podTimer = null;
-  document.getElementById('podium').hidden = true;
-  document.removeEventListener('keydown', podKeys);
-}
-
-// ═══════ المرحلة الثانية ٢-٢: النجوم الطائرة ═══════
-// من زر النقطة إلى رابط «لوحة الصدارة» بالشريط — يرى الصف أن النجمة «وصلت»
-function flyStars(fromRect, n){
-  if(!fromRect || !n) return;
-  const x0 = fromRect.left + fromRect.width / 2, y0 = fromRect.top + fromRect.height / 2;
-  const plus = document.createElement('div');
-  plus.className = 'flyPlus';
-  plus.textContent = '+' + String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) + ' ⭐';
-  plus.style.left = (x0 - 30) + 'px'; plus.style.top = (y0 - 40) + 'px';
-  document.body.appendChild(plus);
-  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(plus.animate) plus.animate([{transform:'translateY(0)', opacity:1}, {transform:'translateY(-46px)', opacity:0}], {duration: reduce ? 600 : 1100, easing:'ease-out', fill:'forwards'});
-  setTimeout(() => plus.remove(), 1200);
-  if(reduce) return;
-  const target = [...document.querySelectorAll('#mainNav > a')].find(a => a.textContent.includes('لوحة الصدارة') && a.offsetWidth);
-  const tr = target ? target.getBoundingClientRect() : {left: innerWidth / 2, top: 10, width: 0, height: 0};
-  const x1 = tr.left + tr.width / 2, y1 = tr.top + tr.height / 2;
-  for(let i = 0; i < Math.min(n, 5); i++){
-    const st = document.createElement('div');
-    st.className = 'flyStar'; st.textContent = '⭐';
-    st.style.left = (x0 - 16) + 'px'; st.style.top = (y0 - 16) + 'px';
-    document.body.appendChild(st);
-    const dx = x1 - x0, dy = y1 - y0, lift = -120 - i * 18;
-    if(st.animate) st.animate([
-      {transform:'translate(0,0) scale(1)', opacity:1},
-      {transform:`translate(${dx * .5}px, ${dy * .5 + lift}px) scale(1.25)`, opacity:1, offset:.5},
-      {transform:`translate(${dx}px, ${dy}px) scale(.5)`, opacity:.2}
-    ], {duration:900 + i * 90, delay:i * 70, easing:'cubic-bezier(.3,.1,.3,1)', fill:'forwards'});
-    setTimeout(() => st.remove(), 1300 + i * 160);
-  }
-}
-
-// ═══════ المرحلة الثانية ٢-٣: رحلة الصف · جواز السفر · سؤال الأسبوع ═══════
-// المحطات = وحدات المنهج الست بترتيبها. الختم = إنهاء نشاط وحدة حتى آخر شريحة مع صفٍّ محدد.
-// الأختام محفوظة على هذا الجهاز (localStorage) — نقلها لقاعدة البيانات يحتاج جدولاً جديداً
-const JR_ICONS = {7:['🌍','🏛️','⚖️','👥','🕌','🛡️'], 8:['🌍','🏺','🤝','👥','🕌','🛡️']};
-const JR_INK = ['#175a4a', '#7a1232', '#1f5068', '#68430b', '#7a1232', '#175a4a'];
-let jrCls = '';
-function jrLoad(){ try{ return JSON.parse(localStorage.getItem('rahhala_journey_v1') || '{}') || {}; }catch(e){ return {}; } }
-function jrSave(d){ try{ localStorage.setItem('rahhala_journey_v1', JSON.stringify(d)); }catch(e){} }
-function jrStamps(cls){ return jrLoad()[cls] || {}; }
-function jrUnits(cls){ const U = thGrade(cls) === 8 ? UNITS_DATA_8 : UNITS_DATA; return Object.keys(U).map(n => ({n: +n, title: U[n].title})); }
-// المحطة الحالية = أول وحدة بلا ختم
-function jrNow(cls){ const st = jrStamps(cls); const u = jrUnits(cls).find(x => !st[x.n]); return u ? u.n : 0; }
-const jrAr = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
-function jrDate(iso){ try{ return new Date(iso + 'T00:00:00').toLocaleDateString('ar-QA', {day:'numeric', month:'long'}); }catch(e){ return iso; } }
-
-function jrStampUnit(cls, unit, actId){
-  const d = jrLoad(); d[cls] = d[cls] || {};
-  if(d[cls][unit]) return false;
-  d[cls][unit] = {d: new Date().toLocaleDateString('en-CA'), a: actId || ''};
-  jrSave(d);
-  return true;
-}
-function jrUnstamp(cls, unit){ const d = jrLoad(); if(d[cls]){ delete d[cls][unit]; jrSave(d); } }
-
-// يُستدعى عند الوصول لآخر شريحة بعرض الحصة
-function jrMaybeStamp(){
-  if(!isAdmin || !lsCls || !lsCurrentAct) return;
-  const act = ACTIVITIES.find(a => a.id === lsCurrentAct);
-  if(!act || !act.unit || thGrade(lsCls) !== act.grade) return;
-  if(!jrStampUnit(lsCls, act.unit, act.id)) return;
-  const units = jrUnits(lsCls), u = units.find(x => x.n === act.unit);
-  const ring = document.getElementById('stRing');
-  ring.style.setProperty('--c', JR_INK[(act.unit - 1) % JR_INK.length]);
-  ring.innerHTML = `<span>${JR_ICONS[act.grade][act.unit - 1] || '🧭'}</span><b>${esc(u ? u.title : '')}</b><small>المحطة ${jrAr(act.unit)}<br>${esc(jrDate(new Date().toLocaleDateString('en-CA')))}</small>`;
-  document.getElementById('stTxt').textContent = `ختم جديد في جواز ${thClsLabel(lsCls)}! 🎉`;
-  const t = document.getElementById('stampToast');
-  t.hidden = false;
-  if(!window.matchMedia || !matchMedia('(prefers-reduced-motion: reduce)').matches) lsConfetti(24);
-  setTimeout(() => { t.hidden = true; }, 3200);
-  if(document.getElementById('teacherHome').style.display !== 'none') renderTeacherHome();
-}
-
-// شريط الرحلة بالصفحة الرئيسية
-function jrStripHtml(cls){
-  const units = jrUnits(cls), st = jrStamps(cls), now = jrNow(cls);
-  const others = thClasses().filter(c => c.cls !== cls && thGrade(c.cls) === thGrade(cls));
-  const done = units.filter(u => st[u.n]).length;
-  const nowIdx = now ? units.findIndex(u => u.n === now) : units.length - 1;
-  const fill = Math.max(0, nowIdx) / Math.max(1, units.length - 1) * 84;
-  return `<div class="jrStrip"><div class="jrHead"><h3>🧭 رحلة ${esc(thClsLabel(cls))} عبر المنهج</h3>
-    <div class="jrActs">${jrAr(done)} من ${jrAr(units.length)} محطات
-      <button type="button" class="thOther" onclick="openJourney()">🗺️ الخريطة</button>
-      <button type="button" class="thOther" onclick="openPassport()">📘 الجواز</button></div></div>
-    <div class="jrTrack"><div class="jrFill" style="width:${fill}%"></div>${units.map(u => {
-      const state = st[u.n] ? 'done' : u.n === now ? 'now' : 'next';
-      const here = u.n === now ? `<em>${esc(thClsLabel(cls))}</em>` : (others.find(o => jrNow(o.cls) === u.n) ? `<em class="other">${esc(others.find(o => jrNow(o.cls) === u.n).label)}</em>` : '');
-      return `<button type="button" class="jrSt ${state}" onclick="openJourney()" title="${esc(u.title)}">${here}<div class="jrDot">${JR_ICONS[thGrade(cls)][u.n - 1] || '🧭'}</div><b>${esc(u.title)}</b></button>`;
-    }).join('')}</div></div>`;
-}
-
-// خريطة الرحلة بملء الشاشة — SVG واحد يتحجّم مع الشاشة
-const JR_POS = [[1600,640],[1330,420],[1020,620],[760,330],[480,560],[250,260]];
-function openJourney(cls){
-  if(!isAdmin) return;
-  jrCls = cls || thCurrentCls();
-  const units = jrUnits(jrCls), st = jrStamps(jrCls), now = jrNow(jrCls), g = thGrade(jrCls);
-  const others = thClasses().filter(c => c.cls !== jrCls && thGrade(c.cls) === g);
-  document.getElementById('jrTitle').textContent = `رحلة ${thClsLabel(jrCls)} عبر المنهج`;
-  const P = JR_POS.slice(0, units.length);
-  const path = 'M' + P.map(p => p.join(',')).join(' L');
-  const nowIdx = now ? units.findIndex(u => u.n === now) : units.length - 1;
-  const donePath = 'M' + P.slice(0, Math.max(1, nowIdx + 1)).map(p => p.join(',')).join(' L');
-  let svg = `<path d="${path}" fill="none" stroke="#dfccbd" stroke-width="10" stroke-dasharray="2 22" stroke-linecap="round" stroke-linejoin="round"/>`
-    + (nowIdx > 0 ? `<path d="${donePath}" fill="none" stroke="#dca73a" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>` : '');
-  units.forEach((u, i) => {
-    const [x, y] = P[i], state = st[u.n] ? 'done' : u.n === now ? 'now' : 'next';
-    const r = state === 'now' ? 58 : 48;
-    const stroke = state === 'done' ? '#175a4a' : state === 'now' ? '#dca73a' : '#dfccbd';
-    const fill = state === 'done' ? '#eaf4f1' : '#ffffff';
-    svg += `<g opacity="${state === 'next' ? .72 : 1}">`
-      + (state === 'now' ? `<circle cx="${x}" cy="${y}" r="${r + 16}" fill="#dca73a" opacity=".22"/>` : '')
-      + `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="6"/>`
-      + `<text x="${x}" y="${y + 17}" text-anchor="middle" font-size="${state === 'now' ? 52 : 44}">${JR_ICONS[g][u.n - 1] || '🧭'}</text>`
-      + (state === 'done' ? `<g transform="translate(${x - 44},${y - 44}) rotate(-12)"><circle r="22" fill="#175a4a" stroke="#ffffff" stroke-width="3"/><text y="9" text-anchor="middle" font-size="26" fill="#ffffff" font-weight="900">✓</text></g>` : '')
-      + `<text x="${x}" y="${y + r + 30}" text-anchor="middle" font-size="18" font-weight="700" fill="#594a50">المحطة ${jrAr(u.n)}</text>`
-      + `<text x="${x}" y="${y + r + 62}" text-anchor="middle" font-size="27" font-weight="800" fill="${state === 'next' ? '#594a50' : '#1f1216'}">${esc(u.title)}</text></g>`;
-  });
-  const tag = (x, y, label, mine) => `<g transform="translate(${x},${y})"><rect x="-${label.length * 8 + 18}" y="-46" width="${label.length * 16 + 36}" height="40" rx="10" fill="${mine ? '#7a1232' : '#dba73c'}"/>`
-    + `<path d="M-10,-6 L10,-6 L0,6 Z" fill="${mine ? '#7a1232' : '#dba73c'}"/><text y="-18" text-anchor="middle" font-size="22" font-weight="800" fill="${mine ? '#ffffff' : '#420a1c'}">${esc(label)}</text></g>`;
-  if(now){ const [x, y] = P[units.findIndex(u => u.n === now)]; svg += tag(x, y - 82, thClsLabel(jrCls), true); }
-  others.forEach((o, k) => { const n = jrNow(o.cls); if(n){ const [x, y] = P[units.findIndex(u => u.n === n)]; svg += tag(x, y - 82 - (n === now ? 52 * (k + 1) : 0), o.label, false); } });
-  document.getElementById('jrMap').innerHTML = svg;
-  const done = units.filter(u => st[u.n]).length;
-  const stars = (lbRows || []).filter(r => r.cls === jrCls).reduce((a, r) => a + (r.participation_points || 0), 0);
-  document.getElementById('jrStats').innerHTML = `<div><b>${jrAr(done)} / ${jrAr(units.length)}</b>محطات مكتملة</div><div><b>${jrAr(stars)} ⭐</b>نجوم الصف</div>`
-    + `<div><b>${now ? esc(units.find(u => u.n === now).title) : 'اكتملت الرحلة 🎉'}</b>${now ? 'المحطة التالية' : 'كل المحطات'}</div>`;
-  document.getElementById('journey').hidden = false;
-  document.addEventListener('keydown', jrKeys);
-}
-function closeJourney(){ document.getElementById('journey').hidden = true; document.removeEventListener('keydown', jrKeys); }
-function jrKeys(e){ if(e.key === 'Escape' && document.getElementById('passport').hidden) closeJourney(); }
-
-// جواز السفر
-let ppCur = '';
-function openPassport(cls){
-  if(!isAdmin) return;
-  ppCur = cls || jrCls || thCurrentCls();
-  const units = jrUnits(ppCur), st = jrStamps(ppCur), g = thGrade(ppCur);
-  document.getElementById('ppGrid').innerHTML = units.map((u, i) => st[u.n]
-    ? `<button type="button" class="ppSlot" onclick="ppToggle(${u.n})" style="transform:rotate(${[-8, 6, -4, 5, -6, 4][i]}deg)"><div class="ppRing" style="--c:${JR_INK[i % JR_INK.length]}"><span>${JR_ICONS[g][i] || '🧭'}</span><b>${esc(u.title)}</b><small>محطة ${jrAr(u.n)}<br>${esc(jrDate(st[u.n].d))}</small></div></button>`
-    : `<button type="button" class="ppSlot empty" onclick="ppToggle(${u.n})"><div class="ppRing"><b>المحطة ${jrAr(u.n)}</b><small>${esc(u.title)}</small></div></button>`).join('');
-  const done = units.filter(u => st[u.n]).length;
-  const stars = (lbRows || []).filter(r => r.cls === ppCur).reduce((a, r) => a + (r.participation_points || 0), 0);
-  document.getElementById('ppCls').textContent = 'صف ' + thClsLabel(ppCur);
-  document.getElementById('ppRow').innerHTML = `<div><b>${jrAr(done)} / ${jrAr(units.length)}</b>محطات</div><div><b>${jrAr(stars)} ⭐</b>نجوم</div>`;
-  document.getElementById('ppMrz').textContent = `P<QAT<RAHHALA<<CLASS<${ppCur}<<<${new Date().getFullYear()}`;
-  document.getElementById('passport').hidden = false;
-  document.addEventListener('keydown', ppKeys);
-}
-function ppToggle(unit){
-  const st = jrStamps(ppCur), u = jrUnits(ppCur).find(x => x.n === unit);
-  if(st[unit]){ if(!confirm(`سحب ختم «${u ? u.title : unit}» من جواز ${thClsLabel(ppCur)}؟`)) return; jrUnstamp(ppCur, unit); }
-  else { if(!confirm(`منح ختم «${u ? u.title : unit}» لجواز ${thClsLabel(ppCur)} يدوياً؟`)) return; jrStampUnit(ppCur, unit, 'manual'); }
-  openPassport(ppCur);
-  if(!document.getElementById('journey').hidden) openJourney(jrCls);
-  if(document.getElementById('teacherHome').style.display !== 'none') renderTeacherHome();
-}
-function closePassport(){ document.getElementById('passport').hidden = true; document.removeEventListener('keydown', ppKeys); }
-function ppBackdrop(e){ if(e.target === e.currentTarget) closePassport(); }
-function ppKeys(e){ if(e.key === 'Escape') closePassport(); }
-
-// سؤال الأسبوع: من قاعدة معرفة المنقذ (إجاباتها محققة على نص الكتاب) — وحدة الصف الحالية
-function thWeekNo(){ const d = new Date(); const j = new Date(d.getFullYear(), 0, 1); return Math.floor(((d - j) / 86400000 + j.getDay()) / 7); }
-function thQuestion(cls){
-  const g = thGrade(cls), kb = g === 8 ? KNOWLEDGE_BASE_8 : KNOWLEDGE_BASE;
-  const pick = thPickActivity(cls), unit = pick ? pick.act.unit : 1;
-  let pool = kb.filter(e => e.unit === unit && e.a && e.a.length >= 40 && e.a.length <= 260 && Array.isArray(e.k) && e.k.length);
-  if(!pool.length) pool = kb.filter(e => e.a && e.a.length >= 40 && e.a.length <= 260 && Array.isArray(e.k) && e.k.length);
-  if(!pool.length) return null;
-  let off = 0;
-  try{ off = parseInt(localStorage.getItem('rahhala_q_off_' + thWeekNo()) || '0', 10) || 0; }catch(e){}
-  const e = pool[(thWeekNo() * 7 + off) % pool.length];
-  // أوضح مفتاح: المكتوب بالهمزة/التاء المربوطة أولاً ثم الأطول
-  const key = [...e.k].sort((a, b) => (/[أإآة]/.test(b) - /[أإآة]/.test(a)) || b.length - a.length)[0];
-  return {q: `ماذا تعرف عن «${key}»؟`, a: e.a, unit, g};
-}
-function thQuestionHtml(cls, open){
-  const Q = thQuestion(cls);
-  if(!Q) return '';
-  return `<div class="thQ"><div class="thTag">❓ سؤال الأسبوع · ${Q.g === 8 ? 'ثامن' : 'سابع'} · الوحدة ${jrAr(Q.unit)}</div><h3>${esc(Q.q)}</h3>`
-    + (open ? `<p>${esc(Q.a)}</p><div class="thQSrc">📖 من نص المنهج</div>` : '')
-    + `<div class="thQBtns">${open ? '' : '<button type="button" class="thOther" onclick="thQReveal()">💡 اكشف الإجابة</button>'}<button type="button" class="thOther" onclick="thQNext()">↻ سؤال آخر</button></div></div>`;
-}
-let thQOpen = false;
-function thQReveal(){ thQOpen = true; document.getElementById('thQuestionSlot').innerHTML = thQuestionHtml(thCurrentCls(), true); }
-function thQNext(){
-  const k = 'rahhala_q_off_' + thWeekNo();
-  try{ localStorage.setItem(k, String((parseInt(localStorage.getItem(k) || '0', 10) || 0) + 1)); }catch(e){}
-  thQOpen = false;
-  document.getElementById('thQuestionSlot').innerHTML = thQuestionHtml(thCurrentCls(), false);
-}
-
-// ═══════ الأوامر السريعة (Ctrl+K أو /) واختصارات جهاز التحكم ═══════
-let cmdAll = [], cmdShown = [], cmdSel = 0;
-const cmdNorm = t => String(t || '').toLowerCase()
-  .replace(/[ً-ْـ]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي')
-  .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
-
-function cmdBuild(){
-  const L = [];
-  const add = (icon, label, sub, run, keys) => L.push({icon, label, sub, run, hay: cmdNorm(label + ' ' + sub + ' ' + (keys || ''))});
-  add('🏠', 'الصفحة الرئيسية', 'غرفة القيادة', goHome, 'رئيسيه بيت');
-  add('📝', 'حصة اليوم', 'الأنشطة وعرضها على الشاشة', openLessonFromNav, 'نشاط انشطه');
-  add('🏆', 'لوحة الصدارة', 'نجوم المشاركة', () => showSection('leaderboard'), 'صداره نجوم');
-  add('🖥️', 'اعرض لوحة الصدارة على الشاشة', 'ملء الشاشة', thBoardShow, 'صداره عرض شاشه');
-  add('🎛️', 'لوحة المعلم', 'الإدارة والأسئلة', openAdminPanel, 'اداره معلم');
-  add('🎮', 'الألعاب', 'مراجعة وتحديات', () => showSection('games'), 'لعبه');
-  thClasses().forEach(c => {
-    add('🎡', `عجلة الأسماء — ${c.label}`, 'اختيار عشوائي', () => openWheel(c.cls), 'عجله اسماء');
-    add('🍀', `الطالب المحظوظ — ${c.label}`, 'مكافأة نجوم', () => openLucky(c.cls), 'محظوظ');
-    add('📋', `صفوفي — ${c.label}`, 'النقاط والملاحظات', () => { thCls = c.cls; thMyClass(); }, 'صفوفي صف');
-    add('🎉', `كشف الأبطال — ${c.label}`, 'منصة التتويج بالتشويق', () => openPodium(c.cls), 'ابطال تتويج صداره');
-    add('🗺️', `رحلة ${c.label} عبر المنهج`, 'الخريطة والمحطات', () => openJourney(c.cls), 'رحله خريطه محطات');
-    add('📘', `جواز ${c.label}`, 'الأختام', () => openPassport(c.cls), 'جواز اختام سفر');
-  });
-  [[7, UNITS_DATA], [8, UNITS_DATA_8]].forEach(([g, U]) => Object.keys(U).forEach(n => {
-    add('📖', `الوحدة ${n} — ${U[n].title}`, `المنهج · ${g === 8 ? 'ثامن' : 'سابع'}`, () => { if(GRADE !== g) applyGrade(g, true); openUnit(parseInt(n, 10)); }, 'وحده منهج');
-  }));
-  ACTIVITIES.forEach(a => add('▶️', `نشاط: ${a.title}`, `${a.grade === 8 ? 'ثامن' : 'سابع'} · الوحدة ${a.unit}`, () => startActivity(a.id), 'نشاط'));
-  return L;
-}
-function openCmd(){
-  if(!isAdmin) return;
-  cmdAll = cmdBuild(); cmdSel = 0;
-  const pal = document.getElementById('cmdPal'), inp = document.getElementById('cmdInput');
-  pal.hidden = false; inp.value = '';
-  cmdRender();
-  setTimeout(() => inp.focus(), 0);
-}
-function closeCmd(){ document.getElementById('cmdPal').hidden = true; }
-function cmdBackdrop(e){ if(e.target === e.currentTarget) closeCmd(); }
-function cmdRender(){
-  const q = cmdNorm(document.getElementById('cmdInput').value).split(/\s+/).filter(Boolean);
-  cmdShown = (q.length ? cmdAll.filter(it => q.every(t => it.hay.includes(t))) : cmdAll).slice(0, 8);
-  if(cmdSel >= cmdShown.length) cmdSel = 0;
-  document.getElementById('cmdList').innerHTML = cmdShown.length ? cmdShown.map((it, i) =>
-    `<button type="button" class="cmdItem${i === cmdSel ? ' sel' : ''}" onclick="cmdRun(${i})"><i>${it.icon}</i><div><b>${esc(it.label)}</b><small>${esc(it.sub)}</small></div></button>`).join('')
-    : '<div class="cmdNone">ما لقيت شيئاً بهذا الاسم — جرّب: عجلة · وحدة ٣ · حصة اليوم</div>';
-}
-function cmdRun(i){
-  const it = cmdShown[i];
-  if(!it) return;
-  closeCmd();
-  it.run();
-}
-function cmdKeys(e){
-  if(e.key === 'ArrowDown'){ e.preventDefault(); cmdSel = (cmdSel + 1) % Math.max(cmdShown.length, 1); cmdRender(); }
-  else if(e.key === 'ArrowUp'){ e.preventDefault(); cmdSel = (cmdSel - 1 + cmdShown.length) % Math.max(cmdShown.length, 1); cmdRender(); }
-  else if(e.key === 'Enter'){ e.preventDefault(); cmdRun(cmdSel); }
-  else if(e.key === 'Escape'){ e.preventDefault(); closeCmd(); }
-}
-
-// اختصارات المعلم: Ctrl+K أو / للأوامر · W العجلة · L المحظوظ
-// e.code لا e.key: يعمل والكيبورد على العربية أيضاً (W = ص، L = م)
-document.addEventListener('keydown', e => {
-  if(!isAdmin) return;
-  if((e.ctrlKey || e.metaKey) && e.code === 'KeyK'){ e.preventDefault(); document.getElementById('cmdPal').hidden ? openCmd() : closeCmd(); return; }
-  const t = e.target, typing = t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable);
-  if(typing || e.ctrlKey || e.metaKey || e.altKey) return;
-  if(!document.getElementById('cmdPal').hidden || whOpen() || lkOpen() || ['podium', 'journey', 'passport'].some(id => !document.getElementById(id).hidden)) return;
-  const showing = document.getElementById('lessonShow').classList.contains('show');
-  if(e.key === '/' || e.code === 'Slash'){ e.preventDefault(); openCmd(); }
-  else if(e.code === 'KeyW'){ e.preventDefault(); openWheel(showing && lsCls ? lsCls : thCurrentCls()); }
-  else if(e.code === 'KeyL'){ e.preventDefault(); openLucky(showing && lsCls ? lsCls : thCurrentCls()); }
-});
 
 // ---------- وضع العرض الجماعي — للاستخدام داخل الحصة على شاشة/بروجكتر، بدون أجهزة للطلاب ----------
 let cdIndex = 0;
@@ -5143,12 +4316,6 @@ document.getElementById('curriculumDropBtn').addEventListener('click', (e)=>{
   document.getElementById('enrichDropBtn').closest('.navDrop').classList.remove('open'); // سكّر القائمة الثانية أول
   document.getElementById('curriculumDropBtn').closest('.navDrop').classList.toggle('open');
 });
-document.getElementById('moreDropBtn').addEventListener('click', (e)=>{
-  e.stopPropagation();
-  document.getElementById('curriculumDropBtn').closest('.navDrop').classList.remove('open');
-  document.getElementById('enrichDropBtn').closest('.navDrop').classList.remove('open');
-  document.getElementById('moreDropBtn').closest('.navDrop').classList.toggle('open');
-});
 document.getElementById('enrichDropBtn').addEventListener('click', (e)=>{
   e.stopPropagation();
   document.getElementById('curriculumDropBtn').closest('.navDrop').classList.remove('open'); // سكّر القائمة الأولى أول
@@ -5159,8 +4326,6 @@ document.addEventListener('click', (e)=>{
   if(drop1.classList.contains('open') && !drop1.contains(e.target)) drop1.classList.remove('open');
   const drop2 = document.getElementById('enrichDropBtn').closest('.navDrop');
   if(drop2.classList.contains('open') && !drop2.contains(e.target)) drop2.classList.remove('open');
-  const drop3 = document.getElementById('moreDropBtn').closest('.navDrop');
-  if(drop3.classList.contains('open') && !drop3.contains(e.target)) drop3.classList.remove('open');
 });
 // دخول مباشر برابط يحتوي #unit-3 أو #enrich-3 مثلاً
 (function(){
@@ -6755,7 +5920,6 @@ function startActivity(id){
   lsStatRun(id);
   lsSetupCls(act.grade);
   openLessonShow();
-  lsIntroShow(act);
 }
 
 // ── وضع العرض على البروجكتر ──
@@ -6897,7 +6061,6 @@ function openLessonShow(){
 }
 
 function closeLessonShow(){
-  lsIntroEnd();
   lsClosePicker();
   lsStopTimer();
   lsCancelAuto();
@@ -6919,7 +6082,6 @@ function lsKeys(e){
 function renderLessonShow(){
   const q = lessonQs[lsIndex];
   if(!q) return;
-  if(lsIndex === lessonQs.length - 1 && lessonQs.length > 1) jrMaybeStamp();   // ٢-٣: إنهاء النشاط = ختم المحطة
   const kind = q.kind || 'essay';
   const cfg = LQ_KINDS[kind] || LQ_KINDS.essay;
   const qEl = document.getElementById('lsQ');
@@ -7149,8 +6311,6 @@ async function lsGiveAward(id){
   const r = lsRoster.find(x => x.id === id);
   if(!r) return;
   lsAwards[idx] = {id, name: r.student_name};   // استجابة فورية
-  const btn = document.activeElement && document.activeElement.classList.contains('lsPickName') ? document.activeElement.getBoundingClientRect() : null;
-  if(btn) flyStars(btn, 1);
   lsClosePicker();
   lsRefreshAward();
   lsConfetti(10);
@@ -8064,10 +7224,7 @@ async function changePoints(id, delta, rerender){
   const next = (row.participation_points || 0) + delta;
   if(next < 0) return;                 // ما ننزل تحت الصفر
   row.participation_points = next;
-  // موضع الزر المضغوط قبل إعادة الرسم (الرسم يستبدل العنصر)
-  const from = delta > 0 && document.activeElement && document.activeElement.tagName === 'BUTTON' ? document.activeElement.getBoundingClientRect() : null;
   rerender();                          // استجابة فورية
-  if(from) flyStars(from, delta);
   const { error } = await sb.from('class_roster')
     .update({participation_points: next}).eq('id', id);
   if(error){ showToast('تعذر الحفظ: ' + error.message, 'error'); refreshClassChallenge(); }
@@ -8486,13 +7643,6 @@ function openAdminPanel(){
 // المحفوظة عند فتح الموقع كانت تُنزل الصفحة لآخرها بدل الواجهة
 function setAdminActive(active, scrollToPanel){
   isAdmin = active;
-  document.body.classList.toggle('tch', active);
-  const chip = document.getElementById('adminChip');
-  if(chip && chip.firstChild && chip.firstChild.nodeType === 3) chip.firstChild.nodeValue = active ? '🎛️' : '🔒';
-  if(chip) chip.title = active ? 'لوحة المعلم' : 'دخول المعلم';
-  // لو كان على الصفحة الرئيسية: تتبدل بين الواجهة التعريفية وغرفة القيادة
-  const onHome = ['hero', 'teacherHome'].some(id => { const el = document.getElementById(id); return el && el.style.display !== 'none'; });
-  if(onHome && !scrollToPanel) showHome();
   document.getElementById('adminChip').classList.toggle('active', active);
   document.getElementById('adminPanel').classList.toggle('show', active);
   document.getElementById('adminLogoutTop').classList.toggle('show', active);
@@ -8516,7 +7666,7 @@ function setAdminActive(active, scrollToPanel){
 
 document.getElementById('adminChip').addEventListener('click', ()=>{
   if(isAdmin){
-    openAdminPanel();
+    document.getElementById('adminPanel').scrollIntoView({behavior:'smooth'});
   } else {
     openAdminLogin();
   }
@@ -10296,6 +9446,10 @@ document.getElementById('menuBtn').addEventListener('click', ()=>{
 });
 
 // ---------- شريط "آخر تحديث" — يقرأ الوقت الفعلي لآخر نشر على GitHub تلقائياً، بدون أي تحديث يدوي ----------
+function dismissUpdateBar(){
+  document.getElementById('lastUpdateBar').classList.remove('show');
+  localStorage.setItem('rahhala_seen_update', document.lastModified);
+}
 // ---------- شريط طقس الدوحة (سابع: الوحدة ١ «عناصر المناخ» · ثامن: الوحدة ١ «الغلاف الجوي») ----------
 function dismissWeatherBar(){
   document.getElementById('weatherBar').classList.remove('show');
@@ -10345,6 +9499,16 @@ async function initWeatherBar(){
   }
 }
 
+function initUpdateBar(){
+  const lm = new Date(document.lastModified);
+  const dateStr = lm.toLocaleDateString('ar-QA', {year:'numeric', month:'long', day:'numeric'});
+  const timeStr = lm.toLocaleTimeString('ar-QA', {hour:'2-digit', minute:'2-digit'});
+  document.getElementById('lastUpdateText').textContent = dateStr + ' — ' + timeStr;
+  // يظهر بس لو المستخدم ما شافه قبل لنفس نسخة التحديث (كل تحديث جديد يرجّع يظهر تلقائياً)
+  if(localStorage.getItem('rahhala_seen_update') !== document.lastModified){
+    document.getElementById('lastUpdateBar').classList.add('show');
+  }
+}
 
 // ---------- أداة "قارن بين" — مهارة مقارنة رسمية بالمنهج، من نفس محتوى الكتاب ----------
 const COMPARE_DATA = [
@@ -10599,6 +9763,7 @@ window.scrollTo(0, 0);
 try { renderQuestion(); } catch(e){ console.error('renderQuestion:', e); }
 try { showHome(); } catch(e){ console.error('showHome:', e); } // نبدأ بالصفحة الرئيسية النظيفة
 try { renderEnergy(); } catch(e){ console.error('renderEnergy:', e); }
+try { initUpdateBar(); } catch(e){ console.error('initUpdateBar:', e); }
 try { initWeatherBar(); } catch(e){ console.error('initWeatherBar:', e); }
 // صورة المنقذ بترويسة الشات تستخدم نفس مصدر الزر العائم — بدل تضمينها مرتين
 try {
