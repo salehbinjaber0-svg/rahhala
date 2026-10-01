@@ -1,8 +1,13 @@
 // اختبار سلوكي بـjsdom لنشاط مراجعة الوحدة الثانية — لا يكفي فحص الصياغة
 const fs = require('fs');
+const path = require('path');
 const { JSDOM } = require('jsdom');
 
-const html = fs.readFileSync('/home/user/rahhala/index.html', 'utf8');
+// الصفحة تحمّل ملفات مصاحبة (supabase.js · content.js): نضمّنها من القرص كي يُفحص ما سيُرفع فعلاً
+// لا النسخة المنشورة على الإنترنت (التي قد تكون أقدم أو غير متاحة)
+const loadSite = (dir) => fs.readFileSync(path.join(dir, 'index.html'), 'utf8')
+  .replace(/<script src="([^":]+\.js)"><\/script>/g, (m, f) => '<script>' + fs.readFileSync(path.join(dir, f), 'utf8') + '</script>');
+const html = loadSite(__dirname);
 const dom = new JSDOM(html, { runScripts: 'dangerously', url: 'https://x/', pretendToBeVisual: true });
 const w = dom.window;
 

@@ -18,6 +18,24 @@ const err = m => errors.push(m);
 const warn = m => warnings.push(m);
 const ok = m => passed.push(m);
 
+// الملفات المصاحبة (<script src="...">): كل واحد لازم يكون موجوداً وسليم الصياغة،
+// وإلا رُفع الموقع ناقصاً وتعطّل على السبورة. index.html وحده لا يكفي.
+const vm = require('vm');
+const localSrcs = [...html.matchAll(/<script src="([^":]+\.js)"><\/script>/g)].map(m => m[1]);
+const companions = {};
+localSrcs.forEach(f => {
+  const fp = path.join(__dirname, f);
+  if (!fs.existsSync(fp)) { err(`ملف مصاحب مفقود: ${f} — الصفحة تحمّله ولن تعمل بدونه`); return; }
+  companions[f] = fs.readFileSync(fp, 'utf8');
+  try { new vm.Script(companions[f], { filename: f }); ok(`${f} موجود وسليم الصياغة`); }
+  catch (e) { err(`خطأ صياغة في ${f}: ${e.message}`); }
+});
+if (!localSrcs.includes('content.js')) err('index.html لا يحمّل content.js (المنهج والمنقذ والأنشطة)');
+// المحتوى التربوي في content.js — فحوص البيانات تقرأ منه
+const contentScript = companions['content.js'] || '';
+// كل ما كان بملف واحد قبل التقسيم يُفحص معاً: الصفحة + المحتوى (ألوان، خطوط، أزرار، معرّفات، رسوم)
+const site = html + '\n' + contentScript;
+
 // ═══════════════════════════════════════════
 // 1) السلامة البنيوية
 // ═══════════════════════════════════════════
@@ -40,7 +58,7 @@ else ok(`وسوم section متوازنة (${openSections})`);
 const count = arr => arr.reduce((m, x) => (m[x] = (m[x] || 0) + 1, m), {});
 const dupes = obj => Object.entries(obj).filter(([, v]) => v > 1);
 
-const ids = [...html.matchAll(/\sid="([a-zA-Z][\w-]*)"/g)].map(m => m[1]);
+const ids = [...site.matchAll(/\sid="([a-zA-Z][\w-]*)"/g)].map(m => m[1]);
 const dupIds = dupes(count(ids));
 if (dupIds.length) err(`معرّفات HTML مكررة: ${dupIds.map(([k, v]) => `${k}×${v}`).join(', ')}`);
 else ok(`لا معرّفات مكررة (${new Set(ids).size} معرّفاً)`);
@@ -48,12 +66,14 @@ else ok(`لا معرّفات مكررة (${new Set(ids).size} معرّفاً)`);
 const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
 const mainScript = scripts[scripts.length - 1] || '';
 
+
 const fnNames = [...mainScript.matchAll(/function (\w+)\s*\(/g)].map(m => m[1]);
 const dupFns = dupes(count(fnNames));
 if (dupFns.length) err(`دوال مكررة (تتجاوز بعضها): ${dupFns.map(([k]) => k).join(', ')}`);
 else ok(`لا دوال مكررة (${fnNames.length} دالة)`);
 
-const topVars = [...mainScript.matchAll(/^(?:let|const|var) (\w+)/gm)].map(m => m[1]);
+// السكربتان يتشاركان النطاق العام: اسم معرّف بالاثنين يكسر الصفحة كاملة
+const topVars = [...(contentScript + '\n' + mainScript).matchAll(/^(?:let|const|var) (\w+)/gm)].map(m => m[1]);
 const dupVars = dupes(count(topVars));
 if (dupVars.length) err(`متغيرات معرّفة مرتين (خطأ صياغة): ${dupVars.map(([k]) => k).join(', ')}`);
 else ok('لا متغيرات مكررة');
@@ -62,18 +82,18 @@ else ok('لا متغيرات مكررة');
 // 3) الترابط — كل مرجع يشير لشيء موجود
 // ═══════════════════════════════════════════
 const DYNAMIC_IDS = ['typingIndicator']; // تُنشأ وقت التشغيل
-const refs = [...new Set([...html.matchAll(/getElementById\('([^']+)'\)/g)].map(m => m[1]))];
+const refs = [...new Set([...site.matchAll(/getElementById\('([^']+)'\)/g)].map(m => m[1]))];
 const missingRefs = refs.filter(id =>
-  !html.includes(`id="${id}"`) && !DYNAMIC_IDS.includes(id) && !id.startsWith('note-')
+  !site.includes(`id="${id}"`) && !DYNAMIC_IDS.includes(id) && !id.startsWith('note-')
 );
 if (missingRefs.length) err(`مراجع DOM لعناصر غير موجودة: ${missingRefs.join(', ')}`);
 else ok(`كل مراجع DOM سليمة (${refs.length})`);
 
-const onclicks = [...new Set([...html.matchAll(/onclick="([^\s("]+)\(/g)].map(m => m[1]))];
+const onclicks = [...new Set([...site.matchAll(/onclick="([^\s("]+)\(/g)].map(m => m[1]))];
 // نلتقط الدوال بكل صيغها: function foo() · const foo = () => · const foo = function
 const definedAll = new Set([
-  ...[...html.matchAll(/function ([^\s(]+)\s*\(/g)].map(m => m[1]),
-  ...[...html.matchAll(/(?:const|let|var)\s+(\w+)\s*=\s*(?:async\s*)?(?:\([^)]*\)\s*=>|function)/g)].map(m => m[1]),
+  ...[...site.matchAll(/function ([^\s(]+)\s*\(/g)].map(m => m[1]),
+  ...[...site.matchAll(/(?:const|let|var)\s+(\w+)\s*=\s*(?:async\s*)?(?:\([^)]*\)\s*=>|function)/g)].map(m => m[1]),
 ]);
 // نستثني استدعاءات المتصفح المدمجة (window.print, location.reload...)
 const BUILTIN = /^(window|document|location|history|speechSynthesis)\./;
@@ -132,10 +152,10 @@ else ok('لا ثغرات حقن ظاهرة');
 // ═══════════════════════════════════════════
 // المنهجان يُفحصان منفصلين: سابع وثامن، كل منهما 6 وحدات × درسين
 function sliceData(name){
-  const i = mainScript.indexOf(`const ${name} = {`);
+  const i = contentScript.indexOf(`const ${name} = {`);
   if (i < 0) return '';
-  const j = mainScript.indexOf('\n};', i);
-  return j < 0 ? '' : mainScript.slice(i, j);
+  const j = contentScript.indexOf('\n};', i);
+  return j < 0 ? '' : contentScript.slice(i, j);
 }
 [['UNITS_DATA','سابع'], ['UNITS_DATA_8','ثامن']].forEach(([varName, label])=>{
   const seg = sliceData(varName);
@@ -147,12 +167,12 @@ function sliceData(name){
   else ok(`منهج ${label} كامل (6 وحدات · 12 درساً)`);
 });
 
-const kbMatch = mainScript.match(/const KNOWLEDGE_BASE = \[([\s\S]*?)\n\];/);
+const kbMatch = contentScript.match(/const KNOWLEDGE_BASE = \[([\s\S]*?)\n\];/);
 const kbCount = kbMatch ? (kbMatch[1].match(/\{k:\[/g) || []).length : 0;
 if (kbCount < 100) warn(`مفاهيم المنقذ ${kbCount} — كانت 102`);
 else ok(`قاعدة معرفة المنقذ (${kbCount} مفهوماً)`);
 
-const figCount = (html.match(/class="lessonFig"/g) || []).length;
+const figCount = (site.match(/class="lessonFig"/g) || []).length;
 if (figCount < 7) warn(`الرسوم التوضيحية ${figCount} — كانت 7`);
 else ok(`الرسوم التوضيحية (${figCount})`);
 
@@ -167,9 +187,11 @@ else ok('لا تسريب مؤقتات');
 if (!mainScript.includes('document.hidden')) warn('الاستطلاع لا يتوقف عند إخفاء التبويب');
 else ok('الاستطلاع يتوقف عند إخفاء التبويب');
 
-const sizeKb = Math.round(html.length / 1024);
-if (sizeKb > 600) warn(`حجم الملف ${sizeKb} كيلوبايت — كبير`);
-else ok(`حجم الملف ${sizeKb} كيلوبايت`);
+// بالبايت لا بعدد الحروف (العربية حرفان لكل حرف) — هذا ما ينزل فعلاً
+const sizeKb = Math.round(Buffer.byteLength(html) / 1024);
+const compKb = Object.entries(companions).map(([f, c]) => `${f} ${Math.round(Buffer.byteLength(c) / 1024)}`).join(' · ');
+if (sizeKb > 600) warn(`حجم index.html ${sizeKb} كيلوبايت — كبير`);
+else ok(`حجم index.html ${sizeKb} كيلوبايت (المصاحبة: ${compKb})`);
 
 // ملفات مصاحبة مطلوبة
 if (mainScript.includes("sc.src = 'qrcode.js'") && !fs.existsSync(path.join(__dirname, 'qrcode.js')))
@@ -181,7 +203,7 @@ else if (mainScript.includes("sc.src = 'qrcode.js'")) ok('ملف qrcode.js مو�
 // ═══════════════════════════════════════════
 // الهوية: العنابي القطري + ذهبي رملي على أبيض (منذ أكتوبر ٢٠٢٦)، بثلاثة خطوط فقط. أي خط أو لون جديد يُرفض حتى يُضاف هنا عن قصد.
 // المكتبة المضمّنة (supabase) مستثناة لأنها ليست من تصميم الموقع.
-const siteOnly = html.replace(/<script>\s*var supabase=[\s\S]*?<\/script>/, '');
+const siteOnly = site;   // مكتبة Supabase صارت بملفها المستقل — لا تدخل فحص الهوية
 
 const IDENTITY_TOKENS = {
   '--navy': '#7a1232', '--navy-deep': '#420a1c', '--navy-soft': '#80173a',
