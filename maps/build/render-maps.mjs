@@ -2,9 +2,11 @@
 // التشغيل (من هذا المجلد):
 //   npm install d3-geo topojson-client playwright-core sane-topojson koppen-climate-lookup all-the-cities
 //   CHROME=/path/to/chrome node render-maps.mjs
-// المخرجات: maps/pop.webp · deserts.webp · rain.webp · seas.webp · zones.webp · labels.json
+// المخرجات: maps/pop.webp · deserts.webp · rain.webp · seas.webp · zones.webp
+//           · rafidain.webp · nile.webp · census.webp · labels.json
+// توليد بعضها فقط: MAPS=rafidain,nile,census node render-maps.mjs (الباقي لا يُعاد كتابته)
 // labels.json = مواضع الأسماء (نسب مئوية) بنفس الإسقاط — تُنسخ إلى HERO_PLATES في index.html
-import {geoEqualEarth, geoPath, geoGraticule} from 'd3-geo';
+import {geoEqualEarth, geoMercator, geoPath, geoGraticule} from 'd3-geo';
 import {createRequire} from 'module'; const require = createRequire(import.meta.url);
 const {chromium} = require('playwright-core'); const tc = require('topojson-client'); const fs = require('fs');
 const W50 = require('sane-topojson/dist/world_50m.json');
@@ -78,7 +80,10 @@ await page.evaluate(({base,WIDTH,HEIGHT})=>{
   };
   window.clipLand = () => { ctx.save(); ctx.clip(B.sphere); ctx.clip(B.land); };
 }, {base,WIDTH,HEIGHT});
+const ONLY = process.env.MAPS ? process.env.MAPS.split(',') : null;
+const want = (name) => !ONLY || ONLY.includes(name);
 const save = async (name) => {
+  if(!want(name)) return;
   for(const [fmt,q] of [['webp',.86],['png',1]]){
     const url = await page.evaluate(([f,q])=>document.getElementById('c').toDataURL('image/'+f,q), [fmt,q]);
     fs.mkdirSync(OUT,{recursive:true}); if(fmt==='webp') fs.writeFileSync(`${OUT}/${name}.${fmt}`, Buffer.from(url.split(',')[1],'base64'));
@@ -145,6 +150,75 @@ await page.evaluate(({bands,latl})=>{
 }, {bands,latl});
 await save('zones');
 
+// ═══ خرائط إقليمية (إسقاط مركاتور مقصوص على المنطقة) ═══
+// الأنهار في Natural Earth بلا أسماء — حُدِّدت مقاطعها بمرورها قرب مدن معروفة على مجراها
+// (الفرات: الرقة · دير الزور · الرمادي · الحلة · الناصرية — دجلة: الموصل · تكريت · بغداد · الكوت · العمارة
+//  — النيل: الخرطوم · أسوان · الأقصر · أسيوط · القاهرة · رشيد)، وتُرسم أعرض من بقية الأنهار
+const countries = tc.feature(W50, W50.objects.countries);
+const riverF = rivers.features;
+const MAJOR = { rafidain:[170,398,190,105,187,364,197], nile:[298,47,165,223,342,378,75] };
+const regional = (lo0,lo1,la0,la1) => {
+  const P2 = geoMercator().fitWidth(WIDTH, {type:'MultiPoint', coordinates:[[lo0,la0],[lo1,la1]]});
+  const H2 = Math.round(P2([lo0,la0])[1] - P2([lo1,la1])[1]);
+  const pa = geoPath(P2), S2 = (f)=>pa(f)||'';
+  const pct2 = (lo,la) => { const [x,y]=P2([lo,la]); return [+(x/WIDTH*100).toFixed(2), +(y/H2*100).toFixed(2)]; };
+  return {P2,H2,S2,pct2};
+};
+const drawRegion = async (name, R, o) => {
+  if(!want(name)) return;
+  const paths = {
+    land: R.S2(land), lakes: R.S2(lakes),
+    borders: R.S2(tc.mesh(W50, W50.objects.countries, (a,b)=>a!==b)),
+    focus: R.S2({type:'FeatureCollection', features: countries.features.filter(f=>o.focus.includes(f.id))}),
+    minor: R.S2({type:'FeatureCollection', features: riverF.filter((f,i)=>!MAJOR[name].includes(i))}),
+    major: R.S2({type:'FeatureCollection', features: MAJOR[name].map(i=>riverF[i])}),
+  };
+  await page.evaluate(({paths,W,H})=>{
+    const c = document.getElementById('c'); c.width = W; c.height = H; window.ctx = c.getContext('2d');
+    const P = Object.fromEntries(Object.entries(paths).map(([k,v])=>[k,new Path2D(v)]));
+    const g = ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#2a6f8c'); g.addColorStop(1,'#154860');
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle = '#d4b273'; ctx.fill(P.land);
+    ctx.fillStyle = '#ebc87f'; ctx.fill(P.focus);                       // الدولة الحالية للمنطقة
+    ctx.strokeStyle = '#a8813f'; ctx.lineWidth = 1; ctx.stroke(P.land);
+    ctx.setLineDash([4,3]); ctx.strokeStyle = 'rgba(90,31,31,.45)'; ctx.lineWidth = 1; ctx.stroke(P.borders); ctx.setLineDash([]);
+    ctx.fillStyle = '#2a6f8c'; ctx.fill(P.lakes);
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.strokeStyle = 'rgba(42,111,140,.8)'; ctx.lineWidth = 1.4; ctx.stroke(P.minor);
+    ctx.strokeStyle = '#1e5771'; ctx.lineWidth = 5.5; ctx.stroke(P.major);   // حدّ داكن ثم المجرى الفاتح
+    ctx.strokeStyle = '#59a5c4'; ctx.lineWidth = 3; ctx.stroke(P.major);
+  }, {paths, W:WIDTH, H:R.H2});
+  await save(name);
+};
+// ٦) بلاد الرافدين — من البحر المتوسط غرباً إلى الخليج العربي شرقاً
+const RAF = regional(32.0, 52.5, 27.4, 38.0);
+await drawRegion('rafidain', RAF, {focus:['IRQ']});
+// ٧) مصر ونهر النيل
+const NIL = regional(21.5, 44, 21.6, 34.0);
+await drawRegion('nile', NIL, {focus:['EGY']});
+
+// ٨) فترات إجراء التعداد السكاني (كتاب الثامن، الوحدة ٤) — نفس إسقاط خرائط العالم
+const CENSUS = { five:['FRA','JPN','DNK'], ten:['USA','IND','EGY'], irregular:['BRA','QAT','VEN'] };
+// فرنسا في Natural Earth تضم أقاليمها خارج أوروبا (كغويانا بأمريكا الجنوبية) — نرسم جزءها الأوروبي
+// فقط كي لا يظن الطالب أن بقعة في أمريكا الجنوبية دولة أوروبية
+const inEurope = (f) => f.id !== 'FRA' ? f : {...f, geometry:{type:'MultiPolygon',
+  coordinates: f.geometry.coordinates.filter(poly => { const [lo,la] = poly[0][0]; return lo > -10 && lo < 15 && la > 40 && la < 52; })}};
+const cpaths = Object.fromEntries(Object.entries(CENSUS).map(([k,ids])=>[k, S({type:'FeatureCollection', features: countries.features.filter(f=>ids.includes(f.id)).map(inEurope)})]));
+if(want('census')){
+  await page.evaluate(({base,WIDTH,HEIGHT})=>{
+    const c = document.getElementById('c'); c.width = WIDTH; c.height = HEIGHT; window.ctx = c.getContext('2d');
+    window.B = Object.fromEntries(Object.entries(base).map(([k,v])=>[k,new Path2D(v)]));
+  }, {base,WIDTH,HEIGHT});
+  await page.evaluate((cp)=>{
+    drawBase({sea1:'#0f2f3e',sea2:'#0b2533',grat:'rgba(201,161,94,.07)',land:'#25505b',coast:'rgba(201,161,94,.25)',rim:'rgba(201,161,94,.55)'});
+    const col = {five:'#4a9fd6', ten:'#e39a45', irregular:'#8cc46c'};
+    ctx.save(); ctx.clip(B.sphere);
+    for(const k in cp){ const p = new Path2D(cp[k]); ctx.fillStyle = col[k]; ctx.fill(p); ctx.strokeStyle = 'rgba(11,37,51,.6)'; ctx.lineWidth = .6; ctx.stroke(p); }
+    ctx.restore();
+  }, cpaths);
+  await save('census');
+}
+
 await browser.close();
 const L = (t,lo,la) => { const [x,y]=pct(lo,la); return {t,x,y}; };
 const out = {W:WIDTH, H:HEIGHT, qatar: pct(51.2,25.3), labels: {
@@ -152,6 +226,15 @@ const out = {W:WIDTH, H:HEIGHT, qatar: pct(51.2,25.3), labels: {
   deserts: [L('الصحراء الكبرى',8,23), L('صحراء الربع الخالي',50,19.5), L('صحراء غوبي',104,43), L('صحراء كالاهاري',21,-23), L('الصحراء الأسترالية',128,-25), L('صحراء أتاكاما',-70,-24)],
   seas: [L('المحيط الهادئ',-145,8), L('المحيط الأطلسي',-38,18), L('المحيط الهندي',77,-20), L('المحيط المتجمد الشمالي',-10,80), L('المحيط المتجمد الجنوبي',100,-55), L('البحر المتوسط',17,35), L('الخليج العربي',51.5,27.5), L('البحر الأحمر',38,20)],
   zones: [L('خط الاستواء',-150,0), L('30°',-165,30), L('40°',-165,40), L('66.5°',-165,66.5)],
-}};
+  census: [L('الولايات المتحدة',-99,39), L('البرازيل',-52,-10), L('فنزويلا',-66,7.5), L('فرنسا',2.5,46.5), L('الدانمارك',9.5,56.2), L('مصر',27.5,23), L('الهند',78.5,17), L('اليابان',138.5,36.5)],
+},
+// الخرائط الإقليمية: لكل منها مقاسها وإسقاطها، فمواضعها تُحسب بإسقاطها هي
+regional: Object.fromEntries([['rafidain',RAF,[
+    ['نهر الفرات',40.6,35.55],['نهر دجلة',43.9,35.35],['الخليج العربي',50.2,28.0],['البحر المتوسط',33.4,33.3],['العراق حالياً',41.6,32.4]],
+    [['أور',46.103,30.963],['بابل',44.421,32.536],['نينوى',43.153,36.359]]],
+  ['nile',NIL,[['نهر النيل',30.75,27.0],['البحر المتوسط',27.0,33.1],['البحر الأحمر',37.6,22.6],['مصر',28.5,25.0]],[]]]
+  .map(([n,R,lab,pins])=>[n,{W:WIDTH,H:R.H2, labels:lab.map(([t,lo,la])=>{const [x,y]=R.pct2(lo,la); return {t,x,y};}),
+      pins:pins.map(([t,lo,la])=>{const [x,y]=R.pct2(lo,la); return {t,x,y};}), qatar:R.pct2(51.2,25.3)}]))
+};
 fs.writeFileSync(`${OUT}/labels.json`, JSON.stringify(out,null,1));
 console.log('done', WIDTH, HEIGHT);

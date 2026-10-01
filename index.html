@@ -1350,7 +1350,6 @@
     max-width:560px; margin-bottom:24px;
   }
   .heroIntroArt{position:relative; text-align:center;}
-  .heroIntroArt svg{width:100%; max-width:340px; height:auto; display:block; margin:0 auto;}
   .heroQuoteBadge{
     display:inline-block; font-family:'Cairo', 'Tajawal', sans-serif; font-weight:700; color:var(--navy); font-size:.95rem;
     padding:8px 20px; border-radius:30px; margin-bottom:14px;
@@ -1360,8 +1359,6 @@
     .heroIntroInner{grid-template-columns:1fr; text-align:center; gap:26px;}
     .heroEyebrow{justify-content:center;}
     .heroIntroLead{margin-inline:auto;}
-    .heroIntro .heroBtns{justify-content:center;}
-    .heroIntroArt svg{max-width:270px;}
   }
 
   /* ===== لوحة الواجهة المتغيّرة: خريطة أو لوحة من المنهج مع كل زيارة =====
@@ -1375,7 +1372,7 @@
   }
   @keyframes hpIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
   .hpHead{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:8px;}
-  .hpEyebrow{color:var(--gold); font-size:.68rem; font-weight:700; letter-spacing:.3px; white-space:nowrap;}
+  .hpEyebrow{color:var(--gold-light); font-size:.68rem; font-weight:700; letter-spacing:.3px; white-space:nowrap;}
   .hpTitle{font-family:'Aref Ruqaa'; color:var(--gold-light); font-size:1.18rem; line-height:1.4; margin:0;}
   .hpNext{
     background:rgba(0,0,0,.18); color:var(--gold-light); border:1px solid rgba(220,167,58,.35);
@@ -1392,8 +1389,10 @@
     font-size:.62rem; font-weight:700; color:#fbf9f8; letter-spacing:.2px;
     text-shadow:0 0 3px rgba(79,12,32,.95), 0 0 6px rgba(79,12,32,.8);
   }
-  .hpLbl.dim{color:rgba(244,237,232,.7); font-weight:500;}
+  .hpLbl.dim{color:#d5c5b8; font-weight:500;}   /* أخفت من الأسماء الرئيسة بلون صلب لا بشفافية (≥7:1 على يابس الخريطة الداكن) */
   .hpLbl.sea{color:#e7f3f8; font-style:normal; font-weight:500; text-shadow:0 0 4px rgba(108,16,44,.9);}
+  /* اسم دولة على يابس فاتح (الخرائط الإقليمية): نص داكن بهالة فاتحة — الفاتح على الرملي لا يُقرأ */
+  .hpLbl.land{color:#5a1f1f; font-size:.7rem; text-shadow:0 0 3px #f6dc96, 0 0 6px #f6dc96;}
   .hpQatar{position:absolute; transform:translate(-50%,-50%); pointer-events:none;}
   .hpQatar i{display:block; width:8px; height:8px; border-radius:50%; background:#7a3030; border:1.5px solid #ffffff;
     box-shadow:0 0 0 3px rgba(122,48,48,.35); animation:hpPulse 2.2s ease-in-out infinite;}
@@ -1401,16 +1400,16 @@
     text-shadow:0 0 3px #4f0c20, 0 0 6px #4f0c20;}
   @keyframes hpPulse{0%,100%{box-shadow:0 0 0 2px rgba(122,48,48,.45);} 50%{box-shadow:0 0 0 6px rgba(122,48,48,.0);}}
   /* .heroPlate p.hpNote أخص من «.hero p» العامة (السطر اللاحق بالورقة) التي كانت تكبّر الخط وتضيّق العرض */
-  .heroPlate p.hpNote{color:rgba(244,237,232,.85); font-size:.78rem; line-height:1.85; margin:10px 0 8px; max-width:none;}
+  .heroPlate p.hpNote{color:#f4ede7; font-size:.78rem; line-height:1.85; margin:10px 0 8px; max-width:none;}
   .hpLegend{display:flex; flex-wrap:wrap; gap:6px 12px; margin-bottom:8px;}
-  .hpLegend span{display:inline-flex; align-items:center; gap:5px; color:rgba(244,237,232,.8); font-size:.66rem;}
+  .hpLegend span{display:inline-flex; align-items:center; gap:5px; color:#f4ede7; font-size:.66rem;}
   .hpLegend i{width:10px; height:10px; border-radius:3px; display:inline-block; flex:0 0 10px;}
-  .hpRamp{display:flex; align-items:center; gap:8px; color:rgba(244,237,232,.75); font-size:.66rem; margin-bottom:8px;}
+  .hpRamp{display:flex; align-items:center; gap:8px; color:#f4ede7; font-size:.66rem; margin-bottom:8px;}
   .hpRamp i{flex:1; height:7px; border-radius:4px; max-width:170px;
     background:linear-gradient(to left, rgba(23,90,74,.2), #1f8c6e, #dca73a, #ebc578, #f4ede7);}   /* يمين خافت (تخلخل) ← يسار ساطع (تركّز) */
   .hpFoot{display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px 10px; border-top:1px solid rgba(220,167,58,.18); padding-top:7px;}
   .hpUnit{color:var(--gold-light); font-size:.68rem; font-weight:700;}
-  .hpSrc{color:rgba(244,237,232,.5); font-size:.6rem;}
+  .hpSrc{color:#ebded4; font-size:.6rem;}
   /* لوحات مصمّمة من الكتاب */
   .hpLayers{display:flex; align-items:center; gap:12px;}
   .hpLayers svg{flex:0 0 46%; max-width:none; width:46%; height:auto; margin:0;}
@@ -1421,9 +1420,56 @@
   .hpTimeline{display:flex; height:30px; border-radius:8px; overflow:hidden; margin:6px 0 10px; direction:rtl;}
   .hpTimeline span{display:flex; align-items:center; justify-content:center; color:#ffffff; font-size:.62rem; font-weight:700; min-width:6px;}
   .hpTlList{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:4px 12px;}
-  .hpTlList li{display:flex; gap:6px; align-items:center; color:rgba(244,237,232,.85); font-size:.7rem;}
+  .hpTlList li{display:flex; gap:6px; align-items:center; color:#f4ede7; font-size:.7rem;}
   .hpTlList li i{width:10px; height:10px; border-radius:3px; flex:0 0 10px;}
-  .hpTlList li small{color:rgba(244,237,232,.55); font-size:.64rem;}
+  .hpTlList li small{color:#ebded4; font-size:.64rem;}
+  /* مواقع مدن تاريخية على الخرائط الإقليمية */
+  .hpPin{position:absolute; transform:translate(-50%,-50%); pointer-events:none;}
+  .hpPin i{display:block; width:9px; height:9px; border-radius:50%; background:#ebc578; border:2px solid #4f0c20;}
+  .hpPin b{position:absolute; top:-4px; left:13px; font-size:.66rem; color:#ffffff; white-space:nowrap;
+    text-shadow:0 0 3px #4f0c20, 0 0 6px #4f0c20;}
+  /* اللوحات المصمّمة الجديدة — نصوص بألوان صلبة على العنابي (لا شفافية على النص) */
+  .hpCards{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .hpCards.n3{grid-template-columns:repeat(3, 1fr);}
+  .hpCard{background:rgba(0,0,0,.2); border:1px solid rgba(220,167,58,.28); border-radius:10px; padding:9px 11px;}
+  .hpCard b{display:flex; align-items:center; gap:6px; color:#f6dc96; font-size:.84rem; margin-bottom:3px;}
+  .hpCard > span{display:block; color:#f4ede7; font-size:.72rem; line-height:1.7;}
+  .hpSteps{list-style:none; margin:0; padding:0; position:relative;}
+  .hpSteps::before{content:''; position:absolute; top:10px; bottom:10px; inset-inline-start:7px; width:2px; background:rgba(220,167,58,.35);}
+  .hpSteps li{position:relative; display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 8px; padding:4px 0; padding-inline-start:24px;}
+  .hpSteps li::before{content:''; position:absolute; inset-inline-start:2px; top:11px; width:12px; height:12px; border-radius:50%;
+    background:#dca73a; border:2px solid #4f0c20;}
+  .hpStDate{color:#f6dc96; font-size:.72rem; font-weight:700; min-width:92px;}
+  .hpSteps b{color:#ffffff; font-size:.86rem;}
+  .hpSteps small{color:#f4ede7; font-size:.72rem;}
+  .hpFlow{display:flex; align-items:stretch; gap:6px;}
+  .hpFlowBox{flex:1; background:rgba(0,0,0,.2); border:1px solid rgba(220,167,58,.28); border-radius:10px; padding:10px; text-align:center;}
+  .hpFlowBox b{display:block; color:#f6dc96; font-size:.86rem; margin-bottom:4px;}
+  .hpFlowBox span{color:#f4ede7; font-size:.72rem; line-height:1.7;}
+  .hpFlowArr{align-self:center; color:#f6dc96; font-size:1.2rem; font-weight:700;}
+  .hpAir{display:flex; gap:16px; align-items:center;}
+  .hpAirGas{flex:0 0 44%; display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .hpAirGas svg{width:100%; max-width:150px; height:auto; display:block;}
+  .hpAirGas ul{list-style:none; margin:0; padding:0;}
+  .hpAirGas li{display:flex; align-items:center; gap:6px; color:#f4ede7; font-size:.74rem;}
+  .hpAirGas li i{width:10px; height:10px; border-radius:3px; flex:0 0 10px;}
+  .hpAirGas li b{color:#ffffff;}
+  .hpAirLayers{flex:1; display:flex; flex-direction:column; gap:4px;}
+  .hpAirUp{color:#f6dc96; font-size:.68rem; font-weight:700; margin-bottom:2px;}
+  .hpAirL{border-radius:8px; padding:7px 10px; display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 8px;}
+  .hpAirL b{font-size:.8rem;}
+  .hpAirL small{font-size:.68rem; font-weight:700;}
+  .hpAirL.l0{background:#1f5068; color:#ffffff;} .hpAirL.l1{background:#1e5771; color:#ffffff; border:1px solid #59a5c4;}
+  .hpAirL.l2{background:#a8c8e0; color:#1f1216;} .hpAirL.l3{background:#d6e4f0; color:#1f1216;}
+  .hpEras + .hpTlList{grid-template-columns:1fr;}
+  .hpEras .gap{display:flex; align-items:center; justify-content:center; font-size:.58rem; font-weight:700; color:#f4ede7;
+    background:repeating-linear-gradient(135deg, rgba(0,0,0,.25) 0 4px, rgba(0,0,0,.1) 4px 8px);}
+  @media(max-width:520px){
+    .hpCards.n3{grid-template-columns:1fr;}
+    .hpFlow{flex-direction:column;}
+    .hpFlowArr{transform:rotate(-90deg);}
+    .hpAir{flex-direction:column;}
+  }
   @media(max-width:860px){
     .heroPlate{max-width:440px;}
   }
@@ -1452,7 +1498,6 @@
   .hero h1{font-size:2.9rem; line-height:1.25; color:var(--navy);}
   .hero h1 em{font-style:normal; color:var(--gold-deep);}
   .hero p{margin-top:18px; font-size:1.1rem; color:#432830; max-width:46ch;}
-  .heroBtns{margin-top:30px; display:flex; gap:14px; flex-wrap:wrap;}
   .btn{
     display:inline-block; padding:13px 26px; border-radius:10px; font-weight:700; cursor:pointer;
     border:2px solid transparent; font-family:'Tajawal'; font-size:.95rem; transition:.2s;
@@ -1466,9 +1511,12 @@
   /* ===== الواجهة: حافة العلم القطري وأفق الدوحة (بعد قواعد .hero العامة عمداً) ===== */
   .heroFlag{position:absolute; inset-inline-end:0; top:0; width:64px; height:100%; color:var(--navy); pointer-events:none; z-index:0;}
   .heroSky{position:absolute; bottom:0; inset-inline-end:8%; width:min(900px,70%); height:62%; color:var(--navy); opacity:.06; pointer-events:none; z-index:0;}
-  .heroGlobe{margin:0;}
-  .heroIntroArt .heroGlobe svg{max-width:430px;}
-  @media(max-width:760px){ .heroIntroArt .heroGlobe svg{max-width:290px;} }
+  /* عمودان متقاربان يبدآن من الأعلى: النص يميناً، والطقس فوق لوحة الأطلس يساراً */
+  .hero .heroIntroInner{grid-template-columns:1fr 1.06fr; gap:44px; align-items:start;}
+  .heroIntroArt{display:flex; flex-direction:column; gap:14px; text-align:start;}
+  .heroIntroArt .heroPlate{max-width:none; width:100%; margin:0;}
+  .heroIntroText .heroQuoteBadge{margin:6px 0 0;}
+  .heroIntroText{align-self:center;}
   @media(max-width:1260px){ .hero .wrap{padding-inline-end:84px;} }
   @media(max-width:760px){
     .heroFlag{width:24px;}
@@ -1476,40 +1524,48 @@
     .hero .wrap{padding-inline-end:40px;}
   }
 
-  /* ===== لوحة الصفحة الرئيسية ===== */
-  #homeDash{padding:34px 0 64px; background:var(--cream);}
+  /* ===== طقس الدوحة أعلى يسار الواجهة: شريحة أفقية خفيفة ===== */
+  .hdWx{display:flex; align-items:stretch; background:#ffffff; border:1px solid #eee3db; border-radius:16px;
+    box-shadow:0 6px 18px rgba(66,10,28,.07); overflow:hidden;}
+  .hdWx[hidden]{display:none;}
+  .hdWxTop{flex:0 0 118px; background:linear-gradient(160deg, var(--navy-soft), var(--navy-deep)); color:#ffffff;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px 6px; font-weight:700; font-size:.82rem; text-align:center;}
+  .hdWxTop b{font-family:'Cairo'; font-weight:800; font-size:2.3rem; line-height:1.1; color:var(--gold-light);}
+  .hdWxInfo{flex:1; padding:9px 14px; min-width:0;}
+  .hdWxHead{font-family:'Cairo'; font-weight:800; font-size:1rem; color:var(--navy);}
+  .hdWxList{display:flex; flex-wrap:wrap; gap:2px 16px; font-weight:700; font-size:.9rem; margin-top:2px;}
+  .hdWxNote{font-size:.76rem; color:#594a50; font-weight:700; line-height:1.6; margin-top:3px;}
 
-  .hdRow{display:flex; flex-wrap:wrap; gap:22px; align-items:flex-start;}
-  .hdPanel{background:#ffffff; border:1px solid #eee3db; border-radius:18px; box-shadow:0 8px 24px rgba(66,10,28,.06); overflow:hidden;}
-  .hdPanel[hidden]{display:none;}
-  .hdWx{flex:0 1 260px;}
-  .hdLb{flex:1 1 300px; padding:16px 20px 18px;}
-  .hdAtlas{flex:1.3 1 380px; min-width:0;}   /* مجموع الأسس + الفجوات < ١٠٦٠ (عرض .wrap) فتبقى الثلاث بسطر */
-  .hdAtlas .heroPlate{max-width:none; margin:0;}
-  .hdWxTop{background:linear-gradient(160deg, var(--navy-soft), var(--navy-deep)); color:#ffffff; padding:14px 16px; display:flex; flex-direction:column; align-items:center; font-weight:700;}
-  .hdWxTop b{font-family:'Cairo'; font-weight:800; font-size:2.8rem; line-height:1.15; color:var(--gold-light);}
-  .hdWxList{display:grid; grid-template-columns:1fr 1fr; gap:8px 12px; padding:12px 16px 4px; font-weight:700; font-size:.92rem;}
-  .hdWxNote{margin:4px 16px 14px; font-size:.82rem; color:#594a50; font-weight:700; line-height:1.7;}
+  /* ===== شريط متصدري المشاركة أسفل الواجهة (أفقي) ===== */
+  #homeDash{padding:26px 0 56px; background:var(--cream);}
+  .hdLb{display:flex; flex-wrap:wrap; align-items:center; gap:12px 26px; padding:16px 22px;
+    background:#ffffff; border:1px solid #eee3db; border-radius:18px; box-shadow:0 8px 24px rgba(66,10,28,.06);}
   .hdLb h3{font-family:'Cairo'; font-weight:800; font-size:1.2rem; color:var(--ink);}
   .hdSub{font-size:.86rem; color:#594a50; font-weight:500; margin-top:2px;}
-  .hdChips{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 10px;}
+  .hdChips{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;}
   .hdChips:empty{display:none;}
   .hdChip{font-family:'Cairo'; font-weight:800; font-size:.95rem; padding:4px 14px; border-radius:20px; border:2px solid var(--navy); color:var(--navy); background:#ffffff; cursor:pointer;}
   .hdChip.on{background:var(--navy); color:#ffffff;}
-  .hdHint{text-align:center; color:#594a50; font-weight:700; line-height:1.8; padding:14px 0 6px;}
-  .hdHint span{display:block; font-size:2.2rem;}
+  .hdLbBody{flex:1 1 380px; display:flex; flex-wrap:wrap; gap:8px; min-width:0;}
+  .hdHint{display:flex; align-items:center; gap:10px; color:#594a50; font-weight:700; line-height:1.6;}
+  .hdHint span{font-size:1.6rem;}
   .hdHint small{display:block; font-weight:500; font-size:.8rem;}
-  .hdLbRow{display:flex; align-items:center; gap:10px; padding:9px 12px; margin-bottom:4px; border-radius:12px; font-family:'Cairo'; font-weight:800; font-size:1.05rem;}
-  .hdLbRow.r1{background:#fbedcf;}
-  .hdLbRow i{font-style:normal; width:26px; text-align:center;}
-  .hdLbRow span{margin-inline-start:auto; color:var(--gold-deep);}
+  .hdLbRow{flex:1 1 170px; display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:12px;
+    border:1px solid #eee3db; font-family:'Cairo'; font-weight:800; font-size:1.05rem; min-width:0;}
+  .hdLbRow b{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .hdLbRow.r1{background:#fbedcf; border-color:#f2d498;}
+  .hdLbRow i{font-style:normal;}
+  .hdLbRow span{margin-inline-start:auto; color:var(--gold-deep); white-space:nowrap;}
   @media(max-width:760px){
-    #homeDash{padding:22px 0 48px;}
-    .hdRow{gap:14px;}
-    .hdWx, .hdLb, .hdAtlas{flex:1 1 100%;}
+    #homeDash{padding:18px 0 44px;}
+    .hdLb{padding:14px 16px;}
+    .hdLbBody{flex-basis:100%;}
+    .hdLbRow{flex-basis:100%;}
+    .hdWxTop{flex-basis:96px;}
+    .hdWxTop b{font-size:1.9rem;}
   }
-  /* الصفحة الرئيسية لها بطاقة طقس كاملة — الشريط الرفيع لباقي الصفحات فقط */
-  body:not(:has(#homeDash[style*="none"])) #weatherBar{display:none;}
+  /* الواجهة فيها بطاقة الطقس — الشريط الرفيع لباقي الصفحات فقط */
+  body:not(:has(#hero[style*="none"])) #weatherBar{display:none;}
 
   #journeySection{display:none;}
   #journeySection.show{display:block;}
@@ -1995,7 +2051,6 @@
     .menuBtn{display:block;}
     .hero .wrap{grid-template-columns:1fr; text-align:center;}
     .hero p{margin-inline:auto;}
-    .heroBtns{justify-content:center;}
     .hero h1{font-size:2.1rem;}
   }
   /* ===== مقاس معتدل للابتوب والكمبيوتر =====
@@ -2182,77 +2237,29 @@
       <div class="heroEyebrow"><span class="ebLine"></span> مرحباً بك في منصتي التعليمية</div>
       <h1 class="heroIntroTitle">أصنع تجربة تعليمية<br>تجعل الطالب <em>مشاركاً لا متلقياً</em></h1>
       <p class="heroIntroLead">
-        الأستاذ صالح جبر ناصر — معلم دراسات اجتماعية للصف السابع، خريج جامعة قطر،
+        الأستاذ صالح جبر ناصر — معلم دراسات اجتماعية للصفين السابع والثامن، خريج جامعة قطر،
         وأكثر من خمس سنوات في ميدان التعليم. أوظّف التقنية والذكاء الاصطناعي لبناء
         بيئة تعليمية تنمّي التفكير والقيادة.
       </p>
-      <div class="heroBtns">
-        <button class="btn btn-gold" onclick="openLogin()">🚀 ابدأ رحلتك</button>
-        <button class="btn btn-outline" onclick="showSection('about')">✦ تعرّف عليّ</button>
-      </div>
+      <div class="heroQuoteBadge" id="heroQuote">« بالتعليم نبني أجيالاً أكثر وعياً »</div>
     </div>
 
     <div class="heroIntroArt">
-      <div class="heroQuoteBadge" id="heroQuote">« بالتعليم نبني أجيالاً أكثر وعياً »</div>
-      <!-- الكرة الأرضية وكتب المواد — ثابتة؛ لوحة الأطلس المتغيّرة في بطاقتها أسفل الواجهة (#heroPlate) -->
-      <figure class="heroGlobe">
-      <svg viewBox="0 0 320 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="كرة أرضية وكتب المواد الدراسية">
-        <defs>
-          <linearGradient id="hgG" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#6bb8e0"/><stop offset="55%" stop-color="#3a86ad"/><stop offset="100%" stop-color="#1e5771"/>
-          </linearGradient>
-          <radialGradient id="hgShine" cx="32%" cy="28%" r="62%">
-            <stop offset="0%" stop-color="#ffffff" stop-opacity=".42"/><stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
-          </radialGradient>
-        </defs>
-        <ellipse cx="160" cy="216" rx="132" ry="8" fill="#000000" opacity=".22"/>
-        <g transform="translate(22,14)">
-          <circle cx="56" cy="56" r="54" fill="url(#hgG)"/>
-          <path d="M16,30 Q42,18 66,34 Q50,56 26,50 Z" fill="#4faa7c" opacity=".93"/>
-          <path d="M56,72 Q78,62 94,80 Q80,100 56,92 Z" fill="#4faa7c" opacity=".93"/>
-          <path d="M70,16 Q90,14 100,30 Q82,42 70,32 Z" fill="#4faa7c" opacity=".88"/>
-          <path d="M18,78 Q34,72 44,86 Q32,96 20,90 Z" fill="#4faa7c" opacity=".8"/>
-          <ellipse cx="56" cy="56" rx="54" ry="19" fill="none" stroke="#ffffff" stroke-width="1" opacity=".3"/>
-          <ellipse cx="56" cy="56" rx="22" ry="54" fill="none" stroke="#ffffff" stroke-width="1" opacity=".3"/>
-          <circle cx="56" cy="56" r="54" fill="url(#hgShine)"/>
-          <circle cx="56" cy="56" r="54" fill="none" stroke="#dca73a" stroke-width="3.2"/>
-          <path d="M56,113 L56,128 M32,134 L80,134" stroke="#b78623" stroke-width="5.5" stroke-linecap="round"/>
-        </g>
-        <g transform="translate(128,96)">
-          <rect x="0" y="72" width="180" height="21" rx="3.5" fill="#7a3030"/>
-          <rect x="0" y="72" width="180" height="4" rx="2" fill="#ffffff" opacity=".14"/>
-          <text x="90" y="86" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="bold">المواطنة</text>
-          <rect x="6" y="49" width="170" height="21" rx="3.5" fill="#b78623"/>
-          <rect x="6" y="49" width="170" height="4" rx="2" fill="#ffffff" opacity=".16"/>
-          <text x="91" y="63" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="bold">الجغرافيا</text>
-          <rect x="2" y="26" width="176" height="21" rx="3.5" fill="#175a4a"/>
-          <rect x="2" y="26" width="176" height="4" rx="2" fill="#ffffff" opacity=".16"/>
-          <text x="90" y="40" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="bold">التاريخ</text>
-          <rect x="10" y="3" width="162" height="21" rx="3.5" fill="#a71944"/>
-          <rect x="10" y="3" width="162" height="4" rx="2" fill="#ffffff" opacity=".18"/>
-          <text x="91" y="17" font-size="10.5" fill="#ebc578" text-anchor="middle" font-weight="bold">الدراسات الاجتماعية</text>
-        </g>
-      </svg>
-      </figure>
+      <!-- طقس الدوحة (initWeatherBar) يبقى مخفياً إن تعذّر جلبه -->
+      <div class="hdWx" id="hdWeather" hidden></div>
+      <!-- لوحة متغيّرة مع كل زيارة (renderHeroPlate): خريطة أو لوحة من المنهج -->
+      <figure class="heroPlate" id="heroPlate"></figure>
     </div>
   </div>
 </section>
 
-<!-- لوحة الصفحة الرئيسية: طقس الدوحة + متصدرو المشاركة (للمعلم بعد اختيار الصف) + الأطلس -->
+<!-- شريط الصفحة الرئيسية: متصدرو المشاركة (للمعلم، والأسماء بعد اختيار الصف) -->
 <section id="homeDash">
   <div class="wrap">
-    <div class="hdRow">
-      <div class="hdPanel hdWx" id="hdWeather" hidden></div>
-      <div class="hdPanel hdLb">
-        <h3>🏆 متصدرو المشاركة</h3>
-        <p class="hdSub">تظهر الأسماء بعد اختيار الصف فقط</p>
-        <div class="hdChips" id="hdLbChips"></div>
-        <div id="hdLbBody"></div>
-      </div>
-      <div class="hdAtlas">
-        <!-- لوحة متغيّرة مع كل زيارة (renderHeroPlate): خريطة أو لوحة من المنهج -->
-        <figure class="heroPlate" id="heroPlate"></figure>
-      </div>
+    <div class="hdLb">
+      <div class="hdLbHead"><h3>🏆 متصدرو المشاركة</h3><div class="hdSub">تظهر الأسماء بعد اختيار الصف فقط</div>
+        <div class="hdChips" id="hdLbChips"></div></div>
+      <div class="hdLbBody" id="hdLbBody"></div>
     </div>
   </div>
 </section>
@@ -4238,7 +4245,7 @@ function homeLbRender(rows){
     const pts = r.participation_points || 0;
     // الترتيب بالتنافس كلوحة الصدارة: المتعادلون يأخذون نفس الوسام
     const rank = 1 + top.filter(x => (x.participation_points || 0) > pts).length;
-    return `<div class="hdLbRow${rank === 1 ? ' r1' : ''}"><i>${LB_MEDALS[rank - 1]}</i><b>${esc(r.student_name)}</b><span>⭐ ${pts}</span></div>`;
+    return `<div class="hdLbRow${rank === 1 ? ' r1' : ''}"><i>${LB_MEDALS[rank - 1]}</i><b title="${esc(r.student_name)}">${esc(r.student_name)}</b><span>⭐ ${pts}</span></div>`;
   }).join('');
 }
 async function hdLbPick(cls){
@@ -8027,10 +8034,10 @@ async function initWeatherBar(){
         w !== null && `<span>💨 ${w} كم/س</span>`,
         h !== null && `<span>💧 رطوبة ${h}%</span>`,
       ].filter(Boolean).join('');
-      card.innerHTML = `<div class="hdWxTop"><span>${icon} طقس الدوحة الآن</span>` +
-        (t !== null ? `<b dir="ltr">${t}°</b>` : '') + `<span>${esc(desc)}</span></div>` +
-        `<div class="hdWxList">${items}</div>` +
-        `<p class="hdWxNote">الطقس حالة الجو المتغيرة يومياً — سابع: عناصر المناخ · ثامن: الغلاف الجوي</p>`;
+      // بلا <p>: البطاقة داخل .hero وقاعدة «.hero p» العامة تكبّر خطها وتزيحها
+      card.innerHTML = `<div class="hdWxTop">` + (t !== null ? `<b dir="ltr">${t}°</b>` : '') + `<span>${icon} ${esc(desc)}</span></div>` +
+        `<div class="hdWxInfo"><div class="hdWxHead">طقس الدوحة الآن</div><div class="hdWxList">${items}</div>` +
+        `<div class="hdWxNote">الطقس حالة الجو المتغيرة يومياً — سابع: عناصر المناخ · ثامن: الغلاف الجوي</div></div>`;
       card.hidden = false;
     }
     // الشريط: لو أغلقه اليوم، ما نزعجه مرة ثانية
@@ -8118,6 +8125,8 @@ function showCompare(i){
 //  اللوحات المصمَّمة (طبقات الأرض، مراحل الدولة الإسلامية) أرقامها من نص الكتاب حرفياً.
 // ═══════════════════════════════════════════════════════════
 const HP_KOPPEN = 'البيانات: تصنيف كوبن-جايجر للمناخ (Kottek وآخرون، 2006)';
+const HP_BOOK7 = 'المصدر: كتاب الدراسات الاجتماعية — الصف السابع';
+const HP_BOOK8 = 'المصدر: كتاب الدراسات الاجتماعية — الصف الثامن';
 const HERO_PLATES = [   // الكرة الأرضية ليست هنا: صارت ثابتة بالواجهة نفسها
   { id:'pop', img:'maps/pop.webp', title:'أين يعيش سكان العالم؟',
     alt:'خريطة العالم تُظهر تجمعات السكان: أكثفها في جنوب آسيا وشرقها وأوروبا',
@@ -8159,10 +8168,93 @@ const HERO_PLATES = [   // الكرة الأرضية ليست هنا: صارت �
     note:'قسّم العلماء سطح الأرض إلى أربع مناطق حرارية حسب دوائر العرض — أكبرها امتداداً المنطقة الحارة.',
     unit:'📚 سابع: عناصر المناخ — الحرارة',
     src:'حدود اليابس: Natural Earth · حدود المناطق من الكتاب' },
-  { id:'layers', title:'طبقات باطن الأرض', unit:'📚 ثامن: تركيب باطن الأرض', src:'المصدر: كتاب الدراسات الاجتماعية — الصف الثامن',
+  { id:'layers', title:'طبقات باطن الأرض', unit:'📚 ثامن: تركيب باطن الأرض', src:HP_BOOK8,
     note:'ترتفع الحرارة كلما اتجهنا نحو المركز، ويبقى باطن الأرض صلباً بسبب الضغط الهائل الواقع عليه.' },
-  { id:'timeline', title:'مراحل الدولة الإسلامية', unit:'📚 سابع: الخلافة العباسية', src:'المصدر: كتاب الدراسات الاجتماعية — الصف السابع',
+  { id:'timeline', title:'مراحل الدولة الإسلامية', unit:'📚 سابع: الخلافة العباسية', src:HP_BOOK7,
     note:'الدولة العباسية أطول هذه المراحل: 524 سنة، من 132 إلى 656هـ.' },
+
+  // ═══ خرائط إقليمية وعالمية (maps/build/render-maps.mjs — الأنهار والحدود من Natural Earth) ═══
+  { id:'rafidain', img:'maps/rafidain.webp', w:1100, h:678, title:'بلاد الرافدين بين دجلة والفرات',
+    alt:'خريطة بلاد الرافدين: نهرا دجلة والفرات يجريان إلى الخليج العربي، ومواقع أور وبابل ونينوى',
+    labels:[['نهر الفرات',41.95,24.21],['نهر دجلة',58.05,26.15],['الخليج العربي',88.78,94.59,'sea'],
+            ['البحر المتوسط',6.83,45.8,'sea minor'],['العراق حالياً',46.83,54.28,'land']],
+    pins:[['أور',68.8,67.65],['بابل',60.59,53],['نينوى',54.4,16.3]],
+    legend:[['#59a5c4','نهرا دجلة والفرات'],['#ebc87f','العراق حالياً'],['#ebc578','عاصمة تاريخية']],
+    note:'بلاد الرافدين هي المنطقة الواقعة بين نهري دجلة والفرات، وتقع ضمن حدود جمهورية العراق حالياً.',
+    unit:'📚 سابع: حضارة بلاد الرافدين', src:'الأنهار والحدود: Natural Earth · المدن من الكتاب' },
+  { id:'nile', img:'maps/nile.webp', w:1100, h:687, title:'مصر ونهر النيل',
+    alt:'خريطة مصر يجري فيها نهر النيل من الجنوب إلى البحر المتوسط، والبحر الأحمر شرقها',
+    labels:[['نهر النيل',41.11,57.87],['البحر المتوسط',24.44,7.69,'sea'],['البحر الأحمر',71.56,92.38,'sea'],['مصر',31.11,73.71,'land']],
+    legend:[['#59a5c4','نهر النيل'],['#ebc87f','مصر حالياً']],
+    note:'ساعد نهر النيل على استقرار المصريين القدماء وقيام الزراعة ووفرة المحاصيل.',
+    unit:'📚 ثامن: الحضارة المصرية', src:'الأنهار والحدود: Natural Earth' },
+  { id:'census', img:'maps/census.webp', title:'متى تُجري الدول تعدادها السكاني؟',
+    alt:'خريطة العالم تُلوّن دولاً حسب فترات إجراء التعداد السكاني فيها',
+    labels:[['الولايات المتحدة',25.74,23.87],['البرازيل',35.82,63.37],['فنزويلا',31.94,48.8,'minor'],['فرنسا',50.58,18.59],
+            ['الدانمارك',52.04,12.41,'minor'],['مصر',57.27,36.13],['الهند',71.12,40.97],['اليابان',84.44,25.7]],
+    qatar:true,
+    legend:[['#4a9fd6','كل خمس سنوات'],['#e39a45','كل عشر سنوات'],['#8cc46c','فترات غير منتظمة']],
+    note:'قطر من الدول التي تُجري تعدادها على فترات غير منتظمة، مثل البرازيل وفنزويلا.',
+    unit:'📚 ثامن: مصادر البيانات السكانية', src:'الحدود: Natural Earth · الفترات من الكتاب' },
+
+  // ═══ لوحات مصمَّمة — كل عبارة من نص الكتاب (content.js) ═══
+  { id:'rafidain-states', kind:'steps', title:'الدول التي قامت في بلاد الرافدين',
+    items:[['نحو 4000 ق.م','السومريون','العاصمة أور · أورنمو'],['نحو 2350 ق.م','الأكاديون','العاصمة أكاد · سرجون الأول'],
+           ['نحو 1880 ق.م','البابليون','العاصمة بابل · حمورابي'],['نحو 1100 ق.م','الآشوريون','شمال بلاد الرافدين · آشور بانيبال'],
+           ['627 ق.م','الكلدانيون','الدولة البابلية الثانية · نبوخذ نصر']],
+    note:'سقطت دولة الكلدانيين عام 538 ق.م على يد الفرس بقيادة قورش.',
+    unit:'📚 سابع: حضارة بلاد الرافدين', src:HP_BOOK7 },
+  { id:'powers', kind:'cards', title:'السلطات الدستورية في دولة قطر',
+    items:[['📜','التشريعية','مجلس الشورى: تشريع القوانين، وإقرار الموازنة العامة، والرقابة على السلطة التنفيذية'],
+           ['🏛️','التنفيذية','الأمير يعاونه مجلس الوزراء: تنفيذ السياسة العامة للدولة'],
+           ['⚖️','القضائية','المحاكم: الفصل في المنازعات، وهي سلطة مستقلة (المادة 130)']],
+    note:'نصّت المادة (60) على الفصل بين السلطات مع تعاونها — لمنع الاستبداد بالسلطة.',
+    unit:'📚 سابع: السلطات الدستورية', src:HP_BOOK7 },
+  { id:'courts', kind:'flow', title:'درجات المحاكم في دولة قطر',
+    items:[['المحكمة الابتدائية','تنظر في القضايا لأول مرة'],['محكمة الاستئناف','تنظر في الطعون على أحكام المحكمة الابتدائية'],
+           ['محكمة التمييز','تنظر في الطعون بطريق التمييز']],
+    note:'المجلس الأعلى للقضاء تأسس عام 1999 لضمان استقلالية القضاء.',
+    unit:'📚 سابع: السلطة القضائية', src:HP_BOOK7 },
+  { id:'security', kind:'cards', title:'أبعاد الأمن الوطني الأربعة',
+    items:[['🛡️','الأمن العسكري','حماية الدولة من أي عدوان'],['🏛️','الأمن السياسي','استقرار نظام الحكم وسيادته'],
+           ['💰','الأمن الاقتصادي','تنويع مصادر الدخل والاكتفاء'],['🤝','الأمن الاجتماعي','تماسك المجتمع وحفظ هويته']],
+    note:'أبعاد مترابطة: ضعف أحدها يؤثر على البقية.',
+    unit:'📚 سابع: الأمن الوطني', src:HP_BOOK7 },
+  { id:'winds', kind:'cards', title:'أنواع الرياح الأربعة',
+    items:[['🌐','الدائمة','تهب بانتظام طوال العام من مناطق الضغط المرتفع إلى مناطق الضغط المنخفض'],
+           ['🌧️','الموسمية','تهب في مواسم معينة؛ الصيفية من الماء إلى اليابس وتكون ممطرة'],
+           ['🏜️','المحلية','تهب على مناطق محدودة لفترات قصيرة، مثل الكوس في دولة قطر'],
+           ['🌊','اليومية','تهب يومياً: نسيم البر والبحر، ونسيم الجبل والوادي']],
+    note:'الرياح حركة الهواء الأفقية من منطقة الضغط المرتفع إلى منطقة الضغط المنخفض.',
+    unit:'📚 سابع: عناصر المناخ — الرياح', src:HP_BOOK7 },
+  { id:'spheres', kind:'cards', title:'أغلفة الأرض الأربعة',
+    items:[['🪨','الغلاف الصخري','قشرة الأرض: القارّات وقيعان البحار والمحيطات'],['☁️','الغلاف الجوي','غازات تحيط بالأرض إحاطة تامة'],
+           ['💧','الغلاف المائي','البحار والمحيطات والأنهار والبحيرات والمياه الجوفية'],['🌱','الغلاف الحيوي','جميع الكائنات الحية، ويتداخل مع الأغلفة الثلاثة الأخرى']],
+    note:'أربعة أغلفة رئيسة مسؤولة عن استمرار الحياة على سطح الأرض.',
+    unit:'📚 ثامن: أغلفة الأرض', src:HP_BOOK8 },
+  { id:'rocks', kind:'cards', title:'أنواع الصخور',
+    items:[['🌋','النارية','كتل شديدة الصلابة، غير مسامية وخالية من الحفريات — الجرانيت والبازلت'],
+           ['🏖️','الرسوبية','طبقات قليلة الصلابة ومسامية، تحتوي على حفريات — الحجر الجيري والرملي'],
+           ['💎','المتحوّلة','نارية أو رسوبية تغيّرت بالضغط أو الحرارة — الرخام والشيست']],
+    note:'تتكوّن القشرة الأرضية من ثلاثة أنواع رئيسة من الصخور.',
+    unit:'📚 ثامن: أغلفة الأرض — الغلاف الصخري', src:HP_BOOK8 },
+  { id:'air', kind:'air', title:'الغلاف الجوي',
+    note:'الغلاف الجوي هو الطبقة الغازية التي تحيط بكوكب الأرض إحاطة تامة.',
+    unit:'📚 ثامن: أغلفة الأرض — الغلاف الجوي', src:HP_BOOK8 },
+  { id:'egypt-eras', kind:'eras', title:'عصور مصر القديمة',
+    note:'قسّم المؤرخون التاريخ المصري القديم إلى عصور، يتبع كلَّ عصر قوة عصرُ ضعف.',
+    unit:'📚 ثامن: الحضارة المصرية', src:HP_BOOK8 },
+  { id:'ottoman', kind:'steps', title:'أهم سلاطين الدولة العثمانية',
+    items:[['1299–1324م','عثمان الأول','المؤسس وإليه تنتسب الدولة'],['1324–1360م','أورخان',''],['1360–1389م','مراد الأول',''],
+           ['1389–1402م','بايزيد الأول',''],['1451–1481م','محمد الثاني','«الفاتح»'],['1512–1520م','سليم الأول',''],
+           ['1520–1566م','سليمان الأول','«القانوني»']],
+    note:'اتخذ عثمان الأول من مدينة أسكي شهر في الأناضول عاصمة له.',
+    unit:'📚 ثامن: الدولة العثمانية', src:HP_BOOK8 },
+  { id:'census-traits', kind:'cards', title:'خصائص التعداد السكاني الشامل',
+    items:[['👤','الفرديّة','يُعَدّ كل فرد على حِدة'],['🧩','الشموليّة','يشمل جميع أفراد المجتمع دون حذف أو تكرار'],
+           ['📅','الآنيّة','يُجرى في يوم محدد'],['🔁','الدوريّة','يُجرى بشكل دوري منتظم']],
+    note:'التعداد السكاني من أدق وأشمل المصادر الإحصائية، ويمثله في قطر جهاز التخطيط والإحصاء.',
+    unit:'📚 ثامن: مصادر البيانات السكانية', src:HP_BOOK8 },
 ];
 
 // طبقات باطن الأرض: أنصاف أقطار بنسبها الحقيقية (نصف قطر الأرض 6371 كم،
@@ -8180,7 +8272,51 @@ function hpLayersSvg(){
   </svg>`;
 }
 
+// الغلاف الجوي (كتاب الثامن): نسب غازات الهواء بالحجم، وطبقاته الأربع من الأسفل إلى الأعلى
+function hpAirHtml(){
+  const C = 2 * Math.PI * 40;
+  const gases = [['النيتروجين',78,'#4a9fd6'],['الأكسجين',21,'#8cc46c'],['غازات أخرى',1,'#e8ae36']];
+  let off = 0;
+  const arcs = gases.map(([,v,c]) => { const len = C * v / 100; const a = `<circle r="40" fill="none" stroke="${c}" stroke-width="16"
+      stroke-dasharray="${len.toFixed(2)} ${(C - len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}"/>`; off += len; return a; }).join('');
+  const layers = [['الثيرموسفير',''],['الميزوسفير',''],['الستراتوسفير','فيه طبقة الأوزون'],['التروبوسفير','']];
+  return `<div class="hpAir">
+    <div class="hpAirGas"><svg viewBox="-50 -50 100 100" role="img" aria-label="نسب غازات الهواء: نيتروجين 78% وأكسجين 21% وغازات أخرى 1%">
+      <g transform="rotate(-90)">${arcs}</g><text y="4" text-anchor="middle" font-size="11" font-weight="bold" fill="#f6dc96">الهواء</text></svg>
+      <ul>${gases.map(([n,v,c]) => `<li><i style="background:${c}"></i>${esc(n)} <b>${v}%</b></li>`).join('')}</ul></div>
+    <div class="hpAirLayers"><span class="hpAirUp">↑ من الأسفل إلى الأعلى</span>${
+      layers.map(([n,t],i) => `<div class="hpAirL l${i}"><b>${esc(n)}</b>${t ? `<small>${esc(t)}</small>` : ''}</div>`).join('')}</div>
+  </div>`;
+}
+
+// عصور مصر القديمة (كتاب الثامن): أطوال متناسبة مع المدة، والفجوات عصور الضعف التي تلي كل عصر قوة
+function hpErasHtml(){
+  const eras = [['العصر العتيق','3200–2800 ق.م','الأسرتان 1–2',400,'#b78623'],['عصر الدولة القديمة','2800–2200 ق.م','الأسر 3–6',600,'#e8ae36'],
+                [null,'',''  ,135],['عصر الدولة الوسطى','2065–1775 ق.م','الأسرتان 11–12',290,'#4f9f86'],
+                [null,'','',205],['عصر الدولة الحديثة','1570–1098 ق.م','الأسر 18–20',472,'#d9663d']];
+  return `<div class="hpTimeline hpEras" role="img" aria-label="خط زمني نسبي لعصور مصر القديمة">${
+    eras.map(([n,,,y,c]) => n ? `<span style="flex:${y}; background:${c}" title="${esc(n)}"></span>`
+                               : `<span class="gap" style="flex:${y}">ضعف</span>`).join('')
+  }</div><ul class="hpTlList">${
+    eras.filter(e => e[0]).map(([n,d,dy,,c]) => `<li><i style="background:${c}"></i>${esc(n)} <small>${d} · ${esc(dy)}</small></li>`).join('')
+  }</ul>`;
+}
+
 function hpBody(pl){
+  if(pl.kind === 'cards'){
+    return `<div class="hpCards n${pl.items.length}">${pl.items.map(([ic,t,d]) =>
+      `<div class="hpCard"><b><span aria-hidden="true">${ic}</span>${esc(t)}</b><span>${esc(d)}</span></div>`).join('')}</div>`;
+  }
+  if(pl.kind === 'steps'){
+    return `<ol class="hpSteps">${pl.items.map(([d,n,x]) =>
+      `<li><span class="hpStDate">${esc(d)}</span><b>${esc(n)}</b>${x ? `<small>${esc(x)}</small>` : ''}</li>`).join('')}</ol>`;
+  }
+  if(pl.kind === 'flow'){
+    return `<div class="hpFlow">${pl.items.map(([n,d],i) =>
+      `${i ? '<span class="hpFlowArr" aria-hidden="true">←</span>' : ''}<div class="hpFlowBox"><b>${esc(n)}</b><span>${esc(d)}</span></div>`).join('')}</div>`;
+  }
+  if(pl.kind === 'air') return hpAirHtml();
+  if(pl.kind === 'eras') return hpErasHtml();
   if(pl.id === 'layers'){
     return `<div class="hpLayers">${hpLayersSvg()}<ol>
       <li><i style="background:#7a5a3a"></i><span><b>١ القشرة الأرضية:</b> نعيش عليها، رقيقة السُّمك (قارية ومحيطية)</span></li>
@@ -8191,7 +8327,7 @@ function hpBody(pl){
   }
   if(pl.id === 'timeline'){
     const eras = [['العصر النبوي','1–11هـ',10,'#175a4a'],['الخلافة الراشدة','11–40هـ',29,'#4f9f86'],
-                  ['الدولة الأموية','40–132هـ',92,'#b78623'],['الدولة العباسية','132–656هـ',524,'#7a3030']];
+                  ['الدولة الأموية','40–132هـ',92,'#68430b'],['الدولة العباسية','132–656هـ',524,'#7a3030']];
     return `<div class="hpTimeline" role="img" aria-label="خط زمني نسبي لمراحل الدولة الإسلامية">${
       eras.map(([n,,y,c]) => `<span style="flex:${y}; background:${c}" title="${esc(n)}">${y >= 90 ? esc(n.replace(/^(الدولة|العصر|الخلافة) /,'')) : ''}</span>`).join('')
     }</div><ul class="hpTlList">${
@@ -8201,29 +8337,44 @@ function hpBody(pl){
   const lbl = (pl.labels || []).map(([t,x,y,cls]) =>
     `<span class="hpLbl ${cls || ''}" style="left:${x}%;top:${y}%">${esc(t)}</span>`).join('');
   const qatar = pl.qatar ? `<span class="hpQatar" style="left:63.42%;top:34.3%"><i></i><b>قطر</b></span>` : '';
+  // مواقع مدن تاريخية بنقطة واسم (الخرائط الإقليمية) — محسوبة بإسقاط خريطتها
+  const pins = (pl.pins || []).map(([t,x,y]) => `<span class="hpPin" style="left:${x}%;top:${y}%"><i></i><b>${esc(t)}</b></span>`).join('');
+  const w = pl.w || 1100, h = pl.h || 488;
   const legend = pl.legend ? `<div class="hpLegend">${pl.legend.map(([c,t]) => `<span><i style="background:${c}"></i>${esc(t)}</span>`).join('')}</div>` : '';
   const ramp = pl.ramp ? `<div class="hpRamp"><span>${esc(pl.ramp[0])}</span><i></i><span>${esc(pl.ramp[1])}</span></div>` : '';
-  return `<div class="hpMap" style="aspect-ratio:1100/488"><img src="${pl.img}" alt="${esc(pl.alt)}" width="1100" height="488" decoding="async"
-      onerror="renderHeroPlate(HP_NO_IMG)">${lbl}${qatar}</div>${legend}${ramp}`;
+  return `<div class="hpMap" style="aspect-ratio:${w}/${h}"><img src="${pl.img}" alt="${esc(pl.alt)}" width="${w}" height="${h}" decoding="async"
+      onerror="renderHeroPlate(HP_NO_IMG)">${lbl}${pins}${qatar}</div>${legend}${ramp}`;
 }
 
 let hpCurrent = -1;
 // لوحة مرسومة بلا صورة — بديل الخريطة إن تعذّر تحميلها (لا تُستدعى نفسها مرة أخرى)
 const HP_NO_IMG = HERO_PLATES.findIndex(p => p.id === 'layers');
-// idx اختياري: بدونه نأخذ اللوحة التالية بالدور المحفوظ (لا تتكرر نفسها بزيارتين متتاليتين)
+// «مجموعة أوراق» مخلوطة محفوظة: كل لوحة تظهر مرة واحدة قبل أن تتكرر أي لوحة، والترتيب يتغيّر
+// كل جولة فلا يُحفظ تسلسل ثابت. بالمعرّفات لا الأرقام، فإضافة لوحة لاحقاً لا تُربك الدور المحفوظ
+function hpNextIdx(){
+  const ids = HERO_PLATES.map(p => p.id);
+  let deck = [], last = null;
+  try{ deck = JSON.parse(localStorage.getItem('rahhala_plate_deck') || '[]'); last = localStorage.getItem('rahhala_hero_plate'); }catch(e){}
+  if(!Array.isArray(deck)) deck = [];
+  deck = deck.filter(id => ids.includes(id));        // لوحة حُذفت من القائمة
+  if(!deck.length){
+    deck = ids.slice();
+    for(let i = deck.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [deck[i], deck[j]] = [deck[j], deck[i]]; }
+    if(deck[0] === last && deck.length > 1) [deck[0], deck[1]] = [deck[1], deck[0]];   // لا تبدأ الجولة بآخر لوحة ظهرت
+  }
+  const id = deck.shift();
+  try{ localStorage.setItem('rahhala_plate_deck', JSON.stringify(deck)); }catch(e){}
+  return ids.indexOf(id);
+}
+// idx اختياري: بدونه نأخذ اللوحة التالية من المجموعة المخلوطة
 function renderHeroPlate(idx){
   const box = document.getElementById('heroPlate');
   if(!box) return;
-  if(typeof idx !== 'number'){
-    let last = -1;
-    try{ last = parseInt(localStorage.getItem('rahhala_hero_plate'), 10); }catch(e){}
-    idx = Number.isInteger(last) && last >= 0 ? (last + 1) % HERO_PLATES.length
-                                             : Math.floor(Math.random() * HERO_PLATES.length);
-  }
+  if(typeof idx !== 'number' || !HERO_PLATES[idx]) idx = hpNextIdx();
   hpCurrent = idx;
-  try{ localStorage.setItem('rahhala_hero_plate', String(idx)); }catch(e){}
   const pl = HERO_PLATES[idx];
-  const next = `<button class="hpNext" type="button" onclick="renderHeroPlate((hpCurrent+1)%HERO_PLATES.length)" title="لوحة أخرى" aria-label="عرض لوحة أخرى">↻</button>`;
+  try{ localStorage.setItem('rahhala_hero_plate', pl.id); }catch(e){}
+  const next = `<button class="hpNext" type="button" onclick="renderHeroPlate()" title="لوحة أخرى" aria-label="عرض لوحة أخرى">↻</button>`;
   box.style.animation = 'none'; void box.offsetWidth; box.style.animation = '';   // إعادة حركة الظهور
   box.innerHTML = `
     <div class="hpHead"><div><div class="hpEyebrow">🧭 من أطلس رحّالة</div><h3 class="hpTitle">${esc(pl.title)}</h3></div>${next}</div>
