@@ -1478,27 +1478,8 @@
 
   /* ===== لوحة الصفحة الرئيسية ===== */
   #homeDash{padding:34px 0 64px; background:var(--cream);}
-  .hdCards{display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:22px;}
-  .hdCard{
-    position:relative; overflow:hidden; display:flex; flex-direction:column; align-items:flex-start; gap:4px;
-    min-height:150px; padding:16px 20px 34px; border-radius:18px; text-align:start; cursor:pointer;
-    border:1px solid #eee3db; box-shadow:0 8px 24px rgba(66,10,28,.06); font-family:'Tajawal'; color:var(--ink);
-    transition:transform .2s ease, box-shadow .2s ease;
-  }
-  .hdCard[hidden]{display:none;}
-  .hdCard:hover{transform:translateY(-3px); box-shadow:0 14px 30px rgba(66,10,28,.12);}
-  .hdCard:focus-visible{outline:3px solid var(--gold); outline-offset:2px;}
-  .hdIco{width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; margin-bottom:4px;}
-  .hdCard b{font-family:'Cairo'; font-weight:800; font-size:1.3rem; position:relative;}
-  .hdCard small{font-size:.9rem; color:#594a50; font-weight:500; position:relative;}
-  .hdArr{position:absolute; bottom:10px; inset-inline-start:20px; font-style:normal; font-size:1.2rem;}
-  .hdBg{position:absolute; inset-inline-end:12px; bottom:-8px; font-size:5rem; opacity:.14; pointer-events:none;}
-  .hdC1{background:linear-gradient(135deg, #fbedcf, #ffffff);} .hdC1 .hdIco{background:var(--navy);}
-  .hdC2{background:linear-gradient(135deg, #eaf0f4, #ffffff);} .hdC2 .hdIco{background:#1f5068;}
-  .hdC3{background:linear-gradient(135deg, #f4eaf4, #ffffff);} .hdC3 .hdIco{background:#5a3d7a;}
-  .hdC4{background:linear-gradient(135deg, #fbedcf, #ffffff);} .hdC4 .hdIco{background:var(--gold-deep);}
 
-  .hdRow{display:flex; flex-wrap:wrap; gap:22px; margin-top:26px; align-items:flex-start;}
+  .hdRow{display:flex; flex-wrap:wrap; gap:22px; align-items:flex-start;}
   .hdPanel{background:#ffffff; border:1px solid #eee3db; border-radius:18px; box-shadow:0 8px 24px rgba(66,10,28,.06); overflow:hidden;}
   .hdPanel[hidden]{display:none;}
   .hdWx{flex:0 1 260px;}
@@ -1524,12 +1505,6 @@
   .hdLbRow span{margin-inline-start:auto; color:var(--gold-deep);}
   @media(max-width:760px){
     #homeDash{padding:22px 0 48px;}
-    .hdCards{grid-template-columns:1fr 1fr; gap:12px;}
-    .hdCard{min-height:132px; padding:12px 14px 30px;}
-    .hdIco{width:40px; height:40px; font-size:1.15rem;}
-    .hdCard b{font-size:1.1rem;}
-    .hdCard small{font-size:.8rem; line-height:1.5;}
-    .hdBg{font-size:3.4rem;}
     .hdRow{gap:14px;}
     .hdWx, .hdLb, .hdAtlas{flex:1 1 100%;}
   }
@@ -2263,23 +2238,9 @@
   </div>
 </section>
 
-<!-- لوحة الصفحة الرئيسية: أربع بوابات + طقس الدوحة + متصدرو المشاركة (للمعلم بعد اختيار الصف) + الأطلس -->
+<!-- لوحة الصفحة الرئيسية: طقس الدوحة + متصدرو المشاركة (للمعلم بعد اختيار الصف) + الأطلس -->
 <section id="homeDash">
   <div class="wrap">
-    <div class="hdCards">
-      <button class="hdCard hdC1" type="button" onclick="hdOpenMenu('curriculumDropBtn', event)">
-        <span class="hdIco">📖</span><b>المنهج</b><small>دروس الصفين السابع والثامن</small><i class="hdArr">←</i><span class="hdBg" aria-hidden="true">📚</span>
-      </button>
-      <button class="hdCard hdC2" type="button" id="hdLessonCard" hidden onclick="openLessonFromNav()">
-        <span class="hdIco">📝</span><b>حصة اليوم</b><small>أنشطة الحصة وعرضها على السبورة</small><i class="hdArr">←</i><span class="hdBg" aria-hidden="true">🗂️</span>
-      </button>
-      <button class="hdCard hdC3" type="button" onclick="showSection('games')">
-        <span class="hdIco">🎮</span><b>الألعاب</b><small>مراجعة وتحديات ممتعة</small><i class="hdArr">←</i><span class="hdBg" aria-hidden="true">🎯</span>
-      </button>
-      <button class="hdCard hdC4" type="button" onclick="hdOpenMenu('enrichDropBtn', event)">
-        <span class="hdIco">🎥</span><b>مصادر إثرائية</b><small>مقاطع وأنشطة لكل وحدة</small><i class="hdArr">←</i><span class="hdBg" aria-hidden="true">🎬</span>
-      </button>
-    </div>
     <div class="hdRow">
       <div class="hdPanel hdWx" id="hdWeather" hidden></div>
       <div class="hdPanel hdLb">
@@ -3115,11 +3076,6 @@ function showHome(){
   });
   document.getElementById('unitView').classList.remove('show');
   document.getElementById('enrichView').classList.remove('show');
-  // لوحة المعلم تظهر تلقائياً لو كان مسجّلاً دخوله
-  if(isAdmin){
-    const ap = document.getElementById('adminPanel');
-    if(ap) ap.style.display = '';
-  }
   window.scrollTo({top:0, behavior:'instant'});
 }
 
@@ -4301,15 +4257,6 @@ async function hdLbPick(cls){
     return;
   }
   homeLbRender(data || []);
-}
-
-// بطاقتا «المنهج» و«مصادر إثرائية» تفتحان قائمتيهما بالشريط العلوي (فيها وحدات الصف النشط)
-function hdOpenMenu(btnId, ev){
-  if(ev) ev.stopPropagation();   // وإلا أغلقها مستمع النقر العام فوراً
-  document.querySelectorAll('.navDrop').forEach(d=>d.classList.remove('open'));
-  document.getElementById('mainNav').classList.add('show');   // الجوال: القائمة مطوية خلف ☰
-  document.getElementById(btnId).closest('.navDrop').classList.add('open');
-  window.scrollTo({top:0, behavior:'smooth'});
 }
 
 // ---------- class challenge (تجميع نقاط كل صف، تحدّث دوري) ----------
@@ -6344,7 +6291,7 @@ async function adminLogin(btn){
     return;
   }
   closeAdminLogin();
-  setAdminActive(true, true);
+  setAdminActive(true);
   showToast('✅ تم تسجيل دخول المعلم بنجاح', 'success');
 }
 
@@ -6352,6 +6299,7 @@ async function adminLogout(btn){
   setBtnLoading(btn, true, 'جاري تسجيل الخروج...');
   if(sb) await sb.auth.signOut();
   setAdminActive(false);
+  showHome();   // لو خرج وهو داخل قسم للمعلم (اللوحة، صفوفي…) لا تبقى صفحة فارغة
   setBtnLoading(btn, false);
   showToast('👋 تم تسجيل خروج المعلم بنجاح', 'success');
 }
@@ -6373,12 +6321,12 @@ function openAdminPanel(){
   window.scrollTo({top:0, behavior:'instant'});
 }
 
-// scrollToPanel: النزول للوحة المعلم فقط عند تسجيل الدخول اليدوي — استعادة الجلسة
-// المحفوظة عند فتح الموقع كانت تُنزل الصفحة لآخرها بدل الواجهة
-function setAdminActive(active, scrollToPanel){
+// لوحة المعلم لا تظهر بنفسها (بطلب المالك): تُفتح فقط من رابط «🎛️ لوحة المعلم» بالشريط
+// أو زر القفل (openAdminPanel). الدخول يحمّل بياناتها بالخلفية فقط
+function setAdminActive(active){
   isAdmin = active;
   document.getElementById('adminChip').classList.toggle('active', active);
-  document.getElementById('adminPanel').classList.toggle('show', active);
+  if(!active) document.getElementById('adminPanel').classList.remove('show');
   document.getElementById('adminLogoutTop').classList.toggle('show', active);
   // رابط لوحة المعلم بالشريط العلوي — يظهر لك وحدك بعد تسجيل الدخول
   const navLink = document.getElementById('adminNavLink');
@@ -6387,12 +6335,8 @@ function setAdminActive(active, scrollToPanel){
   if(myCls) myCls.style.display = active ? 'inline-block' : 'none';
   const lsn = document.getElementById('lessonNavLink');
   if(lsn) lsn.style.display = active ? 'inline-block' : 'none';
-  const hdl = document.getElementById('hdLessonCard');
-  if(hdl) hdl.hidden = !active;
   homeLbRender();
   if(active){
-    document.getElementById('adminPanel').style.display = ''; // نتجاوز إخفاء الصفحة الرئيسية
-    if(scrollToPanel) document.getElementById('adminPanel').scrollIntoView({behavior:'smooth'});
     // الأهم أولاً: الطلاب المنتظرون للموافقة — يظهرون فوراً
     loadPendingStudents();
     loadStudentsList();
@@ -6403,7 +6347,7 @@ function setAdminActive(active, scrollToPanel){
 
 document.getElementById('adminChip').addEventListener('click', ()=>{
   if(isAdmin){
-    document.getElementById('adminPanel').scrollIntoView({behavior:'smooth'});
+    openAdminPanel();
   } else {
     openAdminLogin();
   }
