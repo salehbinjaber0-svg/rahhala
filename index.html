@@ -2105,6 +2105,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .thLbRow:last-child{border-bottom:none;}
   .thLbRow i{font-style:normal; font-size:1.4rem;}
   .thLbRow span{margin-inline-start:auto; color:var(--gold-light);}
+  .thPod{width:100%; margin:6px 0 8px;}
   .thEmpty{font-size:.98rem; padding:8px 0 4px; color:#ffffff;}
   .thSide .heroPlate{max-width:none; margin:0;}
   .thSide .hpTitle{font-size:1.35rem;}
@@ -2139,6 +2140,61 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .cmdItem.sel{background:#fbedcf; outline:2px solid var(--gold);}
   .cmdNone{padding:18px; text-align:center; color:#594a50;}
   .cmdFoot{padding:10px 18px; border-top:1px solid #eee3db; font-size:.85rem; color:#594a50; background:#faf7f4;}
+
+  /* ═══════ المرحلة الثانية ٢-٢: افتتاح الحصة · كشف الأبطال · النجوم الطائرة ═══════ */
+  .lsIntro{position:fixed; inset:0; z-index:500; overflow:hidden; cursor:pointer; color:#ffffff;
+    background:radial-gradient(ellipse at 50% 42%, var(--navy-soft) 0%, var(--navy-deep) 58%, #311d23 100%);
+    display:flex; align-items:center; justify-content:center; text-align:center; transition:opacity .45s ease;}
+  .lsIntro[hidden]{display:none;}
+  .lsIntro.out{opacity:0;}
+  .lsiRays{position:absolute; inset:-50%; background:repeating-conic-gradient(from 0deg at 50% 50%, rgba(246,220,150,.06) 0 6deg, transparent 6deg 18deg); animation:lsiSpin 40s linear infinite;}
+  @keyframes lsiSpin{to{transform:rotate(360deg);}}
+  .lsiIn{position:relative; display:flex; flex-direction:column; align-items:center; gap:2vh; padding:0 4vw;}
+  .lsiKick{font-family:'Cairo'; font-weight:800; font-size:clamp(1.1rem,2vw,1.9rem); color:var(--gold-light); animation:lsiUp .6s ease both;}
+  .lsiLine{width:min(280px,40vw); height:3px; background:linear-gradient(90deg, transparent, var(--gold), transparent); animation:lsiGrow .8s ease .2s both;}
+  .lsiTitle{font-family:'Aref Ruqaa'; font-size:clamp(3rem,7.4vw,7.4rem); line-height:1.35; margin:0; color:var(--gold-light); text-shadow:0 8px 30px rgba(0,0,0,.4); animation:lsiUp .8s ease .25s both;}
+  .lsiSub{font-family:'Cairo'; font-weight:700; font-size:clamp(1.1rem,2.1vw,2rem); color:#ffffff; animation:lsiUp .7s ease .45s both;}
+  .lsiChips{display:flex; gap:12px; flex-wrap:wrap; justify-content:center; animation:lsiUp .7s ease .6s both;}
+  .lsiChips span{background:rgba(0,0,0,.25); border:1.5px solid rgba(246,220,150,.5); border-radius:30px; padding:8px 20px; font-weight:700; font-size:clamp(.95rem,1.4vw,1.35rem); color:var(--gold-light);}
+  .lsiCount{margin-top:2vh; width:clamp(120px,11vw,190px); height:clamp(120px,11vw,190px); border-radius:50%; display:flex; align-items:center; justify-content:center;
+    border:8px solid rgba(246,220,150,.25); border-top-color:var(--gold); font-family:'Cairo'; font-weight:800; font-size:clamp(4rem,7vw,7rem); color:var(--gold-light);}
+  .lsiCount.tick{animation:lsiPop .5s ease;}
+  .lsiSkip{font-size:.95rem; color:#ffffff; opacity:.85;}
+  @keyframes lsiUp{from{opacity:0; transform:translateY(18px);} to{opacity:1; transform:none;}}
+  @keyframes lsiGrow{from{transform:scaleX(0);} to{transform:scaleX(1);}}
+  @keyframes lsiPop{0%{transform:scale(.6); opacity:.2;} 60%{transform:scale(1.12);} 100%{transform:scale(1); opacity:1;}}
+
+  .podium{position:fixed; inset:0; z-index:510; overflow:hidden; color:#ffffff; text-align:center;
+    background:radial-gradient(ellipse at 50% 28%, var(--navy-soft), #311d23 75%);}
+  .podium[hidden]{display:none;}
+  .podClose{position:absolute; top:18px; left:18px; width:44px; height:44px; border-radius:50%; border:1.5px solid rgba(220,167,58,.5); background:rgba(0,0,0,.25); color:#ffffff; font-size:1.1rem; cursor:pointer; z-index:2;}
+  .podTitle{font-family:'Aref Ruqaa'; font-size:clamp(2.6rem,5vw,4.8rem); color:var(--gold-light); margin:3vh 0 0; line-height:1.5;}
+  .podSub{font-family:'Cairo'; font-weight:700; font-size:clamp(1.1rem,2vw,1.8rem); color:#ffffff;}
+  .podStage{position:absolute; bottom:0; left:50%; transform:translateX(-50%); display:flex; align-items:flex-end; gap:2vw; width:min(1400px,96vw);}
+  .podCol{flex:1; display:flex; flex-direction:column; align-items:center;}
+  .podWho{opacity:0; transform:translateY(30px) scale(.9); transition:opacity .6s ease, transform .6s cubic-bezier(.2,1.4,.4,1); margin-bottom:2vh;}
+  .podCol.on .podWho{opacity:1; transform:none;}
+  .podMedal{width:clamp(90px,9vw,150px); height:clamp(90px,9vw,150px); margin:0 auto 1vh; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:clamp(3rem,5vw,5rem); background:rgba(0,0,0,.25); border:5px solid var(--gold);}
+  .podName{font-family:'Cairo'; font-weight:800; font-size:clamp(1.8rem,3.4vw,3.4rem); line-height:1.3;}
+  .podStars{font-family:'Cairo'; font-weight:800; font-size:clamp(1.3rem,2.2vw,2.2rem); color:var(--gold-light);}
+  .podBlk{width:100%; border-radius:22px 22px 0 0; display:flex; justify-content:center; padding-top:2vh; font-family:'Cairo'; font-weight:800;
+    font-size:clamp(3rem,6vw,6rem); color:var(--navy-deep); transform-origin:bottom; transform:scaleY(.08); transition:transform .7s cubic-bezier(.2,1.2,.4,1);}
+  .podCol.on .podBlk{transform:none;}
+  .podCol.r1 .podBlk{height:36vh; background:linear-gradient(180deg, var(--gold-light), var(--gold));}
+  .podCol.r2 .podBlk{height:26vh; background:linear-gradient(180deg, #f4ede8, #bbb1a9);}
+  .podCol.r3 .podBlk{height:19vh; background:linear-gradient(180deg, #f2d498, #c07040);}
+  .podCol.r1 .podMedal{box-shadow:0 0 0 14px rgba(246,220,150,.22), 0 0 60px rgba(246,220,150,.45);}
+  .podCol.r1 .podName{font-size:clamp(2.2rem,4.2vw,4.2rem);}
+  .podHint{position:absolute; bottom:12px; right:18px; font-size:.9rem; color:#ffffff; opacity:.8; z-index:2;}
+
+  .flyStar{position:fixed; z-index:600; pointer-events:none; font-size:2rem; line-height:1; will-change:transform, opacity;}
+  .flyPlus{position:fixed; z-index:601; pointer-events:none; font-family:'Cairo'; font-weight:900; font-size:1.5rem; color:var(--navy);
+    background:var(--gold-light); padding:2px 12px; border-radius:14px; box-shadow:0 6px 16px rgba(66,10,28,.25); white-space:nowrap;}
+  @media (prefers-reduced-motion: reduce){
+    .lsiRays{animation:none;} .lsiKick, .lsiLine, .lsiTitle, .lsiSub, .lsiChips{animation:none;}
+    .podWho, .podBlk{transition:none;}
+  }
 </style>
 </head>
 <body>
@@ -2226,6 +2282,29 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <button class="menuBtn" id="menuBtn">☰</button>
   </div>
 </header>
+
+<!-- المرحلة الثانية ٢-٢: افتتاح الحصة — فوق العرض مباشرة، أي مفتاح أو نقرة يتخطاه -->
+<div id="lsIntro" class="lsIntro" hidden onclick="lsIntroEnd()">
+  <div class="lsiRays" aria-hidden="true"></div>
+  <div class="lsiIn">
+    <div class="lsiKick" id="lsiKick"></div>
+    <div class="lsiLine" aria-hidden="true"></div>
+    <h1 class="lsiTitle" id="lsiTitle"></h1>
+    <div class="lsiSub" id="lsiSub"></div>
+    <div class="lsiChips" id="lsiChips"></div>
+    <div class="lsiCount" id="lsiCount" aria-live="polite">٣</div>
+    <div class="lsiSkip">اضغط أي مفتاح للبدء فوراً</div>
+  </div>
+</div>
+
+<!-- المرحلة الثانية ٢-٢: كشف الأبطال — الثالث ثم الثاني ثم الأول -->
+<div id="podium" class="podium" hidden>
+  <button class="podClose" type="button" onclick="closePodium()" aria-label="إغلاق">✕</button>
+  <h1 class="podTitle">أبطال <span id="podCls"></span> 🏆</h1>
+  <div class="podSub" id="podSub">🥁 من هم أبطال المشاركة؟</div>
+  <div class="podStage" id="podStage"></div>
+  <div class="podHint">مسافة: الكشف التالي · Esc: إغلاق</div>
+</div>
 
 <!-- لوحة الأوامر السريعة (Ctrl+K أو /) — للمعلم فقط -->
 <div id="cmdPal" class="cmdPal" hidden onclick="cmdBackdrop(event)">
@@ -2661,6 +2740,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <div class="lbBar" id="lbBar" hidden>
       <div class="lbFilters" id="lbFilters"></div>
       <button class="lbShowBtn" id="lbShowBtn" onclick="lbToggleShow()">🖥️ اعرض على الشاشة</button>
+      <button class="lbShowBtn" type="button" onclick="openPodium(lbFilter === 'all' ? '' : lbFilter)">🎉 كشف الأبطال</button>
     </div>
     <div id="leaderboardBody"></div>
   </div>
@@ -4237,6 +4317,7 @@ function thRenderBoard(){
   const top = (lbRows || []).filter(r => r.cls === cls && (r.participation_points || 0) > 0)
     .sort((a, b) => (b.participation_points || 0) - (a.participation_points || 0)).slice(0, 3);
   box.innerHTML = `<div class="thBoardHead"><h3>لوحة الصدارة</h3><span>${esc(thClsLabel(cls))}</span></div>`
+    + (top.length ? `<button type="button" class="thOther thPod" onclick="openPodium()">🎉 كشف الأبطال على الشاشة</button>` : '')
     + (top.length ? top.map((r, i) => `<div class="thLbRow"><i>${TH_MEDALS[i]}</i>${esc(r.student_name)}<span>⭐ ${r.participation_points || 0}</span></div>`).join('')
       : `<div class="thEmpty">${thBoardAt ? 'ما فيه نجوم مشاركة بعد — أول نجمة تفتح السباق ⭐' : '⏳ جاري التحميل…'}</div>`);
 }
@@ -4276,6 +4357,127 @@ function thCurriculum(){
   openUnit(pick ? pick.act.unit : 1);
 }
 
+// ═══════ المرحلة الثانية ٢-٢: افتتاح الحصة ═══════
+// العرض يُفتح تحته فوراً؛ الافتتاح طبقة فوقه تختفي بعد ٣·٢·١ — أو بأي مفتاح/نقرة
+let lsiTimer = null;
+const LSI_NUMS = ['٣', '٢', '١'];
+function lsIntroShow(act){
+  const el = document.getElementById('lsIntro');
+  if(!el || !act) return;
+  const U = act.grade === 8 ? UNITS_DATA_8 : UNITS_DATA, u = U[act.unit];
+  const today = new Date().toLocaleDateString('en-CA');
+  const sel = document.getElementById('lsCls');
+  const clsLabel = lsCls && sel && sel.selectedOptions[0] ? sel.selectedOptions[0].textContent.replace('⭐', '').trim() : (act.grade === 8 ? 'ثامن' : 'سابع');
+  document.getElementById('lsiKick').textContent = `📝 ${act.special && act.date === today ? 'حصة اليوم' : 'نشاط الحصة'} · ${clsLabel} · الوحدة ${act.unit}`;
+  document.getElementById('lsiTitle').textContent = u ? u.title : act.title;
+  document.getElementById('lsiSub').textContent = u ? act.title : '';
+  document.getElementById('lsiChips').innerHTML = String(act.desc || '').split(/\s+[—·]\s+/).filter(Boolean).slice(0, 5)
+    .map(t => `<span>${esc(t)}</span>`).join('');
+  const cnt = document.getElementById('lsiCount');
+  let i = 0;
+  cnt.textContent = LSI_NUMS[0];
+  el.classList.remove('out');
+  el.hidden = false;
+  clearInterval(lsiTimer);
+  document.addEventListener('keydown', lsIntroKey, true);
+  lsiTimer = setInterval(() => {
+    i++;
+    if(i < LSI_NUMS.length){ cnt.textContent = LSI_NUMS[i]; cnt.classList.remove('tick'); void cnt.offsetWidth; cnt.classList.add('tick'); }
+    else lsIntroEnd();
+  }, 950);
+}
+// المرحلة الالتقاط: المفتاح يُنهي الافتتاح ولا يصل لعرض النشاط (فلا يقلب سؤالاً تحته)
+function lsIntroKey(e){ e.preventDefault(); e.stopPropagation(); lsIntroEnd(); }
+function lsIntroEnd(){
+  const el = document.getElementById('lsIntro');
+  clearInterval(lsiTimer); lsiTimer = null;
+  document.removeEventListener('keydown', lsIntroKey, true);
+  if(!el || el.hidden) return;
+  el.classList.add('out');
+  setTimeout(() => { el.hidden = true; el.classList.remove('out'); }, 450);
+}
+
+// ═══════ المرحلة الثانية ٢-٢: كشف الأبطال ═══════
+let podCols = [], podStep = 0, podTimer = null;
+async function openPodium(cls){
+  if(!isAdmin) return;
+  cls = cls || thCurrentCls();
+  if(!(lbRows || []).length && dbReady && sb) await refreshLeaderboard();
+  const rows = (lbRows || []).filter(r => r.cls === cls && (r.participation_points || 0) > 0)
+    .sort((a, b) => (b.participation_points || 0) - (a.participation_points || 0)).slice(0, 3);
+  if(!rows.length){ showToast('ما فيه نجوم مشاركة لهذا الصف بعد ⭐', 'info'); return; }
+  const medal = ['🥇', '🥈', '🥉'], ar = ['١', '٢', '٣'];
+  // الترتيب بالتنافس: المتعادلون يأخذون نفس المركز والوسام
+  const rank = r => 1 + rows.filter(x => (x.participation_points || 0) > (r.participation_points || 0)).length;
+  const col = (r, pos) => r ? `<div class="podCol r${pos}"><div class="podWho"><div class="podMedal">${medal[rank(r) - 1]}</div>
+      <div class="podName">${esc(r.student_name)}</div><div class="podStars">⭐ ${r.participation_points || 0}</div></div><div class="podBlk">${ar[rank(r) - 1]}</div></div>`
+    : `<div class="podCol"></div>`;
+  // المنصة يميناً لليسار: الثاني · الأول · الثالث
+  document.getElementById('podStage').innerHTML = col(rows[1], 2) + col(rows[0], 1) + col(rows[2], 3);
+  document.getElementById('podCls').textContent = thClsLabel(cls);
+  document.getElementById('podSub').textContent = '🥁 من هم أبطال المشاركة؟';
+  const stage = document.getElementById('podStage');
+  podCols = [stage.querySelector('.r3'), stage.querySelector('.r2'), stage.querySelector('.r1')].filter(Boolean);
+  podStep = 0;
+  document.getElementById('podium').hidden = false;
+  document.addEventListener('keydown', podKeys);
+  clearInterval(podTimer);
+  podTimer = setInterval(podNext, 1700);
+}
+function podNext(){
+  const c = podCols[podStep++];
+  if(c) c.classList.add('on');
+  if(podStep >= podCols.length){
+    clearInterval(podTimer); podTimer = null;
+    const champ = podCols[podCols.length - 1];
+    if(champ){
+      document.getElementById('podSub').textContent = '👑 البطل: ' + champ.querySelector('.podName').textContent;
+      if(!window.matchMedia || !matchMedia('(prefers-reduced-motion: reduce)').matches) lsConfetti(60);
+    }
+  }
+}
+function podKeys(e){
+  if(e.key === 'Escape') closePodium();
+  else if(e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowLeft'){ e.preventDefault(); clearInterval(podTimer); podTimer = null; podNext(); }
+}
+function closePodium(){
+  clearInterval(podTimer); podTimer = null;
+  document.getElementById('podium').hidden = true;
+  document.removeEventListener('keydown', podKeys);
+}
+
+// ═══════ المرحلة الثانية ٢-٢: النجوم الطائرة ═══════
+// من زر النقطة إلى رابط «لوحة الصدارة» بالشريط — يرى الصف أن النجمة «وصلت»
+function flyStars(fromRect, n){
+  if(!fromRect || !n) return;
+  const x0 = fromRect.left + fromRect.width / 2, y0 = fromRect.top + fromRect.height / 2;
+  const plus = document.createElement('div');
+  plus.className = 'flyPlus';
+  plus.textContent = '+' + String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) + ' ⭐';
+  plus.style.left = (x0 - 30) + 'px'; plus.style.top = (y0 - 40) + 'px';
+  document.body.appendChild(plus);
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(plus.animate) plus.animate([{transform:'translateY(0)', opacity:1}, {transform:'translateY(-46px)', opacity:0}], {duration: reduce ? 600 : 1100, easing:'ease-out', fill:'forwards'});
+  setTimeout(() => plus.remove(), 1200);
+  if(reduce) return;
+  const target = [...document.querySelectorAll('#mainNav > a')].find(a => a.textContent.includes('لوحة الصدارة') && a.offsetWidth);
+  const tr = target ? target.getBoundingClientRect() : {left: innerWidth / 2, top: 10, width: 0, height: 0};
+  const x1 = tr.left + tr.width / 2, y1 = tr.top + tr.height / 2;
+  for(let i = 0; i < Math.min(n, 5); i++){
+    const st = document.createElement('div');
+    st.className = 'flyStar'; st.textContent = '⭐';
+    st.style.left = (x0 - 16) + 'px'; st.style.top = (y0 - 16) + 'px';
+    document.body.appendChild(st);
+    const dx = x1 - x0, dy = y1 - y0, lift = -120 - i * 18;
+    if(st.animate) st.animate([
+      {transform:'translate(0,0) scale(1)', opacity:1},
+      {transform:`translate(${dx * .5}px, ${dy * .5 + lift}px) scale(1.25)`, opacity:1, offset:.5},
+      {transform:`translate(${dx}px, ${dy}px) scale(.5)`, opacity:.2}
+    ], {duration:900 + i * 90, delay:i * 70, easing:'cubic-bezier(.3,.1,.3,1)', fill:'forwards'});
+    setTimeout(() => st.remove(), 1300 + i * 160);
+  }
+}
+
 // ═══════ الأوامر السريعة (Ctrl+K أو /) واختصارات جهاز التحكم ═══════
 let cmdAll = [], cmdShown = [], cmdSel = 0;
 const cmdNorm = t => String(t || '').toLowerCase()
@@ -4295,6 +4497,7 @@ function cmdBuild(){
     add('🎡', `عجلة الأسماء — ${c.label}`, 'اختيار عشوائي', () => openWheel(c.cls), 'عجله اسماء');
     add('🍀', `الطالب المحظوظ — ${c.label}`, 'مكافأة نجوم', () => openLucky(c.cls), 'محظوظ');
     add('📋', `صفوفي — ${c.label}`, 'النقاط والملاحظات', () => { thCls = c.cls; thMyClass(); }, 'صفوفي صف');
+    add('🎉', `كشف الأبطال — ${c.label}`, 'منصة التتويج بالتشويق', () => openPodium(c.cls), 'ابطال تتويج صداره');
   });
   [[7, UNITS_DATA], [8, UNITS_DATA_8]].forEach(([g, U]) => Object.keys(U).forEach(n => {
     add('📖', `الوحدة ${n} — ${U[n].title}`, `المنهج · ${g === 8 ? 'ثامن' : 'سابع'}`, () => { if(GRADE !== g) applyGrade(g, true); openUnit(parseInt(n, 10)); }, 'وحده منهج');
@@ -4340,7 +4543,7 @@ document.addEventListener('keydown', e => {
   if((e.ctrlKey || e.metaKey) && e.code === 'KeyK'){ e.preventDefault(); document.getElementById('cmdPal').hidden ? openCmd() : closeCmd(); return; }
   const t = e.target, typing = t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable);
   if(typing || e.ctrlKey || e.metaKey || e.altKey) return;
-  if(!document.getElementById('cmdPal').hidden || whOpen() || lkOpen()) return;
+  if(!document.getElementById('cmdPal').hidden || whOpen() || lkOpen() || !document.getElementById('podium').hidden) return;
   const showing = document.getElementById('lessonShow').classList.contains('show');
   if(e.key === '/' || e.code === 'Slash'){ e.preventDefault(); openCmd(); }
   else if(e.code === 'KeyW'){ e.preventDefault(); openWheel(showing && lsCls ? lsCls : thCurrentCls()); }
@@ -6272,6 +6475,7 @@ function startActivity(id){
   lsStatRun(id);
   lsSetupCls(act.grade);
   openLessonShow();
+  lsIntroShow(act);
 }
 
 // ── وضع العرض على البروجكتر ──
@@ -6413,6 +6617,7 @@ function openLessonShow(){
 }
 
 function closeLessonShow(){
+  lsIntroEnd();
   lsClosePicker();
   lsStopTimer();
   lsCancelAuto();
@@ -6663,6 +6868,8 @@ async function lsGiveAward(id){
   const r = lsRoster.find(x => x.id === id);
   if(!r) return;
   lsAwards[idx] = {id, name: r.student_name};   // استجابة فورية
+  const btn = document.activeElement && document.activeElement.classList.contains('lsPickName') ? document.activeElement.getBoundingClientRect() : null;
+  if(btn) flyStars(btn, 1);
   lsClosePicker();
   lsRefreshAward();
   lsConfetti(10);
@@ -7576,7 +7783,10 @@ async function changePoints(id, delta, rerender){
   const next = (row.participation_points || 0) + delta;
   if(next < 0) return;                 // ما ننزل تحت الصفر
   row.participation_points = next;
+  // موضع الزر المضغوط قبل إعادة الرسم (الرسم يستبدل العنصر)
+  const from = delta > 0 && document.activeElement && document.activeElement.tagName === 'BUTTON' ? document.activeElement.getBoundingClientRect() : null;
   rerender();                          // استجابة فورية
+  if(from) flyStars(from, delta);
   const { error } = await sb.from('class_roster')
     .update({participation_points: next}).eq('id', id);
   if(error){ showToast('تعذر الحفظ: ' + error.message, 'error'); refreshClassChallenge(); }
