@@ -7,7 +7,7 @@
 
 <!-- أيقونة الموقع: بوصلة ذهبية بهوية رحّالة — مضمّنة بالكود فلا تحتاج ملفاً خارجياً -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230a2029'/%3E%3Ccircle cx='50' cy='50' r='36' fill='none' stroke='%23c9a15e' stroke-width='3'/%3E%3Ccircle cx='50' cy='50' r='27' fill='none' stroke='%23c9a15e' stroke-width='1.5' opacity='.45'/%3E%3Cpolygon points='50,16 57,50 50,84 43,50' fill='%23c9a15e'/%3E%3Cpolygon points='16,50 50,43 84,50 50,57' fill='%23e3c98b' opacity='.9'/%3E%3Ccircle cx='50' cy='50' r='6' fill='%23f6f1e6'/%3E%3C/svg%3E">
-<meta name="theme-color" content="#0a2029">
+<meta name="theme-color" content="#4f0c20">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@600;700;800&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <script>
@@ -45,22 +45,25 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 <!-- مكتبة توليد رموز QR (MIT license, Kazuhiko Arase) — مضمّنة مباشرة، تشتغل بدون إنترنت -->
 <style>
   :root{
-    --navy:#10303f;
-    --navy-deep:#0a2029;
-    --navy-soft:#164256;      /* درجة أفتح للتدرّجات */
-    --gold:#c9a15e;
-    --gold-light:#e3c98b;
-    --gold-deep:#a8813f;      /* ذهبي أعمق لطرف التدرّج */
-    --cream:#f6f1e6;
-    --cream-warm:#fdfbf6;     /* خلفية دافئة بدل الأبيض الجاف */
-    --teal:#1f6f5c;
-    --maroon:#7a3030;
-    --ink:#1c2b30;
+    /* الهوية: العنابي القطري — اختيرت لوضوحها على السبورة والبروجكتر (تباين النص ≥ 7:1).
+       أسماء المتغيرات (navy/gold) باقية من الهوية السابقة حتى لا تنكسر مئات المراجع؛
+       --navy = العنابي الأساسي · --gold = الذهبي الرملي للتعبئة · --gold-deep = البرونزي لكل نص ذهبي */
+    --navy:#7a1232;
+    --navy-deep:#420a1c;
+    --navy-soft:#80173a;      /* عنابي أفتح للتدرّجات */
+    --gold:#dba73c;
+    --gold-light:#f6dc96;
+    --gold-deep:#68430b;      /* برونزي — لون أي نص «ذهبي» على خلفية فاتحة (≥7.5:1) */
+    --cream:#f8f3ef;
+    --cream-warm:#ffffff;     /* خلفية دافئة بدل الأبيض الجاف */
+    --teal:#175a4a;
+    --maroon:#8a2c0e;     /* لون الخطأ والتنبيه: أحمر برتقالي يتميّز عن العنابي الأساسي */
+    --ink:#1f1216;
     --radius:14px;
     /* تدرّجات جاهزة تُستخدم بالعناصر المميزة */
     --grad-navy:linear-gradient(155deg, var(--navy-soft), var(--navy-deep));
     --grad-gold:linear-gradient(135deg, var(--gold-light), var(--gold));
-    --shadow-soft:0 4px 20px rgba(16,48,63,.07);
+    --shadow-soft:0 4px 20px rgba(122,18,50,.07);
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{
@@ -117,34 +120,34 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     color:var(--cream);
     position:sticky; top:0; z-index:50;
     border-bottom:3px solid var(--gold);
-    box-shadow:0 2px 16px rgba(10,32,41,.18);
+    box-shadow:0 2px 16px rgba(79,12,32,.18);
   }
   header .wrap{display:flex; align-items:center; justify-content:space-between; padding:14px 20px;}
   .brand{display:flex; align-items:center; gap:10px; font-size:1.5rem;}
   .brand span.sub{font-family:'Tajawal'; font-size:.7rem; color:var(--gold-light); display:block; font-weight:400;}
   nav{display:flex; gap:22px; font-size:.95rem; align-items:center;}
-  nav a{opacity:.85; padding:6px 2px; border-bottom:2px solid transparent; transition:.2s;}
+  nav a{padding:6px 2px; border-bottom:2px solid transparent; transition:.2s;}
   nav a:hover{opacity:1; border-color:var(--gold);}
 
   .navDrop{position:relative;}
   .navDropBtn{
     background:none; border:none; color:var(--cream); font-family:'Tajawal'; font-size:.95rem;
-    opacity:.85; cursor:pointer; padding:6px 2px; display:flex; align-items:center; gap:4px;
+    cursor:pointer; padding:6px 2px; display:flex; align-items:center; gap:4px;
   }
   .navDropBtn:hover{opacity:1;}
   .navDropBtn .caret{font-size:.7rem; transition:.2s;}
   .navDrop.open .navDropBtn .caret{transform:rotate(180deg);}
   .navDropMenu{
-    display:none; position:absolute; top:36px; right:0; background:#fff; border-radius:12px;
+    display:none; position:absolute; top:36px; right:0; background:#ffffff; border-radius:12px;
     box-shadow:0 10px 30px rgba(0,0,0,.25); padding:8px; min-width:220px; z-index:120;
   }
   .navDrop.open .navDropMenu{display:block;}
   .cmSearchWrap{padding:10px 12px 4px;}
   .cmSearch{
-    width:100%; padding:9px 13px; border-radius:9px; border:1.5px solid #dcd4c0;
-    font-family:'Tajawal'; font-size:.88rem; background:#fff;
+    width:100%; padding:9px 13px; border-radius:9px; border:1.5px solid #dfccbd;
+    font-family:'Tajawal'; font-size:.88rem; background:#ffffff;
   }
-  .cmSearch:focus{outline:none; border-color:var(--gold); box-shadow:0 0 0 3px #f7ecd2;}
+  .cmSearch:focus{outline:none; border-color:var(--gold); box-shadow:0 0 0 3px #eee3db;}
   .cmHit{
     display:block; padding:9px 14px; border-inline-start:3px solid var(--gold);
     background:var(--cream); margin:5px 10px; border-radius:8px;
@@ -152,34 +155,34 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   }
   .cmHit:hover{background:var(--gold-light);}
   .cmHit b{color:var(--gold-deep);}
-  .cmHit .cmHitWhere{display:block; color:#8a8a8a; font-size:.78rem; margin-top:2px;}
-  .cmNoHit{padding:12px 16px; color:#8a8a8a; font-size:.85rem;}
+  .cmHit .cmHitWhere{display:block; color:#673e4b; font-size:.78rem; margin-top:2px;}
+  .cmNoHit{padding:12px 16px; color:#673e4b; font-size:.85rem;}
 
   .gradeTabs{
-    display:flex; gap:6px; padding:10px 12px; border-bottom:1px solid #eee;
+    display:flex; gap:6px; padding:10px 12px; border-bottom:1px solid #f4ede8;
     background:var(--cream); position:sticky; top:0; z-index:2;
   }
   .gradeTab{
     flex:1; padding:9px 12px; border-radius:9px; cursor:pointer; text-align:center;
-    border:1.5px solid #dcd4c0; background:#fff; color:#7a7365;
+    border:1.5px solid #dfccbd; background:#ffffff; color:#54323c;
     font-family:'Tajawal'; font-weight:700; font-size:.86rem;
   }
   .gradeTab.on{background:var(--grad-navy); color:var(--gold-light); border-color:var(--navy);}
   .gradeNow{
     display:inline-block; font-size:.78rem; font-weight:700; padding:4px 12px;
     border-radius:14px; background:var(--cream); color:var(--navy-deep);
-    border:1px solid #e0d8c4; margin-inline-start:8px;
+    border:1px solid #e2d0c2; margin-inline-start:8px;
   }
   .lessonTable{
     width:100%; border-collapse:collapse; margin:16px 0;
-    font-size:.92rem; background:#fff; border-radius:10px; overflow:hidden;
+    font-size:.92rem; background:#ffffff; border-radius:10px; overflow:hidden;
     box-shadow:0 1px 6px rgba(0,0,0,.05);
   }
   .lessonTable th{
     background:var(--grad-navy); color:var(--gold-light);
     padding:11px 12px; font-weight:700; text-align:center;
   }
-  .lessonTable td{padding:10px 12px; border-bottom:1px solid #eee; text-align:center;}
+  .lessonTable td{padding:10px 12px; border-bottom:1px solid #f4ede8; text-align:center;}
   .lessonTable tr:last-child td{border-bottom:none;}
   .lessonTable tr:nth-child(even) td{background:var(--cream);}
 
@@ -192,7 +195,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
   /* قائمة المنهج بمستويين: وحدة ← دروسها */
   .curriculumMenu{min-width:320px; max-height:70vh; overflow-y:auto; padding:6px;}
-  .cmUnit{margin-bottom:4px; padding-bottom:4px; border-bottom:1px solid #f0ebdd;}
+  .cmUnit{margin-bottom:4px; padding-bottom:4px; border-bottom:1px solid #efe6de;}
   .cmUnit:last-child{border-bottom:none; margin-bottom:0;}
   .curriculumMenu a.cmUnitLink{
     display:block; padding:9px 12px; border-radius:8px; font-weight:700;
@@ -201,20 +204,20 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .curriculumMenu a.cmUnitLink:hover{background:var(--gold-light);}
   .curriculumMenu a.cmLesson{
     display:block; padding:7px 12px 7px 12px; border-radius:7px;
-    color:#5c6a6e; font-size:.8rem; position:relative;
-    margin-inline-start:14px; border-inline-start:2px solid #ece5d4;
+    color:#4c2d37; font-size:.8rem; position:relative;
+    margin-inline-start:14px; border-inline-start:2px solid #ebdfd5;
   }
-  .curriculumMenu a.cmLesson:hover{background:#faf6ec; color:var(--navy); border-inline-start-color:var(--gold);}
+  .curriculumMenu a.cmLesson:hover{background:#f7f3ef; color:var(--navy); border-inline-start-color:var(--gold);}
 
   .curriculumMenu a.cmToolLink{
     display:block; padding:9px 12px; border-radius:8px; font-weight:700;
-    color:var(--gold-deep); font-size:.85rem; background:#fdf6e8;
+    color:var(--gold-deep); font-size:.85rem; background:#f7f2ee;
   }
   .curriculumMenu a.cmToolLink:hover{background:var(--gold-light); color:var(--navy);}
 
   /* رابط لوحة المعلم بالشريط العلوي — مميّز بصرياً عن روابط الطلاب */
   .adminNavLink{
-    background:rgba(201,161,94,.16); border:1px solid var(--gold) !important;
+    background:rgba(220,167,58,.16); border:1px solid var(--gold) !important;
     border-radius:20px; padding:5px 14px !important; color:var(--gold-light) !important;
     font-weight:700; margin-inline-start:6px;
   }
@@ -222,22 +225,22 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
   /* ===== قسم صفوفي ===== */
   .mcManage{
-    background:#fff; border:1px solid #e8e0cd; border-radius:12px;
+    background:#ffffff; border:1px solid #e7d9ce; border-radius:12px;
     padding:14px 20px; margin-bottom:16px;
   }
   .mcManage summary{cursor:pointer; font-weight:700; color:var(--navy); font-size:.92rem;}
   .mcManage summary:hover{color:var(--teal);}
   .mcManageBody{padding-top:14px;}
-  .mcHint{font-size:.82rem; color:#7a8a8e; margin-bottom:14px; line-height:1.8;}
+  .mcHint{font-size:.82rem; color:#633b48; margin-bottom:14px; line-height:1.8;}
   .mcAddRow{display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;}
   .mcAddRow input{
     flex:1; min-width:180px; padding:10px 14px; border-radius:9px;
-    border:1.5px solid #dcd4c0; font-family:'Tajawal'; font-size:.9rem;
+    border:1.5px solid #dfccbd; font-family:'Tajawal'; font-size:.9rem;
   }
   .mcAddRow input:focus{outline:none; border-color:var(--gold);}
   .mcBulk label{display:block; font-size:.84rem; font-weight:700; color:var(--navy); margin-bottom:7px;}
   .mcBulk textarea{
-    width:100%; padding:12px; border-radius:9px; border:1.5px solid #dcd4c0;
+    width:100%; padding:12px; border-radius:9px; border:1.5px solid #dfccbd;
     font-family:'Tajawal'; font-size:.88rem; resize:vertical;
   }
   .mcBulk textarea:focus{outline:none; border-color:var(--gold);}
@@ -245,7 +248,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   #mcBulkPreview{font-size:.83rem; color:var(--teal); font-weight:700;}
   .mcDel{
     background:none; border:none; cursor:pointer; font-size:.9rem;
-    color:#c5bda9; padding:4px;
+    color:#c5b5a9; padding:4px;
   }
   .mcDel:hover{color:var(--maroon);}
 
@@ -253,12 +256,12 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .focusModeBtn{
     padding:9px 20px; border-radius:10px; cursor:pointer; font-family:'Tajawal';
     background:var(--grad-gold); color:var(--navy-deep); border:none;
-    font-weight:700; font-size:.86rem; box-shadow:0 3px 10px rgba(168,129,63,.3);
+    font-weight:700; font-size:.86rem; box-shadow:0 3px 10px rgba(183,134,35,.3);
   }
   .focusModeBtn:hover{transform:translateY(-1px);}
   #focusMode{
     display:none; position:fixed; inset:0; z-index:420; background:var(--navy-deep);
-    color:#fff; overflow-y:auto;
+    color:#ffffff; overflow-y:auto;
   }
   #focusMode.show{display:block;}
   .fmHead{
@@ -267,8 +270,8 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     justify-content:space-between; gap:14px; flex-wrap:wrap; z-index:2;
   }
   .fmExit{
-    background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.3);
-    color:#fff; border-radius:24px; padding:8px 18px; cursor:pointer;
+    background:rgba(0,0,0,.2); border:1.5px solid rgba(255,255,255,.3);
+    color:#ffffff; border-radius:24px; padding:8px 18px; cursor:pointer;
     font-family:'Tajawal'; font-size:.86rem; font-weight:700;
   }
   .fmExit:hover{background:rgba(255,255,255,.24);}
@@ -276,7 +279,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .fmStats{display:flex; gap:8px;}
   .fmStat{padding:5px 13px; border-radius:18px; font-size:.85rem; font-weight:700;}
   .fmStat.green{background:rgba(47,150,110,.22); color:#7fe0b8;}
-  .fmStat.amber{background:rgba(201,161,94,.22); color:var(--gold-light);}
+  .fmStat.amber{background:rgba(220,167,58,.22); color:var(--gold-light);}
   .fmStat.red{background:rgba(160,60,60,.25); color:#f2a8a8;}
   /* عمودان على الشاشات الواسعة: الصف الواحد كان يمتد بعرض كامل ومحتواه
      لا يشغل ثلثه، فيطول التمرير بلا داعٍ. عمود واحد على الجوال. */
@@ -292,7 +295,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1);
     border-radius:14px; padding:11px 14px;
   }
-  .fmName{flex:1; min-width:0; font-size:1.05rem; font-weight:700; color:#fff; line-height:1.45;}
+  .fmName{flex:1; min-width:0; font-size:1.05rem; font-weight:700; color:#ffffff; line-height:1.45;}
   .fmStars{font-size:.9rem; letter-spacing:1px; color:var(--gold-light); min-width:60px; text-align:center;}
   .fmPts{display:flex; gap:6px; align-items:center;}
   .fmPlus{
@@ -309,25 +312,25 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   }
   .fmMinus:active{transform:scale(.92);}
   .fmMinus:disabled{opacity:.25; cursor:not-allowed;}
-  .fmZero{color:rgba(246,241,230,.28); font-size:1rem;}
+  .fmZero{color:rgba(244,237,232,.28); font-size:1rem;}
   /* ===== إبراز المتميزين بوضع الحصة (معروض على البروجكتر) ===== */
   .fmRank{
     min-width:34px; font-size:1.35rem; text-align:center; line-height:1;
-    filter:drop-shadow(0 0 6px rgba(201,161,94,.5));
+    filter:drop-shadow(0 0 6px rgba(220,167,58,.5));
   }
   .fmRankBlank{min-width:34px;}
   .fmRow.top1{
-    background:linear-gradient(90deg, rgba(201,161,94,.26), rgba(255,255,255,.06));
-    border-color:rgba(201,161,94,.75);
-    box-shadow:0 0 24px rgba(201,161,94,.3);
+    background:linear-gradient(90deg, rgba(220,167,58,.26), rgba(255,255,255,.06));
+    border-color:rgba(220,167,58,.75);
+    box-shadow:0 0 24px rgba(220,167,58,.3);
   }
-  .fmRow.top2{background:rgba(196,196,208,.14); border-color:rgba(206,206,216,.5);}
+  .fmRow.top2{background:rgba(208,201,196,.14); border-color:rgba(206,206,216,.5);}
   .fmRow.top3{background:rgba(186,140,96,.14); border-color:rgba(198,150,104,.5);}
   .fmRow{transition:background .35s, border-color .35s, box-shadow .35s, transform .18s;}
   /* وميض عند كسب نقطة */
   @keyframes fmPop{
     0%{transform:scale(1);}
-    35%{transform:scale(1.035); box-shadow:0 0 34px rgba(201,161,94,.65);}
+    35%{transform:scale(1.035); box-shadow:0 0 34px rgba(220,167,58,.65);}
     100%{transform:scale(1);}
   }
   .fmRow.fmCheer{animation:fmPop .6s ease-out;}
@@ -345,20 +348,20 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .fmStarBar{
     display:flex; align-items:center; justify-content:center; gap:10px;
     margin:0 0 14px; padding:11px 18px; border-radius:16px;
-    background:linear-gradient(90deg, rgba(201,161,94,.28), rgba(201,161,94,.1));
-    border:1.5px solid rgba(201,161,94,.55); color:var(--gold-light);
+    background:linear-gradient(90deg, rgba(220,167,58,.28), rgba(220,167,58,.1));
+    border:1.5px solid rgba(220,167,58,.55); color:var(--gold-light);
     font-weight:700; font-size:1.05rem; letter-spacing:.3px;
   }
-  .fmStarBar .fmStarName{color:#fff; font-size:1.15rem;}
+  .fmStarBar .fmStarName{color:#ffffff; font-size:1.15rem;}
   .fmStarBar.hidden{display:none;}
   .fmSortBtn{
     background:rgba(255,255,255,.08); color:var(--gold-light); cursor:pointer;
-    border:1.5px solid rgba(201,161,94,.4); border-radius:18px;
+    border:1.5px solid rgba(220,167,58,.4); border-radius:18px;
     padding:5px 14px; font-family:'Tajawal'; font-weight:700; font-size:.82rem;
   }
-  .fmSortBtn:hover{background:rgba(201,161,94,.22);}
+  .fmSortBtn:hover{background:rgba(220,167,58,.22);}
   .fmBig{
-    background:rgba(201,161,94,.2); border:1px solid rgba(201,161,94,.45);
+    background:rgba(220,167,58,.2); border:1px solid rgba(220,167,58,.45);
     border-radius:14px; padding:3px 11px; font-size:.85rem; font-weight:700;
     color:var(--gold-light); white-space:nowrap;
   }
@@ -366,14 +369,14 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   /* ══ الفلاتر ══ */
   .mcFilters{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; align-items:center;}
   .mcFilterBtn{
-    padding:7px 15px; border-radius:20px; border:1.5px solid #dcd4c0;
-    background:#fff; color:var(--navy); cursor:pointer;
+    padding:7px 15px; border-radius:20px; border:1.5px solid #dfccbd;
+    background:#ffffff; color:var(--navy); cursor:pointer;
     font-family:'Tajawal'; font-size:.82rem; font-weight:700;
   }
   .mcFilterBtn.active{background:var(--navy); color:var(--gold-light); border-color:var(--navy);}
   .mcSearchBox{
     flex:1; min-width:160px; padding:7px 14px; border-radius:20px;
-    border:1.5px solid #dcd4c0; font-family:'Tajawal'; font-size:.82rem;
+    border:1.5px solid #dfccbd; font-family:'Tajawal'; font-size:.82rem;
   }
   .mcSearchBox:focus{outline:none; border-color:var(--gold);}
 
@@ -384,7 +387,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     display:none; position:fixed; inset-inline-start:22px; bottom:22px; z-index:40;
     width:50px; height:50px; border-radius:50%; border:none; cursor:pointer;
     background:var(--grad-navy); color:var(--gold-light); font-size:1.3rem;
-    box-shadow:0 5px 18px rgba(10,32,41,.3);
+    box-shadow:0 5px 18px rgba(79,12,32,.3);
     transition:transform .15s, opacity .2s;
   }
   #toTopBtn.show{display:block;}
@@ -394,7 +397,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .myClassBar{
     display:flex; gap:10px; flex-wrap:wrap; align-items:center;
     padding:14px 0 12px; margin-bottom:18px;
-    border-bottom:1.5px solid #e8e0cd;
+    border-bottom:1.5px solid #e7d9ce;
   }
   .myClassBtn{
     padding:10px 24px; border-radius:30px; border:2px solid var(--navy); background:transparent;
@@ -412,7 +415,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   #lessonToday h2{line-height:1.7; padding-top:6px; margin-bottom:6px;}
   #lessonToday .lead{margin-bottom:10px;}
   .statsBox{
-    background:#fff; border:1px solid #e8e0cd; border-radius:14px;
+    background:#ffffff; border:1px solid #e7d9ce; border-radius:14px;
     padding:14px 18px; margin-top:20px;
   }
   .statsSummary{
@@ -421,29 +424,29 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .statsSummary::-webkit-details-marker{display:none;}
   .statsTable{width:100%; border-collapse:collapse; margin-top:14px; font-size:.88rem;}
   .statsTable th{background:var(--cream); padding:9px 10px; text-align:start; color:var(--navy); font-weight:700;}
-  .statsTable td{padding:9px 10px; border-bottom:1px solid #f2ede0;}
-  .statsBar{height:9px; border-radius:5px; background:#eee; overflow:hidden; min-width:70px;}
+  .statsTable td{padding:9px 10px; border-bottom:1px solid #f1e8e1;}
+  .statsBar{height:9px; border-radius:5px; background:#f4ede8; overflow:hidden; min-width:70px;}
   .statsBar i{display:block; height:100%; border-radius:5px;}
   .statsHard{color:var(--maroon); font-weight:700;}
   .statsGood{color:var(--teal); font-weight:700;}
-  .statsEmpty{color:#8a8a8a; padding:16px 0; text-align:center;}
-  .statsHint{color:#8a8a8a; font-size:.85rem; margin:10px 0 0;}
+  .statsEmpty{color:#673e4b; padding:16px 0; text-align:center;}
+  .statsHint{color:#673e4b; font-size:.85rem; margin:10px 0 0;}
 
   .actGrid{display:grid; grid-template-columns:1fr; gap:16px;}
-  .actDate{color:#8a8a8a; font-size:.8rem;}
-  .actCard.isNew{border-color:var(--gold); box-shadow:0 0 0 3px #f7ecd2;}
+  .actDate{color:#673e4b; font-size:.8rem;}
+  .actCard.isNew{border-color:var(--gold); box-shadow:0 0 0 3px #eee3db;}
   .actNew{
     align-self:flex-start; background:var(--grad-gold); color:var(--navy-deep);
     font-size:.72rem; font-weight:700; padding:3px 11px; border-radius:12px;
   }
   .actCard{
-    background:#fff; border:1.5px solid #e8e0cd; border-radius:16px; padding:20px;
+    background:#ffffff; border:1.5px solid #e7d9ce; border-radius:16px; padding:20px;
     display:flex; flex-direction:column; gap:10px; transition:transform .15s, box-shadow .15s;
   }
   .actCard:hover{transform:translateY(-3px); box-shadow:0 8px 22px rgba(0,0,0,.09);}
   .actIcon{font-size:2.1rem; line-height:1;}
   .actTitle{font-weight:700; color:var(--navy); font-size:1.05rem;}
-  .actMeta{color:#8a8a8a; font-size:.84rem;}
+  .actMeta{color:#673e4b; font-size:.84rem;}
   .actGo{
     margin-top:auto; padding:12px; border-radius:11px; border:none; cursor:pointer;
     background:var(--grad-navy); color:var(--gold-light);
@@ -451,19 +454,19 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   }
   .actGo:active{transform:scale(.97);}
   .actEmpty{
-    grid-column:1/-1; text-align:center; padding:34px; color:#8a8a8a;
-    background:#fff; border:1px dashed #dcd4c0; border-radius:14px;
+    grid-column:1/-1; text-align:center; padding:34px; color:#673e4b;
+    background:#ffffff; border:1px dashed #dfccbd; border-radius:14px;
   }
   /* ===== حصة اليوم: تبويب لكل صف، ثم «أنشطة خاصة» منفصلة عن «أنشطة الوحدات» ===== */
-  .actTabs{display:flex; gap:10px; margin-top:24px; border-bottom:2px solid #e8e0cd; flex-wrap:wrap;}
+  .actTabs{display:flex; gap:10px; margin-top:24px; border-bottom:2px solid #e7d9ce; flex-wrap:wrap;}
   .actTab{
     position:relative; padding:12px 26px; margin-bottom:-2px; cursor:pointer; font-family:'Tajawal';
-    font-weight:800; font-size:1.02rem; color:#8a8170; background:transparent;
+    font-weight:800; font-size:1.02rem; color:#5e3844; background:transparent;
     border:2px solid transparent; border-bottom:none; border-radius:14px 14px 0 0;
   }
   .actTab:hover{color:var(--navy);}
-  .actTab.on{color:var(--navy); background:#fff; border-color:#e8e0cd; border-bottom:2px solid #fff;}
-  .actTab small{font-weight:700; color:#a8a08e; font-size:.8rem; margin-inline-start:4px;}
+  .actTab.on{color:var(--navy); background:#ffffff; border-color:#e7d9ce; border-bottom:2px solid #ffffff;}
+  .actTab small{font-weight:700; color:#744654; font-size:.8rem; margin-inline-start:4px;}
   .actTabToday{
     display:inline-block; margin-inline-start:7px; background:var(--grad-gold); color:var(--navy-deep);
     font-size:.7rem; padding:2px 9px; border-radius:10px; vertical-align:middle;
@@ -472,27 +475,27 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .actSec{margin-bottom:34px;}
   .actSecHead{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin:0 0 14px;}
   .actSecHead h3{margin:0; font-size:1.2rem; color:var(--navy);}
-  .actSecHead span{color:#8a8a8a; font-size:.86rem;}
+  .actSecHead span{color:#673e4b; font-size:.86rem;}
   .actSec.special{
-    background:linear-gradient(135deg, #fffaf0, #fdf3dd); border:2px solid var(--gold);
+    background:linear-gradient(135deg, #f9f7f6, #f3ece7); border:2px solid var(--gold);
     border-radius:18px; padding:18px 18px 20px;
   }
   .actGrid.wide{grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));}
   .actUnitHead{
     display:flex; align-items:center; gap:10px; margin:22px 0 12px; padding-bottom:8px;
-    border-bottom:1.5px solid #e8e0cd; color:var(--navy); font-weight:800; font-size:1rem;
+    border-bottom:1.5px solid #e7d9ce; color:var(--navy); font-weight:800; font-size:1rem;
   }
   .actUnitHead:first-of-type{margin-top:4px;}
   .actUnitNum{background:var(--navy); color:var(--gold-light); border-radius:9px; padding:2px 10px; font-size:.85rem;}
-  .actUnitSub{color:#8a8a8a; font-weight:600; font-size:.82rem;}
-  .actCard.special{border-color:#e3c98b;}
-  .actCard.special.isToday{border-color:var(--gold); box-shadow:0 0 0 3px #f7ecd2;}
+  .actUnitSub{color:#673e4b; font-weight:600; font-size:.82rem;}
+  .actCard.special{border-color:#ebc578;}
+  .actCard.special.isToday{border-color:var(--gold); box-shadow:0 0 0 3px #eee3db;}
   .actChips{display:flex; gap:6px; flex-wrap:wrap;}
   .actChip{font-size:.76rem; font-weight:700; padding:3px 10px; border-radius:12px; background:var(--cream); color:var(--navy);}
   .actChip.cls{background:var(--navy); color:var(--gold-light);}
   .actChip.today{background:var(--grad-gold); color:var(--navy-deep);}
-  .actNote{font-size:.85rem; color:var(--navy); background:#fff; border:1px dashed #d8cfb8; border-radius:10px; padding:7px 11px; line-height:1.7;}
-  .actNone{color:#8a8170; font-size:.9rem; padding:6px 2px;}
+  .actNote{font-size:.85rem; color:var(--navy); background:#ffffff; border:1px dashed #d8c6b8; border-radius:10px; padding:7px 11px; line-height:1.7;}
+  .actNone{color:#5e3844; font-size:.9rem; padding:6px 2px;}
   .actArchive{margin-top:16px;}
   .actArchive summary{cursor:pointer; color:var(--gold-deep); font-weight:800; font-size:.92rem; padding:6px 2px;}
   .actArchive .actGrid{margin-top:10px;}
@@ -511,46 +514,46 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
   .lqKindBtn.on{background:var(--grad-navy); color:var(--gold-light); border-color:var(--navy);}
 
-  .lqItem.kind-mcq{border-inline-start-color:#2a6b8a;}
+  .lqItem.kind-mcq{border-inline-start-color:#1f5068;}
   .lqItem.kind-game{border-inline-start-color:#7a4fa3;}
   .lqItem.kind-reward{border-inline-start-color:var(--gold-deep);}
-  .lqItem.kind-break{border-inline-start-color:#9a9384;}
+  .lqItem.kind-break{border-inline-start-color:#6b404e;}
   .lqChoices{margin-top:6px; display:flex; flex-direction:column; gap:3px;}
-  .lqCh{font-size:.85rem; color:#6a6458;}
+  .lqCh{font-size:.85rem; color:#492c35;}
   .lqCh.ok{color:var(--teal); font-weight:700;}
   /* عرض الاختياري على البروجكتر */
   .lsChoices{display:flex; flex-direction:column; gap:11px; width:100%; max-width:820px;}
   .lsCh{
     display:flex; align-items:center; gap:14px; padding:13px 22px; border-radius:14px;
     /* خلفية صلبة لا شفافة: الشفافية تذوب على سبورة الصف مهما رُفعت */
-    background:#fff; border:3px solid var(--navy); font-family:'Cairo', 'Tajawal', sans-serif;
+    background:#ffffff; border:3px solid var(--navy); font-family:'Cairo', 'Tajawal', sans-serif;
     font-size:clamp(1.05rem, 2.1vw, 1.6rem); color:var(--navy-deep); text-align:start; font-weight:700;
-    box-shadow:0 3px 10px rgba(10,32,41,.13);
+    box-shadow:0 3px 10px rgba(79,12,32,.13);
     transition:background .3s, border-color .3s;
   }
   .lsCh .lsChKey{
-    min-width:48px; height:48px; border-radius:50%; background:var(--navy); color:#fff; font-size:1.15em;
+    min-width:48px; height:48px; border-radius:50%; background:var(--navy); color:#ffffff; font-size:1.15em;
     display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;
   }
   .lsCh.correct{
-    background:#158a55; border-color:#0d5c39; color:#fff;
+    background:#0f7646; border-color:#0d5c39; color:#ffffff;
     box-shadow:0 0 0 4px #b6ebd2;
     animation:lsFade .4s ease-out;
   }
-  .lsCh.correct .lsChKey{background:#fff; color:#0d5c39;}
+  .lsCh.correct .lsChKey{background:#ffffff; color:#0d5c39;}
   .lsCard{
     display:flex; flex-direction:column; align-items:center; gap:18px;
     padding:44px 40px; border-radius:26px; max-width:900px;
   }
   .lsCard.game{background:#f2ebfa; border:3px solid #6b3fa0; color:#4a2775;}
-  .lsCard.reward{background:#fdf3dd; border:3px solid var(--gold-deep); color:#7a5a1e;}
+  .lsCard.reward{background:#f3ece7; border:3px solid var(--gold-deep); color:#7d5a13;}
   .lsCard.break{background:var(--cream); border:3px solid var(--navy); color:var(--navy-deep);}
   .lsCardIcon{font-size:clamp(3rem, 7vw, 5rem); line-height:1;}
   /* رسالة تشجيع عند الإجابة الصحيحة */
   .lsCh.pick{cursor:pointer;}
   .lsCh.pick:hover{background:var(--cream); border-color:var(--gold-deep);}
   .lsCh.wrong{
-    background:#fadddd; border-color:#a32b2b; color:#7d1f1f;
+    background:#fde5d6; border-color:#c2410c; color:#7c2d12;
     animation:shake .42s ease;
   }
   @keyframes shake{
@@ -563,16 +566,16 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .lsOops{
     position:fixed; inset-inline:0; bottom:104px; z-index:6;
     font-family:'Cairo', 'Tajawal', sans-serif; font-weight:700; font-size:clamp(1.05rem,2.1vw,1.6rem);
-    color:#7d1f1f; background:#fadddd; border-top:2px solid #a32b2b;
-    border-bottom:2px solid #a32b2b; padding:10px 20px; text-align:center;
+    color:#7c2d12; background:#fde5d6; border-top:2px solid #c2410c;
+    border-bottom:2px solid #c2410c; padding:10px 20px; text-align:center;
     animation:cheerPop .45s ease-out;
   }
   /* التعزيز يجب أن يُرى من آخر الصف: شريط صلب لا نص عارٍ يذوب بالخلفية */
   .lsCheer{
     font-family:'Cairo', 'Tajawal', sans-serif; font-weight:800; font-size:clamp(1.5rem,3.2vw,2.6rem);
-    color:#fff; background:#158a55; border:3px solid #0d5c39;
+    color:#ffffff; background:#0f7646; border:3px solid #0d5c39;
     border-radius:16px; padding:12px 34px; margin-top:12px;
-    box-shadow:0 6px 20px rgba(21,138,85,.35);
+    box-shadow:0 6px 20px rgba(15,118,70,.35);
     animation:cheerPop .55s ease-out;
   }
   @keyframes cheerPop{
@@ -594,17 +597,17 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .lsTimer.done{color:#ff6b6b;}
   @keyframes tick{50%{transform:scale(1.14);}}
   .lsTimerBtn{
-    background:rgba(255,255,255,.1); color:var(--gold-light); cursor:pointer;
-    border:1.5px solid rgba(201,161,94,.45); border-radius:20px;
+    background:rgba(0,0,0,.2); color:var(--gold-light); cursor:pointer;
+    border:1.5px solid rgba(220,167,58,.45); border-radius:20px;
     padding:7px 15px; font-family:'Tajawal'; font-weight:700; font-size:.84rem;
   }
-  .lsTimerBtn:hover{background:rgba(201,161,94,.25);}
+  .lsTimerBtn:hover{background:rgba(220,167,58,.25);}
   /* pre-line: نصوص البطاقات (فاصل/لعبة/مكافأة) تُكتب بأسطر منفصلة،
      وبدونها تلتصق الأسطر ببعضها فتصير فقرة واحدة غير مقروءة على البروجكتر. */
   .lsCardTxt{font-family:'Cairo', 'Tajawal', sans-serif; font-size:clamp(1rem, 2.1vw, 1.6rem); line-height:1.85; color:inherit; font-weight:600; white-space:pre-line;}
   .lqEmpty{
-    text-align:center; padding:34px 20px; color:#8a8a8a;
-    background:#fff; border:1px dashed #dcd4c0; border-radius:14px;
+    text-align:center; padding:34px 20px; color:#673e4b;
+    background:#ffffff; border:1px dashed #dfccbd; border-radius:14px;
   }
 
   /* ===== شاشة عرض حصة اليوم (البروجكتر) ===== */
@@ -612,7 +615,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     display:none; position:fixed; inset:0; z-index:430;
     /* خلفية فاتحة: البروجكتر على السبورة البيضاء يطرح الضوء، فالداكن
        يظهر رمادياً باهتاً بينما الفاتح يبقى ساطعاً وعالي التباين */
-    background:#fffdf8; color:var(--navy-deep); overflow-y:auto;
+    background:#fcfbfb; color:var(--navy-deep); overflow-y:auto;
   }
   #lessonShow.show{display:flex; flex-direction:column;}
   /* خلفية النشاط: رسم متجهي مضمّن (لا صورة خارجية) بشفافية منخفضة
@@ -645,7 +648,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     gap:14px; padding:16px 28px 18px; text-align:center;
   }
   /* السؤال يبقى مرئياً أعلى المسرح مهما طال ما تحته */
-  .lsQ{position:sticky; top:0; background:#fffdf8; padding:6px 0 10px; z-index:3; width:100%;}
+  .lsQ{position:sticky; top:0; background:#fcfbfb; padding:6px 0 10px; z-index:3; width:100%;}
   /* خط القاهرة بشاشتي العرض: الرقعة الزخرفية كانت صعبة القراءة على البروجكتر من آخر الصف */
   .lsQ{
     font-family:'Cairo', 'Tajawal', sans-serif; font-weight:700; font-size:clamp(1.4rem, 3.4vw, 2.6rem); line-height:1.55;
@@ -657,11 +660,11 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     font-family:'Tajawal'; font-weight:700;
     font-size:clamp(.82rem, 1.5vw, 1.12rem); letter-spacing:.3px;
     display:inline-block; margin-bottom:10px; padding:5px 18px;
-    color:#10303f; background:#f6e9c9; border:2px solid #c9a15e; border-radius:999px;
+    color:#7a1232; background:#ebded4; border:2px solid #dca73a; border-radius:999px;
   }
   .lsA{
     font-family:'Cairo', 'Tajawal', sans-serif; font-size:clamp(1.02rem, 1.9vw, 1.45rem); line-height:1.7; color:#0a4a2e; font-weight:600;
-    background:#eaf7f0; border:2px solid #158a55;
+    background:#eaf7f0; border:2px solid #0f7646;
     border-radius:14px; padding:13px 24px; max-width:950px;
     animation:lsFade .4s ease-out;
   }
@@ -671,7 +674,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .lsWrite{
     font-family:'Tajawal'; font-weight:800;
     font-size:clamp(1rem, 1.9vw, 1.4rem); color:#7a3d00;
-    background:#fff3e0; border:2px dashed #d98324; border-radius:14px;
+    background:#f5efea; border:2px dashed #d98324; border-radius:14px;
     padding:11px 26px; max-width:950px; animation:lsFade .4s ease-out;
   }
 
@@ -679,13 +682,13 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .lsNav{
     display:flex; align-items:center; justify-content:center; gap:14px;
     padding:13px 20px 16px; flex-wrap:wrap;
-    flex-shrink:0; background:#fffdf8;
-    border-top:2px solid #e0d8c4;
+    flex-shrink:0; background:#fcfbfb;
+    border-top:2px solid #e2d0c2;
   }
   .lsDots{flex-shrink:0; padding-bottom:4px;}
   .lsNavBtn{
     padding:14px 30px; border-radius:14px; cursor:pointer; font-family:'Tajawal';
-    font-weight:700; font-size:1rem; background:#fff;
+    font-weight:700; font-size:1rem; background:#ffffff;
     color:var(--navy-deep); border:2.5px solid var(--navy);
   }
   .lsNavBtn:hover:not(:disabled){background:var(--cream);}
@@ -693,59 +696,59 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .lsNavBtn.reveal{background:var(--grad-gold); color:var(--navy-deep); border:none;}
   .lsDots{display:flex; gap:7px; justify-content:center; flex-wrap:wrap; padding:0 20px 8px;}
   .lsDot{
-    width:12px; height:12px; border-radius:50%; background:#d5cdb8;
+    width:12px; height:12px; border-radius:50%; background:#d5c5b8;
     cursor:pointer; border:none; padding:0;
   }
   .lsDot.on{background:var(--gold); transform:scale(1.3);}
-  .lsDot.done{background:#158a55;}
+  .lsDot.done{background:#0f7646;}
   /* ===== نقطة مشاركة من حصة اليوم إلى صفوفي ===== */
   .lsClsSel{
     padding:7px 12px; border-radius:10px; font-family:'Tajawal'; font-weight:700; font-size:.9rem;
-    background:rgba(255,255,255,.1); color:var(--gold-light); border:1.5px solid rgba(201,161,94,.6); cursor:pointer;
+    background:rgba(255,255,255,.1); color:var(--gold-light); border:1.5px solid rgba(220,167,58,.6); cursor:pointer;
   }
-  .lsClsSel option{color:var(--navy-deep); background:#fff;}
+  .lsClsSel option{color:var(--navy-deep); background:#ffffff;}
   .lsAward{display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; animation:lsFade .4s ease-out;}
   .lsAwardBtn{
     padding:11px 24px; border-radius:30px; cursor:pointer; font-family:'Tajawal'; font-weight:700;
     font-size:clamp(.95rem, 1.6vw, 1.15rem); background:var(--grad-gold); color:var(--navy-deep); border:none;
-    box-shadow:0 4px 14px rgba(201,161,94,.35);
+    box-shadow:0 4px 14px rgba(220,167,58,.35);
   }
   .lsAwardDone{
     font-weight:700; font-size:clamp(1rem, 1.8vw, 1.3rem); color:var(--gold-deep);
-    background:#fdf4e3; border:2px solid var(--gold); border-radius:30px; padding:9px 22px;
+    background:#f5efeb; border:2px solid var(--gold); border-radius:30px; padding:9px 22px;
   }
   .lsAwardUndo{
     padding:8px 14px; border-radius:30px; cursor:pointer; font-family:'Tajawal'; font-size:.85rem;
-    background:transparent; border:1.5px solid #cfc6b0; color:#8a8170;
+    background:transparent; border:1.5px solid #cfbeb0; color:#5e3844;
   }
   .lsPicker{
-    position:fixed; inset:0; z-index:470; background:rgba(10,32,41,.55);
+    position:fixed; inset:0; z-index:470; background:rgba(79,12,32,.55);
     display:flex; align-items:center; justify-content:center; padding:18px;
   }
   .lsPicker[hidden]{display:none;}
   .lsPickBox{
-    background:#fffdf8; border:2px solid var(--gold); border-radius:18px; width:min(980px, 100%);
+    background:#fcfbfb; border:2px solid var(--gold); border-radius:18px; width:min(980px, 100%);
     max-height:88vh; display:flex; flex-direction:column; overflow:hidden;
   }
   .lsPickHead{
     background:var(--grad-navy); color:var(--gold-light); padding:13px 18px; font-weight:700;
     display:flex; align-items:center; justify-content:space-between; gap:10px;
   }
-  .lsPickClose{background:transparent; border:1.5px solid rgba(201,161,94,.6); color:var(--gold-light); border-radius:10px; padding:6px 14px; cursor:pointer; font-family:'Tajawal'; font-weight:700;}
+  .lsPickClose{background:transparent; border:1.5px solid rgba(220,167,58,.6); color:var(--gold-light); border-radius:10px; padding:6px 14px; cursor:pointer; font-family:'Tajawal'; font-weight:700;}
   .lsPickGrid{
     display:grid; grid-template-columns:repeat(auto-fill, minmax(165px, 1fr)); gap:10px;
     padding:16px; overflow-y:auto;
   }
   .lsPickName{
     position:relative; padding:14px 10px; border-radius:12px; cursor:pointer; font-family:'Tajawal';
-    font-weight:700; font-size:1.02rem; color:var(--navy-deep); background:#fff; border:2px solid #e0d8c4;
+    font-weight:700; font-size:1.02rem; color:var(--navy-deep); background:#ffffff; border:2px solid #e2d0c2;
   }
   .lsPickName:hover{border-color:var(--gold-deep); background:var(--cream);}
   .lsPickName i{
     position:absolute; top:-8px; left:-6px; font-style:normal; font-size:.75rem;
     background:var(--gold); color:var(--navy-deep); border-radius:12px; padding:1px 7px;
   }
-  .lsPickEmpty{padding:26px; text-align:center; color:#8a8170;}
+  .lsPickEmpty{padding:26px; text-align:center; color:#5e3844;}
   /* ===== عجلة الأسماء ===== */
   .whModal{
     position:fixed; inset:0; z-index:490; display:flex; align-items:center; justify-content:center;
@@ -756,45 +759,45 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .whBox{
     width:min(780px, 100%); max-height:100%; overflow-y:auto; display:flex; flex-direction:column;
     background:radial-gradient(ellipse at 50% 0%, var(--navy-soft), var(--navy-deep) 72%);
-    border:2px solid var(--gold); border-radius:22px; color:#fff; box-shadow:0 30px 80px rgba(0,0,0,.5);
+    border:2px solid var(--gold); border-radius:22px; color:#ffffff; box-shadow:0 30px 80px rgba(0,0,0,.5);
   }
   .whHead{
     display:flex; align-items:center; gap:9px; flex-wrap:wrap; padding:11px 16px;
-    border-bottom:1px solid rgba(201,161,94,.35);
+    border-bottom:1px solid rgba(220,167,58,.35);
   }
   .whTitle{font-family:'Aref Ruqaa'; color:var(--gold-light); font-size:1.4rem; line-height:1.7; margin-inline-end:auto;}
   .whSel{
     padding:7px 12px; border-radius:10px; font-family:'Tajawal'; font-weight:700; font-size:.9rem; cursor:pointer;
-    background:rgba(255,255,255,.08); color:var(--gold-light); border:1.5px solid rgba(201,161,94,.6);
+    background:rgba(255,255,255,.08); color:var(--gold-light); border:1.5px solid rgba(220,167,58,.6);
   }
-  .whSel option{color:var(--navy-deep); background:#fff;}
+  .whSel option{color:var(--navy-deep); background:#ffffff;}
   .whOpt{display:flex; align-items:center; gap:6px; font-size:.86rem; color:var(--gold-light); cursor:pointer; user-select:none;}
   .whOpt input{accent-color:var(--gold); width:16px; height:16px;}
   .whBtn{
     padding:7px 14px; border-radius:10px; cursor:pointer; font-family:'Tajawal'; font-weight:700; font-size:.88rem;
-    background:rgba(255,255,255,.06); color:var(--gold-light); border:1.5px solid rgba(201,161,94,.6);
+    background:rgba(255,255,255,.06); color:var(--gold-light); border:1.5px solid rgba(220,167,58,.6);
   }
-  .whBtn:hover{background:rgba(201,161,94,.18);}
+  .whBtn:hover{background:rgba(220,167,58,.18);}
   .whBtn.grow{background:var(--grad-gold); color:var(--navy-deep); border-color:transparent;}
   .whStage{display:flex; flex-direction:column; align-items:center; gap:14px; padding:18px 16px 20px;}
   .whWheel{position:relative; width:var(--whS); height:var(--whS); flex-shrink:0;}
   .whWheel svg{width:100%; height:100%; display:block; overflow:visible; filter:drop-shadow(0 16px 30px rgba(0,0,0,.45));}
   #whRot{transform-box:view-box; transform-origin:0 0; will-change:transform;}
-  .whSeg{stroke:rgba(10,32,41,.55); stroke-width:1.2;}
-  .whSeg.win{stroke:#fff6d8; stroke-width:4; filter:brightness(1.2);}
+  .whSeg{stroke:rgba(79,12,32,.55); stroke-width:1.2;}
+  .whSeg.win{stroke:#f2ebe5; stroke-width:4; filter:brightness(1.2);}
   .whTxt{font-family:'Tajawal'; font-weight:800; pointer-events:none;}
-  .whBulb{fill:#6d5a35; transition:fill .2s;}
-  .whBulb.on{fill:#fff3cf;}
+  .whBulb{fill:#7c5d1d; transition:fill .2s;}
+  .whBulb.on{fill:#fbedcf;}
   .whModal.spinning .whBulb{animation:whBlink .36s steps(1) infinite;}
   .whModal.spinning .whBulb.alt{animation-delay:.18s;}
-  @keyframes whBlink{0%{fill:#fff3cf;} 50%{fill:#6d5a35;}}
+  @keyframes whBlink{0%{fill:#fbedcf;} 50%{fill:#7c5d1d;}}
   .whPtr{transform-box:fill-box; transform-origin:50% 15%;}
   .whPtr.tick{animation:whTick .13s ease-out;}
   @keyframes whTick{40%{transform:rotate(-16deg);}}
   .whHub{
     position:absolute; left:50%; top:50%; width:23%; height:23%; transform:translate(-50%,-50%);
     border-radius:50%; border:4px solid var(--gold-light); cursor:pointer;
-    background:radial-gradient(circle at 35% 28%, #fffaf0, var(--gold) 62%, var(--gold-deep));
+    background:radial-gradient(circle at 35% 28%, #f9f7f6, var(--gold) 62%, var(--gold-deep));
     color:var(--navy-deep); font-family:'Aref Ruqaa'; font-weight:700; font-size:calc(var(--whS) * .062);
     box-shadow:0 5px 16px rgba(0,0,0,.4), inset 0 -4px 8px rgba(0,0,0,.18); transition:transform .15s;
   }
@@ -803,20 +806,20 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .whResult{min-height:128px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:9px; text-align:center;}
   .whWinLbl{color:var(--gold-light); font-size:1rem; letter-spacing:.3px;}
   .whWinName{
-    font-family:'Aref Ruqaa'; font-size:clamp(1.9rem, 4.6vw, 3.1rem); line-height:1.5; color:#fff;
-    text-shadow:0 0 24px rgba(227,201,139,.6); animation:whPop .55s cubic-bezier(.2,1.6,.4,1);
+    font-family:'Aref Ruqaa'; font-size:clamp(1.9rem, 4.6vw, 3.1rem); line-height:1.5; color:#ffffff;
+    text-shadow:0 0 24px rgba(235,197,120,.6); animation:whPop .55s cubic-bezier(.2,1.6,.4,1);
   }
   @keyframes whPop{from{transform:scale(.4); opacity:0;} to{transform:none; opacity:1;}}
   .whActs{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; align-items:center;}
   .whPt{
     padding:11px 24px; border-radius:30px; cursor:pointer; font-family:'Tajawal'; font-weight:800; font-size:1rem;
-    background:var(--grad-gold); color:var(--navy-deep); border:none; box-shadow:0 4px 14px rgba(201,161,94,.35);
+    background:var(--grad-gold); color:var(--navy-deep); border:none; box-shadow:0 4px 14px rgba(220,167,58,.35);
   }
   .whPt:disabled{opacity:.6; cursor:wait;}
-  .whPtDone{font-weight:800; color:var(--gold-light); background:rgba(201,161,94,.16); border:1.5px solid var(--gold); border-radius:30px; padding:9px 20px;}
+  .whPtDone{font-weight:800; color:var(--gold-light); background:rgba(220,167,58,.16); border:1.5px solid var(--gold); border-radius:30px; padding:9px 20px;}
   .whGhost{
     padding:10px 20px; border-radius:30px; cursor:pointer; font-family:'Tajawal'; font-weight:700; font-size:.95rem;
-    background:transparent; color:#fff; border:1.5px solid rgba(255,255,255,.4);
+    background:transparent; color:#ffffff; border:1.5px solid rgba(255,255,255,.4);
   }
   .whGhost:hover{border-color:var(--gold-light); color:var(--gold-light);}
   .whHint{color:rgba(255,255,255,.72); font-size:.92rem; line-height:1.8;}
@@ -841,23 +844,23 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .lkCard{
     position:relative; width:min(560px, 100%); min-height:270px; border-radius:26px; padding:26px 22px;
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; text-align:center;
-    background:radial-gradient(circle at 50% 28%, #fffaf0, #f3e0b3 78%); color:var(--navy-deep);
+    background:radial-gradient(circle at 50% 28%, #f9f7f6, #f5dcab 78%); color:var(--navy-deep);
     border:3px solid var(--gold-light);
-    box-shadow:0 0 0 6px rgba(201,161,94,.22), 0 22px 50px rgba(0,0,0,.42);
+    box-shadow:0 0 0 6px rgba(220,167,58,.22), 0 22px 50px rgba(0,0,0,.42);
   }
   .lkQ{font-size:clamp(4rem, 10vw, 6.5rem); line-height:1; animation:lkBob 2.2s ease-in-out infinite;}
   @keyframes lkBob{50%{transform:translateY(-8px) rotate(-4deg);}}
   .lkLbl{font-weight:800; color:var(--gold-deep); font-size:1rem; letter-spacing:.3px;}
   .lkName{font-family:'Aref Ruqaa'; font-size:clamp(2rem, 5.2vw, 3.5rem); line-height:1.5; min-height:1.5em; color:var(--navy-deep);}
-  .lkCard.rolling .lkName{color:#7a6538;}
+  .lkCard.rolling .lkName{color:#89661e;}
   .lkCard.win{
     animation:lkWin .6s cubic-bezier(.2,1.6,.4,1);
-    box-shadow:0 0 0 6px rgba(201,161,94,.45), 0 0 70px rgba(227,201,139,.75), 0 22px 50px rgba(0,0,0,.42);
+    box-shadow:0 0 0 6px rgba(220,167,58,.45), 0 0 70px rgba(235,197,120,.75), 0 22px 50px rgba(0,0,0,.42);
   }
   @keyframes lkWin{from{transform:scale(.92);} to{transform:none;}}
   .lkReward{display:flex; flex-direction:column; align-items:center; gap:8px; min-height:5.2em;}
   .lkNum{font-size:clamp(1.6rem, 4.2vw, 2.7rem); font-weight:900; color:var(--maroon); line-height:1.3;}
-  .lkNum.rolling{color:#9a7a45;}
+  .lkNum.rolling{color:#ad8126;}
   .lkStarsRow{display:flex; gap:5px; flex-wrap:wrap; justify-content:center; font-size:clamp(1.3rem, 3.2vw, 2.1rem); line-height:1;}
   .lkStarsRow span{animation:lkPop .38s cubic-bezier(.2,1.8,.4,1) both;}
   @keyframes lkPop{from{transform:scale(0) rotate(-40deg); opacity:0;} to{transform:none; opacity:1;}}
@@ -874,25 +877,25 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .lkReel{
     position:relative; direction:ltr; width:min(780px, 100%); height:clamp(130px, 24vh, 200px); overflow:hidden;
     border-radius:20px; border:3px solid var(--gold-light);
-    background:linear-gradient(180deg, #123746, #0a2029);
+    background:linear-gradient(180deg, #881438, #4f0c20);
     box-shadow:inset 0 0 34px rgba(0,0,0,.65), 0 18px 40px rgba(0,0,0,.4);
   }
   .lkReel::before, .lkReel::after{content:''; position:absolute; top:0; bottom:0; width:16%; z-index:2; pointer-events:none;}
-  .lkReel::before{left:0; background:linear-gradient(90deg, #0a2029, transparent);}
-  .lkReel::after{right:0; background:linear-gradient(-90deg, #0a2029, transparent);}
+  .lkReel::before{left:0; background:linear-gradient(90deg, #4f0c20, transparent);}
+  .lkReel::after{right:0; background:linear-gradient(-90deg, #4f0c20, transparent);}
   .lkTrack{position:relative; display:flex; align-items:center; gap:12px; height:100%; padding:0 12px; will-change:transform;}
   .lkMini{
     flex:0 0 clamp(118px, 17vw, 170px); height:70%; border-radius:14px; direction:rtl;
     display:flex; align-items:center; justify-content:center; text-align:center; padding:8px;
     font-weight:800; font-size:clamp(.95rem, 1.6vw, 1.2rem); line-height:1.4; overflow-wrap:anywhere;
-    background:radial-gradient(circle at 50% 28%, #fffaf0, #efd9a3); color:var(--navy-deep);
+    background:radial-gradient(circle at 50% 28%, #f9f7f6, #f2d498); color:var(--navy-deep);
     border:2px solid var(--gold); box-shadow:0 5px 14px rgba(0,0,0,.4);
     transition:transform .35s cubic-bezier(.2,1.6,.4,1), box-shadow .35s;
   }
-  .lkMini:nth-child(3n+2){background:radial-gradient(circle at 50% 28%, #f3fbf7, #cfe8dd); border-color:#6fb89c;}
-  .lkMini:nth-child(3n){background:radial-gradient(circle at 50% 28%, #f6f8fc, #d3dfeb); border-color:#7fa2c2;}
-  .lkMini.win{transform:scale(1.12); box-shadow:0 0 0 4px #fff6dc, 0 0 44px rgba(227,201,139,.95);}
-  .lkLine{position:absolute; left:50%; top:0; bottom:0; width:3px; transform:translateX(-50%); z-index:3; background:rgba(227,201,139,.6);}
+  .lkMini:nth-child(3n+2){background:radial-gradient(circle at 50% 28%, #faf7f4, #cfe8dd); border-color:#6fb89c;}
+  .lkMini:nth-child(3n){background:radial-gradient(circle at 50% 28%, #faf9f8, #d3dfeb); border-color:#7fa2c2;}
+  .lkMini.win{transform:scale(1.12); box-shadow:0 0 0 4px #f4ede7, 0 0 44px rgba(235,197,120,.95);}
+  .lkLine{position:absolute; left:50%; top:0; bottom:0; width:3px; transform:translateX(-50%); z-index:3; background:rgba(235,197,120,.6);}
   .lkMark{position:absolute; left:50%; transform:translateX(-50%); z-index:4; width:0; height:0; border-left:15px solid transparent; border-right:15px solid transparent;}
   .lkMark.top{top:0; border-top:20px solid var(--gold-light);}
   .lkMark.bot{bottom:0; border-bottom:20px solid var(--gold-light);}
@@ -905,7 +908,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     font-weight:700; font-size:.88rem; background:transparent;
     border:2px dashed var(--maroon); color:var(--maroon);
   }
-  .mcWipe:hover{background:#fbe9e9; border-style:solid;}
+  .mcWipe:hover{background:#fdece3; border-style:solid;}
 
   .myClassExport{
     margin-inline-start:auto; padding:9px 18px; border-radius:10px; cursor:pointer;
@@ -914,35 +917,35 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   }
   .myClassExport:hover{background:var(--gold-light); border-color:var(--gold);}
   .myClassSummary{
-    background:var(--cream); border:1px solid #e8e0cd; border-radius:10px;
+    background:var(--cream); border:1px solid #e7d9ce; border-radius:10px;
     padding:11px 18px; margin-bottom:14px; font-size:.87rem; color:var(--navy);
   }
   .myClassSummary strong{color:var(--gold-deep);}
-  .myClassTableWrap{overflow-x:auto; border-radius:14px; border:1px solid #e8e0cd; background:#fff;}
+  .myClassTableWrap{overflow-x:auto; border-radius:14px; border:1px solid #e7d9ce; background:#ffffff;}
   .myClassTable{width:100%; min-width:600px; border-collapse:collapse; font-size:.88rem;}
   .myClassTable thead th{
     background:var(--grad-navy); color:var(--gold-light); padding:13px 10px;
     text-align:center; font-weight:700; font-size:.82rem; white-space:nowrap;
   }
-  .myClassTable tbody td{padding:11px 10px; border-bottom:1px solid #f2ede0; text-align:center; vertical-align:middle;}
+  .myClassTable tbody td{padding:11px 10px; border-bottom:1px solid #f1e8e1; text-align:center; vertical-align:middle;}
   .myClassTable tbody tr:last-child td{border-bottom:none;}
-  .myClassTable tbody tr:nth-child(even){background:#fdfbf6;}
+  .myClassTable tbody tr:nth-child(even){background:#fbf9f8;}
   .myClassTable tbody tr:hover{background:var(--cream);}
-  .mcIdx{color:#a8a08e; font-size:.8rem; width:38px;}
+  .mcIdx{color:#744654; font-size:.8rem; width:38px;}
   .mcNameInput{
     width:100%; padding:8px 11px; border-radius:8px; border:2px solid var(--gold);
     font-family:'Tajawal'; font-size:.95rem; font-weight:700; color:var(--navy);
-    background:#fffdf5;
+    background:#fbfaf9;
   }
-  .mcNameInput:focus{outline:none; box-shadow:0 0 0 3px #f7ecd2;}
+  .mcNameInput:focus{outline:none; box-shadow:0 0 0 3px #eee3db;}
   .mcName{font-weight:700; color:var(--navy); text-align:right !important; min-width:130px;}
   .mcBadge{display:inline-block; padding:4px 11px; border-radius:16px; font-size:.8rem; font-weight:700;}
-  .mcBadge.points{background:#eaf0f4; color:#2a6b8a;}
-  .mcBadge.praise{background:#fdf4e3; color:var(--gold-deep);}
-  .mcBadge.warn{background:var(--maroon); color:#fff; box-shadow:0 0 0 2px #f3cfcf; letter-spacing:.3px;}
-  .mcBadge.ok{background:#f2f0ea; color:#9a9384; font-weight:600;}
+  .mcBadge.points{background:#eaf0f4; color:#1f5068;}
+  .mcBadge.praise{background:#f5efeb; color:var(--gold-deep);}
+  .mcBadge.warn{background:var(--maroon); color:#ffffff; box-shadow:0 0 0 2px #f3cfcf; letter-spacing:.3px;}
+  .mcBadge.ok{background:#f4ede8; color:#6b404e; font-weight:600;}
   .mcAdd{
-    width:34px; height:34px; border-radius:50%; border:1.5px solid #dcd4c0; background:#fff;
+    width:34px; height:34px; border-radius:50%; border:1.5px solid #dfccbd; background:#ffffff;
     color:var(--navy); cursor:pointer; font-size:1.15rem; line-height:1; margin-inline-start:5px; font-weight:700;
     transition:background .12s, border-color .12s, transform .12s;
   }
@@ -970,7 +973,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .myClassTable th:nth-child(5), .myClassTable td:nth-child(5){width:auto;}
   .myClassTable th:nth-child(6), .myClassTable td:nth-child(6){width:52px;}
   .mcAdd.minus{color:var(--maroon); border-color:#e8cccc;}
-  .mcAdd.minus:hover{background:#fbe9e9; border-color:var(--maroon);}
+  .mcAdd.minus:hover{background:#fdece3; border-color:var(--maroon);}
   .mcNoteCell{text-align:right !important; min-width:320px;}
   .mcNotesBox{display:flex; flex-direction:column; gap:5px;}
   /* الملاحظات مطوية — الجدول يبقى مضغوطاً مهما كثرت */
@@ -978,36 +981,36 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .mcNotesSummary{
     cursor:pointer; list-style:none; display:flex; align-items:center; gap:7px;
     padding:8px 14px; border-radius:18px; background:var(--cream);
-    border:1.5px solid #e0d8c4; color:var(--navy); font-weight:700; width:fit-content;
+    border:1.5px solid #e2d0c2; color:var(--navy); font-weight:700; width:fit-content;
   }
   .mcNotesSummary::-webkit-details-marker{display:none;}
   .mcNotesSummary:hover{background:var(--gold-light); border-color:var(--gold);}
   .mcNotesFold[open] .mcNotesSummary{background:var(--gold-light); border-color:var(--gold);}
   .nfChip{padding:1px 6px; border-radius:10px; font-size:.68rem;}
   .nfChip.good{background:#eaf4f1; color:var(--teal);}
-  .nfChip.bad{background:#fbe9e9; color:var(--maroon);}
+  .nfChip.bad{background:#fdece3; color:var(--maroon);}
   .mcNotesList{
     display:flex; flex-direction:column; gap:4px; margin-top:6px;
     max-height:260px; overflow-y:auto; padding-inline-end:4px;
   }
   .mcNoteItem{
     font-size:.85rem; line-height:1.7; padding:8px 11px; border-radius:8px;
-    background:var(--cream); border-inline-start:3px solid #dcd4c0;
+    background:var(--cream); border-inline-start:3px solid #dfccbd;
   }
-  .mcNoteItem.good{border-inline-start-color:var(--teal); color:#2a6b5c;}
+  .mcNoteItem.good{border-inline-start-color:var(--teal); color:#1f5a4c;}
   .mcNoteItem.bad{border-inline-start-color:var(--maroon); color:#8a3838;}
-  .mcNoteDate{color:#a8a08e; font-size:.68rem; margin-inline-end:4px;}
+  .mcNoteDate{color:#5e3743; font-size:.68rem; margin-inline-end:4px;}
   .mcNoteItem{display:flex; align-items:flex-start; gap:4px;}
   .mcNoteTxt{flex:1;}
   /* أزرار التعديل والحذف ظاهرة دائماً — لا تحتاج تمرير الماوس لتجدها */
   .mcNoteOps{display:flex; gap:4px; flex-shrink:0;}
   .mcNoteOps button{
-    background:#fff; border:1px solid #e0d8c4; border-radius:7px; cursor:pointer;
+    background:#ffffff; border:1px solid #e2d0c2; border-radius:7px; cursor:pointer;
     font-size:.85rem; width:30px; height:30px; line-height:1; padding:0;
     transition:background .12s, border-color .12s, transform .12s;
   }
   .mcNoteOps button:active{transform:scale(.9);}
-  .mcNoteOps .mcNoteDel:hover{background:#fbe9e9; border-color:var(--maroon);}
+  .mcNoteOps .mcNoteDel:hover{background:#fdece3; border-color:var(--maroon);}
   .mcNoteOps .mcNoteEdit:hover{background:var(--gold-light); border-color:var(--gold);}
   .mcEditBox{display:flex; gap:3px; width:100%; align-items:center;}
   .mcEditInput{
@@ -1019,33 +1022,33 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     border:none; border-radius:5px; cursor:pointer; padding:3px 7px;
     font-size:.75rem; line-height:1;
   }
-  .mcEditOk{background:var(--teal); color:#fff;}
-  .mcEditNo{background:#e8e0cd; color:#7a8a8e;}
+  .mcEditOk{background:var(--teal); color:#ffffff;}
+  .mcEditNo{background:#e7d9ce; color:#633b48;}
   @media(hover:none){ .mcNoteOps{opacity:1;} } /* على الجوال تظهر دائماً */
   .mcNoteAdd{display:flex; gap:6px; margin-top:6px;}
   .mcNoteInput{
     flex:1; min-width:150px; padding:10px 13px; border-radius:9px;
-    border:1.5px solid #dcd4c0; font-family:'Tajawal'; font-size:.88rem;
+    border:1.5px solid #dfccbd; font-family:'Tajawal'; font-size:.88rem;
   }
-  .mcNoteInput:focus{outline:none; border-color:var(--gold); box-shadow:0 0 0 3px #f7ecd2;}
+  .mcNoteInput:focus{outline:none; border-color:var(--gold); box-shadow:0 0 0 3px #eee3db;}
   .mcNoteSend{
-    border:1.5px solid #dcd4c0; border-radius:9px; background:#fff;
+    border:1.5px solid #dfccbd; border-radius:9px; background:#ffffff;
     cursor:pointer; font-size:1.05rem; padding:0 13px; line-height:1; min-width:46px;
     transition:background .12s, border-color .12s, transform .12s;
   }
   .mcNoteSend:active{transform:scale(.93);}
   .mcNoteSend.praise:hover{background:#eaf4f1; border-color:var(--teal);}
-  .mcNoteSend.warn:hover{background:#fbe9e9; border-color:var(--maroon);}
+  .mcNoteSend.warn:hover{background:#fdece3; border-color:var(--maroon);}
   .mcNote{font-size:.79rem; display:inline-block;}
   .mcNote.good{color:var(--teal);}
   .mcNote.bad{color:var(--maroon);}
-  .mcNoteEmpty{color:#c5bda9;}
-  .enrichMenu a:hover{background:#faf3e3;}
+  .mcNoteEmpty{color:#594a50;}
+  .enrichMenu a:hover{background:#f4eee9;}
 
   #userChip{
     background:var(--grad-gold); color:var(--navy-deep); padding:7px 16px; border-radius:30px;
     font-weight:700; font-size:.85rem; cursor:pointer; border:none;
-    box-shadow:0 2px 8px rgba(168,129,63,.3);
+    box-shadow:0 2px 8px rgba(183,134,35,.3);
   }
   #badgesRow{gap:4px; align-items:center; margin-inline-start:6px;}
   .badgeIcon{
@@ -1054,40 +1057,40 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   }
   @keyframes badgePop{0%{transform:scale(0);} 70%{transform:scale(1.25);} 100%{transform:scale(1);}}
   #adminChip{
-    background:transparent; color:var(--gold-light); border:1.5px solid rgba(201,161,94,.4);
+    background:transparent; color:var(--gold-light); border:1.5px solid rgba(220,167,58,.4);
     width:36px; height:36px; border-radius:50%; font-size:1rem; cursor:pointer; margin-inline-start:8px;
     position:relative;
   }
-  #adminChip.active{background:var(--teal); border-color:var(--teal); color:#fff;}
+  #adminChip.active{background:var(--teal); border-color:var(--teal); color:#ffffff;}
   #adminLogoutTop{
     display:none; background:transparent; color:var(--gold-light); border:1.5px solid rgba(122,48,48,.5);
     border-radius:20px; padding:6px 14px; font-size:.78rem; font-family:'Tajawal'; font-weight:700;
     cursor:pointer; margin-inline-start:8px;
   }
   #adminLogoutTop.show{display:inline-block;}
-  #adminLogoutTop:hover{background:var(--maroon); border-color:var(--maroon); color:#fff;}
+  #adminLogoutTop:hover{background:var(--maroon); border-color:var(--maroon); color:#ffffff;}
   .badge{
-    display:none; position:absolute; top:-6px; left:-6px; background:var(--maroon); color:#fff;
+    display:none; position:absolute; top:-6px; left:-6px; background:var(--maroon); color:#ffffff;
     font-size:.65rem; font-weight:700; min-width:18px; height:18px; border-radius:50%;
     align-items:center; justify-content:center; border:2px solid var(--navy);
   }
   .badge.show{display:flex;}
 
   #lastUpdateBar{
-    display:none; background:var(--teal); color:#fff; text-align:center; padding:9px 20px;
+    display:none; background:var(--teal); color:#ffffff; text-align:center; padding:9px 20px;
     font-size:.82rem; position:relative;
   }
   /* شريط طقس الدوحة — بنفس نمط شريط التحديث، بلون سماوي يناسب موضوعه */
   #weatherBar{
-    display:none; background:linear-gradient(90deg,#2a6b8a,#3a86ad); color:#fff;
+    display:none; background:linear-gradient(90deg,var(--navy-soft),var(--navy)); color:#ffffff;
     text-align:center; padding:9px 44px; font-size:.82rem; position:relative; /* 44px: مساحة زر الإغلاق كي لا يغطي النص */
   }
   #weatherBar.show{display:block;}
-  #weatherBar strong{color:#ffe6b0;}
-  #weatherBar .wbHint{opacity:.72; font-size:.76rem;}
+  #weatherBar strong{color:var(--gold-light);}
+  #weatherBar .wbHint{opacity:.92; font-size:.76rem;}
   #weatherBar button{
     position:absolute; inset-inline-end:12px; top:50%; transform:translateY(-50%);
-    background:rgba(255,255,255,.16); border:none; color:#fff; cursor:pointer;
+    background:rgba(255,255,255,.16); border:none; color:#ffffff; cursor:pointer;
     width:22px; height:22px; border-radius:50%; font-size:.72rem; line-height:1;
   }
   #weatherBar button:hover{background:rgba(255,255,255,.3);}
@@ -1095,7 +1098,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   #lastUpdateBar.show{display:block;}
   #lastUpdateBar button{
     position:absolute; left:16px; top:50%; transform:translateY(-50%); background:none; border:none;
-    color:#fff; font-size:.9rem; cursor:pointer; opacity:.8;
+    color:#ffffff; font-size:.9rem; cursor:pointer; opacity:.8;
   }
   #lastUpdateBar button:hover{opacity:1;}
 
@@ -1110,17 +1113,17 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .topPendingInner strong{color:var(--navy-deep); font-size:.85rem; white-space:nowrap;}
   #topPendingList{display:flex; gap:8px; flex-wrap:wrap; flex:1;}
   .pendingPill{
-    display:flex; align-items:center; gap:8px; background:#fff; border-radius:20px;
+    display:flex; align-items:center; gap:8px; background:#ffffff; border-radius:20px;
     padding:5px 6px 5px 12px; font-size:.82rem; box-shadow:0 1px 3px rgba(0,0,0,.1);
   }
   .pendingPill .pname{font-weight:700; color:var(--navy);}
-  .pendingPill .pcls{color:#8a8a8a; font-size:.75rem;}
+  .pendingPill .pcls{color:#673e4b; font-size:.75rem;}
   .pendingPill button{
     border:none; border-radius:50%; width:24px; height:24px; cursor:pointer; font-size:.75rem;
     display:flex; align-items:center; justify-content:center;
   }
-  .pendingPill .pApprove{background:var(--teal); color:#fff;}
-  .pendingPill .pReject{background:var(--maroon); color:#fff;}
+  .pendingPill .pApprove{background:var(--teal); color:#ffffff;}
+  .pendingPill .pReject{background:var(--maroon); color:#ffffff;}
   .menuBtn{display:none; background:none; border:none; color:var(--cream); font-size:1.6rem; cursor:pointer;}
 
   /* admin panel */
@@ -1132,18 +1135,18 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .adminPanelBody{display:none;}
   .adminPanelBody.active{display:block;}
   .miniBtn{padding:8px 16px; border-radius:8px; border:none; font-weight:700; font-size:.85rem; cursor:pointer;}
-  .miniBtn.reject{background:var(--maroon); color:#fff;}
-  .qRow{background:#fff; border:1px solid #e8e0cd; border-radius:12px; padding:16px 18px; margin-bottom:10px;}
+  .miniBtn.reject{background:var(--maroon); color:#ffffff;}
+  .qRow{background:#ffffff; border:1px solid #e7d9ce; border-radius:12px; padding:16px 18px; margin-bottom:10px;}
   .qRow .qtext{font-weight:700; color:var(--navy); margin-bottom:6px;}
-  .qRow .qchoices{font-size:.85rem; color:#5c6a6e; margin-bottom:8px;}
+  .qRow .qchoices{font-size:.85rem; color:#4c2d37; margin-bottom:8px;}
   .qRow .qchoices .correctChoice{color:var(--teal); font-weight:700;}
-  .addQForm{background:#fff; border:1px solid #e8e0cd; border-radius:12px; padding:20px; margin-bottom:24px;}
-  .addQForm input{width:100%; padding:10px 12px; border-radius:8px; border:1.5px solid #dcd4c0; font-family:'Tajawal'; margin-bottom:10px; font-size:.9rem;}
+  .addQForm{background:#ffffff; border:1px solid #e7d9ce; border-radius:12px; padding:20px; margin-bottom:24px;}
+  .addQForm input{width:100%; padding:10px 12px; border-radius:8px; border:1.5px solid #dfccbd; font-family:'Tajawal'; margin-bottom:10px; font-size:.9rem;}
   .addQForm label{font-size:.82rem; font-weight:700; color:var(--navy); display:block; margin-bottom:4px;}
 
   .rosterClassBar{display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;}
   .bulkBox{
-    background:#fff; border:1px solid #e8e0cd; border-radius:12px;
+    background:#ffffff; border:1px solid #e7d9ce; border-radius:12px;
     padding:16px 20px; margin-bottom:20px;
   }
   .bulkBox summary{
@@ -1155,25 +1158,25 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   /* الحضور */
   .attGroup{display:inline-flex; gap:3px; margin-inline-end:6px;}
   .attBtn{
-    width:30px; height:30px; border-radius:8px; border:1.5px solid #dcd4c0;
-    background:#fff; cursor:pointer; font-size:.85rem; opacity:.4; transition:.15s;
+    width:30px; height:30px; border-radius:8px; border:1.5px solid #dfccbd;
+    background:#ffffff; cursor:pointer; font-size:.85rem; opacity:.4; transition:.15s;
   }
   .attBtn:hover{opacity:.8;}
   .attBtn.on{opacity:1; transform:scale(1.05);}
   .attBtn.on.present{background:#eaf4f1; border-color:var(--teal);}
-  .attBtn.on.late{background:#fdf4e3; border-color:var(--gold);}
-  .attBtn.on.absent{background:#fbe9e9; border-color:var(--maroon);}
+  .attBtn.on.late{background:#f5efeb; border-color:var(--gold);}
+  .attBtn.on.absent{background:#fdece3; border-color:var(--maroon);}
   .attSummary{
-    background:var(--cream); border:1px solid #e8e0cd; border-radius:10px;
+    background:var(--cream); border:1px solid #e7d9ce; border-radius:10px;
     padding:10px 16px; margin-bottom:14px; font-size:.86rem; color:var(--navy);
   }
   .attSummary strong{color:var(--teal);}
 
   /* الملاحظات الإيجابية والقوالب السريعة */
-  .rStat.praise{background:#fdf4e3; color:var(--gold-deep);}
+  .rStat.praise{background:#f5efeb; color:var(--gold-deep);}
   .noteTplRow{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;}
   .noteTpl{
-    background:var(--cream); border:1px solid #dcd4c0; border-radius:16px;
+    background:var(--cream); border:1px solid #dfccbd; border-radius:16px;
     padding:5px 12px; font-size:.78rem; cursor:pointer; font-family:'Tajawal'; color:var(--navy);
   }
   .noteTpl:hover{background:var(--gold-light); border-color:var(--gold);}
@@ -1184,7 +1187,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   }
   .rosterClassBtn.active{background:var(--navy); color:var(--gold-light);}
   .rosterRow{
-    background:#fff; border:1px solid #e8e0cd; border-radius:12px; padding:14px 18px;
+    background:#ffffff; border:1px solid #e7d9ce; border-radius:12px; padding:14px 18px;
     display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; flex-wrap:wrap;
   }
   .rosterRow .rName{font-weight:700; color:var(--navy); font-size:.95rem; min-width:120px;}
@@ -1192,14 +1195,14 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .rStat{display:flex; align-items:center; gap:6px; font-size:.85rem; font-weight:700; padding:6px 12px; border-radius:20px;}
   .rStat.points{background:#eaf4f1; color:var(--teal);}
   .rStat.warnOk{background:#eaf4f1; color:var(--teal);}
-  .rStat.warnBad{background:#fbe9e9; color:var(--maroon);}
+  .rStat.warnBad{background:#fdece3; color:var(--maroon);}
   .rStat button{border:none; background:none; cursor:pointer; font-size:1rem; padding:0 2px;}
-  .rDelete{background:none; border:none; color:#b0a898; cursor:pointer; font-size:1rem;}
-  .lastWarnNote{margin-top:8px; padding-top:8px; border-top:1px dashed #eee; font-size:.78rem; color:var(--maroon);}
+  .rDelete{background:none; border:none; color:#b0a398; cursor:pointer; font-size:1rem;}
+  .lastWarnNote{margin-top:8px; padding-top:8px; border-top:1px dashed #f4ede8; font-size:.78rem; color:var(--maroon);}
 
   /* الأسئلة غير المجابة */
   .tabBadge{
-    display:inline-block; background:var(--maroon); color:#fff; border-radius:11px;
+    display:inline-block; background:var(--maroon); color:#ffffff; border-radius:11px;
     padding:1px 7px; font-size:.7rem; margin-inline-start:5px; min-width:18px;
   }
   .fbSummary{margin-bottom:18px;}
@@ -1208,55 +1211,55 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .fbStats{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;}
   .fbStat{padding:7px 15px; border-radius:20px; font-size:.83rem; font-weight:700;}
   .fbStat.good{background:#eaf4f1; color:var(--teal);}
-  .fbStat.bad{background:#fbe9e9; color:var(--maroon);}
+  .fbStat.bad{background:#fdece3; color:var(--maroon);}
   .fbStat.rate{background:var(--cream); color:var(--navy);}
-  .fbWorst{background:#fff; border:1px solid #e8e0cd; border-radius:10px; padding:12px 16px; font-size:.84rem;}
+  .fbWorst{background:#ffffff; border:1px solid #e7d9ce; border-radius:10px; padding:12px 16px; font-size:.84rem;}
   .fbWorst strong{color:var(--navy); display:block; margin-bottom:6px;}
-  .fbWorst ul{margin:0; padding-inline-start:18px; color:#5c6a6e;}
+  .fbWorst ul{margin:0; padding-inline-start:18px; color:#4c2d37;}
   .fbWorst li{margin-bottom:3px;}
   .fbHot{color:var(--maroon); font-weight:700;}
 
   .gapRow{
-    background:#fff; border:1px solid #e8e0cd; border-radius:12px; padding:14px 18px;
+    background:#ffffff; border:1px solid #e7d9ce; border-radius:12px; padding:14px 18px;
     display:flex; align-items:center; justify-content:space-between; gap:12px;
     margin-bottom:10px; flex-wrap:wrap; border-inline-start:3px solid var(--gold);
   }
   .gapInfo{flex:1; min-width:200px;}
   .gapQ{font-weight:700; color:var(--navy); font-size:.92rem; margin-bottom:4px;}
-  .gapMeta{font-size:.76rem; color:#8a8a8a;}
+  .gapMeta{font-size:.76rem; color:#673e4b;}
   .gapHot{color:var(--maroon); font-weight:700;}
   .gapActions{display:flex; gap:8px;}
   .gapBtn{
     border:none; border-radius:8px; padding:8px 14px; font-size:.8rem;
     font-weight:700; cursor:pointer; font-family:'Tajawal';
   }
-  .gapBtn.done{background:var(--teal); color:#fff;}
-  .gapBtn.drop{background:var(--cream); color:#8a8a8a; border:1px solid #dcd4c0;}
-  .gapBtn.drop:hover{background:#fbe9e9; color:var(--maroon);}
+  .gapBtn.done{background:var(--teal); color:#ffffff;}
+  .gapBtn.drop{background:var(--cream); color:#673e4b; border:1px solid #dfccbd;}
+  .gapBtn.drop:hover{background:#fdece3; color:var(--maroon);}
 
   .trashRow{
-    background:#fff; border:1px solid #e8e0cd; border-radius:12px; padding:14px 18px;
+    background:#ffffff; border:1px solid #e7d9ce; border-radius:12px; padding:14px 18px;
     display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; flex-wrap:wrap;
   }
   .trashRow .tType{font-size:.72rem; background:var(--cream); color:var(--navy); padding:2px 10px; border-radius:10px; font-weight:700; margin-inline-end:8px;}
   .trashRow .tInfo{flex:1; min-width:200px; font-size:.88rem; color:var(--navy);}
-  .trashRow .tDate{font-size:.75rem; color:#8a8a8a; display:block; margin-top:2px;}
+  .trashRow .tDate{font-size:.75rem; color:#673e4b; display:block; margin-top:2px;}
   .trashActions{display:flex; gap:8px;}
-  .restoreBtn{background:var(--teal); color:#fff; border:none; border-radius:8px; padding:8px 14px; font-size:.8rem; font-weight:700; cursor:pointer;}
-  .purgeBtn{background:var(--maroon); color:#fff; border:none; border-radius:8px; padding:8px 14px; font-size:.8rem; font-weight:700; cursor:pointer;}
+  .restoreBtn{background:var(--teal); color:#ffffff; border:none; border-radius:8px; padding:8px 14px; font-size:.8rem; font-weight:700; cursor:pointer;}
+  .purgeBtn{background:var(--maroon); color:#ffffff; border:none; border-radius:8px; padding:8px 14px; font-size:.8rem; font-weight:700; cursor:pointer;}
 
-  .studentRow{background:#fff; border:1px solid #e8e0cd; border-radius:12px; padding:16px 18px; margin-bottom:10px;}
+  .studentRow{background:#ffffff; border:1px solid #e7d9ce; border-radius:12px; padding:16px 18px; margin-bottom:10px;}
   .studentRow .srTop{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:10px;}
   .studentRow .srInfo strong{color:var(--navy); font-size:1rem;}
-  .studentRow .srInfo span{font-size:.8rem; color:#7a8a8e; display:block; margin-top:2px;}
+  .studentRow .srInfo span{font-size:.8rem; color:#633b48; display:block; margin-top:2px;}
   .srBadge{padding:3px 10px; border-radius:20px; font-size:.72rem; font-weight:700;}
-  .srBadge.active{background:var(--teal); color:#fff;}
-  .srBadge.away{background:#e8e0cd; color:#7a8a8e;}
-  .srBadge.kicked{background:var(--maroon); color:#fff;}
+  .srBadge.active{background:var(--teal); color:#ffffff;}
+  .srBadge.away{background:#e7d9ce; color:#633b48;}
+  .srBadge.kicked{background:var(--maroon); color:#ffffff;}
   .studentRow .srActions{display:flex; gap:8px; align-items:center;}
-  .noteInput{flex:1; padding:8px 10px; border-radius:8px; border:1.5px solid #dcd4c0; font-family:'Tajawal'; font-size:.82rem;}
-  .kickBtn{background:var(--maroon); color:#fff; border:none; border-radius:8px; padding:8px 14px; font-size:.8rem; font-weight:700; cursor:pointer;}
-  .saveNoteBtn{background:var(--teal); color:#fff; border:none; border-radius:8px; padding:8px 12px; font-size:.8rem; cursor:pointer;}
+  .noteInput{flex:1; padding:8px 10px; border-radius:8px; border:1.5px solid #dfccbd; font-family:'Tajawal'; font-size:.82rem;}
+  .kickBtn{background:var(--maroon); color:#ffffff; border:none; border-radius:8px; padding:8px 14px; font-size:.8rem; font-weight:700; cursor:pointer;}
+  .saveNoteBtn{background:var(--teal); color:#ffffff; border:none; border-radius:8px; padding:8px 12px; font-size:.8rem; cursor:pointer;}
 
   /* chatbot */
   #chatFab{
@@ -1268,26 +1271,26 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .mascotImg{width:52px; height:52px; border-radius:50%; object-fit:cover;}
   #chatPanel{
     position:fixed; bottom:90px; left:22px; z-index:150; width:340px; max-width:calc(100vw - 40px);
-    height:460px; max-height:70vh; background:#fff; border-radius:18px; box-shadow:0 10px 40px rgba(0,0,0,.3);
+    height:460px; max-height:70vh; background:#ffffff; border-radius:18px; box-shadow:0 10px 40px rgba(0,0,0,.3);
     display:none; flex-direction:column; overflow:hidden;
   }
   #chatPanel.show{display:flex;}
-  .chatHead{background:var(--navy); color:#fff; padding:14px 18px; display:flex; justify-content:space-between; align-items:center;}
+  .chatHead{background:var(--navy); color:#ffffff; padding:14px 18px; display:flex; justify-content:space-between; align-items:center;}
   .chatHead strong{font-size:.95rem;}
   .chatHead span{font-size:.75rem; color:var(--gold-light); display:block;}
-  .chatHead button{background:none; border:none; color:#fff; font-size:1.2rem; cursor:pointer;}
-  .chatBody{flex:1; overflow-y:auto; padding:14px; background:#faf7ef;}
+  .chatHead button{background:none; border:none; color:#ffffff; font-size:1.2rem; cursor:pointer;}
+  .chatBody{flex:1; overflow-y:auto; padding:14px; background:#f8f4f1;}
   .chatMsg{max-width:82%; padding:9px 13px; border-radius:12px; margin-bottom:10px; font-size:.86rem; line-height:1.6;}
-  .chatMsg.bot{background:#fff; border:1px solid #e8e0cd; margin-inline-end:auto; border-start-start-radius:2px;}
+  .chatMsg.bot{background:#ffffff; border:1px solid #e7d9ce; margin-inline-end:auto; border-start-start-radius:2px;}
   .chatMsg.user{background:var(--gold); color:var(--navy-deep); margin-inline-start:auto; border-start-end-radius:2px; font-weight:700;}
   /* تقييم الإجابة */
   .rateRow{
     display:flex; align-items:center; gap:7px; margin:4px 0 10px;
     padding-inline-start:6px; font-size:.75rem;
   }
-  .rateLbl{color:#9a9282;}
+  .rateLbl{color:#6a404d;}
   .rateBtn{
-    background:#fff; border:1px solid #e0d8c4; border-radius:14px;
+    background:#ffffff; border:1px solid #e2d0c2; border-radius:14px;
     padding:3px 9px; cursor:pointer; font-size:.82rem; line-height:1.2;
   }
   .rateBtn:hover{background:var(--cream); border-color:var(--gold);}
@@ -1297,27 +1300,27 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
   .chatHeadBtns{display:flex; gap:4px; align-items:center;}
   .chatHeadBtns button{
-    background:rgba(255,255,255,.12); border:none; color:#fff; cursor:pointer;
+    background:rgba(255,255,255,.12); border:none; color:#ffffff; cursor:pointer;
     width:26px; height:26px; border-radius:50%; font-size:.75rem; line-height:1;
   }
   .chatHeadBtns button:hover{background:rgba(255,255,255,.28);}
   .chatResumed{
-    text-align:center; font-size:.72rem; color:#a8a08e; margin:10px 0;
-    padding:5px; border-block:1px dashed #e0d8c4;
+    text-align:center; font-size:.72rem; color:#744654; margin:10px 0;
+    padding:5px; border-block:1px dashed #e2d0c2;
   }
 
   .chatChips{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;}
-  .typingRow{display:flex; align-items:center; gap:6px; padding:9px 13px; background:#fff; border:1px solid #e8e0cd; border-radius:12px; margin-bottom:10px; width:fit-content;}
-  .typingRow span{font-size:.78rem; color:#8a8a8a;}
+  .typingRow{display:flex; align-items:center; gap:6px; padding:9px 13px; background:#ffffff; border:1px solid #e7d9ce; border-radius:12px; margin-bottom:10px; width:fit-content;}
+  .typingRow span{font-size:.78rem; color:#673e4b;}
   .typingDots{display:flex; gap:3px;}
   .typingDots i{width:6px; height:6px; border-radius:50%; background:var(--gold); display:inline-block; animation:typingBounce 1s infinite ease-in-out;}
   .typingDots i:nth-child(2){animation-delay:.15s;}
   .typingDots i:nth-child(3){animation-delay:.3s;}
   @keyframes typingBounce{0%,60%,100%{transform:translateY(0); opacity:.5;} 30%{transform:translateY(-4px); opacity:1;}}
-  .chatChip{background:#fff; border:1.5px solid var(--gold); color:var(--navy); border-radius:20px; padding:6px 12px; font-size:.78rem; cursor:pointer;}
-  .chatInputRow{display:flex; gap:8px; padding:12px; border-top:1px solid #eee; background:#fff;}
-  .chatInputRow input{flex:1; padding:10px 12px; border-radius:10px; border:1.5px solid #dcd4c0; font-family:'Tajawal'; font-size:.85rem;}
-  .chatInputRow button{background:var(--teal); color:#fff; border:none; border-radius:10px; padding:0 16px; font-weight:700; cursor:pointer;}
+  .chatChip{background:#ffffff; border:1.5px solid var(--gold); color:var(--navy); border-radius:20px; padding:6px 12px; font-size:.78rem; cursor:pointer;}
+  .chatInputRow{display:flex; gap:8px; padding:12px; border-top:1px solid #f4ede8; background:#ffffff;}
+  .chatInputRow input{flex:1; padding:10px 12px; border-radius:10px; border:1.5px solid #dfccbd; font-family:'Tajawal'; font-size:.85rem;}
+  .chatInputRow button{background:var(--teal); color:#ffffff; border:none; border-radius:10px; padding:0 16px; font-weight:700; cursor:pointer;}
 
   /* Hero */
   /* ===== البانر التعريفي بالصفحة الرئيسية ===== */
@@ -1347,20 +1350,20 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   }
   .heroEyebrow{
     display:flex; align-items:center; gap:10px;
-    color:var(--gold); font-size:.85rem; font-weight:700; margin-bottom:14px; letter-spacing:.3px;
+    color:var(--gold-light); font-size:.85rem; font-weight:700; margin-bottom:14px; letter-spacing:.3px;
   }
   .ebLine{display:inline-block; width:34px; height:2px; background:var(--gold); border-radius:2px;}
   .heroIntroTitle{
     font-family:'Aref Ruqaa'; font-size:clamp(1.6rem,3.6vw,2.55rem);
-    color:#fff; line-height:1.68; margin-bottom:18px;
+    color:#ffffff; line-height:1.68; margin-bottom:18px;
     text-shadow:0 2px 14px rgba(0,0,0,.28);
   }
   .heroIntroTitle em{
     color:var(--gold-light); font-style:normal; position:relative;
-    background:linear-gradient(transparent 68%, rgba(201,161,94,.28) 68%);
+    background:linear-gradient(transparent 68%, rgba(220,167,58,.28) 68%);
   }
   .heroIntroLead{
-    color:rgba(246,241,230,.82); font-size:.95rem; line-height:2.05;
+    color:rgba(248,243,239,.95); font-size:.95rem; line-height:2.05;
     max-width:560px; margin-bottom:24px;
   }
   .heroIntroArt{position:relative; text-align:center;}
@@ -1368,7 +1371,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .heroQuoteBadge{
     display:inline-block; font-family:'Cairo', 'Tajawal', sans-serif; font-weight:700; color:var(--gold-light); font-size:.95rem;
     padding:8px 20px; border-radius:30px; margin-bottom:14px;
-    background:rgba(201,161,94,.12); border:1px solid rgba(201,161,94,.36);
+    background:rgba(0,0,0,.18); border:1px solid rgba(220,167,58,.36);
   }
   @media(max-width:860px){
     .heroIntroInner{grid-template-columns:1fr; text-align:center; gap:26px;}
@@ -1382,8 +1385,8 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
      (بعد قواعد .heroIntroArt العامة عمداً — القواعد الأخص تأتي بعدها) */
   .heroPlate{
     position:relative; margin:0 auto; max-width:500px; text-align:start;
-    background:linear-gradient(160deg, rgba(22,66,86,.55), rgba(10,32,41,.72));
-    border:1px solid rgba(201,161,94,.32); border-radius:18px;
+    background:linear-gradient(160deg, rgba(167,25,68,.55), rgba(79,12,32,.72));
+    border:1px solid rgba(220,167,58,.32); border-radius:18px;
     padding:14px 16px 12px; box-shadow:0 18px 40px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04);
     animation:hpIn .7s ease both;
   }
@@ -1393,52 +1396,52 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .hpEyebrow{color:var(--gold); font-size:.68rem; font-weight:700; letter-spacing:.3px; white-space:nowrap;}
   .hpTitle{font-family:'Aref Ruqaa'; color:var(--gold-light); font-size:1.18rem; line-height:1.4; margin:0;}
   .hpNext{
-    background:rgba(201,161,94,.12); color:var(--gold-light); border:1px solid rgba(201,161,94,.35);
+    background:rgba(0,0,0,.18); color:var(--gold-light); border:1px solid rgba(220,167,58,.35);
     border-radius:50%; width:28px; height:28px; flex:0 0 28px; cursor:pointer; font-size:.9rem; line-height:1;
     transition:transform .3s ease, background .2s ease;
   }
-  .hpNext:hover{background:rgba(201,161,94,.24); transform:rotate(-90deg);}
+  .hpNext:hover{background:rgba(220,167,58,.24); transform:rotate(-90deg);}
   .hpNext:focus-visible{outline:2px solid var(--gold-light); outline-offset:2px;}
   .hpMap{position:relative; width:100%; border-radius:10px; overflow:hidden;}
   .hpMap img{display:block; width:100%; height:auto;}
   /* أسماء المواقع نص حقيقي فوق الصورة — حادة بأي مقاس، مواضعها محسوبة من خطوط الطول والعرض */
   .hpLbl{
     position:absolute; transform:translate(-50%,-50%); white-space:nowrap; pointer-events:none;
-    font-size:.62rem; font-weight:700; color:#fdfbf6; letter-spacing:.2px;
-    text-shadow:0 0 3px rgba(10,32,41,.95), 0 0 6px rgba(10,32,41,.8);
+    font-size:.62rem; font-weight:700; color:#fbf9f8; letter-spacing:.2px;
+    text-shadow:0 0 3px rgba(79,12,32,.95), 0 0 6px rgba(79,12,32,.8);
   }
-  .hpLbl.dim{color:rgba(246,241,230,.7); font-weight:500;}
-  .hpLbl.sea{color:#e7f3f8; font-style:normal; font-weight:500; text-shadow:0 0 4px rgba(10,40,60,.9);}
+  .hpLbl.dim{color:rgba(244,237,232,.7); font-weight:500;}
+  .hpLbl.sea{color:#e7f3f8; font-style:normal; font-weight:500; text-shadow:0 0 4px rgba(108,16,44,.9);}
   .hpQatar{position:absolute; transform:translate(-50%,-50%); pointer-events:none;}
-  .hpQatar i{display:block; width:8px; height:8px; border-radius:50%; background:#7a3030; border:1.5px solid #fff;
+  .hpQatar i{display:block; width:8px; height:8px; border-radius:50%; background:#7a3030; border:1.5px solid #ffffff;
     box-shadow:0 0 0 3px rgba(122,48,48,.35); animation:hpPulse 2.2s ease-in-out infinite;}
-  .hpQatar b{position:absolute; top:-3px; left:13px;   /* يمين النقطة فعلياً (اتجاه فيزيائي — الصفحة RTL) */ font-size:.62rem; color:#fff; white-space:nowrap;
-    text-shadow:0 0 3px #0a2029, 0 0 6px #0a2029;}
+  .hpQatar b{position:absolute; top:-3px; left:13px;   /* يمين النقطة فعلياً (اتجاه فيزيائي — الصفحة RTL) */ font-size:.62rem; color:#ffffff; white-space:nowrap;
+    text-shadow:0 0 3px #4f0c20, 0 0 6px #4f0c20;}
   @keyframes hpPulse{0%,100%{box-shadow:0 0 0 2px rgba(122,48,48,.45);} 50%{box-shadow:0 0 0 6px rgba(122,48,48,.0);}}
   /* .heroPlate p.hpNote أخص من «.hero p» العامة (السطر اللاحق بالورقة) التي كانت تكبّر الخط وتضيّق العرض */
-  .heroPlate p.hpNote{color:rgba(246,241,230,.85); font-size:.78rem; line-height:1.85; margin:10px 0 8px; max-width:none;}
+  .heroPlate p.hpNote{color:rgba(244,237,232,.85); font-size:.78rem; line-height:1.85; margin:10px 0 8px; max-width:none;}
   .hpLegend{display:flex; flex-wrap:wrap; gap:6px 12px; margin-bottom:8px;}
-  .hpLegend span{display:inline-flex; align-items:center; gap:5px; color:rgba(246,241,230,.8); font-size:.66rem;}
+  .hpLegend span{display:inline-flex; align-items:center; gap:5px; color:rgba(244,237,232,.8); font-size:.66rem;}
   .hpLegend i{width:10px; height:10px; border-radius:3px; display:inline-block; flex:0 0 10px;}
-  .hpRamp{display:flex; align-items:center; gap:8px; color:rgba(246,241,230,.75); font-size:.66rem; margin-bottom:8px;}
+  .hpRamp{display:flex; align-items:center; gap:8px; color:rgba(244,237,232,.75); font-size:.66rem; margin-bottom:8px;}
   .hpRamp i{flex:1; height:7px; border-radius:4px; max-width:170px;
-    background:linear-gradient(to left, rgba(31,111,92,.2), #1f8c6e, #c9a15e, #e3c98b, #fff6dc);}   /* يمين خافت (تخلخل) ← يسار ساطع (تركّز) */
-  .hpFoot{display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px 10px; border-top:1px solid rgba(201,161,94,.18); padding-top:7px;}
+    background:linear-gradient(to left, rgba(23,90,74,.2), #1f8c6e, #dca73a, #ebc578, #f4ede7);}   /* يمين خافت (تخلخل) ← يسار ساطع (تركّز) */
+  .hpFoot{display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px 10px; border-top:1px solid rgba(220,167,58,.18); padding-top:7px;}
   .hpUnit{color:var(--gold-light); font-size:.68rem; font-weight:700;}
-  .hpSrc{color:rgba(246,241,230,.5); font-size:.6rem;}
+  .hpSrc{color:rgba(244,237,232,.5); font-size:.6rem;}
   /* لوحات مصمّمة من الكتاب */
   .hpLayers{display:flex; align-items:center; gap:12px;}
   .hpLayers svg{flex:0 0 46%; max-width:none; width:46%; height:auto; margin:0;}
   .hpLayers ol{list-style:none; margin:0; padding:0; flex:1;}
-  .hpLayers li{display:flex; gap:7px; align-items:flex-start; color:rgba(246,241,230,.88); font-size:.7rem; line-height:1.6; margin-bottom:5px;}
+  .hpLayers li{display:flex; gap:7px; align-items:flex-start; color:rgba(244,237,232,.88); font-size:.7rem; line-height:1.6; margin-bottom:5px;}
   .hpLayers li i{width:10px; height:10px; border-radius:50%; flex:0 0 10px; margin-top:4px;}
-  .hpLayers li b{color:#fff;}
+  .hpLayers li b{color:#ffffff;}
   .hpTimeline{display:flex; height:30px; border-radius:8px; overflow:hidden; margin:6px 0 10px; direction:rtl;}
-  .hpTimeline span{display:flex; align-items:center; justify-content:center; color:#fff; font-size:.62rem; font-weight:700; min-width:6px;}
+  .hpTimeline span{display:flex; align-items:center; justify-content:center; color:#ffffff; font-size:.62rem; font-weight:700; min-width:6px;}
   .hpTlList{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:4px 12px;}
-  .hpTlList li{display:flex; gap:6px; align-items:center; color:rgba(246,241,230,.85); font-size:.7rem;}
+  .hpTlList li{display:flex; gap:6px; align-items:center; color:rgba(244,237,232,.85); font-size:.7rem;}
   .hpTlList li i{width:10px; height:10px; border-radius:3px; flex:0 0 10px;}
-  .hpTlList li small{color:rgba(246,241,230,.55); font-size:.64rem;}
+  .hpTlList li small{color:rgba(244,237,232,.55); font-size:.64rem;}
   @media(max-width:860px){
     .heroPlate{max-width:440px;}
   }
@@ -1465,26 +1468,26 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .hero .wrap{display:grid; grid-template-columns:1.2fr .8fr; gap:40px; align-items:center;}
   .hero h1{font-size:2.9rem; line-height:1.25; color:var(--cream);}
   .hero h1 em{font-style:normal; color:var(--gold);}
-  .hero p{margin-top:18px; font-size:1.1rem; color:#d8cdb8; max-width:46ch;}
+  .hero p{margin-top:18px; font-size:1.1rem; color:rgba(248,243,239,.95); max-width:46ch;}
   .heroBtns{margin-top:30px; display:flex; gap:14px; flex-wrap:wrap;}
   .btn{
     display:inline-block; padding:13px 26px; border-radius:10px; font-weight:700; cursor:pointer;
     border:2px solid transparent; font-family:'Tajawal'; font-size:.95rem; transition:.2s;
   }
-  .btn-gold{background:var(--grad-gold); color:var(--navy-deep); box-shadow:0 3px 12px rgba(168,129,63,.28);}
-  .btn-gold:hover{background:linear-gradient(135deg, #f0daa5, var(--gold-light)); transform:translateY(-1px);}
+  .btn-gold{background:var(--grad-gold); color:var(--navy-deep); box-shadow:0 3px 12px rgba(183,134,35,.28);}
+  .btn-gold:hover{background:linear-gradient(135deg, #f2d69a, var(--gold-light)); transform:translateY(-1px);}
   .btn-outline{background:transparent; border-color:var(--gold-light); color:var(--cream);}
-  .btn-outline:hover{background:rgba(201,161,94,.15);}
+  .btn-outline:hover{background:rgba(220,167,58,.15);}
 
   #journeySection{display:none;}
   #journeySection.show{display:block;}
   #journeyMap{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; position:relative; padding:20px 0;}
   .jStop{display:flex; flex-direction:column; align-items:center; gap:8px; flex:1; min-width:90px; position:relative; z-index:1;}
-  .jStop::before{content:''; position:absolute; top:24px; right:50%; width:100%; height:3px; background:#e0dccc; z-index:-1;}
+  .jStop::before{content:''; position:absolute; top:24px; right:50%; width:100%; height:3px; background:#e4d4c8; z-index:-1;}
   .jStop:first-child::before{display:none;}
   .jCircle{
     width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-    font-size:1.3rem; background:#e0dccc; color:#a89f88; border:3px solid #e0dccc;
+    font-size:1.3rem; background:#e4d4c8; color:#724452; border:3px solid #e4d4c8;
   }
   .jStop.unlocked .jCircle{background:var(--gold); color:var(--navy-deep); border-color:var(--gold);}
   .jStop.unlocked::before{background:var(--gold);}
@@ -1493,32 +1496,32 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
   section{padding:70px 0;}
   .eyebrow-free h2{font-size:2.1rem; margin-bottom:10px;}
-  .lead{color:#4a5a5f; max-width:60ch; margin-bottom:36px;}
+  .lead{color:#3f262e; max-width:60ch; margin-bottom:36px;}
 
   /* cards grid */
   .grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:20px;}
   .card{
-    background:#fff; border-radius:var(--radius); padding:24px;
-    border:1px solid #ece5d4; box-shadow:var(--shadow-soft);
+    background:#ffffff; border-radius:var(--radius); padding:24px;
+    border:1px solid #ebdfd5; box-shadow:var(--shadow-soft);
     transition:transform .2s, box-shadow .2s;
   }
-  .card:hover{transform:translateY(-2px); box-shadow:0 8px 26px rgba(16,48,63,.11);}
+  .card:hover{transform:translateY(-2px); box-shadow:0 8px 26px rgba(122,18,50,.11);}
 
   /* ===== قسم "عن المعلم" — تصميم متكامل ===== */
   .abtBanner{background:var(--grad-navy); border-bottom:3px solid var(--gold); padding:52px 0 46px;}
   .abtBannerInner{display:grid; grid-template-columns:1.25fr .95fr; gap:34px; align-items:center;}
-  .abtEyebrow{color:var(--gold); font-size:.84rem; font-weight:700; margin-bottom:12px; letter-spacing:.4px;}
-  .abtHeadline{font-family:'Aref Ruqaa'; font-size:clamp(1.55rem,3.4vw,2.4rem); color:#fff; line-height:1.65; margin-bottom:16px;}
+  .abtEyebrow{color:var(--gold-light); font-size:.84rem; font-weight:700; margin-bottom:12px; letter-spacing:.4px;}
+  .abtHeadline{font-family:'Aref Ruqaa'; font-size:clamp(1.55rem,3.4vw,2.4rem); color:#ffffff; line-height:1.65; margin-bottom:16px;}
   .abtHeadline em{color:var(--gold-light); font-style:normal;}
-  .abtLead{color:rgba(246,241,230,.8); font-size:.94rem; line-height:2; margin-bottom:18px;}
+  .abtLead{color:rgba(248,243,239,.95); font-size:.94rem; line-height:2; margin-bottom:18px;}
   .abtQuote{
     display:inline-block; font-family:'Aref Ruqaa'; color:var(--gold-light); font-size:1.05rem;
-    padding:9px 20px; border-radius:30px; background:rgba(201,161,94,.12); border:1px solid rgba(201,161,94,.35);
+    padding:9px 20px; border-radius:30px; background:rgba(0,0,0,.18); border:1px solid rgba(220,167,58,.35);
   }
   .abtBannerArt svg{width:100%; height:auto; display:block;}
   .abtChipsRow{display:flex; flex-wrap:wrap; gap:9px; margin-top:6px;}
   .abtChip{
-    background:rgba(255,255,255,.08); border:1px solid rgba(201,161,94,.36);
+    background:rgba(0,0,0,.18); border:1px solid rgba(220,167,58,.36);
     color:var(--cream); padding:6px 15px; border-radius:20px; font-size:.79rem; font-weight:700;
   }
 
@@ -1526,42 +1529,42 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .abtLabel{color:var(--gold-deep); font-size:.83rem; font-weight:700; margin-bottom:8px;}
   .abtLabel.gold{color:var(--gold);}
   .abtTitle{font-family:'Aref Ruqaa'; font-size:clamp(1.3rem,2.7vw,1.85rem); color:var(--navy); margin-bottom:14px; line-height:1.6;}
-  .abtTitle.light{color:#fff;}
+  .abtTitle.light{color:#ffffff;}
     
            .apIcon.gold{background:var(--grad-gold);}
-  .apIcon.teal{background:linear-gradient(140deg,#2b8f78,#1f6f5c);} .apIcon.plum{background:linear-gradient(140deg,#7a5a9e,#5a3d7a);}
+  .apIcon.teal{background:linear-gradient(140deg,#2b8f78,#175a4a);} .apIcon.plum{background:linear-gradient(140deg,#7a5a9e,#5a3d7a);}
     
       .abtStatsGrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px;}
   .abtStat{
-    background:rgba(255,255,255,.055); border:1px solid rgba(201,161,94,.25);
+    background:rgba(255,255,255,.055); border:1px solid rgba(220,167,58,.25);
     border-radius:15px; padding:22px 14px; text-align:center; transition:.2s;
   }
   .abtStat:hover{background:rgba(255,255,255,.1); transform:translateY(-3px);}
   /* نسخة فاتحة تُستخدم داخل قسم بخلفية فاتحة */
-  .abtStat.light{background:#fff; border:1px solid #ece5d4; box-shadow:var(--shadow-soft);}
-  .abtStat.light:hover{background:#fff; box-shadow:0 8px 26px rgba(16,48,63,.1);}
+  .abtStat.light{background:#ffffff; border:1px solid #ebdfd5; box-shadow:var(--shadow-soft);}
+  .abtStat.light:hover{background:#ffffff; box-shadow:0 8px 26px rgba(122,18,50,.1);}
   .abtStat.light .asNum{color:var(--navy);}
   .abtStat.light .asName{color:var(--gold-deep);}
-  .abtStat.light .asSub{color:#7a8a8e;}
+  .abtStat.light .asSub{color:#633b48;}
   .asIcon{
     width:46px; height:46px; border-radius:50%; margin:0 auto 12px;
-    display:flex; align-items:center; justify-content:center; font-size:1.25rem; color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:1.25rem; color:#ffffff;
   }
   .asIcon.navy{background:#2f6fa8;} .asIcon.gold{background:var(--gold);}
   .asIcon.teal{background:#2b8f78;} .asIcon.plum{background:#7a5a9e;}
-  .asNum{font-family:'Aref Ruqaa'; font-size:1.4rem; color:#fff; line-height:1.4;}
+  .asNum{font-family:'Aref Ruqaa'; font-size:1.4rem; color:#ffffff; line-height:1.4;}
   .asName{color:var(--gold-light); font-size:.85rem; font-weight:700; margin-bottom:5px;}
-  .asSub{font-size:.74rem; color:rgba(246,241,230,.58); line-height:1.7;}
+  .asSub{font-size:.74rem; color:rgba(244,237,232,.58); line-height:1.7;}
 
          .tlIcon.gold{background:var(--grad-gold);}
-  .tlIcon.teal{background:linear-gradient(140deg,#2b8f78,#1f6f5c);} .tlIcon.plum{background:linear-gradient(140deg,#7a5a9e,#5a3d7a);}
+  .tlIcon.teal{background:linear-gradient(140deg,#2b8f78,#175a4a);} .tlIcon.plum{background:linear-gradient(140deg,#7a5a9e,#5a3d7a);}
     
   @media(max-width:860px){
     .abtBannerInner,     .abtBannerArt{max-width:330px; margin:0 auto;}
   }
 
   .card h3{font-size:1.2rem; margin-bottom:8px; color:var(--navy);}
-  .card p{font-size:.92rem; color:#5c6a6e;}
+  .card p{font-size:.92rem; color:#4c2d37;}
 
   /* unit detail view */
   #unitView{display:none;}
@@ -1570,32 +1573,32 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   #profileView{display:none;}
   .profBadgeGrid{display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:14px;}
   .profBadge{
-    border-radius:14px; padding:18px 14px; text-align:center; border:1px solid #e8e0cd; transition:.2s;
+    border-radius:14px; padding:18px 14px; text-align:center; border:1px solid #e7d9ce; transition:.2s;
   }
-  .profBadge.earned{background:linear-gradient(160deg,#fffdf7,#f7f0dd); border-color:var(--gold);}
-  .profBadge.locked{background:#f7f7f5; opacity:.6;}
+  .profBadge.earned{background:linear-gradient(160deg,#fcfbfa,#f1e9e3); border-color:var(--gold);}
+  .profBadge.locked{background:#f9f6f3; opacity:.6;}
   .pbIcon{font-size:2rem; margin-bottom:8px;}
   .pbName{font-weight:700; color:var(--navy); font-size:.9rem; margin-bottom:4px;}
-  .pbDesc{font-size:.75rem; color:#7a8a8e; line-height:1.5;}
+  .pbDesc{font-size:.75rem; color:#633b48; line-height:1.5;}
   .backLink{display:inline-block; margin-bottom:20px; color:var(--teal); font-weight:700; font-size:.9rem;}
   .unitHead{margin-bottom:28px;}
-  .unitHead .tag{color:var(--gold); font-family:'Aref Ruqaa'; font-size:1.1rem;}
+  .unitHead .tag{color:var(--gold-deep); font-family:'Aref Ruqaa'; font-size:1.1rem;}
   .unitHead h2{margin:6px 0 8px;}
-  .unitHead .fw{color:#5c6a6e; font-size:.88rem; line-height:1.9;}
+  .unitHead .fw{color:#4c2d37; font-size:.88rem; line-height:1.9;}
   /* أدوات الدرس والتنقل بينه */
   .lessonTools{display:flex; gap:9px; flex-wrap:wrap; margin-top:14px;}
   .lessonTools a, .lessonTools button{
-    background:var(--cream); border:1.5px solid #dcd4c0; border-radius:9px;
+    background:var(--cream); border:1.5px solid #dfccbd; border-radius:9px;
     padding:7px 15px; font-size:.83rem; font-weight:700; color:var(--navy);
     cursor:pointer; font-family:'Tajawal';
   }
   .lessonTools a:hover, .lessonTools button:hover{background:var(--gold-light); border-color:var(--gold);}
   .lessonNav{
     display:flex; justify-content:space-between; gap:12px; margin-top:30px;
-    padding-top:20px; border-top:2px solid #ece5d4;
+    padding-top:20px; border-top:2px solid #ebdfd5;
   }
   .lessonNav button{
-    background:#fff; border:1.5px solid var(--navy); border-radius:10px;
+    background:#ffffff; border:1.5px solid var(--navy); border-radius:10px;
     padding:11px 18px; font-size:.85rem; font-weight:700; color:var(--navy);
     cursor:pointer; font-family:'Tajawal'; max-width:46%; text-align:start;
   }
@@ -1605,34 +1608,34 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   }
 
   .lessonFig{
-    margin:22px 0; background:#fff; border:1px solid #e8e0cd; border-radius:14px;
+    margin:22px 0; background:#ffffff; border:1px solid #e7d9ce; border-radius:14px;
     padding:14px; box-shadow:var(--shadow-soft); overflow-x:auto;
   }
   .lessonFig svg{width:100%; min-width:330px; height:auto; display:block; border-radius:8px;}
   .lessonFig figcaption{
-    margin-top:10px; font-size:.82rem; color:#5c6a6e; text-align:center; line-height:1.7;
+    margin-top:10px; font-size:.82rem; color:#4c2d37; text-align:center; line-height:1.7;
   }
 
   .lessonBlock{
-    background:#fff; border:1px solid #e8e0cd; border-radius:16px; padding:24px; margin-bottom:20px;
+    background:#ffffff; border:1px solid #e7d9ce; border-radius:16px; padding:24px; margin-bottom:20px;
   }
   .lessonBlock h3{color:var(--navy); font-size:1.15rem; margin-bottom:16px; border-bottom:2px solid var(--cream); padding-bottom:10px;}
   .lessonBlock h4{color:var(--teal); font-size:1rem; margin:22px 0 10px; font-family:'Aref Ruqaa';}
-  .lessonBlock p{font-size:.92rem; color:#3a4548; line-height:1.9; margin-bottom:14px;}
+  .lessonBlock p{font-size:.92rem; color:#311d23; line-height:1.9; margin-bottom:14px;}
   .lessonBlock ul, .lessonBlock ol{padding-inline-start:24px; margin:0 0 14px;}
-  .lessonBlock li{margin-bottom:10px; font-size:.92rem; color:#3a4548; line-height:1.85;}
+  .lessonBlock li{margin-bottom:10px; font-size:.92rem; color:#311d23; line-height:1.85;}
   .lessonBlock li strong, .lessonBlock p strong{color:var(--navy);}
-  .lessonBlock .hi{background:rgba(201,161,94,.25); padding:1px 6px; border-radius:5px; font-weight:700;}
+  .lessonBlock .hi{background:rgba(220,167,58,.25); padding:1px 6px; border-radius:5px; font-weight:700;}
   .conceptBox{
-    background:#f6f9f8; border-inline-start:4px solid var(--teal); border-radius:8px;
-    padding:12px 16px; font-size:.88rem !important; color:#3a4548;
+    background:#f9f7f6; border-inline-start:4px solid var(--teal); border-radius:8px;
+    padding:12px 16px; font-size:.88rem !important; color:#311d23;
   }
   .qList{background:var(--cream); border-radius:10px; padding:16px 16px 4px 24px !important; list-style:none;}
   .qList li{padding-inline-start:0; position:relative;}
   .qList li::before{content:"◆"; color:var(--gold); position:absolute; right:-20px; font-size:.7rem; top:5px;}
   .qList em{color:var(--teal); font-style:normal; font-weight:700;}
 
-  section.alt{background:#fff;}
+  section.alt{background:#ffffff;}
 
   .cmpTabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;}
   .cmpTab{padding:9px 16px; border-radius:20px; border:2px solid var(--navy); background:transparent; color:var(--navy); font-size:.82rem; font-weight:700; cursor:pointer; font-family:'Tajawal';}
@@ -1640,12 +1643,12 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .cmpCols{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
   .cmpCol{border-radius:14px; padding:20px; }
   .cmpCol.left{background:#eaf4f1; border:2px solid var(--teal);}
-  .cmpCol.right{background:#fbe9e9; border:2px solid var(--maroon);}
+  .cmpCol.right{background:#fdece3; border:2px solid var(--maroon);}
   .cmpCol h4{margin-bottom:14px; font-size:1rem;}
   .cmpCol.left h4{color:var(--teal);}
   .cmpCol.right h4{color:var(--maroon);}
   .cmpCol ul{padding-inline-start:20px; margin:0;}
-  .cmpCol li{margin-bottom:10px; font-size:.85rem; line-height:1.6; color:#3a4548;}
+  .cmpCol li{margin-bottom:10px; font-size:.85rem; line-height:1.6; color:#311d23;}
   @media (max-width:560px){ .cmpCols{grid-template-columns:1fr;} }
 
   /* تقرير الأداء الأسبوعي */
@@ -1654,24 +1657,24 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .bkBar{
     display:none; align-items:center; gap:12px; flex-wrap:wrap;
     padding:14px 18px; border-radius:14px; margin-bottom:20px;
-    background:#fdf4e3; border:1.5px solid var(--gold); color:var(--navy);
+    background:#f5efeb; border:1.5px solid var(--gold); color:var(--navy);
     font-weight:700; font-size:.95rem;
   }
   .bkBar.show{display:flex;}
-  .bkBar.due{background:#fbe9e9; border-color:var(--maroon); color:var(--maroon);}
+  .bkBar.due{background:#fdece3; border-color:var(--maroon); color:var(--maroon);}
   .bkBar button{
     padding:9px 18px; border-radius:10px; border:none; cursor:pointer;
     background:var(--grad-navy); color:var(--gold-light);
     font-family:'Tajawal'; font-weight:700; font-size:.88rem;
   }
   .bkBar .bkDismiss{background:transparent; color:inherit; border:1.5px solid currentColor;}
-  .repSection{background:#fff; border:1px solid #e8e0cd; border-radius:16px; padding:24px; margin-bottom:20px; overflow-x:auto;}
+  .repSection{background:#ffffff; border:1px solid #e7d9ce; border-radius:16px; padding:24px; margin-bottom:20px; overflow-x:auto;}
   .repSection h3{color:var(--navy); margin-bottom:16px; font-size:1.1rem;}
   .repTable{width:100%; min-width:420px; border-collapse:collapse; font-size:.9rem;}
   .repTable th{text-align:right; padding:10px 12px; background:var(--cream); color:var(--navy); font-weight:700; white-space:nowrap;}
-  .repTable td{padding:10px 12px; border-bottom:1px solid #eee;}
+  .repTable td{padding:10px 12px; border-bottom:1px solid #f4ede8;}
   .repStatsRow{display:flex; gap:16px; flex-wrap:wrap; margin-bottom:20px;}
-  .repStatCard{background:var(--navy); color:#fff; border-radius:14px; padding:20px 26px; text-align:center; flex:1; min-width:140px;}
+  .repStatCard{background:var(--navy); color:#ffffff; border-radius:14px; padding:20px 26px; text-align:center; flex:1; min-width:140px;}
   .repStatCard .num{font-size:2rem; font-weight:700; color:var(--gold-light); font-family:'Aref Ruqaa';}
   .repStatCard .lbl{font-size:.8rem; opacity:.85; margin-top:4px;}
   @media print{
@@ -1680,17 +1683,17 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     #reportView, #reportView .wrap{display:block !important;}
     /* طباعة صفحة الدرس كذلك لو كانت مفتوحة */
     #unitView.show, #unitView.show .wrap{display:block !important;}
-    body{background:#fff;}
+    body{background:#ffffff;}
   }
 
   /* class display mode — للعرض على شاشة/بروجكتر بالحصة */
   #classDisplayView{
     display:none; position:fixed; inset:0; z-index:400; background:var(--navy-deep);
-    color:#fff; overflow-y:auto;
+    color:#ffffff; overflow-y:auto;
   }
   #classDisplayView.show{display:block;}
   #cdExit{
-    position:fixed; top:20px; left:20px; background:rgba(255,255,255,.1); color:#fff;
+    position:fixed; top:20px; left:20px; background:rgba(255,255,255,.1); color:#ffffff;
     border:1.5px solid rgba(255,255,255,.3); border-radius:30px; padding:10px 20px;
     font-size:.9rem; cursor:pointer; z-index:401;
   }
@@ -1706,7 +1709,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   @keyframes cdPulse{0%,100%{transform:scale(1);} 50%{transform:scale(1.08);}}
   .cdQuestion{
     font-family:'Cairo', 'Tajawal', sans-serif; font-weight:700; font-size:clamp(1.8rem, 4vw, 3rem); line-height:1.5;
-    margin-bottom:50px; color:#fff;
+    margin-bottom:50px; color:#ffffff;
   }
   .cdChoices{display:flex; flex-direction:column; gap:18px; margin-bottom:50px;}
   .cdChoice{
@@ -1718,10 +1721,10 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     background:var(--gold); color:var(--navy-deep); width:44px; height:44px; border-radius:50%;
     display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;
   }
-  .cdChoice.revealCorrect{background:rgba(31,111,92,.5); border-color:var(--teal);}
+  .cdChoice.revealCorrect{background:rgba(23,90,74,.5); border-color:var(--teal);}
   .cdControls{display:flex; justify-content:center; gap:14px; flex-wrap:wrap;}
   .cdBtn{
-    background:rgba(255,255,255,.12); color:#fff; border:1.5px solid rgba(255,255,255,.3);
+    background:rgba(255,255,255,.12); color:#ffffff; border:1.5px solid rgba(255,255,255,.3);
     border-radius:12px; padding:14px 26px; font-size:1rem; font-weight:700; cursor:pointer; font-family:'Tajawal';
   }
   .cdBtn:hover{background:rgba(255,255,255,.22);}
@@ -1734,7 +1737,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   }
   .gameTabs{display:flex; gap:10px; margin-bottom:26px; flex-wrap:wrap;}
   .gtab{
-    padding:10px 18px; border-radius:30px; border:2px solid rgba(201,161,94,.4); cursor:pointer;
+    padding:10px 18px; border-radius:30px; border:2px solid rgba(220,167,58,.4); cursor:pointer;
     font-weight:700; font-size:.9rem; background:transparent; color:var(--cream);
   }
   .gtab.active{background:var(--gold); color:var(--navy-deep); border-color:var(--gold);}
@@ -1744,7 +1747,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   #quizBox{background:rgba(255,255,255,.05); border-radius:14px; padding:26px;}
   #quizBox h4{font-size:1.15rem; color:var(--gold-light); margin:0;}
   .qHeadRow{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px;}
-  #speakBtn{background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#fff; width:38px; height:38px; border-radius:50%; font-size:1.1rem; cursor:pointer; flex-shrink:0;}
+  #speakBtn{background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:#ffffff; width:38px; height:38px; border-radius:50%; font-size:1.1rem; cursor:pointer; flex-shrink:0;}
   #speakBtn:hover{background:rgba(255,255,255,.2);}
   #speakBtn.speaking{background:var(--gold); color:var(--navy-deep);}
   .choices{display:grid; gap:10px;}
@@ -1763,7 +1766,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
   #orderList{max-width:560px; margin:0 auto; display:flex; flex-direction:column; gap:10px;}
   .orderItem{
-    background:#fff; border:1.5px solid #e8e0cd; border-radius:12px; padding:14px 16px;
+    background:#ffffff; border:1.5px solid #e7d9ce; border-radius:12px; padding:14px 16px;
     display:flex; align-items:center; gap:12px; transition:.25s;
   }
   .orderItem .oNum{
@@ -1773,13 +1776,13 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .orderItem .oText{flex:1; font-size:.9rem; color:var(--navy); font-weight:700; text-align:right;}
   .orderItem .oMoves{display:flex; flex-direction:column; gap:3px;}
   .orderItem .oMoves button{
-    background:var(--cream); border:1px solid #dcd4c0; border-radius:6px; cursor:pointer;
+    background:var(--cream); border:1px solid #dfccbd; border-radius:6px; cursor:pointer;
     width:30px; height:22px; font-size:.7rem; line-height:1; color:var(--navy);
   }
   .orderItem .oMoves button:hover:not(:disabled){background:var(--gold-light);}
   .orderItem .oMoves button:disabled{opacity:.3; cursor:not-allowed;}
   .orderItem.correctPos{background:#eaf4f1; border-color:var(--teal);}
-  .orderItem.wrongPos{background:#fbe9e9; border-color:var(--maroon);}
+  .orderItem.wrongPos{background:#fdece3; border-color:var(--maroon);}
 
   #matchGrid{
     display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; max-width:420px; margin:0 auto;
@@ -1793,7 +1796,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     transition:transform .4s; box-shadow:0 2px 6px rgba(0,0,0,.15);
   }
   .matchCard .mBack{background:var(--navy); color:var(--gold); font-size:1.4rem;}
-  .matchCard .mFront{background:#fff; color:var(--navy); border:2px solid var(--gold); transform:rotateY(180deg);}
+  .matchCard .mFront{background:#ffffff; color:var(--navy); border:2px solid var(--gold); transform:rotateY(180deg);}
   .matchCard.flipped .mBack{transform:rotateY(180deg);}
   .matchCard.flipped .mFront{transform:rotateY(0deg);}
   .matchCard.matched .mFront{background:#eaf4f1; border-color:var(--teal); color:var(--teal);}
@@ -1803,31 +1806,31 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     background:linear-gradient(180deg,#2c7a4b,#1f5c39); border-radius:14px; height:220px; position:relative;
     overflow:hidden; margin-bottom:16px; cursor:pointer;
   }
-  #goalMouth{position:absolute; top:14px; left:50%; transform:translateX(-50%); width:65%; height:50px; border:5px solid #fff; border-bottom:none; border-radius:4px 4px 0 0; opacity:.9;}
-  #ball{position:absolute; bottom:14px; left:50%; transform:translateX(-50%); width:26px; height:26px; border-radius:50%; background:#fff; box-shadow:0 0 0 2px #111 inset; transition:all .5s ease;}
+  #goalMouth{position:absolute; top:14px; left:50%; transform:translateX(-50%); width:65%; height:50px; border:5px solid #ffffff; border-bottom:none; border-radius:4px 4px 0 0; opacity:.9;}
+  #ball{position:absolute; bottom:14px; left:50%; transform:translateX(-50%); width:26px; height:26px; border-radius:50%; background:#ffffff; box-shadow:0 0 0 2px #111111 inset; transition:all .5s ease;}
   #shootRow{display:flex; gap:10px; justify-content:center;}
   #shootRow button{flex:1; max-width:120px;}
 
   /* leaderboard */
-  table{width:100%; border-collapse:collapse; background:#fff; border-radius:var(--radius); overflow:hidden;}
+  table{width:100%; border-collapse:collapse; background:#ffffff; border-radius:var(--radius); overflow:hidden;}
   th,td{padding:13px 16px; text-align:right; font-size:.92rem;}
   thead{background:var(--navy); color:var(--gold-light);}
-  tbody tr:nth-child(odd){background:#faf7ef;}
+  tbody tr:nth-child(odd){background:#f8f4f1;}
   tbody tr:first-child td{font-weight:700; color:var(--teal);}
 
   /* ===== لوحة الصدارة: أعلى ثلاثة بنجوم المشاركة في كل صف ===== */
   .lbGrid{display:grid; grid-template-columns:repeat(auto-fit, minmax(290px, 1fr)); gap:20px;}
   .lbCard{
-    background:#fff; border-radius:18px; overflow:hidden; border:1px solid #e8e0cd;
-    box-shadow:0 6px 24px rgba(16,48,63,.08);
+    background:#ffffff; border-radius:18px; overflow:hidden; border:1px solid #e7d9ce;
+    box-shadow:0 6px 24px rgba(122,18,50,.08);
   }
   .lbHead{
     background:var(--grad-navy); color:var(--gold-light); padding:13px 18px;
     display:flex; align-items:center; justify-content:space-between; gap:10px;
     font-family:'Aref Ruqaa'; font-size:1.3rem; line-height:1.7;
   }
-  .lbHead small{font-family:'Tajawal'; font-size:.8rem; color:rgba(255,255,255,.7);}
-  .lbRow{display:flex; align-items:center; gap:13px; padding:13px 16px; border-bottom:1px solid #f2ede0;}
+  .lbHead small{font-family:'Tajawal'; font-size:.8rem; color:rgba(255,255,255,.9);}
+  .lbRow{display:flex; align-items:center; gap:13px; padding:13px 16px; border-bottom:1px solid #f1e8e1;}
   .lbRow:last-child{border-bottom:none;}
   .lbMedal{
     flex-shrink:0; width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center;
@@ -1835,17 +1838,17 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   }
   .lbWho{flex:1; min-width:0;}
   .lbName{font-weight:800; color:var(--navy-deep); font-size:1.02rem; overflow-wrap:anywhere;}
-  .lbStars{flex-shrink:0; font-weight:800; color:var(--gold-deep); background:#fdf4e3; border-radius:20px; padding:5px 12px; font-size:.92rem;}
-  .lbRow.champ{background:linear-gradient(135deg, #fff8e8, #fdf0d2); padding:17px 16px;}
-  .lbRow.champ .lbMedal{background:var(--grad-gold); box-shadow:0 0 0 3px #fff, 0 0 0 5px var(--gold); width:50px; height:50px; font-size:1.7rem;}
+  .lbStars{flex-shrink:0; font-weight:800; color:var(--gold-deep); background:#f5efeb; border-radius:20px; padding:5px 12px; font-size:.92rem;}
+  .lbRow.champ{background:linear-gradient(135deg, #f8f3ef, #f0e7df); padding:17px 16px;}
+  .lbRow.champ .lbMedal{background:var(--grad-gold); box-shadow:0 0 0 3px #ffffff, 0 0 0 5px var(--gold); width:50px; height:50px; font-size:1.7rem;}
   .lbRow.champ .lbName{font-size:1.15rem;}
   .lbChamp{margin-top:4px; font-family:'Aref Ruqaa'; line-height:1.65;}
   .lbChamp span{display:block; white-space:nowrap;}
   .lbChamp span:first-child{color:var(--maroon); font-size:1.02rem;}
   .lbChamp span:last-child{color:var(--gold-deep); font-size:.92rem;}
-  .lbEmpty{padding:22px 16px; text-align:center; color:#8a8a8a; font-size:.92rem;}
+  .lbEmpty{padding:22px 16px; text-align:center; color:#673e4b; font-size:.92rem;}
   .lbLocked{
-    background:#fff; border:1px dashed #d8cfb8; border-radius:16px; padding:28px 20px;
+    background:#ffffff; border:1px dashed #d8c6b8; border-radius:16px; padding:28px 20px;
     text-align:center; color:var(--navy); line-height:1.9;
   }
   .lbBar{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:18px;}
@@ -1853,12 +1856,12 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .lbFilters{display:flex; gap:8px; flex-wrap:wrap;}
   .lbChip{
     padding:8px 16px; border-radius:30px; cursor:pointer; font-family:'Tajawal'; font-weight:700; font-size:.88rem;
-    background:#fff; color:var(--navy); border:1.5px solid #dcd4c0;
+    background:#ffffff; color:var(--navy); border:1.5px solid #dfccbd;
   }
   .lbChip.on{background:var(--navy); color:var(--gold-light); border-color:var(--navy);}
   .lbShowBtn{
     padding:10px 20px; border-radius:12px; cursor:pointer; font-family:'Tajawal'; font-weight:800; font-size:.92rem;
-    background:var(--grad-gold); color:var(--navy-deep); border:none; box-shadow:0 3px 10px rgba(168,129,63,.3);
+    background:var(--grad-gold); color:var(--navy-deep); border:none; box-shadow:0 3px 10px rgba(183,134,35,.3);
   }
   .lbGrid.single{max-width:560px; margin:0 auto;}
   /* وضع العرض على الشاشة: خلفية داكنة وخط كبير يُقرأ من آخر الفصل */
@@ -1873,7 +1876,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     font-size:clamp(2.2rem, 4.4vw, 3.8rem); margin-bottom:1vh;
   }
   #leaderboard.lbShowMode .lbBar{justify-content:center; margin-bottom:3vh;}
-  #leaderboard.lbShowMode .lbChip{background:rgba(255,255,255,.07); color:var(--gold-light); border-color:rgba(201,161,94,.5);}
+  #leaderboard.lbShowMode .lbChip{background:rgba(0,0,0,.2); color:var(--gold-light); border-color:rgba(220,167,58,.5);}
   #leaderboard.lbShowMode .lbChip.on{background:var(--grad-gold); color:var(--navy-deep); border-color:transparent;}
   #leaderboard.lbShowMode .lbGrid{gap:2.4vw; grid-template-columns:repeat(auto-fit, minmax(min(400px, 100%), 1fr));}
   #leaderboard.lbShowMode .lbGrid.single{max-width:min(980px, 100%);}
@@ -1904,27 +1907,27 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
   /* class challenge */
 
-  footer{background:var(--navy-deep); color:#a9b7bb; padding:36px 0; font-size:.85rem; text-align:center;}
+  footer{background:var(--navy-deep); color:#bbb1a9; padding:36px 0; font-size:.85rem; text-align:center;}
   footer strong{color:var(--gold-light);}
 
   /* modal */
   .modalBg{
-    display:none; position:fixed; inset:0; background:rgba(10,32,41,.7); z-index:250;
+    display:none; position:fixed; inset:0; background:rgba(79,12,32,.7); z-index:250;
     align-items:center; justify-content:center; padding:20px;
   }
   .modalBg.show{display:flex;}
-  .modal{background:#fff; border-radius:16px; padding:30px; width:100%; max-width:380px; position:relative;}
+  .modal{background:#ffffff; border-radius:16px; padding:30px; width:100%; max-width:380px; position:relative;}
   .modalClose{
     position:absolute; top:14px; left:14px; background:none; border:none; font-size:1.2rem;
-    color:#8a8a8a; cursor:pointer; width:30px; height:30px; border-radius:50%; line-height:1;
+    color:#673e4b; cursor:pointer; width:30px; height:30px; border-radius:50%; line-height:1;
   }
-  .modalClose:hover{background:#f2eee0; color:var(--navy);}
+  .modalClose:hover{background:#f1e8e1; color:var(--navy);}
   .modal h3{color:var(--navy); margin-bottom:6px;}
-  .modal p.sub{color:#6b7a7e; font-size:.88rem; margin-bottom:20px;}
+  .modal p.sub{color:#57343f; font-size:.88rem; margin-bottom:20px;}
   .field{margin-bottom:14px;}
   .field label{display:block; font-size:.85rem; margin-bottom:6px; color:var(--navy); font-weight:700;}
   .field input, .field textarea{
-    width:100%; padding:11px 14px; border-radius:9px; border:1.5px solid #dcd4c0; font-family:'Tajawal'; font-size:.95rem;
+    width:100%; padding:11px 14px; border-radius:9px; border:1.5px solid #dfccbd; font-family:'Tajawal'; font-size:.95rem;
   }
   .field textarea{resize:vertical;}
   .field input:focus, .field textarea:focus{outline:none; border-color:var(--gold);}
@@ -1936,7 +1939,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none;
   }
   .toast{
-    padding:12px 22px; border-radius:30px; font-size:.88rem; font-weight:700; color:#fff;
+    padding:12px 22px; border-radius:30px; font-size:.88rem; font-weight:700; color:#ffffff;
     box-shadow:0 6px 20px rgba(0,0,0,.25); opacity:0; transform:translateY(-14px);
     transition:opacity .3s, transform .3s; white-space:nowrap;
   }
@@ -1946,11 +1949,11 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   .toast.info{background:var(--navy);}
 
   #connBanner{
-    display:none; background:#7a3030; color:#fff; text-align:center; padding:12px 20px;
+    display:none; background:#7a3030; color:#ffffff; text-align:center; padding:12px 20px;
     font-size:.9rem; position:sticky; top:0; z-index:200;
   }
   #connBanner button{
-    margin-inline-start:12px; background:#fff; color:#7a3030; border:none; padding:6px 14px;
+    margin-inline-start:12px; background:#ffffff; color:#7a3030; border:none; padding:6px 14px;
     border-radius:20px; font-weight:700; cursor:pointer; font-family:'Tajawal'; font-size:.85rem;
   }
 
@@ -2050,12 +2053,12 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   <div class="bootInner">
     <div class="bootCompass">
       <svg viewBox="0 0 100 100" width="90" height="90">
-        <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(201,161,94,.35)" stroke-width="2"/>
-        <circle cx="50" cy="50" r="34" fill="none" stroke="rgba(201,161,94,.2)" stroke-width="1.5"/>
+        <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(220,167,58,.35)" stroke-width="2"/>
+        <circle cx="50" cy="50" r="34" fill="none" stroke="rgba(220,167,58,.2)" stroke-width="1.5"/>
         <g class="bootNeedle">
-          <path d="M50,10 L57,50 L50,90 L43,50 Z" fill="#C9A15E"/>
-          <path d="M10,50 L50,43 L90,50 L50,57 Z" fill="#e3c98b" opacity=".75"/>
-          <circle cx="50" cy="50" r="6" fill="#fff"/>
+          <path d="M50,10 L57,50 L50,90 L43,50 Z" fill="#dca73a"/>
+          <path d="M10,50 L50,43 L90,50 L50,57 Z" fill="#ebc578" opacity=".75"/>
+          <circle cx="50" cy="50" r="6" fill="#ffffff"/>
         </g>
       </svg>
     </div>
@@ -2135,7 +2138,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 <section id="hero" class="hero heroIntro">
   <!-- خلفية: خريطة عالم باهتة تعطي عمقاً بصرياً -->
   <svg class="heroMapBg" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <g fill="#c9a15e" opacity="0.055">
+    <g fill="#dca73a" opacity="0.055">
       <path d="M120,90 Q160,70 200,88 L230,120 Q210,165 175,180 L140,215 Q108,200 100,160 Q95,120 120,90 Z"/>
       <path d="M180,235 Q215,225 235,250 L245,300 Q230,350 205,365 Q185,340 180,300 Q172,265 180,235 Z"/>
       <path d="M380,80 Q430,62 470,80 L490,110 Q470,145 435,152 L395,145 Q368,115 380,80 Z"/>
@@ -2143,7 +2146,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <path d="M500,75 Q580,55 660,78 L700,120 Q680,175 620,185 L540,168 Q495,125 500,75 Z"/>
       <path d="M640,255 Q690,240 720,265 L725,305 Q700,335 660,330 Q630,300 640,255 Z"/>
     </g>
-    <g stroke="#c9a15e" stroke-width="0.6" opacity="0.09" fill="none">
+    <g stroke="#dca73a" stroke-width="0.6" opacity="0.09" fill="none">
       <line x1="0" y1="100" x2="800" y2="100"/><line x1="0" y1="200" x2="800" y2="200"/><line x1="0" y1="300" x2="800" y2="300"/>
       <line x1="160" y1="0" x2="160" y2="400"/><line x1="320" y1="0" x2="320" y2="400"/>
       <line x1="480" y1="0" x2="480" y2="400"/><line x1="640" y1="0" x2="640" y2="400"/>
@@ -2175,35 +2178,35 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
             <stop offset="0%" stop-color="#6bb8e0"/><stop offset="55%" stop-color="#3a86ad"/><stop offset="100%" stop-color="#1e5771"/>
           </linearGradient>
           <radialGradient id="hgShine" cx="32%" cy="28%" r="62%">
-            <stop offset="0%" stop-color="#fff" stop-opacity=".42"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+            <stop offset="0%" stop-color="#ffffff" stop-opacity=".42"/><stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
           </radialGradient>
         </defs>
-        <ellipse cx="160" cy="216" rx="132" ry="8" fill="#000" opacity=".22"/>
+        <ellipse cx="160" cy="216" rx="132" ry="8" fill="#000000" opacity=".22"/>
         <g transform="translate(22,14)">
           <circle cx="56" cy="56" r="54" fill="url(#hgG)"/>
           <path d="M16,30 Q42,18 66,34 Q50,56 26,50 Z" fill="#4faa7c" opacity=".93"/>
           <path d="M56,72 Q78,62 94,80 Q80,100 56,92 Z" fill="#4faa7c" opacity=".93"/>
           <path d="M70,16 Q90,14 100,30 Q82,42 70,32 Z" fill="#4faa7c" opacity=".88"/>
           <path d="M18,78 Q34,72 44,86 Q32,96 20,90 Z" fill="#4faa7c" opacity=".8"/>
-          <ellipse cx="56" cy="56" rx="54" ry="19" fill="none" stroke="#fff" stroke-width="1" opacity=".3"/>
-          <ellipse cx="56" cy="56" rx="22" ry="54" fill="none" stroke="#fff" stroke-width="1" opacity=".3"/>
+          <ellipse cx="56" cy="56" rx="54" ry="19" fill="none" stroke="#ffffff" stroke-width="1" opacity=".3"/>
+          <ellipse cx="56" cy="56" rx="22" ry="54" fill="none" stroke="#ffffff" stroke-width="1" opacity=".3"/>
           <circle cx="56" cy="56" r="54" fill="url(#hgShine)"/>
-          <circle cx="56" cy="56" r="54" fill="none" stroke="#c9a15e" stroke-width="3.2"/>
-          <path d="M56,113 L56,128 M32,134 L80,134" stroke="#a8813f" stroke-width="5.5" stroke-linecap="round"/>
+          <circle cx="56" cy="56" r="54" fill="none" stroke="#dca73a" stroke-width="3.2"/>
+          <path d="M56,113 L56,128 M32,134 L80,134" stroke="#b78623" stroke-width="5.5" stroke-linecap="round"/>
         </g>
         <g transform="translate(128,96)">
           <rect x="0" y="72" width="180" height="21" rx="3.5" fill="#7a3030"/>
-          <rect x="0" y="72" width="180" height="4" rx="2" fill="#fff" opacity=".14"/>
-          <text x="90" y="86" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold">المواطنة</text>
-          <rect x="6" y="49" width="170" height="21" rx="3.5" fill="#a8813f"/>
-          <rect x="6" y="49" width="170" height="4" rx="2" fill="#fff" opacity=".16"/>
-          <text x="91" y="63" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold">الجغرافيا</text>
-          <rect x="2" y="26" width="176" height="21" rx="3.5" fill="#1f6f5c"/>
-          <rect x="2" y="26" width="176" height="4" rx="2" fill="#fff" opacity=".16"/>
-          <text x="90" y="40" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold">التاريخ</text>
-          <rect x="10" y="3" width="162" height="21" rx="3.5" fill="#164256"/>
-          <rect x="10" y="3" width="162" height="4" rx="2" fill="#fff" opacity=".18"/>
-          <text x="91" y="17" font-size="10.5" fill="#e3c98b" text-anchor="middle" font-weight="bold">الدراسات الاجتماعية</text>
+          <rect x="0" y="72" width="180" height="4" rx="2" fill="#ffffff" opacity=".14"/>
+          <text x="90" y="86" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="bold">المواطنة</text>
+          <rect x="6" y="49" width="170" height="21" rx="3.5" fill="#b78623"/>
+          <rect x="6" y="49" width="170" height="4" rx="2" fill="#ffffff" opacity=".16"/>
+          <text x="91" y="63" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="bold">الجغرافيا</text>
+          <rect x="2" y="26" width="176" height="21" rx="3.5" fill="#175a4a"/>
+          <rect x="2" y="26" width="176" height="4" rx="2" fill="#ffffff" opacity=".16"/>
+          <text x="90" y="40" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="bold">التاريخ</text>
+          <rect x="10" y="3" width="162" height="21" rx="3.5" fill="#a71944"/>
+          <rect x="10" y="3" width="162" height="4" rx="2" fill="#ffffff" opacity=".18"/>
+          <text x="91" y="17" font-size="10.5" fill="#ebc578" text-anchor="middle" font-weight="bold">الدراسات الاجتماعية</text>
         </g>
       </svg>
       </figure>
@@ -2278,13 +2281,13 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <div class="whStage">
       <div class="whWheel">
         <svg viewBox="-222 -222 444 444" aria-hidden="true">
-          <circle r="214" fill="#0a2029" stroke="#c9a15e" stroke-width="5"/>
+          <circle r="214" fill="#4f0c20" stroke="#dca73a" stroke-width="5"/>
           <g id="whBulbs"></g>
           <g id="whRot"></g>
-          <circle r="200" fill="none" stroke="#c9a15e" stroke-width="3"/>
+          <circle r="200" fill="none" stroke="#dca73a" stroke-width="3"/>
           <g class="whPtr" id="whPtr">
-            <path d="M-17,-226 L17,-226 L0,-186 Z" fill="#fff6dc" stroke="#a8813f" stroke-width="3" stroke-linejoin="round"/>
-            <circle cy="-222" r="6" fill="#a8813f"/>
+            <path d="M-17,-226 L17,-226 L0,-186 Z" fill="#f4ede7" stroke="#b78623" stroke-width="3" stroke-linejoin="round"/>
+            <circle cy="-222" r="6" fill="#b78623"/>
           </g>
         </svg>
         <button class="whHub" id="whHub" onclick="whSpin()">لِفّ</button>
@@ -2427,7 +2430,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       </div>
 
       <div class="panel" id="panel-match">
-        <p style="text-align:center; color:#5c6a6e; margin-bottom:14px;">اقلب بطاقتين — لو طابقت المصطلح مع تعريفه الصحيح تربح! (تكلّف طاقة وحدة لكل جولة جديدة)</p>
+        <p style="text-align:center; color:#4c2d37; margin-bottom:14px;">اقلب بطاقتين — لو طابقت المصطلح مع تعريفه الصحيح تربح! (تكلّف طاقة وحدة لكل جولة جديدة)</p>
         <div id="matchStatus" style="text-align:center; font-weight:700; margin-bottom:14px;"></div>
         <div id="matchGrid"></div>
         <div style="text-align:center; margin-top:16px;">
@@ -2436,7 +2439,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       </div>
 
       <div class="panel" id="panel-order">
-        <p style="text-align:center; color:#5c6a6e; margin-bottom:14px;">رتّب البطاقات بالتسلسل الصحيح — استخدم الأسهم لتحريك كل بطاقة، وبعدين تحقق من إجابتك.</p>
+        <p style="text-align:center; color:#4c2d37; margin-bottom:14px;">رتّب البطاقات بالتسلسل الصحيح — استخدم الأسهم لتحريك كل بطاقة، وبعدين تحقق من إجابتك.</p>
         <div id="orderTopic" style="text-align:center; font-weight:700; color:var(--navy); margin-bottom:14px;"></div>
         <div id="orderList"></div>
         <div id="orderStatus" style="text-align:center; font-weight:700; margin:14px 0;"></div>
@@ -2497,7 +2500,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
     <div id="myClassSummary" class="myClassSummary"></div>
     <div id="myClassTableWrap" class="myClassTableWrap">
-      <p style="color:#8a8a8a;">جاري تحميل القائمة...</p>
+      <p style="color:#673e4b;">جاري تحميل القائمة...</p>
     </div>
   </div>
 </section>
@@ -2622,13 +2625,13 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
       <details class="bulkBox">
         <summary>📋 لصق قائمة أسماء من إكسل (إضافة دفعة واحدة)</summary>
         <div style="padding:16px 0 0;">
-          <p style="font-size:.84rem; color:#5c6a6e; margin-bottom:10px;">
+          <p style="font-size:.84rem; color:#4c2d37; margin-bottom:10px;">
             انسخ عمود الأسماء من ملف الإكسل والصقه هنا مباشرة — كل اسم بسطر. سيُضافون كلهم للصف <strong id="bulkTargetCls">سابع 1</strong>.
           </p>
-          <textarea id="bulkNames" rows="7" placeholder="محمد أحمد&#10;سالم خالد&#10;عبدالله ناصر" style="width:100%; padding:12px; border-radius:9px; border:1.5px solid #dcd4c0; font-family:'Tajawal'; font-size:.9rem;"></textarea>
+          <textarea id="bulkNames" rows="7" placeholder="محمد أحمد&#10;سالم خالد&#10;عبدالله ناصر" style="width:100%; padding:12px; border-radius:9px; border:1.5px solid #dfccbd; font-family:'Tajawal'; font-size:.9rem;"></textarea>
           <div style="display:flex; gap:10px; align-items:center; margin-top:10px; flex-wrap:wrap;">
             <button class="btn btn-gold" onclick="bulkAddRoster(this)">⬆️ إضافة الكل</button>
-            <span id="bulkPreview" style="font-size:.84rem; color:#5c6a6e;"></span>
+            <span id="bulkPreview" style="font-size:.84rem; color:#4c2d37;"></span>
           </div>
         </div>
       </details>
@@ -2697,7 +2700,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     <h3>رمز QR لموقع رحّالة</h3>
     <p class="sub">امسحه بكاميرا أي جوال ليوصل الموقع مباشرة</p>
     <div id="qrCodeHolder" style="display:flex; justify-content:center; margin:16px 0;"></div>
-    <p style="font-size:.8rem; color:#8a8a8a; word-break:break-all;">salehbinjaber0-svg.github.io/rahhala</p>
+    <p style="font-size:.8rem; color:#673e4b; word-break:break-all;">salehbinjaber0-svg.github.io/rahhala</p>
   </div>
 </div>
 
@@ -3226,33 +3229,33 @@ const UNITS_DATA = {
 
       <figure class="lessonFig">
         <svg viewBox="0 0 460 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="خريطة ذهنية لعناصر المناخ الأربعة">
-          <rect width="460" height="210" fill="#fdfbf6"/>
-          <line x1="230" y1="105" x2="82" y2="52" stroke="#c9a15e" stroke-width="2"/>
-          <line x1="230" y1="105" x2="378" y2="52" stroke="#c9a15e" stroke-width="2"/>
-          <line x1="230" y1="105" x2="82" y2="158" stroke="#c9a15e" stroke-width="2"/>
-          <line x1="230" y1="105" x2="378" y2="158" stroke="#c9a15e" stroke-width="2"/>
-          <ellipse cx="230" cy="105" rx="58" ry="34" fill="#10303f"/>
-          <text x="230" y="102" font-size="13" fill="#e3c98b" text-anchor="middle" font-weight="bold">عناصر</text>
-          <text x="230" y="119" font-size="13" fill="#e3c98b" text-anchor="middle" font-weight="bold">المناخ</text>
+          <rect width="460" height="210" fill="#fbf9f8"/>
+          <line x1="230" y1="105" x2="82" y2="52" stroke="#dca73a" stroke-width="2"/>
+          <line x1="230" y1="105" x2="378" y2="52" stroke="#dca73a" stroke-width="2"/>
+          <line x1="230" y1="105" x2="82" y2="158" stroke="#dca73a" stroke-width="2"/>
+          <line x1="230" y1="105" x2="378" y2="158" stroke="#dca73a" stroke-width="2"/>
+          <ellipse cx="230" cy="105" rx="58" ry="34" fill="#7a1232"/>
+          <text x="230" y="102" font-size="13" fill="#ebc578" text-anchor="middle" font-weight="bold">عناصر</text>
+          <text x="230" y="119" font-size="13" fill="#ebc578" text-anchor="middle" font-weight="bold">المناخ</text>
           <g>
             <rect x="10" y="32" width="146" height="42" rx="10" fill="#fbeee9" stroke="#7a3030" stroke-width="2"/>
             <text x="83" y="52" font-size="12" fill="#7a3030" text-anchor="middle" font-weight="bold">🌡️ الحرارة</text>
-            <text x="83" y="67" font-size="9.5" fill="#4d5f65" text-anchor="middle">مصدرها الإشعاع الشمسي</text>
+            <text x="83" y="67" font-size="9.5" fill="#432830" text-anchor="middle">مصدرها الإشعاع الشمسي</text>
           </g>
           <g>
-            <rect x="304" y="32" width="146" height="42" rx="10" fill="#eaf0f4" stroke="#2a6b8a" stroke-width="2"/>
-            <text x="377" y="52" font-size="12" fill="#2a6b8a" text-anchor="middle" font-weight="bold">🔽 الضغط الجوي</text>
-            <text x="377" y="67" font-size="9.5" fill="#4d5f65" text-anchor="middle">علاقة عكسية بالحرارة</text>
+            <rect x="304" y="32" width="146" height="42" rx="10" fill="#eaf0f4" stroke="#1f5068" stroke-width="2"/>
+            <text x="377" y="52" font-size="12" fill="#1f5068" text-anchor="middle" font-weight="bold">🔽 الضغط الجوي</text>
+            <text x="377" y="67" font-size="9.5" fill="#432830" text-anchor="middle">علاقة عكسية بالحرارة</text>
           </g>
           <g>
-            <rect x="10" y="136" width="146" height="42" rx="10" fill="#eaf4f1" stroke="#1f6f5c" stroke-width="2"/>
-            <text x="83" y="156" font-size="12" fill="#1f6f5c" text-anchor="middle" font-weight="bold">💨 الرياح</text>
-            <text x="83" y="171" font-size="9.5" fill="#4d5f65" text-anchor="middle">من المرتفع إلى المنخفض</text>
+            <rect x="10" y="136" width="146" height="42" rx="10" fill="#eaf4f1" stroke="#175a4a" stroke-width="2"/>
+            <text x="83" y="156" font-size="12" fill="#175a4a" text-anchor="middle" font-weight="bold">💨 الرياح</text>
+            <text x="83" y="171" font-size="9.5" fill="#432830" text-anchor="middle">من المرتفع إلى المنخفض</text>
           </g>
           <g>
             <rect x="304" y="136" width="146" height="42" rx="10" fill="#f4eaf4" stroke="#5a3d7a" stroke-width="2"/>
             <text x="377" y="156" font-size="12" fill="#5a3d7a" text-anchor="middle" font-weight="bold">💧 الرطوبة والتكاثف</text>
-            <text x="377" y="171" font-size="9.5" fill="#4d5f65" text-anchor="middle">بخار الماء في الهواء</text>
+            <text x="377" y="171" font-size="9.5" fill="#432830" text-anchor="middle">بخار الماء في الهواء</text>
           </g>
         </svg>
         <figcaption>خريطة ذهنية: عناصر المناخ الأربعة — الحرارة تؤثر في بقية العناصر جميعها.</figcaption>
@@ -3267,36 +3270,36 @@ const UNITS_DATA = {
 
       <figure class="lessonFig">
         <svg viewBox="0 0 420 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="مخطط المناطق الحرارية الأربع على سطح الأرض">
-          <rect width="420" height="300" fill="#fdfbf6"/>
-          <text x="210" y="22" font-size="13" fill="#10303f" text-anchor="middle" font-weight="bold">المناطق الحرارية على سطح الأرض</text>
+          <rect width="420" height="300" fill="#fbf9f8"/>
+          <text x="210" y="22" font-size="13" fill="#7a1232" text-anchor="middle" font-weight="bold">المناطق الحرارية على سطح الأرض</text>
           <defs>
             <clipPath id="globeClip"><circle cx="150" cy="160" r="112"/></clipPath>
           </defs>
           <g clip-path="url(#globeClip)">
             <rect x="38" y="48" width="224" height="30" fill="#d6e4f0"/>
             <rect x="38" y="78" width="224" height="34" fill="#a8c8e0"/>
-            <rect x="38" y="112" width="224" height="34" fill="#f2d9a8"/>
+            <rect x="38" y="112" width="224" height="34" fill="#f3d89f"/>
             <rect x="38" y="146" width="224" height="30" fill="#e8a87c"/>
-            <rect x="38" y="176" width="224" height="34" fill="#f2d9a8"/>
+            <rect x="38" y="176" width="224" height="34" fill="#f3d89f"/>
             <rect x="38" y="210" width="224" height="34" fill="#a8c8e0"/>
             <rect x="38" y="244" width="224" height="30" fill="#d6e4f0"/>
           </g>
-          <circle cx="150" cy="160" r="112" fill="none" stroke="#10303f" stroke-width="2.5"/>
+          <circle cx="150" cy="160" r="112" fill="none" stroke="#7a1232" stroke-width="2.5"/>
           <line x1="38" y1="161" x2="262" y2="161" stroke="#7a3030" stroke-width="1.5" stroke-dasharray="5,3"/>
           <text x="150" y="156" font-size="9" fill="#7a3030" text-anchor="middle" font-weight="bold">خط الاستواء °0</text>
-          <g font-size="10" fill="#10303f">
-            <rect x="272" y="52" width="140" height="26" rx="6" fill="#d6e4f0" stroke="#8aa5b8"/>
+          <g font-size="10" fill="#7a1232">
+            <rect x="272" y="52" width="140" height="26" rx="6" fill="#d6e4f0" stroke="#b89e8a"/>
             <text x="342" y="69" text-anchor="middle" font-weight="bold">باردة قطبية °66.5–°90</text>
             <rect x="272" y="88" width="140" height="26" rx="6" fill="#a8c8e0" stroke="#5a89aa"/>
             <text x="342" y="105" text-anchor="middle" font-weight="bold">معتدلة باردة °40–°66.5</text>
-            <rect x="272" y="124" width="140" height="26" rx="6" fill="#f2d9a8" stroke="#c9a15e"/>
+            <rect x="272" y="124" width="140" height="26" rx="6" fill="#f3d89f" stroke="#dca73a"/>
             <text x="342" y="141" text-anchor="middle" font-weight="bold">معتدلة دافئة °30–°40</text>
             <rect x="272" y="160" width="140" height="26" rx="6" fill="#e8a87c" stroke="#c07040"/>
             <text x="342" y="177" text-anchor="middle" font-weight="bold">حارة °0–°30</text>
           </g>
-          <text x="342" y="206" font-size="9.5" fill="#4d5f65" text-anchor="middle">المنطقة الحارة هي</text>
-          <text x="342" y="220" font-size="9.5" fill="#4d5f65" text-anchor="middle">أكبر المناطق امتداداً</text>
-          <text x="210" y="292" font-size="9.5" fill="#4d5f65" text-anchor="middle">تتكرر المناطق شمال خط الاستواء وجنوبه بالتناظر</text>
+          <text x="342" y="206" font-size="9.5" fill="#432830" text-anchor="middle">المنطقة الحارة هي</text>
+          <text x="342" y="220" font-size="9.5" fill="#432830" text-anchor="middle">أكبر المناطق امتداداً</text>
+          <text x="210" y="292" font-size="9.5" fill="#432830" text-anchor="middle">تتكرر المناطق شمال خط الاستواء وجنوبه بالتناظر</text>
         </svg>
         <figcaption>مخطط: المناطق الحرارية الأربع ودوائر العرض التي تحدّها.</figcaption>
       </figure>
@@ -3365,20 +3368,20 @@ const UNITS_DATA = {
 
       <figure class="lessonFig">
         <svg viewBox="0 0 460 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="خريطة بلاد الرافدين بين نهري دجلة والفرات وأهم المدن التاريخية">
-          <rect width="460" height="340" fill="#f4ead6"/>
+          <rect width="460" height="340" fill="#eee4dc"/>
           <path d="M0,250 Q120,268 240,282 T460,300 L460,340 L0,340 Z" fill="#bcd9dd"/>
           <text x="392" y="326" font-size="11" fill="#3f6b72" text-anchor="middle">الخليج العربي</text>
           <path d="M118,20 C150,80 168,140 196,196 C214,232 238,262 262,286" stroke="#3d84a8" stroke-width="6" fill="none" stroke-linecap="round"/>
-          <text x="97" y="120" font-size="13" fill="#2a6b8a" font-weight="bold" transform="rotate(58 97 120)">نهر دجلة</text>
+          <text x="97" y="120" font-size="13" fill="#1f5068" font-weight="bold" transform="rotate(58 97 120)">نهر دجلة</text>
           <path d="M64,44 C82,112 116,172 158,214 C192,248 226,272 258,290" stroke="#59a5c4" stroke-width="6" fill="none" stroke-linecap="round"/>
-          <text x="176" y="196" font-size="13" fill="#2a6b8a" font-weight="bold" transform="rotate(46 176 196)">نهر الفرات</text>
-          <g font-size="12" fill="#10303f" font-weight="bold">
+          <text x="176" y="196" font-size="13" fill="#1f5068" font-weight="bold" transform="rotate(46 176 196)">نهر الفرات</text>
+          <g font-size="12" fill="#7a1232" font-weight="bold">
             <circle cx="150" cy="70" r="6" fill="#7a3030"/><text x="162" y="74">نينوى (آشور)</text>
-            <circle cx="176" cy="176" r="6" fill="#c9a15e"/><text x="188" y="180">بابل</text>
-            <circle cx="196" cy="214" r="6" fill="#1f6f5c"/><text x="208" y="218">أكاد</text>
+            <circle cx="176" cy="176" r="6" fill="#dca73a"/><text x="188" y="180">بابل</text>
+            <circle cx="196" cy="214" r="6" fill="#175a4a"/><text x="208" y="218">أكاد</text>
             <circle cx="246" cy="272" r="6" fill="#5a3d7a"/><text x="258" y="276">أور (سومر)</text>
           </g>
-          <text x="230" y="22" font-size="14" fill="#10303f" font-weight="bold" text-anchor="middle">بلاد الرافدين — أهم المدن التاريخية</text>
+          <text x="230" y="22" font-size="14" fill="#7a1232" font-weight="bold" text-anchor="middle">بلاد الرافدين — أهم المدن التاريخية</text>
         </svg>
         <figcaption>خريطة توضيحية: موقع أهم عواصم بلاد الرافدين بين نهري دجلة والفرات (رسم تخطيطي مبسّط).</figcaption>
       </figure>
@@ -3459,35 +3462,35 @@ const UNITS_DATA = {
 
       <figure class="lessonFig">
         <svg viewBox="0 0 470 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="مخطط السلطات الدستورية الثلاث في دولة قطر">
-          <rect width="470" height="250" fill="#fdfbf6"/>
-          <rect x="160" y="12" width="150" height="42" rx="10" fill="#10303f"/>
-          <text x="235" y="33" font-size="13" fill="#e3c98b" text-anchor="middle" font-weight="bold">أمير البلاد</text>
-          <text x="235" y="47" font-size="10" fill="#e3c98b" text-anchor="middle">رأس الدولة</text>
+          <rect width="470" height="250" fill="#fbf9f8"/>
+          <rect x="160" y="12" width="150" height="42" rx="10" fill="#7a1232"/>
+          <text x="235" y="33" font-size="13" fill="#ebc578" text-anchor="middle" font-weight="bold">أمير البلاد</text>
+          <text x="235" y="47" font-size="10" fill="#ebc578" text-anchor="middle">رأس الدولة</text>
           <path d="M235,54 L235,80 M80,80 L390,80 M80,80 L80,98 M235,80 L235,98 M390,80 L390,98"
-                stroke="#c9a15e" stroke-width="2" fill="none"/>
+                stroke="#dca73a" stroke-width="2" fill="none"/>
           <g>
-            <rect x="12" y="98" width="136" height="86" rx="10" fill="#eaf4f1" stroke="#1f6f5c" stroke-width="2"/>
-            <text x="80" y="120" font-size="12" fill="#1f6f5c" text-anchor="middle" font-weight="bold">التشريعية</text>
-            <text x="80" y="140" font-size="11" fill="#10303f" text-anchor="middle">مجلس الشورى</text>
-            <text x="80" y="158" font-size="10" fill="#4d5f65" text-anchor="middle">تشريع القوانين</text>
-            <text x="80" y="173" font-size="10" fill="#4d5f65" text-anchor="middle">وإقرار الموازنة</text>
+            <rect x="12" y="98" width="136" height="86" rx="10" fill="#eaf4f1" stroke="#175a4a" stroke-width="2"/>
+            <text x="80" y="120" font-size="12" fill="#175a4a" text-anchor="middle" font-weight="bold">التشريعية</text>
+            <text x="80" y="140" font-size="11" fill="#7a1232" text-anchor="middle">مجلس الشورى</text>
+            <text x="80" y="158" font-size="10" fill="#432830" text-anchor="middle">تشريع القوانين</text>
+            <text x="80" y="173" font-size="10" fill="#432830" text-anchor="middle">وإقرار الموازنة</text>
           </g>
           <g>
-            <rect x="167" y="98" width="136" height="86" rx="10" fill="#fdf4e3" stroke="#c9a15e" stroke-width="2"/>
-            <text x="235" y="120" font-size="12" fill="#a8813f" text-anchor="middle" font-weight="bold">التنفيذية</text>
-            <text x="235" y="140" font-size="11" fill="#10303f" text-anchor="middle">مجلس الوزراء</text>
-            <text x="235" y="158" font-size="10" fill="#4d5f65" text-anchor="middle">تنفيذ السياسة</text>
-            <text x="235" y="173" font-size="10" fill="#4d5f65" text-anchor="middle">العامة للدولة</text>
+            <rect x="167" y="98" width="136" height="86" rx="10" fill="#f5efeb" stroke="#dca73a" stroke-width="2"/>
+            <text x="235" y="120" font-size="12" fill="#b78623" text-anchor="middle" font-weight="bold">التنفيذية</text>
+            <text x="235" y="140" font-size="11" fill="#7a1232" text-anchor="middle">مجلس الوزراء</text>
+            <text x="235" y="158" font-size="10" fill="#432830" text-anchor="middle">تنفيذ السياسة</text>
+            <text x="235" y="173" font-size="10" fill="#432830" text-anchor="middle">العامة للدولة</text>
           </g>
           <g>
             <rect x="322" y="98" width="136" height="86" rx="10" fill="#f4eaf4" stroke="#5a3d7a" stroke-width="2"/>
             <text x="390" y="120" font-size="12" fill="#5a3d7a" text-anchor="middle" font-weight="bold">القضائية</text>
-            <text x="390" y="140" font-size="11" fill="#10303f" text-anchor="middle">المحاكم</text>
-            <text x="390" y="158" font-size="10" fill="#4d5f65" text-anchor="middle">الفصل في</text>
-            <text x="390" y="173" font-size="10" fill="#4d5f65" text-anchor="middle">المنازعات</text>
+            <text x="390" y="140" font-size="11" fill="#7a1232" text-anchor="middle">المحاكم</text>
+            <text x="390" y="158" font-size="10" fill="#432830" text-anchor="middle">الفصل في</text>
+            <text x="390" y="173" font-size="10" fill="#432830" text-anchor="middle">المنازعات</text>
           </g>
-          <text x="235" y="214" font-size="11" fill="#4d5f65" text-anchor="middle">تتعاون السلطات الثلاث فيما بينها وفق أحكام الدستور</text>
-          <text x="235" y="234" font-size="10" fill="#8a8a8a" text-anchor="middle">المرجع: الدستور القطري — المواد (60) وما بعدها</text>
+          <text x="235" y="214" font-size="11" fill="#432830" text-anchor="middle">تتعاون السلطات الثلاث فيما بينها وفق أحكام الدستور</text>
+          <text x="235" y="234" font-size="10" fill="#673e4b" text-anchor="middle">المرجع: الدستور القطري — المواد (60) وما بعدها</text>
         </svg>
         <figcaption>مخطط توضيحي: السلطات الدستورية الثلاث في دولة قطر واختصاص كل منها.</figcaption>
       </figure>
@@ -3541,27 +3544,27 @@ const UNITS_DATA = {
 
       <figure class="lessonFig">
         <svg viewBox="0 0 460 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="مخطط العوامل الجاذبة والطاردة للسكان">
-          <rect width="460" height="250" fill="#fdfbf6"/>
-          <text x="230" y="22" font-size="13" fill="#10303f" text-anchor="middle" font-weight="bold">العوامل الطبيعية وأثرها في توزيع السكان</text>
-          <rect x="14" y="38" width="204" height="196" rx="12" fill="#eaf4f1" stroke="#1f6f5c" stroke-width="2"/>
-          <text x="116" y="60" font-size="13" fill="#1f6f5c" text-anchor="middle" font-weight="bold">✅ عوامل جاذبة</text>
-          <g font-size="10.5" fill="#10303f">
+          <rect width="460" height="250" fill="#fbf9f8"/>
+          <text x="230" y="22" font-size="13" fill="#7a1232" text-anchor="middle" font-weight="bold">العوامل الطبيعية وأثرها في توزيع السكان</text>
+          <rect x="14" y="38" width="204" height="196" rx="12" fill="#eaf4f1" stroke="#175a4a" stroke-width="2"/>
+          <text x="116" y="60" font-size="13" fill="#175a4a" text-anchor="middle" font-weight="bold">✅ عوامل جاذبة</text>
+          <g font-size="10.5" fill="#7a1232">
             <text x="204" y="86" text-anchor="end">🏞️ السهول الفيضية الخصبة</text>
             <text x="204" y="112" text-anchor="end">🌤️ المناخ المعتدل (°30–°60)</text>
             <text x="204" y="138" text-anchor="end">💧 وفرة المياه العذبة</text>
             <text x="204" y="164" text-anchor="end">🌱 التربة الخصبة</text>
             <text x="204" y="190" text-anchor="end">⛰️ مرتفعات معتدلة المناخ</text>
-            <text x="204" y="216" text-anchor="end" font-size="9.5" fill="#4d5f65">مثال: مرتفعات اليمن وأثيوبيا</text>
+            <text x="204" y="216" text-anchor="end" font-size="9.5" fill="#432830">مثال: مرتفعات اليمن وأثيوبيا</text>
           </g>
           <rect x="242" y="38" width="204" height="196" rx="12" fill="#fbeee9" stroke="#7a3030" stroke-width="2"/>
           <text x="344" y="60" font-size="13" fill="#7a3030" text-anchor="middle" font-weight="bold">❌ عوامل طاردة</text>
-          <g font-size="10.5" fill="#10303f">
+          <g font-size="10.5" fill="#7a1232">
             <text x="432" y="86" text-anchor="end">🏔️ الجبال الوعرة</text>
             <text x="432" y="112" text-anchor="end">🔥 الحرارة الشديدة والجفاف</text>
             <text x="432" y="138" text-anchor="end">❄️ البرودة الشديدة</text>
             <text x="432" y="164" text-anchor="end">🏜️ ندرة المياه</text>
             <text x="432" y="190" text-anchor="end">🪨 التربة الفقيرة</text>
-            <text x="432" y="216" text-anchor="end" font-size="9.5" fill="#4d5f65">مثال: الصحاري وسيبيريا</text>
+            <text x="432" y="216" text-anchor="end" font-size="9.5" fill="#432830">مثال: الصحاري وسيبيريا</text>
           </g>
         </svg>
         <figcaption>مخطط مقارن: العوامل الطبيعية الجاذبة للسكان مقابل الطاردة لهم.</figcaption>
@@ -3618,32 +3621,32 @@ const UNITS_DATA = {
 
       <figure class="lessonFig">
         <svg viewBox="0 0 470 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="خط زمني للدولة العباسية وأبرز خلفائها">
-          <rect width="470" height="230" fill="#fdfbf6"/>
-          <text x="235" y="24" font-size="13" fill="#10303f" text-anchor="middle" font-weight="bold">الدولة العباسية (132هـ – 656هـ)</text>
-          <rect x="34" y="42" width="212" height="26" rx="6" fill="#1f6f5c" opacity=".85"/>
-          <text x="140" y="60" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold">العصر العباسي الأول (132–232هـ) — القوة والازدهار</text>
+          <rect width="470" height="230" fill="#fbf9f8"/>
+          <text x="235" y="24" font-size="13" fill="#7a1232" text-anchor="middle" font-weight="bold">الدولة العباسية (132هـ – 656هـ)</text>
+          <rect x="34" y="42" width="212" height="26" rx="6" fill="#175a4a" opacity=".85"/>
+          <text x="140" y="60" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="bold">العصر العباسي الأول (132–232هـ) — القوة والازدهار</text>
           <rect x="246" y="42" width="190" height="26" rx="6" fill="#7a3030" opacity=".75"/>
-          <text x="341" y="60" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold">العصر الثاني (232–656هـ) — الضعف</text>
-          <line x1="34" y1="96" x2="436" y2="96" stroke="#c9a15e" stroke-width="3"/>
-          <g font-size="10" fill="#10303f">
-            <circle cx="60" cy="96" r="7" fill="#c9a15e"/>
+          <text x="341" y="60" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="bold">العصر الثاني (232–656هـ) — الضعف</text>
+          <line x1="34" y1="96" x2="436" y2="96" stroke="#dca73a" stroke-width="3"/>
+          <g font-size="10" fill="#7a1232">
+            <circle cx="60" cy="96" r="7" fill="#dca73a"/>
             <text x="60" y="120" text-anchor="middle" font-weight="bold">132هـ</text>
             <text x="60" y="134" text-anchor="middle">قيام الدولة</text>
             <text x="60" y="147" text-anchor="middle">(معركة الزاب)</text>
 
-            <circle cx="140" cy="96" r="7" fill="#1f6f5c"/>
+            <circle cx="140" cy="96" r="7" fill="#175a4a"/>
             <text x="140" y="120" text-anchor="middle" font-weight="bold">أبو جعفر المنصور</text>
             <text x="140" y="134" text-anchor="middle">بنى بغداد</text>
 
-            <circle cx="222" cy="96" r="7" fill="#1f6f5c"/>
+            <circle cx="222" cy="96" r="7" fill="#175a4a"/>
             <text x="222" y="120" text-anchor="middle" font-weight="bold">هارون الرشيد</text>
             <text x="222" y="134" text-anchor="middle">أنشأ بيت الحكمة</text>
 
-            <circle cx="300" cy="96" r="7" fill="#1f6f5c"/>
+            <circle cx="300" cy="96" r="7" fill="#175a4a"/>
             <text x="300" y="120" text-anchor="middle" font-weight="bold">المأمون</text>
             <text x="300" y="134" text-anchor="middle">حركة الترجمة</text>
 
-            <circle cx="370" cy="96" r="7" fill="#1f6f5c"/>
+            <circle cx="370" cy="96" r="7" fill="#175a4a"/>
             <text x="370" y="120" text-anchor="middle" font-weight="bold">المعتصم بالله</text>
             <text x="370" y="134" text-anchor="middle">فتح عمورية</text>
 
@@ -3651,7 +3654,7 @@ const UNITS_DATA = {
             <text x="424" y="120" text-anchor="middle" font-weight="bold">656هـ</text>
             <text x="424" y="134" text-anchor="middle">سقوط بغداد</text>
           </g>
-          <text x="235" y="178" font-size="10" fill="#4d5f65" text-anchor="middle">الخلفاء الأربعة أعلاه من العصر الأول — عصر ازدهار العلم والفتوحات</text>
+          <text x="235" y="178" font-size="10" fill="#432830" text-anchor="middle">الخلفاء الأربعة أعلاه من العصر الأول — عصر ازدهار العلم والفتوحات</text>
           <text x="235" y="200" font-size="10" fill="#7a3030" text-anchor="middle">أسباب الضعف: سيطرة العناصر غير العربية · انفصال الدويلات · انشغال الخلفاء بالترف</text>
         </svg>
         <figcaption>خط زمني: مسار الدولة العباسية من القيام إلى السقوط، وأبرز خلفاء عصرها الأول.</figcaption>
@@ -3725,33 +3728,33 @@ const UNITS_DATA = {
 
       <figure class="lessonFig">
         <svg viewBox="0 0 460 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="خريطة ذهنية لأبعاد الأمن الوطني الأربعة">
-          <rect width="460" height="300" fill="#fdfbf6"/>
-          <line x1="230" y1="150" x2="112" y2="72" stroke="#c9a15e" stroke-width="2"/>
-          <line x1="230" y1="150" x2="348" y2="72" stroke="#c9a15e" stroke-width="2"/>
-          <line x1="230" y1="150" x2="112" y2="228" stroke="#c9a15e" stroke-width="2"/>
-          <line x1="230" y1="150" x2="348" y2="228" stroke="#c9a15e" stroke-width="2"/>
-          <circle cx="230" cy="150" r="52" fill="#10303f"/>
-          <text x="230" y="145" font-size="13" fill="#e3c98b" text-anchor="middle" font-weight="bold">الأمن</text>
-          <text x="230" y="163" font-size="13" fill="#e3c98b" text-anchor="middle" font-weight="bold">الوطني</text>
+          <rect width="460" height="300" fill="#fbf9f8"/>
+          <line x1="230" y1="150" x2="112" y2="72" stroke="#dca73a" stroke-width="2"/>
+          <line x1="230" y1="150" x2="348" y2="72" stroke="#dca73a" stroke-width="2"/>
+          <line x1="230" y1="150" x2="112" y2="228" stroke="#dca73a" stroke-width="2"/>
+          <line x1="230" y1="150" x2="348" y2="228" stroke="#dca73a" stroke-width="2"/>
+          <circle cx="230" cy="150" r="52" fill="#7a1232"/>
+          <text x="230" y="145" font-size="13" fill="#ebc578" text-anchor="middle" font-weight="bold">الأمن</text>
+          <text x="230" y="163" font-size="13" fill="#ebc578" text-anchor="middle" font-weight="bold">الوطني</text>
           <g>
-            <rect x="24" y="46" width="168" height="52" rx="12" fill="#eaf4f1" stroke="#1f6f5c" stroke-width="2"/>
-            <text x="108" y="68" font-size="12" fill="#1f6f5c" text-anchor="middle" font-weight="bold">🛡️ الأمن العسكري</text>
-            <text x="108" y="86" font-size="10" fill="#4d5f65" text-anchor="middle">حماية الدولة من أي عدوان</text>
+            <rect x="24" y="46" width="168" height="52" rx="12" fill="#eaf4f1" stroke="#175a4a" stroke-width="2"/>
+            <text x="108" y="68" font-size="12" fill="#175a4a" text-anchor="middle" font-weight="bold">🛡️ الأمن العسكري</text>
+            <text x="108" y="86" font-size="10" fill="#432830" text-anchor="middle">حماية الدولة من أي عدوان</text>
           </g>
           <g>
-            <rect x="268" y="46" width="168" height="52" rx="12" fill="#fdf4e3" stroke="#c9a15e" stroke-width="2"/>
-            <text x="352" y="68" font-size="12" fill="#a8813f" text-anchor="middle" font-weight="bold">🏛️ الأمن السياسي</text>
-            <text x="352" y="86" font-size="10" fill="#4d5f65" text-anchor="middle">استقرار نظام الحكم وسيادته</text>
+            <rect x="268" y="46" width="168" height="52" rx="12" fill="#f5efeb" stroke="#dca73a" stroke-width="2"/>
+            <text x="352" y="68" font-size="12" fill="#b78623" text-anchor="middle" font-weight="bold">🏛️ الأمن السياسي</text>
+            <text x="352" y="86" font-size="10" fill="#432830" text-anchor="middle">استقرار نظام الحكم وسيادته</text>
           </g>
           <g>
             <rect x="24" y="202" width="168" height="52" rx="12" fill="#f4eaf4" stroke="#5a3d7a" stroke-width="2"/>
             <text x="108" y="224" font-size="12" fill="#5a3d7a" text-anchor="middle" font-weight="bold">💰 الأمن الاقتصادي</text>
-            <text x="108" y="242" font-size="10" fill="#4d5f65" text-anchor="middle">تنويع مصادر الدخل والاكتفاء</text>
+            <text x="108" y="242" font-size="10" fill="#432830" text-anchor="middle">تنويع مصادر الدخل والاكتفاء</text>
           </g>
           <g>
             <rect x="268" y="202" width="168" height="52" rx="12" fill="#fbeee9" stroke="#7a3030" stroke-width="2"/>
             <text x="352" y="224" font-size="12" fill="#7a3030" text-anchor="middle" font-weight="bold">🤝 الأمن الاجتماعي</text>
-            <text x="352" y="242" font-size="10" fill="#4d5f65" text-anchor="middle">تماسك المجتمع وحفظ هويته</text>
+            <text x="352" y="242" font-size="10" fill="#432830" text-anchor="middle">تماسك المجتمع وحفظ هويته</text>
           </g>
         </svg>
         <figcaption>خريطة ذهنية: أبعاد الأمن الوطني الأربعة المترابطة — ضعف أحدها يؤثر على البقية.</figcaption>
@@ -4098,7 +4101,7 @@ function loadQrLib(){
 async function showSiteQR(){
   if(!isAdmin){ showToast('هذي الميزة للمعلم فقط', 'error'); return; }
   const holder = document.getElementById('qrCodeHolder');
-  holder.innerHTML = '<p style="color:#8a8a8a;">جاري التحضير...</p>';
+  holder.innerHTML = '<p style="color:#673e4b;">جاري التحضير...</p>';
   document.getElementById('qrModal').classList.add('show');
   try{
     await loadQrLib();
@@ -4809,7 +4812,7 @@ function shoot(dir){
   if(!requireApproved()) return;
   if(state.energy <= 0){
     document.getElementById('funFeedback').textContent = '⚡ ما عندك طاقة كافية — جاوب أسئلة المراجعة لتكسب طاقة!';
-    document.getElementById('funFeedback').style.color = '#e3c98b';
+    document.getElementById('funFeedback').style.color = '#ebc578';
     return;
   }
   state.energy -= 1;
@@ -5867,7 +5870,7 @@ function renderLessonStats(){
       ${rows.map(r=>`
         <tr>
           <td>${esc(r.qText.length > 58 ? r.qText.slice(0,58) + '…' : r.qText)}</td>
-          <td>${esc(r.title)} <span style="color:#8a8a8a;">(${r.grade})</span></td>
+          <td>${esc(r.title)} <span style="color:#673e4b;">(${r.grade})</span></td>
           <td>
             <div class="statsBar"><i style="width:${r.pct}%; background:${r.pct < 50 ? 'var(--maroon)' : r.pct < 80 ? 'var(--gold-deep)' : 'var(--teal)'};"></i></div>
             <span class="${r.pct < 50 ? 'statsHard' : r.pct >= 80 ? 'statsGood' : ''}">${r.pct}%</span>
@@ -6337,8 +6340,8 @@ async function lsUndoAward(){
 // ═══════ عجلة الأسماء ═══════
 // الفائز يُختار عشوائياً بعدالة قبل الدوران، ثم تُوجَّه العجلة لتقف عند منتصف شريحته
 // (مع إزاحة بسيطة داخلها كي لا يبدو التوقّف آلياً). الغائبون اليوم لا يدخلون العجلة.
-const WH_COLORS = [['#164256','#fff'], ['#c9a15e','#0a2029'], ['#1f6f5c','#fff'],
-                   ['#7a3030','#fff'], ['#2a6b8a','#fff'], ['#e3c98b','#0a2029']];
+const WH_COLORS = [['#a71944','#ffffff'], ['#dca73a','#4f0c20'], ['#175a4a','#ffffff'],
+                   ['#7a3030','#ffffff'], ['#1f5068','#ffffff'], ['#ebc578','#4f0c20']];
 const wh = {cls:'', all:[], pool:[], absent:0, pickedBy:{}, angle:0, spinning:false,
             winner:null, winIdx:-1, awarded:false, req:0, timer:null, lastIdx:-1, lastTick:0, ac:null, msg:''};
 
@@ -6447,7 +6450,7 @@ function whPaint(){
   const n = wh.pool.length, R = 200;
   let svg = '';
   if(!n){
-    svg = `<circle r="${R}" fill="#164256"/>`;
+    svg = `<circle r="${R}" fill="#a71944"/>`;
   } else {
     const seg = 360 / n;
     const fitW = R * 0.6;                                  // المسافة المتاحة للاسم على نصف القطر
@@ -6599,7 +6602,7 @@ function whConfetti(){ whConfettiIn(document.getElementById('wheelModal')); }
 // قصاصات داخل النافذة نفسها — في ملء الشاشة لا يظهر إلا ما بداخل العنصر المكبَّر
 function whConfettiIn(m){
   if(!m) return;
-  const cols = ['#e3c98b', '#c9a15e', '#fff6dc', '#1f6f5c', '#2a6b8a', '#7a3030'];
+  const cols = ['#ebc578', '#dca73a', '#f4ede7', '#175a4a', '#1f5068', '#7a3030'];
   for(let i = 0; i < 34; i++){
     const c = document.createElement('div');
     c.className = 'whConf';
@@ -6963,7 +6966,7 @@ async function refreshClassChallenge(){
   myClassData = (data || []).filter(r => !r.deleted_at);
 
   if(myClassData.length === 0){
-    wrap.innerHTML = `<p style="color:#8a8a8a;">ما فيه طلاب مضافين لصف ${esc(myClassCls)} بعد.<br>أضفهم من لوحة المعلم ← تبويب «متابعة الحصة» (تقدر تلصق الأسماء دفعة واحدة من إكسل).</p>`;
+    wrap.innerHTML = `<p style="color:#673e4b;">ما فيه طلاب مضافين لصف ${esc(myClassCls)} بعد.<br>أضفهم من لوحة المعلم ← تبويب «متابعة الحصة» (تقدر تلصق الأسماء دفعة واحدة من إكسل).</p>`;
     document.getElementById('myClassSummary').innerHTML = '';
     return;
   }
@@ -7005,7 +7008,7 @@ function renderMyClassTable(){
   const filtered = applyMcFilter(myClassData);
   if(filtered.length === 0){
     document.getElementById('myClassTableWrap').innerHTML =
-      '<p style="color:#8a8a8a; padding:20px; text-align:center;">ما فيه طلاب يطابقون الفلتر الحالي.</p>';
+      '<p style="color:#673e4b; padding:20px; text-align:center;">ما فيه طلاب يطابقون الفلتر الحالي.</p>';
     return;
   }
   const rows = filtered.map((r, i)=>{
@@ -7783,11 +7786,11 @@ async function loadStudentsList(){
   const { data, error } = await sb.from('students').select('*').neq('status','rejected').order('last_seen', {ascending:false});
   const list = document.getElementById('studentsList');
   const countEl = document.getElementById('activeCount');
-  if(error){ list.innerHTML = '<p style="color:#8a8a8a;">تعذر تحميل قائمة الطلاب.</p>'; return; }
+  if(error){ list.innerHTML = '<p style="color:#673e4b;">تعذر تحميل قائمة الطلاب.</p>'; return; }
   const activeNow = (data||[]).filter(r => r.last_seen && (Date.now() - new Date(r.last_seen).getTime())/1000 < ACTIVE_THRESHOLD_SEC).length;
   countEl.textContent = activeNow;
   if(!data || data.length === 0){
-    list.innerHTML = '<p style="color:#8a8a8a;">لا يوجد طلاب مسجّلين بعد.</p>';
+    list.innerHTML = '<p style="color:#673e4b;">لا يوجد طلاب مسجّلين بعد.</p>';
     return;
   }
   list.innerHTML = data.map(renderStudentRow).join('');
@@ -7890,9 +7893,9 @@ async function loadRoster(){
     data = (fb.data || []).filter(r => !r.deleted_at); error = fb.error;
   }
   const list = document.getElementById('rosterList');
-  if(error){ list.innerHTML = '<p style="color:#8a8a8a;">تعذر تحميل القائمة.</p>'; return; }
+  if(error){ list.innerHTML = '<p style="color:#673e4b;">تعذر تحميل القائمة.</p>'; return; }
   if(!data || data.length === 0){
-    list.innerHTML = '<p style="color:#8a8a8a; margin-top:16px;">لا يوجد طلاب مضافين لهذا الصف بعد — أضف أول طالب من الأعلى.</p>';
+    list.innerHTML = '<p style="color:#673e4b; margin-top:16px;">لا يوجد طلاب مضافين لهذا الصف بعد — أضف أول طالب من الأعلى.</p>';
     return;
   }
   // نجيب كل ملاحظات طلاب هذا الصف + حضور اليوم دفعة وحدة
@@ -8082,12 +8085,12 @@ async function loadGaps(){
     .select('*').eq('resolved', false)
     .order('asked_count', {ascending:false}).order('last_asked', {ascending:false});
   if(error){
-    list.innerHTML = '<p style="color:#8a8a8a;">تعذر التحميل — تأكد من تشغيل كود جدول الأسئلة غير المجابة.</p>';
+    list.innerHTML = '<p style="color:#673e4b;">تعذر التحميل — تأكد من تشغيل كود جدول الأسئلة غير المجابة.</p>';
     if(badge) badge.textContent = '';
     return;
   }
   if(!data || data.length === 0){
-    list.innerHTML = '<p style="color:#8a8a8a;">ما فيه أسئلة بلا جواب 👍 المنقذ يغطي كل ما سُئل عنه.</p>';
+    list.innerHTML = '<p style="color:#673e4b;">ما فيه أسئلة بلا جواب 👍 المنقذ يغطي كل ما سُئل عنه.</p>';
     if(badge) badge.textContent = '';
     return;
   }
@@ -8162,7 +8165,7 @@ async function loadTrash(){
   items.sort((a,b) => new Date(b.deleted_at) - new Date(a.deleted_at));
 
   if(items.length === 0){
-    list.innerHTML = '<p style="color:#8a8a8a;">السلة فاضية — ما فيه شي محذوف حالياً.</p>';
+    list.innerHTML = '<p style="color:#673e4b;">السلة فاضية — ما فيه شي محذوف حالياً.</p>';
     return;
   }
   list.innerHTML = items.map(item => `
@@ -8237,7 +8240,7 @@ async function loadQuestionsAdmin(){
     data = (fb.data || []).filter(r => !r.deleted_at); error = fb.error;
   }
   const list = document.getElementById('questionsList');
-  if(error){ list.innerHTML = '<p style="color:#8a8a8a;">تعذر تحميل الأسئلة.</p>'; return; }
+  if(error){ list.innerHTML = '<p style="color:#673e4b;">تعذر تحميل الأسئلة.</p>'; return; }
   list.innerHTML = '';
   (data || []).forEach(r=>{
     const row = document.createElement('div');
@@ -9581,7 +9584,7 @@ const HERO_PLATES = [
     labels:[['الصحراء الكبرى',50.6,36.13],['الربع الخالي',63.36,41.6],['صحراء غوبي',74.83,21.01],['كالاهاري',55.55,73.97,'minor'],
             ['الصحراء الأسترالية',83.58,75.56],['أتاكاما',31.57,74.76,'minor']],
     qatar:true,
-    legend:[['#e39a45','صحراء حارة'],['#d9c48f','صحراء باردة'],['rgba(214,180,120,.55)','شبه جافة']],
+    legend:[['#e39a45','صحراء حارة'],['#e6c276','صحراء باردة'],['rgba(228,183,93,.55)','شبه جافة']],
     note:'تمتد أوسع الصحاري الحارة حول دائرتي عرض 18° و30° تقريباً — ودولة قطر ضمن الإقليم الصحراوي.',
     unit:'📚 سابع: الأقاليم المناخية — الإقليم الصحراوي',
     src:HP_KOPPEN },
@@ -9590,7 +9593,7 @@ const HERO_PLATES = [
     labels:[['حوض الأمازون',32.99,58.38,'minor'],['حوض الكونغو',56.04,55.88,'minor']],
     qatar:true,
     legend:[['#12804f','غزيرة (استوائية)'],['#4a9fd6','على مدار العام'],['#8cc46c','موسم ممطر وموسم جاف'],
-            ['#c9bb57','شتاء ممطر وصيف جاف'],['#e3c992','شبه جافة'],['#e39a45','جافة (صحراوية)'],['#e8f0f3','ثلوج وجليد']],
+            ['#c9bb57','شتاء ممطر وصيف جاف'],['#ebc87f','شبه جافة'],['#e39a45','جافة (صحراوية)'],['#e8f0f3','ثلوج وجليد']],
     note:'أغزر الأمطار قرب خط الاستواء، وأقلها في الصحاري — ولإقليم البحر المتوسط شتاء ممطر وصيف جاف.',
     unit:'📚 سابع: الأقاليم المناخية',
     src:HP_KOPPEN },
@@ -9604,7 +9607,7 @@ const HERO_PLATES = [
   { id:'zones', img:'maps/zones.webp', title:'المناطق الحرارية',
     alt:'خريطة المناطق الحرارية الأربع حسب دوائر العرض',
     labels:[['خط الاستواء 0°',8.79,55.05,'dim'],['30°',8.88,30.63,'dim'],['40°',11.53,23.14,'dim'],['66.5°',20.97,6.88,'dim minor']],
-    legend:[['#d9663d','الحارة (0°–30°)'],['#e3b04f','المعتدلة الدافئة (30°–40°)'],['#4f9f86','المعتدلة الباردة (40°–66.5°)'],['#cfe6ee','الباردة القطبية (66.5°–90°)']],
+    legend:[['#d9663d','الحارة (0°–30°)'],['#e7af3b','المعتدلة الدافئة (30°–40°)'],['#4f9f86','المعتدلة الباردة (40°–66.5°)'],['#cfe6ee','الباردة القطبية (66.5°–90°)']],
     note:'قسّم العلماء سطح الأرض إلى أربع مناطق حرارية حسب دوائر العرض — أكبرها امتداداً المنطقة الحارة.',
     unit:'📚 سابع: عناصر المناخ — الحرارة',
     src:'حدود اليابس: Natural Earth · حدود المناطق من الكتاب' },
@@ -9620,11 +9623,11 @@ function hpLayersSvg(){
   const cx = 110, cy = 112, R = 104;
   const r = { crust:R, mantle:R-6, outer:R*(6371-2900)/6371, inner:R*1220/6371 };
   const half = (rad, fill) => `<path d="M${cx-rad},${cy} A${rad},${rad} 0 0 1 ${cx+rad},${cy} Z" fill="${fill}"/>`;
-  const tag = (n, x, y) => `<g><circle cx="${x}" cy="${y}" r="7" fill="#0a2029" stroke="#e3c98b" stroke-width="1"/><text x="${x}" y="${y+3}" font-size="8" fill="#e3c98b" text-anchor="middle" font-weight="bold">${n}</text></g>`;
+  const tag = (n, x, y) => `<g><circle cx="${x}" cy="${y}" r="7" fill="#4f0c20" stroke="#ebc578" stroke-width="1"/><text x="${x}" y="${y+3}" font-size="8" fill="#ebc578" text-anchor="middle" font-weight="bold">${n}</text></g>`;
   return `<svg viewBox="0 0 220 118" role="img" aria-label="مقطع في طبقات باطن الأرض">
     <defs><radialGradient id="hpMantle" cx="50%" cy="100%" r="100%"><stop offset="0%" stop-color="#e0773a"/><stop offset="100%" stop-color="#9c3b2a"/></radialGradient></defs>
-    ${half(r.crust,'#7a5a3a')}${half(r.mantle,'url(#hpMantle)')}${half(r.outer,'#e7a347')}${half(r.inner,'#fbe3a0')}
-    <line x1="4" y1="${cy}" x2="216" y2="${cy}" stroke="#e3c98b" stroke-width="1" opacity=".6"/>
+    ${half(r.crust,'#7a5a3a')}${half(r.mantle,'url(#hpMantle)')}${half(r.outer,'#e8ae36')}${half(r.inner,'#f6d99d')}
+    <line x1="4" y1="${cy}" x2="216" y2="${cy}" stroke="#ebc578" stroke-width="1" opacity=".6"/>
     ${tag('١', cx-R*0.72, cy-R*0.72)}${tag('٢', cx+R*0.55, cy-R*0.55)}${tag('٣', cx-r.outer*0.62, cy-r.outer*0.55)}${tag('٤', cx, cy-r.inner*0.5)}
   </svg>`;
 }
@@ -9634,13 +9637,13 @@ function hpBody(pl){
     return `<div class="hpLayers">${hpLayersSvg()}<ol>
       <li><i style="background:#7a5a3a"></i><span><b>١ القشرة الأرضية:</b> نعيش عليها، رقيقة السُّمك (قارية ومحيطية)</span></li>
       <li><i style="background:#c85a33"></i><span><b>٢ الوشاح (الكسوة):</b> أسمك الطبقات — 2900 كم</span></li>
-      <li><i style="background:#e7a347"></i><span><b>٣ النواة الخارجية:</b> سائلة، 2200–5000°م</span></li>
-      <li><i style="background:#fbe3a0"></i><span><b>٤ النواة الداخلية:</b> صلبة، تصل إلى 5500°م</span></li>
+      <li><i style="background:#e8ae36"></i><span><b>٣ النواة الخارجية:</b> سائلة، 2200–5000°م</span></li>
+      <li><i style="background:#f6d99d"></i><span><b>٤ النواة الداخلية:</b> صلبة، تصل إلى 5500°م</span></li>
     </ol></div>`;
   }
   if(pl.id === 'timeline'){
-    const eras = [['العصر النبوي','1–11هـ',10,'#1f6f5c'],['الخلافة الراشدة','11–40هـ',29,'#4f9f86'],
-                  ['الدولة الأموية','40–132هـ',92,'#a8813f'],['الدولة العباسية','132–656هـ',524,'#7a3030']];
+    const eras = [['العصر النبوي','1–11هـ',10,'#175a4a'],['الخلافة الراشدة','11–40هـ',29,'#4f9f86'],
+                  ['الدولة الأموية','40–132هـ',92,'#b78623'],['الدولة العباسية','132–656هـ',524,'#7a3030']];
     return `<div class="hpTimeline" role="img" aria-label="خط زمني نسبي لمراحل الدولة الإسلامية">${
       eras.map(([n,,y,c]) => `<span style="flex:${y}; background:${c}" title="${esc(n)}">${y >= 90 ? esc(n.replace(/^(الدولة|العصر|الخلافة) /,'')) : ''}</span>`).join('')
     }</div><ul class="hpTlList">${
