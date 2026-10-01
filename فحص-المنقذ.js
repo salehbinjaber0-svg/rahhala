@@ -26,7 +26,10 @@ try {
   process.exit(1);
 }
 
-const FILE = path.join(__dirname, 'index.html');
+// الصفحة تحمّل ملفات مصاحبة (supabase.js · content.js): نضمّنها من القرص كي يُفحص ما سيُرفع فعلاً
+// لا النسخة المنشورة على الإنترنت (التي قد تكون أقدم أو غير متاحة)
+const loadSite = (dir) => fs.readFileSync(path.join(dir, 'index.html'), 'utf8')
+  .replace(/<script src="([^":]+\.js)"><\/script>/g, (m, f) => '<script>' + fs.readFileSync(path.join(dir, f), 'utf8') + '</script>');
 // الحالة الوحيدة المقبولة: «اقليم مناخي» تُجيب بقائمة الأقاليم الثمانية —
 // جمع تكسير صحيح وإجابة مفيدة، لا خطأ.
 const ALLOWED = ['اقليم مناخي'];
@@ -35,7 +38,7 @@ const vc = new VirtualConsole();
 vc.on('jsdomError', () => {});
 vc.on('error', () => {});
 
-const dom = new JSDOM(fs.readFileSync(FILE, 'utf8'), {
+const dom = new JSDOM(loadSite(__dirname), {
   runScripts: 'dangerously',
   resources: 'usable',
   url: 'https://salehbinjaber0-svg.github.io/rahhala/',
