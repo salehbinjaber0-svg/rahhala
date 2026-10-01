@@ -1080,7 +1080,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   /* شريط طقس الدوحة — بنفس نمط شريط التحديث، بلون سماوي يناسب موضوعه */
   #weatherBar{
     display:none; background:linear-gradient(90deg,#2a6b8a,#3a86ad); color:#fff;
-    text-align:center; padding:9px 20px; font-size:.82rem; position:relative;
+    text-align:center; padding:9px 44px; font-size:.82rem; position:relative; /* 44px: مساحة زر الإغلاق كي لا يغطي النص */
   }
   #weatherBar.show{display:block;}
   #weatherBar strong{color:#ffe6b0;}
@@ -1091,7 +1091,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     width:22px; height:22px; border-radius:50%; font-size:.72rem; line-height:1;
   }
   #weatherBar button:hover{background:rgba(255,255,255,.3);}
-  @media(max-width:620px){ #weatherBar .wbHint{display:none;} }
+  @media(max-width:620px){ #weatherBar .wbHint{display:none;} #weatherBar{font-size:.76rem; padding:8px 40px;} }
   #lastUpdateBar.show{display:block;}
   #lastUpdateBar button{
     position:absolute; left:16px; top:50%; transform:translateY(-50%); background:none; border:none;
@@ -4273,6 +4273,14 @@ async function buildReport(){
     </div>`;
 }
 
+// خلية CSV آمنة: تُحاط بعلامتي تنصيص (الفاصلة في الاسم لا تزيح الأعمدة)،
+// وما يبدأ بـ = + - @ يُسبق بفاصلة عليا كي لا ينفّذه إكسل كمعادلة
+function csvCell(v){
+  let t = String(v ?? '');
+  if(/^[=+\-@\t\r]/.test(t)) t = "'" + t;
+  return '"' + t.replace(/"/g, '""') + '"';
+}
+
 function exportReportCSV(){
   if(!isAdmin) return;
   if(!lastReportData){ showToast('انتظر التقرير يخلص التحميل أول', 'error'); return; }
@@ -4282,11 +4290,11 @@ function exportReportCSV(){
   csv += `تاريخ الإنشاء,${d.generatedAt.toLocaleDateString('ar-QA')}\n\n`;
   csv += `إجمالي الطلاب,${d.studentsCount}\nبانتظار الموافقة,${d.pendingCount}\nإجابات هذا الأسبوع,${d.totalAnswers}\nنسبة الصحة,${d.accuracyRate}%\n\n`;
   csv += 'الأكثر نقاطاً\nالطالب,الصف,النقاط\n';
-  d.topByPoints.forEach(s=> csv += `${s.name},${s.cls},${s.points}\n`);
+  d.topByPoints.forEach(s=> csv += `${csvCell(s.name)},${csvCell(s.cls)},${s.points}\n`);
   csv += '\nالأكثر وقت استخدام\nالطالب,الصف,ثواني الاستخدام\n';
-  d.topByTime.forEach(s=> csv += `${s.name},${s.cls},${s.total_seconds||0}\n`);
+  d.topByTime.forEach(s=> csv += `${csvCell(s.name)},${csvCell(s.cls)},${s.total_seconds||0}\n`);
   csv += '\nالأسئلة الأكثر خطأ\nالسؤال,مرات الخطأ,الإجمالي\n';
-  d.mostMissed.forEach(m=> csv += `"${m.qText.replace(/"/g,'""')}",${m.wrong},${m.total}\n`);
+  d.mostMissed.forEach(m=> csv += `${csvCell(m.qText)},${m.wrong},${m.total}\n`);
 
   const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
@@ -7471,14 +7479,15 @@ function exportMyClassCSV(){
     // كل الملاحظات تراكمياً بالتصدير — لا آخر واحدة فقط
     const allNotes = all.map(n =>
       `${new Date(n.created_at).toLocaleDateString('ar-QA')} ${n.kind === 'praise' ? '[تكريم]' : '[تنبيه]'} ${n.note}`
-    ).join(' | ').replace(/"/g, '""');
-    csv += `${i+1},"${String(r.student_name || '').replace(/"/g, '""')}",${r.participation_points || 0},${p},${w},"${allNotes}"\n`;
+    ).join(' | ');
+    csv += `${i+1},${csvCell(r.student_name)},${r.participation_points || 0},${p},${w},${csvCell(allNotes)}\n`;
   });
   const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `متابعة-${myClassCls}-${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   showToast('✅ تم التصدير', 'success');
 }
 
@@ -9436,7 +9445,7 @@ function dismissUpdateBar(){
   document.getElementById('lastUpdateBar').classList.remove('show');
   localStorage.setItem('rahhala_seen_update', document.lastModified);
 }
-// ---------- شريط طقس الدوحة (يرتبط بالوحدة الأولى: عناصر المناخ) ----------
+// ---------- شريط طقس الدوحة (سابع: الوحدة ١ «عناصر المناخ» · ثامن: الوحدة ١ «الغلاف الجوي») ----------
 function dismissWeatherBar(){
   document.getElementById('weatherBar').classList.remove('show');
   // نخفيه لبقية اليوم فقط — يرجع يظهر بكرة بطقس جديد
@@ -9449,7 +9458,7 @@ const WEATHER_CODES = {
   51:['🌦️','رذاذ خفيف'], 53:['🌦️','رذاذ'], 55:['🌦️','رذاذ كثيف'],
   61:['🌧️','مطر خفيف'], 63:['🌧️','مطر'], 65:['🌧️','مطر غزير'],
   80:['🌦️','زخات مطر'], 81:['🌧️','زخات غزيرة'], 82:['⛈️','زخات شديدة'],
-  95:['⛈️','عاصفة رعدية'], 96:['⛈️','عاصفة مع برد'],
+  95:['⛈️','عاصفة رعدية'], 96:['⛈️','عاصفة مع برد'], 99:['⛈️','عاصفة مع برد شديد'],
 };
 
 async function initWeatherBar(){
@@ -9459,15 +9468,25 @@ async function initWeatherBar(){
   if(localStorage.getItem('rahhala_weather_dismissed') === new Date().toISOString().slice(0,10)) return;
   try{
     // خدمة مفتوحة بلا مفتاح — إحداثيات الدوحة
-    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=25.29&longitude=51.53&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=Asia%2FQatar');
+    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=25.29&longitude=51.53&current=temperature_2m,relative_humidity_2m,wind_speed_10m,pressure_msl,weather_code&timezone=Asia%2FQatar');
     if(!res.ok) throw new Error('bad response');
     const j = await res.json();
     const cur = j.current;
-    const [icon, desc] = WEATHER_CODES[cur.weather_code] || ['🌡️','—'];
+    const [icon, desc] = WEATHER_CODES[cur.weather_code] || ['🌤️', ''];
+    // العناصر الأربعة بترتيب الكتاب ورموزه (سابع، الوحدة ١، الدرس ١): 🌡️ الحرارة · 🔽 الضغط · 💨 الرياح · 💧 الرطوبة
+    // الضغط: pressure_msl بالهكتوباسكال، وهو يساوي الملّيبار عددياً. أي قيمة ناقصة يُحذف عنصرها بدل عرض «—»
+    const num = v => (typeof v === 'number' && isFinite(v)) ? Math.round(v) : null;
+    const parts = [
+      desc,
+      num(cur.temperature_2m)      !== null && `🌡️ ${num(cur.temperature_2m)}°م`,
+      num(cur.pressure_msl)        !== null && `🔽 ضغط ${num(cur.pressure_msl)} ملّيبار`,
+      num(cur.wind_speed_10m)      !== null && `💨 رياح ${num(cur.wind_speed_10m)} كم/س`,
+      num(cur.relative_humidity_2m)!== null && `💧 رطوبة ${num(cur.relative_humidity_2m)}%`,
+    ].filter(Boolean);
+    if(parts.length < 2) throw new Error('incomplete data');
     document.getElementById('weatherText').innerHTML =
-      `${icon} <strong>الدوحة الآن:</strong> ${Math.round(cur.temperature_2m)}° · ${desc}` +
-      ` · 💧 رطوبة ${cur.relative_humidity_2m}% · 💨 رياح ${Math.round(cur.wind_speed_10m)} كم/س` +
-      ` <span class="wbHint">— عناصر المناخ من الوحدة الأولى!</span>`;
+      `${icon} <strong>طقس الدوحة الآن:</strong> ${parts.join(' · ')}` +
+      ` <span class="wbHint">— الطقس حالة الجو المتغيرة يومياً (سابع: عناصر المناخ · ثامن: الغلاف الجوي)</span>`;
     bar.classList.add('show');
   } catch(e){
     // فشل الاتصال — ما نعرض شريطاً فاضياً أو رسالة خطأ مزعجة
