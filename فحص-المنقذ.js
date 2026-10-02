@@ -10,8 +10,8 @@
  *   ٢) لا تكرار: لا إجابتان متطابقتان ولا مفتاح يخدم مدخلين
  *   ٣) السياق: الأسئلة المستقلة لا تتلوّث، وأسئلة المتابعة تبقى على موضوعها
  *   ٤) الصف الثامن: ١ و٢ نفسهما على KNOWLEDGE_BASE_8
- *   ٥) الفصل بين المنهجين: مفاهيم كل صف لا تُجاب من معرفته على الصف الآخر،
- *      ولا بعد تبديل الصف وسط المحادثة («ليش؟» بعد التبديل)
+ *   ٥) الإجابة عبر الصفين: سؤال من منهج الصف الآخر يُجاب تلقائياً منه موسوماً
+ *      «📘 من منهج الصف …» — لا تسرّب بلا وسم ولا «لا أعرف»، ولا بعد تبديل الصف
  *
  * يحتاج jsdom:  npm install jsdom
  */
@@ -108,21 +108,26 @@ setTimeout(() => {
     window.__self8 = selfTest(KNOWLEDGE_BASE_8);
     window.__dup8 = dupTest(KNOWLEDGE_BASE_8);
 
-    // ٥) الفصل بين المنهجين
-    const texts7 = KNOWLEDGE_BASE.flatMap(e => e.extra ? [e.a, e.extra] : [e.a]);
-    const texts8 = KNOWLEDGE_BASE_8.flatMap(e => e.extra ? [e.a, e.extra] : [e.a]);
+    // ٥) الإجابة التلقائية عبر الصفين: سؤال من منهج الصف الآخر يُجاب منه
+    //    مع وسم «📘 من منهج الصف …» — لا تسرّب بلا وسم، ولا «لا أعرف»
+    const only = (a, b) => { const sb = new Set(b); return a.filter(x => !sb.has(x)); };
+    const t7 = KNOWLEDGE_BASE.flatMap(e => e.extra ? [e.a, e.extra] : [e.a]);
+    const t8 = KNOWLEDGE_BASE_8.flatMap(e => e.extra ? [e.a, e.extra] : [e.a]);
+    const texts7 = only(t7, t8), texts8 = only(t8, t7);
     const leak = [];
-    const check = (grade, q, forbidden) => {
-      const t = (matchKnowledge(q) || {}).text || '';
-      if(forbidden.some(x => t.includes(x))) leak.push({grade, q, t: t.slice(0,50)});
+    const check = (grade, q, other, otherName, mustAnswer) => {
+      const r = matchKnowledge(q) || {}, t = r.text || '';
+      const tagged = t.startsWith('📘 من منهج الصف ' + otherName);
+      if(mustAnswer && (!t || r.kind === 'unknown')) leak.push({grade, q, t: 'لا إجابة'});
+      else if(!tagged && other.some(x => t.includes(x))) leak.push({grade, q, t: 'بلا وسم: ' + t.slice(0,50)});
     };
     applyGrade(8, false);
-    KNOWLEDGE_BASE.forEach(e => { lastTopic = null; contextTokens = []; check(8, e.k[0], texts7); });
+    KNOWLEDGE_BASE.forEach(e => { lastTopic = null; contextTokens = []; check(8, e.k[0], texts7, 'السابع', true); });
     applyGrade(7, false);
-    KNOWLEDGE_BASE_8.forEach(e => { lastTopic = null; contextTokens = []; check(7, e.k[0], texts8); });
-    // تبديل الصف وسط المحادثة ثم سؤال متابعة
-    applyGrade(8, false); matchKnowledge('الوشاح'); applyGrade(7, false); check(7, 'ليش؟', texts8);
-    applyGrade(7, false); matchKnowledge('حمورابي'); applyGrade(8, false); check(8, 'ليش؟', texts7);
+    KNOWLEDGE_BASE_8.forEach(e => { lastTopic = null; contextTokens = []; check(7, e.k[0], texts8, 'الثامن', true); });
+    // تبديل الصف وسط المحادثة ثم سؤال متابعة: لا تسرّب بلا وسم
+    applyGrade(8, false); matchKnowledge('الوشاح'); applyGrade(7, false); check(7, 'ليش؟', texts8, 'الثامن', false);
+    applyGrade(7, false); matchKnowledge('حمورابي'); applyGrade(8, false); check(8, 'ليش؟', texts7, 'السابع', false);
     window.__sep = { n: KNOWLEDGE_BASE.length + KNOWLEDGE_BASE_8.length + 2, leak };
     applyGrade(7, false);
   `);
@@ -197,12 +202,12 @@ setTimeout(() => {
 
     // ٥
     const sep = w.__sep || { n: 0, leak: [{q:'تعذّر تشغيل الفحص', grade:0, t:''}] };
-    console.log(`\n٥) الفصل بين المنهجين — ${sep.n - sep.leak.length}/${sep.n}`);
+    console.log(`\n٥) الإجابة عبر الصفين — ${sep.n - sep.leak.length}/${sep.n}`);
     if (sep.leak.length) {
       failed += sep.leak.length;
-      sep.leak.slice(0, 12).forEach(l => console.log(`   ❌ الصف ${l.grade} «${l.q}» أجاب من معرفة الصف الآخر: ${l.t}`));
+      sep.leak.slice(0, 12).forEach(l => console.log(`   ❌ الصف ${l.grade} «${l.q}» → ${l.t}`));
     } else {
-      console.log('   ✓ لا صف يجيب من معرفة الآخر، ولا بعد تبديل الصف');
+      console.log('   ✓ كل مفهوم من الصف الآخر يُجاب موسوماً، ولا تسرّب بعد تبديل الصف');
     }
 
     console.log(`\n${line}`);
