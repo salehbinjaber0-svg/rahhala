@@ -1511,6 +1511,23 @@
   .btn-outline:hover{background:rgba(220,167,58,.15);}
   .hero .btn-outline{border-color:var(--navy); color:var(--navy);}
 
+  /* ===== دور الطالب: «الدور على…» فوق السؤال (حصة اليوم والألعاب) ===== */
+  .lsTurn{display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:10px;
+    margin:12px auto 0; padding:10px 16px; max-width:920px; width:calc(100% - 32px); border-radius:16px;
+    background:var(--grad-navy); border:2px solid var(--gold); color:#ffffff; font-family:'Cairo'; position:relative; z-index:1;}
+  .lsTurn[hidden]{display:none;}
+  .tnMsg{font-weight:800; font-size:1.3rem;}
+  .tnMsg b{color:var(--gold-light);}
+  .tnBtn{font-family:'Cairo'; font-weight:800; font-size:1rem; padding:7px 16px; border-radius:12px; cursor:pointer;}
+  .tnBtn.ok{background:var(--gold); color:var(--navy-deep); border:none;}
+  .tnBtn.ghost{background:rgba(0,0,0,.2); color:var(--gold-light); border:1.5px solid rgba(220,167,58,.6);}
+  .tnX{background:none; border:none; color:#f4ede7; font-size:1.1rem; cursor:pointer; padding:4px 8px;}
+  #gmTurn{width:auto; margin:0 0 18px;}
+  .gmTurnBar{display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:16px;}
+  .gmTurnBar[hidden]{display:none;}
+  .gmCls{font-family:'Cairo'; font-weight:800; padding:6px 10px; border-radius:10px; border:1.5px solid rgba(220,167,58,.6); background:var(--navy-deep); color:var(--gold-light);}
+  .gmWheelBtn{font-family:'Cairo'; font-weight:800; padding:7px 16px; border-radius:12px; border:none; cursor:pointer; background:var(--gold); color:var(--navy-deep);}
+
   /* ===== الواجهة: حافة العلم القطري وأفق الدوحة (بعد قواعد .hero العامة عمداً) ===== */
   .heroFlag{position:absolute; inset-inline-end:0; top:0; width:64px; height:100%; color:var(--navy); pointer-events:none; z-index:0;}
   .heroSky{position:absolute; bottom:0; inset-inline-end:8%; width:min(900px,70%); height:62%; color:var(--navy); opacity:.06; pointer-events:none; z-index:0;}
@@ -2298,12 +2315,14 @@
     <div style="display:flex; align-items:center; gap:11px; flex-wrap:wrap;">
       <select class="lsClsSel" id="lsCls" onchange="lsSetCls(this.value)" title="الإجابة الصحيحة تمنح نقطة مشاركة لطالب من هذا الصف"></select>
       <div class="lsTimer" id="lsTimer"></div>
-      <button class="lsTimerBtn" onclick="openWheel(lsCls)" title="عجلة الأسماء">🎡 العجلة</button>
+      <button class="lsTimerBtn" onclick="openWheel(lsCls, 'ls')" title="عجلة الأسماء: تختار طالباً ثم تعود للسؤال">🎡 العجلة</button>
       <button class="lsTimerBtn" onclick="openLucky(lsCls)" title="الطالب المحظوظ">🍀 المحظوظ</button>
       <button class="lsTimerBtn" id="lsTimerBtn" onclick="lsToggleTimer()">⏱️ ٣٠ ثانية</button>
       <div class="lsCount" id="lsCount"></div>
     </div>
   </div>
+  <!-- «الدور على…»: يملؤه turnRender بعد العجلة — النجمة تُعتمد بعد الإجابة لا قبلها -->
+  <div class="lsTurn" id="lsTurn" hidden></div>
   <div class="lsStage">
     <div class="lsQ" id="lsQ"></div>
     <div id="lsAWrap"></div>
@@ -2452,6 +2471,12 @@
     <p class="lead">جاوب صح في أسئلة المراجعة تكسب طاقة، واستخدم طاقتك للعب في الملعب.</p>
 
     <div class="gameArea">
+      <!-- وضع الصف (للمعلم): العجلة تختار طالباً، وإجابته الصحيحة نجمة مشاركة في «صفوفي» -->
+      <div class="gmTurnBar" id="gmTurnBar" hidden>
+        <select class="gmCls" id="gmCls" onchange="gmSetCls(this.value)" title="صف النجوم"></select>
+        <button class="gmWheelBtn" onclick="openWheel(gmCls, 'game')">🎡 اختر طالباً</button>
+      </div>
+      <div class="lsTurn" id="gmTurn" hidden></div>
       <div class="gameTabs">
         <button class="gtab active" data-panel="quiz">🧠 مراجعة سريعة</button>
         <button class="gtab" data-panel="fun">⚽ ركلات الترجيح</button>
@@ -3897,6 +3922,7 @@ function answer(i, correctIdx, btn, box, questionId){
     if(questionId) missedQuestionIds.add(questionId); // يرجع يُعاد عليه أكثر لحد ما يتقنه
   }
   if(sb && questionId){ sb.from('answer_log').insert({question_id: questionId, correct: isCorrect}); } // تسجيل للتقرير — لا ننتظر النتيجة، ما يبطّئ التجربة
+  if(turnOpen('game')){ if(isCorrect) turnAward(); else turnMiss(); }   // طالب العجلة: نجمته في صفوفي
   const newly = checkBadges();
   persist();
   renderEnergy();   // الطاقة تغيّرت — كان العدّاد يبقى على قيمته القديمة
@@ -4053,6 +4079,7 @@ function checkOrder(){
   if(correctCount === total){
     state.points += 20;
     status.textContent = '🎉 ممتاز! الترتيب صحيح بالكامل — +20 نقطة';
+    if(turnOpen('game')) turnAward();
     status.style.color = 'var(--teal)';
     playSound('correct');
     const newly = checkBadges();
@@ -4688,8 +4715,10 @@ function lsPick(i){
     if(lsCurrentAct) lsStatAnswer(lsCurrentAct, lsIndex, lsWrongHere.has(lsIndex) ? 'after' : 'first');
     lsSeen.add(lsIndex);
     renderLessonShowDots();
+    // طالب اختارته العجلة: إجابته الصحيحة نجمته مباشرة، والمعلم يتابع بنفسه (لا انتقال تلقائي)
+    if(turnOpen('ls') && turn.idx === lsIndex) turnAward();
     // مع صف للنقاط: الانتقال التلقائي ينتظر اختيار الطالب، وإلا سبق المعلمَ
-    if(lsCanAward()){ lsShowAward(); if(lsAwards[lsIndex]) lsStartAuto(); }
+    else if(lsCanAward()){ lsShowAward(); if(lsAwards[lsIndex]) lsStartAuto(); }
     else lsStartAuto();
     const rv = document.getElementById('lsRevealBtn');
     if(rv) rv.style.display = 'none';
@@ -4699,6 +4728,7 @@ function lsPick(i){
       lsWrongHere.add(lsIndex);
       lsStatAnswer(lsCurrentAct, lsIndex, 'wrong');
     }
+    if(turnOpen('ls') && turn.idx === lsIndex) turnMiss();   // طالب العجلة أخطأ: لا نجمة، والمعلم يلفّ لغيره
     wrap.insertAdjacentHTML('beforeend', `<div class="lsOops">${lsOopsText()}</div>`);
     setTimeout(()=>{
       const o = wrap.querySelector('.lsOops');
@@ -4766,6 +4796,7 @@ function openLessonShow(){
 }
 
 function closeLessonShow(){
+  if(turn.ctx === 'ls') turnClear();
   lsClosePicker();
   lsStopTimer();
   lsCancelAuto();
@@ -4787,6 +4818,7 @@ function lsKeys(e){
 function renderLessonShow(){
   const q = lessonQs[lsIndex];
   if(!q) return;
+  if(turn.ctx === 'ls' && turn.idx !== lsIndex) turnClear();   // فقرة جديدة ← دور جديد
   const kind = q.kind || 'essay';
   const cfg = LQ_KINDS[kind] || LQ_KINDS.essay;
   const qEl = document.getElementById('lsQ');
@@ -4965,6 +4997,8 @@ function lsAwardHtml(){
 function lsShowAward(){
   const wrap = document.getElementById('lsAWrap');
   if(!wrap || !lsCanAward()) return;
+  // شريط الدور يتولى النجمة لهذه الفقرة — إلا إن أخطأ طالبه فيعود «مَن أجاب؟» لمن يجيب بعده
+  if(turn.ctx === 'ls' && turn.idx === lsIndex && turn.res !== 'miss') return;
   wrap.querySelectorAll('.lsAward').forEach(e => e.remove());
   wrap.insertAdjacentHTML('beforeend', `<div class="lsAward">${lsAwardHtml()}</div>`);
 }
@@ -5050,12 +5084,16 @@ async function lsUndoAward(){
 const WH_COLORS = [['#a71944','#ffffff'], ['#dca73a','#4f0c20'], ['#175a4a','#ffffff'],
                    ['#7a3030','#ffffff'], ['#1f5068','#ffffff'], ['#ebc578','#4f0c20']];
 const wh = {cls:'', all:[], pool:[], absent:0, pickedBy:{}, angle:0, spinning:false,
-            winner:null, winIdx:-1, awarded:false, req:0, timer:null, lastIdx:-1, lastTick:0, ac:null, msg:''};
+            winner:null, winIdx:-1, awarded:false, req:0, timer:null, lastIdx:-1, lastTick:0, ac:null, msg:'',
+            ctx:'', goTimer:null};   // ctx: 'ls' (حصة اليوم) أو 'game' (الألعاب) — العجلة تعود للسؤال ولا تمنح نجمة
 
-function openWheel(cls){
+// ctx اختياري: من شاشة سؤال ('ls' أو 'game') تختار العجلة طالباً ثم تُغلق وتعود للسؤال،
+// والنجمة تُعتمد هناك بعد أن يجيب. بدونه (صفوفي/الرئيسية) تبقى كما هي بزر النجمة.
+function openWheel(cls, ctx){
   if(!isAdmin){ showToast('هذي الأداة للمعلم فقط', 'error'); return; }
   if(!requireDb()) return;
   if(lkOpen()) closeLucky();
+  wh.ctx = ctx || '';
   // الصفوف من أزرار صفوفي ولوحة المعلم معاً — أي صف يُضاف هناك يظهر هنا تلقائياً
   const classes = [];
   document.querySelectorAll('.myClassBtn, .rosterClassBtn').forEach(b=>{
@@ -5077,6 +5115,7 @@ function openWheel(cls){
 
 function closeWheel(){
   whStopSpin();
+  if(wh.goTimer){ clearTimeout(wh.goTimer); wh.goTimer = null; }
   if(document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(()=>{});
   const m = document.getElementById('wheelModal');
   m.classList.remove('full', 'spinning');
@@ -5195,6 +5234,14 @@ function whResult(){
   const left = wh.pool.length, total = wh.all.length;
   const absentTxt = wh.absent ? ` · استُبعد ${wh.absent} غائب اليوم` : '';
   if(wh.msg){ box.innerHTML = `<div class="whHint ${wh.msg.startsWith('⏳') ? '' : 'whErr'}">${esc(wh.msg)}</div>`; return; }
+  if(wh.winner && wh.ctx){
+    // من شاشة سؤال: لا نجمة هنا — الطالب لم يُجب بعد. نعود للسؤال (تلقائياً بعد لحظات)
+    box.innerHTML = `<div class="whWinLbl">🎯 الدور على</div>
+      <div class="whWinName">${esc(wh.winner.name)}</div>
+      <div class="whActs"><button class="whPt" onclick="whGo()">🎤 يجاوب الآن ←</button><button class="whGhost" onclick="whSpin()">🎡 لفّة جديدة</button></div>
+      <div class="whHint">يعود للسؤال تلقائياً…</div>`;
+    return;
+  }
   if(wh.winner){
     const pt = wh.awarded
       ? `<span class="whPtDone">⭐ +١ نقطة مشاركة</span><button class="whGhost" onclick="whUndo()">↩️ تراجع</button>`
@@ -5218,6 +5265,7 @@ function whResetPicked(){ whPicked().clear(); whSavePicked(); wh.winner = null; 
 
 function whSpin(){
   if(wh.spinning || !whOpen()) return;
+  if(wh.goTimer){ clearTimeout(wh.goTimer); wh.goTimer = null; }
   if(wh.winner){ wh.winner = null; whPaint(); }      // من طلع اسمه ينشال قبل اللفّة الجديدة
   const n = wh.pool.length;
   if(!n) return;
@@ -5226,9 +5274,9 @@ function whSpin(){
   const jitter = (Math.random() - 0.5) * seg * 0.6;
   const want = ((360 - ((w + 0.5) * seg + jitter)) % 360 + 360) % 360;   // الزاوية التي تضع الشريحة تحت المؤشر
   const cur = wh.angle;
-  const target = cur - ((cur % 360) + 360) % 360 + 360 * 7 + want;
+  const target = cur - ((cur % 360) + 360) % 360 + 360 * 5 + want;
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const dur = reduce ? 900 : 6200;
+  const dur = reduce ? 900 : 4000;   // كان ٦٢٠٠ — طويل داخل الحصة
   const g = document.getElementById('whRot');
   g.querySelectorAll('.whSeg.win').forEach(s => s.classList.remove('win'));
   g.style.transition = `transform ${dur}ms cubic-bezier(.12,.72,.06,1)`;
@@ -5303,7 +5351,95 @@ function whDone(w){
   whResult();
   playSound('badge');
   whConfetti();
+  if(wh.ctx) wh.goTimer = setTimeout(whGo, 2500);
 }
+
+// يعيد العجلة إلى شاشة السؤال ومعها «الدور على…»
+function whGo(){
+  if(wh.goTimer){ clearTimeout(wh.goTimer); wh.goTimer = null; }
+  if(!wh.winner || !wh.ctx || !whOpen()) return;
+  const ctx = wh.ctx;
+  turnSet(ctx, wh.cls, wh.winner);
+  closeWheel();
+  wh.ctx = '';
+}
+
+// ═══════ دور الطالب: العجلة تختار ← الطالب يجيب ← النجمة تُعتمد بضغطة ═══════
+// كانت العجلة تطلب النجمة لحظة توقّفها والسؤال مختفٍ خلفها، فيُعتمد قبل أن يجيب الطالب.
+// الآن الإجابة الصحيحة (نقر الخيار الصحيح، أو «أجاب صح» للمقالي) تمنحه النجمة مباشرة.
+const turn = {ctx:'', cls:'', id:null, name:'', idx:-1, res:''};   // res: '' | 'star' | 'miss'
+function turnSet(ctx, cls, who){
+  turnClear();
+  Object.assign(turn, {ctx, cls, id: who.id, name: who.name, idx: ctx === 'ls' ? lsIndex : -1, res:''});
+  if(ctx === 'ls'){ lsCancelAuto(); document.querySelectorAll('#lsAWrap .lsAward').forEach(e => e.remove()); }
+  turnRender();
+}
+function turnClear(){
+  Object.assign(turn, {ctx:'', cls:'', id:null, name:'', idx:-1, res:''});
+  ['lsTurn', 'gmTurn'].forEach(id => { const b = document.getElementById(id); if(b){ b.hidden = true; b.innerHTML = ''; } });
+}
+function turnOpen(ctx){ return turn.ctx === ctx && turn.id != null && !turn.res; }
+function turnRender(){
+  const box = document.getElementById(turn.ctx === 'game' ? 'gmTurn' : 'lsTurn');
+  if(!box || !turn.ctx) return;
+  const nm = `<b>${esc(turn.name)}</b>`;
+  let body;
+  if(turn.res === 'star') body = `<span class="tnMsg">⭐ +١ نقطة مشاركة لـ${nm}</span><button class="tnBtn ghost" onclick="turnUndo()">↩️ تراجع</button>`;
+  else if(turn.res === 'miss') body = `<span class="tnMsg">❌ ${nm} لم يُصب</span>`;
+  else body = `<span class="tnMsg">🎤 الدور على ${nm}</span>
+    <button class="tnBtn ok" onclick="turnAward()">⭐ أجاب صح</button><button class="tnBtn ghost" onclick="turnMiss()">❌ لم يُصب</button>`;
+  box.innerHTML = body + `<button class="tnBtn ghost" onclick="turnSpin('${turn.ctx}')">🎡 ${turn.res ? 'الطالب التالي' : 'غيره'}</button>
+    <button class="tnX" onclick="turnClear()" title="إنهاء الدور" aria-label="إنهاء الدور">✕</button>`;
+  box.hidden = false;
+}
+function turnSpin(ctx){ openWheel(ctx === 'game' ? gmCls : (turn.cls || lsCls), ctx); }
+function turnMiss(){ if(!turnOpen(turn.ctx)) return; turn.res = 'miss'; turnRender(); }
+async function turnAward(){
+  if(!isAdmin || !requireDb() || !turnOpen(turn.ctx)) return;
+  const who = {...turn};
+  turn.res = 'star';
+  turnRender();
+  if(who.ctx === 'ls') lsAwards[who.idx] = {id: who.id, name: who.name};   // تمنع منح نقطة ثانية للفقرة نفسها
+  lsConfetti(10);
+  const err = await lsBumpPoints(who.id, +1);
+  if(err){
+    if(who.ctx === 'ls') delete lsAwards[who.idx];
+    if(turn.id === who.id && turn.ctx === who.ctx){ turn.res = ''; turnRender(); }
+    showToast('تعذر حفظ النقطة: ' + err.message, 'error');
+    return;
+  }
+  if(myClassData.some(r => r.id === who.id)) renderMyClassTable();
+}
+async function turnUndo(){
+  if(!isAdmin || !requireDb() || turn.res !== 'star') return;
+  const who = {...turn};
+  turn.res = '';
+  turnRender();
+  if(who.ctx === 'ls') delete lsAwards[who.idx];
+  const err = await lsBumpPoints(who.id, -1);
+  if(err){
+    if(who.ctx === 'ls') lsAwards[who.idx] = {id: who.id, name: who.name};
+    if(turn.id === who.id){ turn.res = 'star'; turnRender(); }
+    showToast('تعذر التراجع: ' + err.message, 'error');
+    return;
+  }
+  if(myClassData.some(r => r.id === who.id)) renderMyClassTable();
+}
+
+// صف النجوم في الألعاب (وضع الصف)
+let gmCls = '';
+function gmSetup(){
+  const bar = document.getElementById('gmTurnBar');
+  if(!bar) return;
+  bar.hidden = !isAdmin;
+  if(!isAdmin) return;
+  const sel = document.getElementById('gmCls');
+  const classes = [...document.querySelectorAll('.myClassBtn')].map(b => ({cls: b.dataset.cls, label: b.textContent.trim()})).filter(c => c.cls);
+  if(!classes.some(c => c.cls === gmCls)) gmCls = classes.some(c => c.cls === myClassCls) ? myClassCls : (classes[0] ? classes[0].cls : '');
+  sel.innerHTML = classes.map(c => `<option value="${esc(c.cls)}">⭐ ${esc(c.label)}</option>`).join('');
+  sel.value = gmCls;
+}
+function gmSetCls(v){ gmCls = v; if(turn.ctx === 'game') turnClear(); }
 
 function whConfetti(){ whConfettiIn(document.getElementById('wheelModal')); }
 // قصاصات داخل النافذة نفسها — في ملء الشاشة لا يظهر إلا ما بداخل العنصر المكبَّر
@@ -6350,6 +6486,8 @@ function openAdminPanel(){
 function setAdminActive(active){
   isAdmin = active;
   if(!active && state && state.practice){ state = null; renderEnergy(); renderBadges(); }   // ينتهي وضع الصف بخروج المعلم
+  if(!active) turnClear();
+  gmSetup();
   document.getElementById('adminChip').classList.toggle('active', active);
   if(!active) document.getElementById('adminPanel').classList.remove('show');
   document.getElementById('adminLogoutTop').classList.toggle('show', active);
