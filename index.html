@@ -7266,7 +7266,7 @@ function stripPrefix(word){
 
 // كلمات استفهام وحشو لا تحمل معنى بحثياً — استبعادها يمنعها من تعطيل المطابقة
 // أعداد مكتوبة تُستبعد من البحث ("اذكر ثلاث عوامل" → "عوامل")
-const NUMBER_WORDS = new Set(['واحد','اثنين','اثنان','ثلاث','ثلاثة','ثلاثه','اربع','اربعة','اربعه','خمس','خمسة','خمسه','ست','ستة','سته','سبع','سبعة','ثمان','ثمانية','تسع','عشر','عشرة','بعض','اهم','أهم','ابرز','أبرز','اشهر','أشهر','اكبر','أكبر']);
+const NUMBER_WORDS = new Set(['واحد','واحده','اثنين','اثنان','ثلاث','ثلاثة','ثلاثه','اربع','اربعة','اربعه','خمس','خمسة','خمسه','ست','ستة','سته','سبع','سبعة','ثمان','ثمانية','تسع','عشر','عشرة','بعض','اهم','أهم','ابرز','أبرز','اشهر','أشهر','اكبر','أكبر']);
 
 const STOPWORDS = new Set(['كم','عدد','ما','ماهي','ماهو','هي','هو','وش','ايش','هل','من','الى','على','في','عن','مع','هذا','هذي','هذه','ذلك','التي','الذي','يعني','قصد','المقصود','تعريف','معني','معنى','اذكر','عدد','بين','وضح','اشرح','عرف','لي','لنا','كان','هناك',
   // حشو عامّي شائع بأسئلة الطلاب («شنو»، «مين»، «ابي اعرف»…). أدوات مثل «ليش/كيف/متى»
@@ -7274,13 +7274,17 @@ const STOPWORDS = new Set(['كم','عدد','ما','ماهي','ماهو','هي','
   'شنو','شو','مين','ماذا','اللي','الي','ابي','ابغى','ابغي','ممكن','عطني','اعطني','قولي','لو','سمحت','تكفى','اعرف','ودي']
   // تُطبَّع كما تُطبَّع كلمات السؤال: «على» تصير «علي» و«إلى» تصير «الي» — كانتا لا تُستبعدان أبداً
   .flatMap(w => [normalizeArabic(w), stripPrefix(normalizeArabic(w))]));
+// ضمائر وأدوات ربط وكلمة «الجهة» العامة («ما الجهة التي…») — كانت تُحسب كلمات بحث فتُفشل المطابقة.
+// تُضاف بلا stripPrefix: «فيه/فيها» تبدأ بالفاء فتستدعي معجم الصف قبل تعريفه (خطأ تحميل)
+['كلما','عنه','عنها','منه','منها','فيه','فيها','له','لها','كل','عندما','اذا','جهه','الجهه','تكون','يكون'].forEach(w => STOPWORDS.add(normalizeArabic(w)));
 
 // أفعال يسأل بها الطالب ومصدرها الذي يرد بالمفاتيح ونص الكتاب:
 // «متى قامت الدولة العباسية» = «قيام» · «متى بنيت بغداد» = «بناء» · «سقطت» = «سقوط»
 const VERB_TO_NOUN = {
   'قام':'قيام','قامت':'قيام','سقط':'سقوط','سقطت':'سقوط','اسقط':'سقوط','اسقطوا':'سقوط',
   'تاسس':'تاسيس','تاسست':'تاسيس','نشا':'نشاه','نشات':'نشاه','بني':'بناء','بنيت':'بناء','بنوا':'بناء',
-  'فتحت':'فتح','فتحوا':'فتح'
+  'فتحت':'فتح','فتحوا':'فتح',
+  'ارتفع':'ارتفاع','ارتفعت':'ارتفاع','ارتفعنا':'ارتفاع','انخفض':'انخفاض','انخفضت':'انخفاض'
 };
 function normalizeToken(t){
   if(VERB_TO_NOUN[t]) return VERB_TO_NOUN[t];
@@ -7396,12 +7400,18 @@ const FOLLOWUP_WORDS = ["ليش","لماذا","سبب","مثال","امثله","
 
 // جودة تطابق كلمة من السؤال مع كلمة من المفتاح:
 // 1 حرفياً · 0.9 نفس الكلمة بلاحقة أو جمعها · 0.7 تصحيح إملائي · 0 لا تطابق
+function presentSwap(q, k){
+  // الجذع أولاً ثم حرف المضارع: «يمثّله» ← «يمثل» ← «مثل» = «تمثل» ← «مثل»
+  if(q.length < 4 || k.length < 4 || q[0] === k[0] || !'يتن'.includes(q[0]) || !'يتن'.includes(k[0])) return false;
+  const a = stemOf(q).slice(1), b = stemOf(k).slice(1);
+  return a.length >= 3 && a === b;
+}
 function matchQuality(q, k){
   if(q === k) return 1;
-  if(sameStem(q, k) || pluralMatch(q, k)) return 0.9;
+  if(sameStem(q, k) || pluralMatch(q, k) || presentSwap(q, k)) return 0.9;
   return wordsClose(q, k) ? 0.7 : 0;
 }
-const KW_TOKENS = new Map(); // تقطيع المفاتيح مرة واحدة بدل كل سؤال
+let KW_TOKENS = new Map(); // تقطيع المفاتيح مرة واحدة بدل كل سؤال (let: يُبدَّل مع سياق الصف في withGrade)
 function kwTokens(kw){
   if(!KW_TOKENS.has(kw)) KW_TOKENS.set(kw, tokenize(kw));
   return KW_TOKENS.get(kw);
@@ -7795,7 +7805,57 @@ function needsContext(query, qTokens){
   return false;
 }
 
+// ═══════ المنقذ يجيب من منهجي السابع والثامن تلقائياً (طلب المالك) ═══════
+// كل فهارس البحث (المعرفة، نص الكتاب، المعجم، معاجم الوحدات) مبنية لصف واحد.
+// withGrade يشغّل البحث بسياق صف آخر دون المساس بالصف النشط بالموقع، ويحفظ فهارس كل صف
+// فلا تُبنى إلا مرة واحدة. ترتيب البحث: الصف المذكور بالسؤال («…بالثامن») ثم النشط ثم الآخر.
+const GRADE_CACHE = {7:null, 8:null};
+function gradeSnapshot(){ return {UNITS, KB_ACTIVE, CURRICULUM_CORPUS, KB_TERMS, LEXICON, KW_TOKENS, UNIT_LEX, KEY_UNITS, KEY_ENTRIES}; }
+function gradeRestore(c){ ({UNITS, KB_ACTIVE, CURRICULUM_CORPUS, KB_TERMS, LEXICON, KW_TOKENS, UNIT_LEX, KEY_UNITS, KEY_ENTRIES} = c); }
+function withGrade(g, fn){
+  if(g === GRADE) return fn();
+  const saved = gradeSnapshot();
+  gradeRestore(GRADE_CACHE[g] || {UNITS: g === 8 ? UNITS_DATA_8 : UNITS_DATA, KB_ACTIVE: g === 8 ? KNOWLEDGE_BASE_8 : KNOWLEDGE_BASE,
+    CURRICULUM_CORPUS:null, KB_TERMS:null, LEXICON:null, KW_TOKENS:new Map(), UNIT_LEX:null, KEY_UNITS:null, KEY_ENTRIES:null});
+  try{ return fn(); }
+  finally{ GRADE_CACHE[g] = gradeSnapshot(); gradeRestore(saved); }
+}
+// قوة الجواب: ٣ جواب موثوق من المعرفة أو غيره (تنقل، نصائح…) · ٢ اقتباس من نص الكتاب ·
+// ١ «أقرب ما لقيته» · ٠ لا جواب
+function answerStrength(r){
+  if(!r || !r.text || r.kind === 'unknown') return 0;
+  if(r.src === 'precise') return 3;   // مقطع الكتاب الدقيق لمفهوم مؤكَّد
+  if(r.text.startsWith('📌')) return 1;
+  if(/📄 صفحة/.test(r.text) && !/\(الوحدة \d+\)/.test(r.text)) return 2;
+  return 3;
+}
+function gradeLabel(g){ return g === 8 ? 'الثامن' : 'السابع'; }
+function tagGrade(r, g){
+  if(!r || !r.text || r.kind === 'unknown' || g === GRADE) return r;
+  return {...r, text: `📘 من منهج الصف ${gradeLabel(g)}:\n` + r.text};
+}
 function matchKnowledge(query){
+  const nq = normalizeArabic(query);
+  const asked = /ثامن/.test(nq) ? 8 : /سابع/.test(nq) ? 7 : null;
+  const first = asked || GRADE, second = first === 7 ? 8 : 7;
+  const realLog = logUnanswered, ctx0 = [lastTopic, contextTokens];
+  logUnanswered = () => {};   // لا نسجّل «بلا جواب» قبل تجربة المنهجين معاً
+  let r1, ctx1;
+  try{
+    r1 = withGrade(first, () => matchKnowledgeIn(query));
+    const s1 = answerStrength(r1);
+    if(s1 >= 3) return tagGrade(r1, first);
+    ctx1 = [lastTopic, contextTokens];
+    [lastTopic, contextTokens] = ctx0;
+    const r2 = withGrade(second, () => matchKnowledgeIn(query));
+    if(answerStrength(r2) > s1) return tagGrade(r2, second);
+    [lastTopic, contextTokens] = ctx1;
+  } finally { logUnanswered = realLog; }
+  if(r1 && r1.kind === 'unknown') logUnanswered(query);
+  return tagGrade(r1, first);
+}
+
+function matchKnowledgeIn(query){
   let qTokens = tokenize(query);
 
   // لو السؤال يطابق مفهوماً مستقلاً بنفسه، فهو موضوع جديد — ما نلوّثه بسياق سابق
@@ -7883,6 +7943,19 @@ function matchKnowledge(query){
   }
 
   if(fullMatches.length > 0){
+    // المعلومة الدقيقة أولى من المفهوم العام: «تنخفض الحرارة درجة واحدة كل…» طابقت مفهوم «الحرارة»
+    // فأجاب بتعريفها، بينما نص الكتاب فيه الجملة نفسها (150 متراً). لو بقيت بالسؤال كلمات مضمونية
+    // لا يذكرها نص المفهوم، ووُجد بالكتاب مقطع يضمّها كلها، فالمقطع هو الجواب.
+    const f0 = fullMatches[0].entry;
+    const unc = qTokens.filter(t => t.length >= 3 && !STOPWORDS.has(t) && !QUESTION_WORDS.has(t) && !NUMBER_WORDS.has(t) && !ownHas(f0, t));
+    if(unc.length){
+      const precise = searchCurriculumDeep(qTokens);
+      if(precise && unc.every(t => precise.tokens.some(ct => matchQuality(ct, t) >= 0.9))){
+        lastTopic = { a: precise.text, extra: null };
+        contextTokens = f0.k.flatMap(k => tokenize(k)).filter(t => t.length >= 3).slice(0, 4);
+        return { text: `"${precise.text}"\n📄 صفحة ${precise.pages} بالكتاب`, chips: [], src: 'precise' };
+      }
+    }
     // سؤال مركّب («الفرق بين الإقليم الاستوائي والصحراوي»): نضيف مفهوماً ثانياً
     // فقط لو فسّر كلمة من السؤال لم يفسّرها الأول — لا تكرار لنفس الجانب
     const first = fullMatches[0];
@@ -8006,7 +8079,7 @@ function matchKnowledge(query){
     kind: 'unknown',
     text: KB_ACTIVE.length === 0
       ? `منهج الصف ${gradeName()} قيد الإضافة حالياً 📘\nتقدر تبدّل للصف السابع من قائمة «المنهج» وتسألني عن أي مفهوم فيه.`
-      : `ما عندي جواب لهذا السؤال 🙏 أنا أجيب فقط من كتاب الدراسات الاجتماعية للصف ${gradeName()}، ولا أخمّن من خارجه.\n\nوحدات منهجك: ${Object.keys(UNITS).map(n=>UNITS[n].title).join('، ')}.\n\nجرّب تسألني عن مفهوم منها:`,
+      : `ما عندي جواب لهذا السؤال 🙏 أنا أجيب فقط من كتابَي الدراسات الاجتماعية للصفين السابع والثامن، ولا أخمّن من خارجهما.\n\nوحدات منهجك: ${Object.keys(UNITS).map(n=>UNITS[n].title).join('، ')}.\n\nجرّب تسألني عن مفهوم منها:`,
     chips: gradeSampleChips()
   };
 }
