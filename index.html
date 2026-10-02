@@ -1579,7 +1579,33 @@
   .heroIntroArt{display:flex; flex-direction:column; gap:14px; text-align:start;}
   .heroIntroArt .heroPlate{max-width:none; width:100%; margin:0;}
   .heroIntroText .heroQuoteBadge{margin:6px 0 0;}
-  .heroIntroText{align-self:center;}
+  .heroIntroText{align-self:start;}   /* يبدأ بمحاذاة الطقس لا في منتصف العمود */
+  /* لوحة الأطلس بارتفاع ثابت: كانت تتراوح ٢٤٠–٤٨٠ فتقفز الصفحة مع ↻ */
+  .heroIntroArt{--mapH:250px; --plateH:440px;}
+  .heroIntroArt .heroPlate{height:var(--plateH); display:flex; flex-direction:column;}
+  .hpBodyWrap{flex:1; min-height:0; display:flex; flex-direction:column; justify-content:center;}
+  .hpBodyWrap .hpMap{margin:0 auto;}
+  /* شاشات اللابتوب القصيرة: الواجهة كلها والمتصدرون في شاشة واحدة بلا تمرير */
+  @media (max-height:820px) and (min-width:761px){
+    .hero{padding:12px 0 14px;}
+    header .wrap{padding:7px 20px;} .brand{font-size:1.3rem;}   /* الشريط ٩٠ ← ~٦٤ بكسل: مساحة للخريطة */
+    .heroEyebrow{margin-bottom:6px;}
+    .heroIntroTitle{font-size:clamp(1.5rem, 2.9vw, 2.15rem); line-height:1.55; margin-bottom:8px;}
+    .heroIntroLead{margin-bottom:12px;}
+    .heroIntroArt{--mapH:165px; --plateH:316px; gap:8px;}
+    .hdWxTop{flex-basis:100px;} .hdWxTop b{font-size:1.9rem;}
+    .hdWxInfo{padding:5px 12px;} .hdWxTop{padding:4px 6px;} .hdWxTop b{font-size:1.7rem;}
+    .heroPlate{padding:10px 14px 8px;}
+    .heroPlate p.hpNote{margin:6px 0 4px; line-height:1.6;}
+    .hpSteps li{padding:2px 0; padding-inline-start:24px;}
+    .hpCard{padding:6px 10px;}
+    .hpCard > span{line-height:1.55;}
+    #homeDash{padding:8px 0 40px;}
+    .hdLb{padding:10px 18px;}
+    .hdChips{margin-top:6px;}
+    .heroPlate .hpHead{margin-bottom:4px;}
+    .hpTitle{font-size:1.05rem;}
+  }
   @media(max-width:1260px){ .hero .wrap{padding-inline-end:84px;} }
   @media(max-width:760px){
     .heroFlag{width:24px;}
@@ -2300,9 +2326,7 @@
       <div class="heroEyebrow"><span class="ebLine"></span> مرحباً بك في منصتي التعليمية</div>
       <h1 class="heroIntroTitle">أصنع تجربة تعليمية<br>تجعل الطالب <em>مشاركاً لا متلقياً</em></h1>
       <p class="heroIntroLead">
-        الأستاذ صالح جبر ناصر — معلم دراسات اجتماعية للصفين السابع والثامن، خريج جامعة قطر،
-        وأكثر من خمس سنوات في ميدان التعليم. أوظّف التقنية والذكاء الاصطناعي لبناء
-        بيئة تعليمية تنمّي التفكير والقيادة.
+        الأستاذ صالح جبر ناصر — معلم دراسات اجتماعية للصفين السابع والثامن
       </p>
       <div class="heroQuoteBadge" id="heroQuote">« بالتعليم نبني أجيالاً أكثر وعياً »</div>
     </div>
@@ -8271,7 +8295,7 @@ async function initWeatherBar(){
       // بلا <p>: البطاقة داخل .hero وقاعدة «.hero p» العامة تكبّر خطها وتزيحها
       card.innerHTML = `<div class="hdWxTop">` + (t !== null ? `<b dir="ltr">${t}°</b>` : '') + `<span>${icon} ${esc(desc)}</span></div>` +
         `<div class="hdWxInfo"><div class="hdWxHead">طقس الدوحة الآن</div><div class="hdWxList">${items}</div>` +
-        `<div class="hdWxNote">الطقس حالة الجو المتغيرة يومياً — سابع: عناصر المناخ · ثامن: الغلاف الجوي</div></div>`;
+        `<div class="hdWxNote">📚 سابع: عناصر المناخ · ثامن: الغلاف الجوي</div></div>`;
       card.hidden = false;
     }
     // الشريط: لو أغلقه اليوم، ما نزعجه مرة ثانية
@@ -8410,7 +8434,7 @@ const HERO_PLATES = [   // الكرة الأرضية ليست هنا: صارت �
   // ═══ خرائط إقليمية وعالمية (maps/build/render-maps.mjs — الأنهار والحدود من Natural Earth) ═══
   { id:'rafidain', img:'maps/rafidain.webp', w:1100, h:678, title:'بلاد الرافدين بين دجلة والفرات',
     alt:'خريطة بلاد الرافدين: نهرا دجلة والفرات يجريان إلى الخليج العربي، ومواقع أور وبابل ونينوى',
-    labels:[['نهر الفرات',41.95,24.21],['نهر دجلة',58.05,26.15],['الخليج العربي',88.78,94.59,'sea'],
+    labels:[['نهر الفرات',35.61,22.26],['نهر دجلة',61.95,26.64],['الخليج العربي',88.78,94.59,'sea'],
             ['البحر المتوسط',6.83,45.8,'sea minor'],['العراق حالياً',46.83,54.28,'land']],
     pins:[['أور',68.8,67.65],['بابل',60.59,53],['نينوى',54.4,16.3]],
     legend:[['#59a5c4','نهرا دجلة والفرات'],['#ebc87f','العراق حالياً'],['#ebc578','عاصمة تاريخية']],
@@ -8576,7 +8600,7 @@ function hpBody(pl){
   const w = pl.w || 1100, h = pl.h || 488;
   const legend = pl.legend ? `<div class="hpLegend">${pl.legend.map(([c,t]) => `<span><i style="background:${c}"></i>${esc(t)}</span>`).join('')}</div>` : '';
   const ramp = pl.ramp ? `<div class="hpRamp"><span>${esc(pl.ramp[0])}</span><i></i><span>${esc(pl.ramp[1])}</span></div>` : '';
-  return `<div class="hpMap" style="aspect-ratio:${w}/${h}"><img src="${pl.img}" alt="${esc(pl.alt)}" width="${w}" height="${h}" decoding="async"
+  return `<div class="hpMap" style="aspect-ratio:${w}/${h}; width:min(100%, calc(var(--mapH, 999px) * ${(w / h).toFixed(4)}))"><img src="${pl.img}" alt="${esc(pl.alt)}" width="${w}" height="${h}" decoding="async"
       onerror="renderHeroPlate(HP_NO_IMG)">${lbl}${pins}${qatar}</div>${legend}${ramp}`;
 }
 
@@ -8612,7 +8636,7 @@ function renderHeroPlate(idx){
   box.style.animation = 'none'; void box.offsetWidth; box.style.animation = '';   // إعادة حركة الظهور
   box.innerHTML = `
     <div class="hpHead"><div><div class="hpEyebrow">🧭 من أطلس رحّالة</div><h3 class="hpTitle">${esc(pl.title)}</h3></div>${next}</div>
-    ${hpBody(pl)}
+    <div class="hpBodyWrap">${hpBody(pl)}</div>
     <p class="hpNote">${esc(pl.note)}</p>
     <div class="hpFoot"><span class="hpUnit">${esc(pl.unit)}</span><span class="hpSrc">${esc(pl.src)}</span></div>`;
 }
