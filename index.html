@@ -1523,6 +1523,31 @@
   .tnBtn.ghost{background:rgba(0,0,0,.2); color:var(--gold-light); border:1.5px solid rgba(220,167,58,.6);}
   .tnX{background:none; border:none; color:#f4ede7; font-size:1.1rem; cursor:pointer; padding:4px 8px;}
   #gmTurn{width:auto; margin:0 0 18px;}
+  /* في حصة اليوم: كبسولة مدمجة داخل الشريط العلوي بدل سطر كامل فوق السؤال
+     (كان السطر ~٨٠ بكسل يقصّ الخيارات على شاشات اللابتوب والسبورة) */
+  .lsHead .lsTurn{margin:0; width:auto; max-width:none; padding:4px 6px 4px 14px; gap:6px; border-radius:30px;
+    background:rgba(0,0,0,.25); border:1.5px solid var(--gold);}
+  .lsHead .tnMsg{font-size:1.12rem; white-space:nowrap;}
+  .lsHead .tnBtn{font-size:.85rem; padding:4px 12px; border-radius:20px;}
+  .lsHead:has(#lsTurn:not([hidden])) .fmTitle{display:none;}
+  /* شاشات قصيرة (لابتوب/سبورة بدقة ٧٦٨ أو أقل): السؤال وخياراته الأربعة تظهر كاملة بلا تمرير.
+     كانت الحشوات الكبيرة والشريط ذو السطرين يدفعان الخيار الرابع خارج الشاشة */
+  @media (max-height:760px){
+    .lsHead{padding:7px 14px; gap:8px;}
+    .lsHead .fmExit{padding:5px 12px;}
+    .lsTimerBtn{padding:4px 11px;}
+    .lsClsSel{padding:4px 8px;}
+    .lsHead .tnMsg{font-size:1rem;}
+    .lsHead .tnBtn{padding:3px 10px; font-size:.8rem;}
+    .lsStage{padding:8px 24px; gap:8px;}
+    .lsQ{font-size:clamp(1.25rem, 2.8vw, 2rem); line-height:1.45; padding:2px 0 6px;}
+    .lsRef{margin-bottom:4px; padding:3px 14px;}
+    .lsChoices{gap:7px;}
+    .lsCh{padding:6px 18px;}
+    .lsCh .lsChKey{min-width:38px; height:38px;}
+    .lsNav{padding:7px 16px 9px;}
+    .lsNavBtn{padding:8px 24px;}
+  }
   .gmTurnBar{display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:16px;}
   .gmTurnBar[hidden]{display:none;}
   .gmCls{font-family:'Cairo'; font-weight:800; padding:6px 10px; border-radius:10px; border:1.5px solid rgba(220,167,58,.6); background:var(--navy-deep); color:var(--gold-light);}
@@ -2312,6 +2337,8 @@
   <div class="lsHead">
     <button class="fmExit" onclick="closeLessonShow()">✕ إنهاء العرض</button>
     <div class="fmTitle">📝 حصة اليوم</div>
+    <!-- «الدور على…» داخل الشريط مكان العنوان: لا يأخذ سطراً من مساحة السؤال -->
+    <div class="lsTurn" id="lsTurn" hidden></div>
     <div style="display:flex; align-items:center; gap:11px; flex-wrap:wrap;">
       <select class="lsClsSel" id="lsCls" onchange="lsSetCls(this.value)" title="الإجابة الصحيحة تمنح نقطة مشاركة لطالب من هذا الصف"></select>
       <div class="lsTimer" id="lsTimer"></div>
@@ -2321,8 +2348,6 @@
       <div class="lsCount" id="lsCount"></div>
     </div>
   </div>
-  <!-- «الدور على…»: يملؤه turnRender بعد العجلة — النجمة تُعتمد بعد الإجابة لا قبلها -->
-  <div class="lsTurn" id="lsTurn" hidden></div>
   <div class="lsStage">
     <div class="lsQ" id="lsQ"></div>
     <div id="lsAWrap"></div>
@@ -5274,9 +5299,9 @@ function whSpin(){
   const jitter = (Math.random() - 0.5) * seg * 0.6;
   const want = ((360 - ((w + 0.5) * seg + jitter)) % 360 + 360) % 360;   // الزاوية التي تضع الشريحة تحت المؤشر
   const cur = wh.angle;
-  const target = cur - ((cur % 360) + 360) % 360 + 360 * 5 + want;
+  const target = cur - ((cur % 360) + 360) % 360 + 360 * 4 + want;
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const dur = reduce ? 900 : 4000;   // كان ٦٢٠٠ — طويل داخل الحصة
+  const dur = reduce ? 900 : 2800;   // كان ٦٢٠٠ ثم ٤٠٠٠ — المالك طلبها أسرع داخل الحصة
   const g = document.getElementById('whRot');
   g.querySelectorAll('.whSeg.win').forEach(s => s.classList.remove('win'));
   g.style.transition = `transform ${dur}ms cubic-bezier(.12,.72,.06,1)`;
@@ -5351,7 +5376,7 @@ function whDone(w){
   whResult();
   playSound('badge');
   whConfetti();
-  if(wh.ctx) wh.goTimer = setTimeout(whGo, 2500);
+  if(wh.ctx) wh.goTimer = setTimeout(whGo, 1500);
 }
 
 // يعيد العجلة إلى شاشة السؤال ومعها «الدور على…»
