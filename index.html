@@ -831,6 +831,24 @@
   @media (prefers-reduced-motion: reduce){
     #wheelModal *, #wheelModal.spinning .whBulb{animation:none !important;}
   }
+  /* ===== العجلة المثبّتة في حصة اليوم: صغيرة يسار الشاشة، والسؤال يقابلها ===== */
+  .whDockX{display:none;}
+  /* تكبر مع الشاشة: ٢١٠ على شاشة ٦٢٠ بكسل، و٣٠٠ على السبورة ١٠٨٠ */
+  #wheelModal.docked{inset:auto; left:16px; top:calc(50% + 30px); transform:translateY(-50%); width:calc(min(300px, 34vh) + 56px);
+    padding:0; background:none; backdrop-filter:none; overflow:visible; z-index:440; --whS:min(300px, 34vh);}
+  #wheelModal.docked .whBox{position:relative; overflow:visible; box-shadow:0 12px 30px rgba(0,0,0,.35);}
+  #wheelModal.docked .whHead{display:none;}
+  #wheelModal.docked .whStage{padding:16px 12px 12px; gap:8px;}
+  #wheelModal.docked .whResult{min-height:96px; gap:6px;}
+  #wheelModal.docked .whWinName{font-size:1.7rem; line-height:1.35;}
+  #wheelModal.docked .whHint{font-size:.82rem; line-height:1.6;}
+  #wheelModal.docked .whWinLbl{font-size:.9rem;}
+  #wheelModal.docked .tnBtn{font-size:.85rem; padding:5px 12px;}
+  #wheelModal.docked .whDockX{display:block; position:absolute; top:6px; left:8px; z-index:2; background:rgba(0,0,0,.2);
+    border:1px solid rgba(220,167,58,.5); color:var(--gold-light); width:26px; height:26px; border-radius:50%; cursor:pointer; font-size:.8rem;}
+  /* المسرح والتنقل يفسحان لها يساراً (الصفحة RTL: اليسار نهاية السطر) */
+  #lessonShow.withWheel .lsStage{padding-left:calc(min(300px, 34vh) + 96px);}
+  #lessonShow.withWheel .lsNav, #lessonShow.withWheel .lsDots{padding-left:calc(min(300px, 34vh) + 86px);}
   /* ===== الطالب المحظوظ — يستعير إطار نافذة العجلة (whModal/whBox/whHead) ===== */
   .lkCard{
     position:relative; width:min(560px, 100%); min-height:270px; border-radius:26px; padding:26px 22px;
@@ -1523,6 +1541,31 @@
   .tnBtn.ghost{background:rgba(0,0,0,.2); color:var(--gold-light); border:1.5px solid rgba(220,167,58,.6);}
   .tnX{background:none; border:none; color:#f4ede7; font-size:1.1rem; cursor:pointer; padding:4px 8px;}
   #gmTurn{width:auto; margin:0 0 18px;}
+  /* في حصة اليوم: كبسولة مدمجة داخل الشريط العلوي بدل سطر كامل فوق السؤال
+     (كان السطر ~٨٠ بكسل يقصّ الخيارات على شاشات اللابتوب والسبورة) */
+  .lsHead .lsTurn{margin:0; width:auto; max-width:none; padding:4px 6px 4px 14px; gap:6px; border-radius:30px;
+    background:rgba(0,0,0,.25); border:1.5px solid var(--gold);}
+  .lsHead .tnMsg{font-size:1.12rem; white-space:nowrap;}
+  .lsHead .tnBtn{font-size:.85rem; padding:4px 12px; border-radius:20px;}
+  .lsHead:has(#lsTurn:not([hidden])) .fmTitle{display:none;}
+  /* شاشات قصيرة (لابتوب/سبورة بدقة ٧٦٨ أو أقل): السؤال وخياراته الأربعة تظهر كاملة بلا تمرير.
+     كانت الحشوات الكبيرة والشريط ذو السطرين يدفعان الخيار الرابع خارج الشاشة */
+  @media (max-height:760px){
+    .lsHead{padding:7px 14px; gap:8px;}
+    .lsHead .fmExit{padding:5px 12px;}
+    .lsTimerBtn{padding:4px 11px;}
+    .lsClsSel{padding:4px 8px;}
+    .lsHead .tnMsg{font-size:1rem;}
+    .lsHead .tnBtn{padding:3px 10px; font-size:.8rem;}
+    .lsStage{padding:8px 24px; gap:8px;}
+    .lsQ{font-size:clamp(1.25rem, 2.8vw, 2rem); line-height:1.45; padding:2px 0 6px;}
+    .lsRef{margin-bottom:4px; padding:3px 14px;}
+    .lsChoices{gap:7px;}
+    .lsCh{padding:6px 18px;}
+    .lsCh .lsChKey{min-width:38px; height:38px;}
+    .lsNav{padding:7px 16px 9px;}
+    .lsNavBtn{padding:8px 24px;}
+  }
   .gmTurnBar{display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:16px;}
   .gmTurnBar[hidden]{display:none;}
   .gmCls{font-family:'Cairo'; font-weight:800; padding:6px 10px; border-radius:10px; border:1.5px solid rgba(220,167,58,.6); background:var(--navy-deep); color:var(--gold-light);}
@@ -2312,6 +2355,8 @@
   <div class="lsHead">
     <button class="fmExit" onclick="closeLessonShow()">✕ إنهاء العرض</button>
     <div class="fmTitle">📝 حصة اليوم</div>
+    <!-- «الدور على…» داخل الشريط مكان العنوان: لا يأخذ سطراً من مساحة السؤال -->
+    <div class="lsTurn" id="lsTurn" hidden></div>
     <div style="display:flex; align-items:center; gap:11px; flex-wrap:wrap;">
       <select class="lsClsSel" id="lsCls" onchange="lsSetCls(this.value)" title="الإجابة الصحيحة تمنح نقطة مشاركة لطالب من هذا الصف"></select>
       <div class="lsTimer" id="lsTimer"></div>
@@ -2321,8 +2366,6 @@
       <div class="lsCount" id="lsCount"></div>
     </div>
   </div>
-  <!-- «الدور على…»: يملؤه turnRender بعد العجلة — النجمة تُعتمد بعد الإجابة لا قبلها -->
-  <div class="lsTurn" id="lsTurn" hidden></div>
   <div class="lsStage">
     <div class="lsQ" id="lsQ"></div>
     <div id="lsAWrap"></div>
@@ -2343,6 +2386,7 @@
 
 <div class="whModal" id="wheelModal" hidden>
   <div class="whBox">
+    <button class="whDockX" onclick="lsWheelOff = true; closeWheel()" title="إخفاء العجلة" aria-label="إخفاء العجلة">✕</button>
     <div class="whHead">
       <div class="whTitle">🎡 عجلة الأسماء</div>
       <select class="whSel" id="whCls" onchange="whSetCls(this.value)" title="الصف"></select>
@@ -4652,6 +4696,8 @@ function startActivity(id){
   lsStatRun(id);
   lsSetupCls(act.grade);
   openLessonShow();
+  // العجلة ثابتة يسار الشاشة مع كل نشاط — إلا إن أخفاها المعلم بهذه الجلسة
+  if(!lsWheelOff && window.innerWidth >= WH_DOCK_MIN && dbReady) openWheel(lsCls, 'ls');
 }
 
 // ── وضع العرض على البروجكتر ──
@@ -4796,6 +4842,7 @@ function openLessonShow(){
 }
 
 function closeLessonShow(){
+  if(whDocked()) closeWheel();
   if(turn.ctx === 'ls') turnClear();
   lsClosePicker();
   lsStopTimer();
@@ -4806,7 +4853,7 @@ function closeLessonShow(){
 }
 
 function lsKeys(e){
-  if(whOpen() || lkOpen()) return;           // العجلة/المحظوظ فوق العرض تستقبلان المفاتيح وحدهما
+  if((whOpen() && !whDocked()) || lkOpen()) return;   // العجلة المنبثقة/المحظوظ تستقبلان المفاتيح وحدهما
   const pk = document.getElementById('lsPicker');
   if(pk && !pk.hidden){ if(e.key === 'Escape') lsClosePicker(); return; }
   if(e.key === 'Escape') closeLessonShow();
@@ -4965,6 +5012,8 @@ function lsSetupCls(grade){
 
 function lsSetCls(v){
   lsCls = v;
+  if(turn.ctx === 'ls') turnClear();
+  if(whDocked()) whSetCls(v || myClassCls);
   const sel = document.getElementById('lsCls');
   try { if(sel) localStorage.setItem('rahhala_ls_cls_' + sel.dataset.grade, v || 'none'); } catch(e){}
   lsAwards = {};           // النقاط الممنوحة محفوظة بقاعدة البيانات؛ السجل المحلي يخص الصف السابق
@@ -5089,8 +5138,14 @@ const wh = {cls:'', all:[], pool:[], absent:0, pickedBy:{}, angle:0, spinning:fa
 
 // ctx اختياري: من شاشة سؤال ('ls' أو 'game') تختار العجلة طالباً ثم تُغلق وتعود للسؤال،
 // والنجمة تُعتمد هناك بعد أن يجيب. بدونه (صفوفي/الرئيسية) تبقى كما هي بزر النجمة.
+// العجلة المثبّتة في حصة اليوم: صغيرة يسار الشاشة والسؤال مقابلها، والاسم وأزرار النجمة تحتها.
+// على الشاشات الضيقة لا مكان بجانب السؤال فتبقى نافذة منبثقة تعود للسؤال بنفسها.
+const WH_DOCK_MIN = 900;
+let lsWheelOff = false;   // أخفاها المعلم بهذا العرض ← لا تُفتح تلقائياً مع النشاط
+function whDocked(){ const m = document.getElementById('wheelModal'); return !!(m && !m.hidden && m.classList.contains('docked')); }
 function openWheel(cls, ctx){
   if(!isAdmin){ showToast('هذي الأداة للمعلم فقط', 'error'); return; }
+  if(ctx === 'ls' && whDocked()){ lsWheelOff = true; closeWheel(); return; }   // زر 🎡 يُخفيها ويُظهرها
   if(!requireDb()) return;
   if(lkOpen()) closeLucky();
   wh.ctx = ctx || '';
@@ -5105,7 +5160,12 @@ function openWheel(cls, ctx){
   sel.innerHTML = classes.map(c => `<option value="${esc(c.cls)}">${esc(c.label)}</option>`).join('');
   const target = classes.some(c => c.cls === cls) ? cls : (classes[0] ? classes[0].cls : '');
   sel.value = target;
-  document.getElementById('wheelModal').hidden = false;
+  const wm = document.getElementById('wheelModal');
+  const dock = ctx === 'ls' && window.innerWidth >= WH_DOCK_MIN;
+  wm.classList.toggle('docked', dock);
+  document.getElementById('lessonShow').classList.toggle('withWheel', dock);
+  if(dock) lsWheelOff = false;
+  wm.hidden = false;
   document.addEventListener('keydown', whKeys);
   whBulbs();
   whLoadPicked();
@@ -5118,14 +5178,18 @@ function closeWheel(){
   if(wh.goTimer){ clearTimeout(wh.goTimer); wh.goTimer = null; }
   if(document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(()=>{});
   const m = document.getElementById('wheelModal');
-  m.classList.remove('full', 'spinning');
+  const wasDocked = m.classList.contains('docked');
+  m.classList.remove('full', 'spinning', 'docked');
+  document.getElementById('lessonShow').classList.remove('withWheel');
   m.hidden = true;
+  if(wasDocked){ wh.ctx = ''; wh.winner = null; const pill = turn.ctx === 'ls' && turn.id != null; if(pill) turnRender(); }
   whFullLabel();
   document.removeEventListener('keydown', whKeys);
 }
 function whOpen(){ const m = document.getElementById('wheelModal'); return !!(m && !m.hidden); }
 
 function whKeys(e){
+  if(whDocked()) return;   // المثبّتة لا تأخذ المفاتيح — الأسهم والمسافة للعرض
   if(e.key === 'Escape'){ e.preventDefault(); closeWheel(); return; }
   // عناصر التحكم داخل العجلة تتصرف طبيعياً؛ أي تركيز خارجها (زر العرض خلفها) لا يسرق المسافة
   const t = e.target, inside = t && t.closest && t.closest('#wheelModal');
@@ -5231,6 +5295,7 @@ function whBulbs(){
 
 function whResult(){
   const box = document.getElementById('whResult');
+  if(whDocked() && turn.ctx === 'ls' && turn.id != null && !wh.spinning){ turnRender(); return; }
   const left = wh.pool.length, total = wh.all.length;
   const absentTxt = wh.absent ? ` · استُبعد ${wh.absent} غائب اليوم` : '';
   if(wh.msg){ box.innerHTML = `<div class="whHint ${wh.msg.startsWith('⏳') ? '' : 'whErr'}">${esc(wh.msg)}</div>`; return; }
@@ -5257,7 +5322,7 @@ function whResult(){
       <div class="whActs"><button class="whPt" onclick="whResetPicked()">↺ إعادة كل الأسماء</button></div>`;
     return;
   }
-  box.innerHTML = `<div class="whHint"><b>${left}</b> ${left === total ? 'اسماً على العجلة' : 'باقٍ من ' + total}${absentTxt}<br>اضغط «لِفّ» أو زر المسافة</div>`
+  box.innerHTML = `<div class="whHint"><b>${left}</b> ${left === total ? 'اسماً على العجلة' : 'باقٍ من ' + total}${absentTxt}<br>اضغط «لِفّ»${whDocked() ? '' : ' أو زر المسافة'}</div>`
     + (left < total ? `<div class="whActs"><button class="whGhost" onclick="whResetPicked()">↺ إعادة كل الأسماء</button></div>` : '');
 }
 
@@ -5274,9 +5339,9 @@ function whSpin(){
   const jitter = (Math.random() - 0.5) * seg * 0.6;
   const want = ((360 - ((w + 0.5) * seg + jitter)) % 360 + 360) % 360;   // الزاوية التي تضع الشريحة تحت المؤشر
   const cur = wh.angle;
-  const target = cur - ((cur % 360) + 360) % 360 + 360 * 5 + want;
+  const target = cur - ((cur % 360) + 360) % 360 + 360 * 4 + want;
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const dur = reduce ? 900 : 4000;   // كان ٦٢٠٠ — طويل داخل الحصة
+  const dur = reduce ? 900 : 2800;   // كان ٦٢٠٠ ثم ٤٠٠٠ — المالك طلبها أسرع داخل الحصة
   const g = document.getElementById('whRot');
   g.querySelectorAll('.whSeg.win').forEach(s => s.classList.remove('win'));
   g.style.transition = `transform ${dur}ms cubic-bezier(.12,.72,.06,1)`;
@@ -5351,7 +5416,8 @@ function whDone(w){
   whResult();
   playSound('badge');
   whConfetti();
-  if(wh.ctx) wh.goTimer = setTimeout(whGo, 2500);
+  if(whDocked()) turnSet('ls', wh.cls, wh.winner);   // المثبّتة: الاسم تحتها مباشرة والسؤال ظاهر أصلاً
+  else if(wh.ctx) wh.goTimer = setTimeout(whGo, 1500);
 }
 
 // يعيد العجلة إلى شاشة السؤال ومعها «الدور على…»
@@ -5377,9 +5443,21 @@ function turnSet(ctx, cls, who){
 function turnClear(){
   Object.assign(turn, {ctx:'', cls:'', id:null, name:'', idx:-1, res:''});
   ['lsTurn', 'gmTurn'].forEach(id => { const b = document.getElementById(id); if(b){ b.hidden = true; b.innerHTML = ''; } });
+  if(whDocked() && !wh.spinning){ wh.winner = null; whResult(); }   // تحت العجلة: يرجع «اضغط لِفّ»
 }
 function turnOpen(ctx){ return turn.ctx === ctx && turn.id != null && !turn.res; }
 function turnRender(){
+  if(turn.ctx === 'ls' && whDocked()){
+    const pill = document.getElementById('lsTurn');
+    if(pill){ pill.hidden = true; pill.innerHTML = ''; }
+    const lbl = turn.res === 'star' ? '⭐ +١ نقطة مشاركة' : turn.res === 'miss' ? '❌ لم يُصب' : '🎤 الدور على';
+    const acts = turn.res === 'star' ? `<button class="tnBtn ghost" onclick="turnUndo()">↩️ تراجع</button>`
+      : turn.res === 'miss' ? '<div class="whHint">اضغط «لِفّ» لطالب آخر</div>'
+      : `<button class="tnBtn ok" onclick="turnAward()">⭐ أجاب صح</button><button class="tnBtn ghost" onclick="turnMiss()">❌ لم يُصب</button>`;
+    document.getElementById('whResult').innerHTML =
+      `<div class="whWinLbl">${lbl}</div><div class="whWinName">${esc(turn.name)}</div><div class="whActs">${acts}</div>`;
+    return;
+  }
   const box = document.getElementById(turn.ctx === 'game' ? 'gmTurn' : 'lsTurn');
   if(!box || !turn.ctx) return;
   const nm = `<b>${esc(turn.name)}</b>`;
@@ -5392,7 +5470,7 @@ function turnRender(){
     <button class="tnX" onclick="turnClear()" title="إنهاء الدور" aria-label="إنهاء الدور">✕</button>`;
   box.hidden = false;
 }
-function turnSpin(ctx){ openWheel(ctx === 'game' ? gmCls : (turn.cls || lsCls), ctx); }
+function turnSpin(ctx){ if(ctx === 'ls' && whDocked()){ whSpin(); return; } openWheel(ctx === 'game' ? gmCls : (turn.cls || lsCls), ctx); }
 function turnMiss(){ if(!turnOpen(turn.ctx)) return; turn.res = 'miss'; turnRender(); }
 async function turnAward(){
   if(!isAdmin || !requireDb() || !turnOpen(turn.ctx)) return;
