@@ -110,18 +110,21 @@
     border-bottom:3px solid var(--gold);
     box-shadow:0 2px 16px rgba(79,12,32,.18);
   }
-  header .wrap{display:flex; align-items:center; justify-content:space-between; padding:14px 20px;}
-  .brand{display:flex; align-items:center; gap:10px; font-size:1.5rem;}
+  /* الشريط أعرض من محتوى الصفحة (١٢٨٠ لا ١١٠٠): روابط المعلم مع الشعار والأزرار تحتاج ~١٠٨٠ بكسل،
+     فكانت تنضغط داخل ١٠٦٠ وينكسر نصّها لسطرين («لوحة / الصدارة») حتى على شاشة ١٩٢٠ */
+  header .wrap{display:flex; align-items:center; justify-content:space-between; padding:14px 20px; max-width:1280px;}
+  .brand{display:flex; align-items:center; gap:10px; font-size:1.5rem; white-space:nowrap;}
   .brand span.sub{font-family:'Tajawal'; font-size:.7rem; color:var(--gold-light); display:block; font-weight:400;}
-  nav{display:flex; gap:22px; font-size:.95rem; align-items:center;}
-  nav a{padding:6px 2px; border-bottom:2px solid transparent; transition:.2s;}
+  nav{display:flex; gap:22px; font-size:.95rem; align-items:center; flex-wrap:wrap; justify-content:center; row-gap:4px;}
+  nav a{padding:6px 2px; border-bottom:2px solid transparent; transition:.2s; white-space:nowrap;}   /* الرابط كاملاً ينتقل لا نصفه */
   nav a:hover{opacity:1; border-color:var(--gold);}
 
   .navDrop{position:relative;}
   .navDropBtn{
     background:none; border:none; color:var(--cream); font-family:'Tajawal'; font-size:.95rem;
-    cursor:pointer; padding:6px 2px; display:flex; align-items:center; gap:4px;
+    cursor:pointer; padding:6px 2px; display:flex; align-items:center; gap:4px; white-space:nowrap;
   }
+  @media(max-width:1180px) and (min-width:761px){ nav{gap:14px; font-size:.88rem;} .navDropBtn{font-size:.88rem;} }
   .navDropBtn:hover{opacity:1;}
   .navDropBtn .caret{font-size:.7rem; transition:.2s;}
   .navDrop.open .navDropBtn .caret{transform:rotate(180deg);}
@@ -205,7 +208,7 @@
 
   /* رابط لوحة المعلم بالشريط العلوي — مميّز بصرياً عن روابط الطلاب */
   .adminNavLink{
-    background:rgba(220,167,58,.16); border:1px solid var(--gold) !important;
+    background:rgba(0,0,0,.2); border:1px solid var(--gold) !important;
     border-radius:20px; padding:5px 14px !important; color:var(--gold-light) !important;
     font-weight:700; margin-inline-start:6px;
   }
@@ -266,9 +269,9 @@
   .fmTitle{font-family:'Aref Ruqaa'; font-size:1.4rem; color:var(--gold-light);}
   .fmStats{display:flex; gap:8px;}
   .fmStat{padding:5px 13px; border-radius:18px; font-size:.85rem; font-weight:700;}
-  .fmStat.green{background:rgba(47,150,110,.22); color:#7fe0b8;}
-  .fmStat.amber{background:rgba(220,167,58,.22); color:var(--gold-light);}
-  .fmStat.red{background:rgba(160,60,60,.25); color:#f2a8a8;}
+  .fmStat.green{background:rgba(0,0,0,.22); color:#b6ebd2; box-shadow:inset 0 0 0 1px rgba(47,150,110,.6);}
+  .fmStat.amber{background:rgba(0,0,0,.22); color:var(--gold-light); box-shadow:inset 0 0 0 1px rgba(220,167,58,.55);}
+  .fmStat.red{background:rgba(0,0,0,.22); color:#f3cfcf; box-shadow:inset 0 0 0 1px rgba(160,60,60,.7);}
   /* عمودان على الشاشات الواسعة: الصف الواحد كان يمتد بعرض كامل ومحتواه
      لا يشغل ثلثه، فيطول التمرير بلا داعٍ. عمود واحد على الجوال. */
   .fmList{
@@ -294,7 +297,7 @@
   .fmPlus:active{transform:scale(.92);}
   .fmMinus{
     min-width:40px; padding:11px 0; border-radius:12px; cursor:pointer;
-    background:rgba(255,255,255,.08); color:#f2a8a8;
+    background:rgba(0,0,0,.2); color:#f3cfcf;
     border:1.5px solid rgba(242,168,168,.35);
     font-family:'Tajawal'; font-weight:700; font-size:1.05rem; line-height:1;
   }
@@ -343,7 +346,7 @@
   .fmStarBar .fmStarName{color:#ffffff; font-size:1.15rem;}
   .fmStarBar.hidden{display:none;}
   .fmSortBtn{
-    background:rgba(255,255,255,.08); color:var(--gold-light); cursor:pointer;
+    background:rgba(0,0,0,.2); color:var(--gold-light); cursor:pointer;
     border:1.5px solid rgba(220,167,58,.4); border-radius:18px;
     padding:5px 14px; font-family:'Tajawal'; font-weight:700; font-size:.82rem;
   }
@@ -763,7 +766,7 @@
   .whOpt input{accent-color:var(--gold); width:16px; height:16px;}
   .whBtn{
     padding:7px 14px; border-radius:10px; cursor:pointer; font-family:'Tajawal'; font-weight:700; font-size:.88rem;
-    background:rgba(255,255,255,.06); color:var(--gold-light); border:1.5px solid rgba(220,167,58,.6);
+    background:rgba(0,0,0,.2); color:var(--gold-light); border:1.5px solid rgba(220,167,58,.6);
   }
   .whBtn:hover{background:rgba(220,167,58,.18);}
   .whBtn.grow{background:var(--grad-gold); color:var(--navy-deep); border-color:transparent;}
@@ -810,7 +813,7 @@
     background:transparent; color:#ffffff; border:1.5px solid rgba(255,255,255,.4);
   }
   .whGhost:hover{border-color:var(--gold-light); color:var(--gold-light);}
-  .whHint{color:rgba(255,255,255,.72); font-size:.92rem; line-height:1.8;}
+  .whHint{color:#f4ede7; font-size:.92rem; line-height:1.8;}
   .whHint b{color:var(--gold-light);}
   .whErr{color:#ffb3a8;}
   .whConf{position:absolute; top:-18px; width:10px; height:15px; border-radius:2px; pointer-events:none; z-index:6; animation:whFall linear forwards;}
@@ -1053,7 +1056,7 @@
   #adminLogoutTop{
     display:none; background:transparent; color:var(--gold-light); border:1.5px solid rgba(122,48,48,.5);
     border-radius:20px; padding:6px 14px; font-size:.78rem; font-family:'Tajawal'; font-weight:700;
-    cursor:pointer; margin-inline-start:8px;
+    cursor:pointer; margin-inline-start:8px; white-space:nowrap;
   }
   #adminLogoutTop.show{display:inline-block;}
   #adminLogoutTop:hover{background:var(--maroon); border-color:var(--maroon); color:#ffffff;}
@@ -1078,7 +1081,7 @@
   #weatherBar .wbHint{opacity:.92; font-size:.76rem;}
   #weatherBar button{
     position:absolute; inset-inline-end:12px; top:50%; transform:translateY(-50%);
-    background:rgba(255,255,255,.16); border:none; color:#ffffff; cursor:pointer;
+    background:rgba(0,0,0,.2); border:none; color:#ffffff; cursor:pointer;
     width:22px; height:22px; border-radius:50%; font-size:.72rem; line-height:1;
   }
   #weatherBar button:hover{background:rgba(255,255,255,.3);}
@@ -1086,7 +1089,7 @@
   #lastUpdateBar.show{display:block;}
   #lastUpdateBar button{
     position:absolute; left:16px; top:50%; transform:translateY(-50%); background:none; border:none;
-    color:#ffffff; font-size:.9rem; cursor:pointer; opacity:.8;
+    color:#ffffff; font-size:.9rem; cursor:pointer;
   }
   #lastUpdateBar button:hover{opacity:1;}
 
@@ -2480,7 +2483,7 @@
       </div>
 
       <div class="panel" id="panel-match">
-        <p style="text-align:center; color:#4c2d37; margin-bottom:14px;">اقلب بطاقتين — لو طابقت المصطلح مع تعريفه الصحيح تربح! (تكلّف طاقة وحدة لكل جولة جديدة)</p>
+        <p style="text-align:center; color:#f4ede7; margin-bottom:14px;">اقلب بطاقتين — لو طابقت المصطلح مع تعريفه الصحيح تربح! (تكلّف طاقة وحدة لكل جولة جديدة)</p>
         <div id="matchStatus" style="text-align:center; font-weight:700; margin-bottom:14px;"></div>
         <div id="matchGrid"></div>
         <div style="text-align:center; margin-top:16px;">
@@ -2489,13 +2492,13 @@
       </div>
 
       <div class="panel" id="panel-order">
-        <p style="text-align:center; color:#4c2d37; margin-bottom:14px;">رتّب البطاقات بالتسلسل الصحيح — استخدم الأسهم لتحريك كل بطاقة، وبعدين تحقق من إجابتك.</p>
-        <div id="orderTopic" style="text-align:center; font-weight:700; color:var(--navy); margin-bottom:14px;"></div>
+        <p style="text-align:center; color:#f4ede7; margin-bottom:14px;">رتّب البطاقات بالتسلسل الصحيح — استخدم الأسهم لتحريك كل بطاقة، وبعدين تحقق من إجابتك.</p>
+        <div id="orderTopic" style="text-align:center; font-weight:700; color:var(--gold-light); margin-bottom:14px;"></div>
         <div id="orderList"></div>
         <div id="orderStatus" style="text-align:center; font-weight:700; margin:14px 0;"></div>
         <div style="text-align:center; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
           <button class="btn btn-gold" onclick="checkOrder()">✅ تحقق من ترتيبي</button>
-          <button class="btn" style="background:transparent; border:2px solid var(--navy); color:var(--navy);" onclick="startOrderGame()">🔄 جولة جديدة</button>
+          <button class="btn" style="background:transparent; border:2px solid var(--gold-light); color:var(--gold-light);" onclick="startOrderGame()">🔄 جولة جديدة</button>
         </div>
       </div>
     </div>
@@ -3665,7 +3668,7 @@ function renderJourneyMap(){
 }
 
 async function persist(){
-  if(!state || !requireDb()) return;
+  if(!state || state.practice || !requireDb()) return;   // وضع الصف لا يُحفظ
   const { error } = await supaCall(() => sb.from('students').upsert({
     key: currentKey(), name: state.name, cls: state.cls,
     points: state.points, energy: state.energy,
@@ -3736,8 +3739,8 @@ function studentLogout(){
 //  دخول الطالب معطّل حالياً بقرار المعلم.
 //  للرجوع: غيّر هذا السطر إلى true — يعود كل شيء كما كان.
 //  الكود كله باقٍ سليماً، والمخفي هو المدخل فقط.
-//  الألعاب ولوحة الصدارة تبقى ظاهرة ويستخدمها المعلم مباشرة،
-//  فهي لا تشترط حساب طالب أصلاً.
+//  لوحة الصدارة تبقى ظاهرة ويستخدمها المعلم (تقرأ من قوائم صفوفه لا من حسابات الطلاب).
+//  الألعاب: المعلم يشغّلها بـ«وضع الصف» (نقاط مؤقتة لا تُحفظ)، والزائر يرى رسالة (requireApproved).
 // ═══════════════════════════════════════════════════════════
 const STUDENT_LOGIN_ENABLED = false;
 
@@ -3842,6 +3845,18 @@ function renderQuestion(){
 }
 // بوابة موحّدة: ما أحد يلعب إلا بعد تسجيل الدخول + موافقتك الشخصية عليه
 function requireApproved(){
+  // دخول الطالب معطّل: المعلم يشغّل الألعاب في الحصة بـ«وضع الصف» — نقاط وطاقة مؤقتة
+  // للجلسة فقط، لا تُحفظ بقاعدة البيانات (persist وrefreshMyState يتجاهلانها). الزائر يرى رسالة.
+  if(!state && !STUDENT_LOGIN_ENABLED){
+    if(isAdmin){
+      state = {name:'الصف', cls:'', points:0, energy:3, badges:[], gamesPlayed:0, status:'approved', practice:true};
+      renderEnergy();
+      showToast('🎮 وضع الصف: العبوا مباشرة — النقاط للحصة فقط ولا تُحفظ', 'info');
+      return true;
+    }
+    showToast('🎮 الألعاب يشغّلها المعلم في الحصة — ودخول الطلاب متوقف حالياً', 'info');
+    return false;
+  }
   if(!state){ openLogin(); return false; }
   if(state.kicked){
     showToast('🚫 أنهى المعلم جلستك — سجّل دخول من جديد', 'error');
@@ -3884,6 +3899,7 @@ function answer(i, correctIdx, btn, box, questionId){
   if(sb && questionId){ sb.from('answer_log').insert({question_id: questionId, correct: isCorrect}); } // تسجيل للتقرير — لا ننتظر النتيجة، ما يبطّئ التجربة
   const newly = checkBadges();
   persist();
+  renderEnergy();   // الطاقة تغيّرت — كان العدّاد يبقى على قيمته القديمة
   if(newly.length) celebrateBadges(newly);
   qIndex = pickNextQuestionIndex();
   setTimeout(renderQuestion, 1400);
@@ -3915,6 +3931,7 @@ function shoot(dir){
   }
   state.energy -= 1;
   state.gamesPlayed = (state.gamesPlayed || 0) + 1; // كان ناقص — العداد ما كان يتحدّث أبداً
+  renderEnergy();
   const ball = document.getElementById('ball');
   const targets = {left:'20%', center:'50%', right:'80%'};
   ball.style.left = targets[dir];
@@ -6186,7 +6203,7 @@ function exportMyClassCSV(){
 
 // يبقي نقاط الطالب متزامنة لو فتح الموقع من جهازين + يفحص إذا طرده المعلم + نبضة نشاط (آخر ظهور ووقت الاستخدام)
 async function refreshMyState(){
-  if(!state || !requireDb()) return;
+  if(!state || state.practice || !requireDb()) return;
   const { data, error } = await supaCall(() => sb.from('students').select('*').eq('key', currentKey()).maybeSingle(), 2, 500);
   if(!error && data){
     state = rowToState(data);
@@ -6332,6 +6349,7 @@ function openAdminPanel(){
 // أو زر القفل (openAdminPanel). الدخول يحمّل بياناتها بالخلفية فقط
 function setAdminActive(active){
   isAdmin = active;
+  if(!active && state && state.practice){ state = null; renderEnergy(); renderBadges(); }   // ينتهي وضع الصف بخروج المعلم
   document.getElementById('adminChip').classList.toggle('active', active);
   if(!active) document.getElementById('adminPanel').classList.remove('show');
   document.getElementById('adminLogoutTop').classList.toggle('show', active);
