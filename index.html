@@ -3668,7 +3668,7 @@ function renderJourneyMap(){
 }
 
 async function persist(){
-  if(!state || !requireDb()) return;
+  if(!state || state.practice || !requireDb()) return;   // وضع الصف لا يُحفظ
   const { error } = await supaCall(() => sb.from('students').upsert({
     key: currentKey(), name: state.name, cls: state.cls,
     points: state.points, energy: state.energy,
@@ -3740,7 +3740,7 @@ function studentLogout(){
 //  للرجوع: غيّر هذا السطر إلى true — يعود كل شيء كما كان.
 //  الكود كله باقٍ سليماً، والمخفي هو المدخل فقط.
 //  لوحة الصدارة تبقى ظاهرة ويستخدمها المعلم (تقرأ من قوائم صفوفه لا من حسابات الطلاب).
-//  الألعاب تحفظ نقاطاً وطاقة في حساب طالب، فتعرض رسالة توقّف الدخول (requireApproved).
+//  الألعاب: المعلم يشغّلها بـ«وضع الصف» (نقاط مؤقتة لا تُحفظ)، والزائر يرى رسالة (requireApproved).
 // ═══════════════════════════════════════════════════════════
 const STUDENT_LOGIN_ENABLED = false;
 
@@ -3845,9 +3845,18 @@ function renderQuestion(){
 }
 // بوابة موحّدة: ما أحد يلعب إلا بعد تسجيل الدخول + موافقتك الشخصية عليه
 function requireApproved(){
-  // دخول الطالب معطّل: الألعاب تحفظ نقاطاً وطاقة في حساب طالب، ونموذج الدخول لن يعمل
-  // (إنشاء الطلاب مغلق بقاعدة البيانات) — رسالة واضحة بدل نافذة دخول بلا مخرج
-  if(!state && !STUDENT_LOGIN_ENABLED){ showToast('🎮 الألعاب تعمل بحسابات الطلاب، ودخول الطلاب متوقف حالياً', 'info'); return false; }
+  // دخول الطالب معطّل: المعلم يشغّل الألعاب في الحصة بـ«وضع الصف» — نقاط وطاقة مؤقتة
+  // للجلسة فقط، لا تُحفظ بقاعدة البيانات (persist وrefreshMyState يتجاهلانها). الزائر يرى رسالة.
+  if(!state && !STUDENT_LOGIN_ENABLED){
+    if(isAdmin){
+      state = {name:'الصف', cls:'', points:0, energy:3, badges:[], gamesPlayed:0, status:'approved', practice:true};
+      renderEnergy();
+      showToast('🎮 وضع الصف: العبوا مباشرة — النقاط للحصة فقط ولا تُحفظ', 'info');
+      return true;
+    }
+    showToast('🎮 الألعاب يشغّلها المعلم في الحصة — ودخول الطلاب متوقف حالياً', 'info');
+    return false;
+  }
   if(!state){ openLogin(); return false; }
   if(state.kicked){
     showToast('🚫 أنهى المعلم جلستك — سجّل دخول من جديد', 'error');
@@ -3890,6 +3899,7 @@ function answer(i, correctIdx, btn, box, questionId){
   if(sb && questionId){ sb.from('answer_log').insert({question_id: questionId, correct: isCorrect}); } // تسجيل للتقرير — لا ننتظر النتيجة، ما يبطّئ التجربة
   const newly = checkBadges();
   persist();
+  renderEnergy();   // الطاقة تغيّرت — كان العدّاد يبقى على قيمته القديمة
   if(newly.length) celebrateBadges(newly);
   qIndex = pickNextQuestionIndex();
   setTimeout(renderQuestion, 1400);
@@ -3921,6 +3931,7 @@ function shoot(dir){
   }
   state.energy -= 1;
   state.gamesPlayed = (state.gamesPlayed || 0) + 1; // كان ناقص — العداد ما كان يتحدّث أبداً
+  renderEnergy();
   const ball = document.getElementById('ball');
   const targets = {left:'20%', center:'50%', right:'80%'};
   ball.style.left = targets[dir];
@@ -6192,7 +6203,7 @@ function exportMyClassCSV(){
 
 // يبقي نقاط الطالب متزامنة لو فتح الموقع من جهازين + يفحص إذا طرده المعلم + نبضة نشاط (آخر ظهور ووقت الاستخدام)
 async function refreshMyState(){
-  if(!state || !requireDb()) return;
+  if(!state || state.practice || !requireDb()) return;
   const { data, error } = await supaCall(() => sb.from('students').select('*').eq('key', currentKey()).maybeSingle(), 2, 500);
   if(!error && data){
     state = rowToState(data);
@@ -6338,6 +6349,7 @@ function openAdminPanel(){
 // أو زر القفل (openAdminPanel). الدخول يحمّل بياناتها بالخلفية فقط
 function setAdminActive(active){
   isAdmin = active;
+  if(!active && state && state.practice){ state = null; renderEnergy(); renderBadges(); }   // ينتهي وضع الصف بخروج المعلم
   document.getElementById('adminChip').classList.toggle('active', active);
   if(!active) document.getElementById('adminPanel').classList.remove('show');
   document.getElementById('adminLogoutTop').classList.toggle('show', active);
