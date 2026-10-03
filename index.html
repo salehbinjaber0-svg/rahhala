@@ -1622,6 +1622,23 @@
   .hdWx{display:flex; align-items:stretch; background:#ffffff; border:1px solid #eee3db; border-radius:16px;
     box-shadow:0 6px 18px rgba(66,10,28,.07); overflow:hidden;}
   .hdWx[hidden]{display:none;}
+  .hdWx{position:relative;}
+  .hdWxClose{position:absolute; top:6px; left:8px; width:24px; height:24px; border-radius:50%; border:1px solid #eee3db;
+    background:#ffffff; color:var(--navy); font-size:.7rem; line-height:1; cursor:pointer;}
+  .hdWxClose:hover{background:var(--navy); color:#ffffff;}
+  /* بلا طقس: اللوحة تأخذ مكان البطاقة (ارتفاعها + الفجوة) فتكبر الصورة */
+  .heroIntroArt.wxOff{--plateH:550px;}
+  .hpBtns{display:flex; gap:6px; flex:0 0 auto;}
+  .hpBtns [hidden]{display:none;}
+  .hpHead{align-items:center;}
+  .hpBodyWrap{overflow:hidden;}
+  .heroIntroArt .hpPhoto{min-height:0;}
+  .heroPlate p.hpNote{font-size:.76rem; line-height:1.6; margin:7px 0 5px;}
+  @media (max-height:820px) and (min-width:761px){
+    .heroIntroArt.wxOff{--plateH:420px;}
+    .heroPlate p.hpNote{margin:5px 0 3px; line-height:1.5;}
+  }
+  @media(max-width:760px){ .heroIntroArt.wxOff{--plateH:480px;} }
   .hdWxTop{flex:0 0 118px; background:linear-gradient(160deg, var(--navy-soft), var(--navy-deep)); color:#ffffff;
     display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px 6px; font-weight:700; font-size:.82rem; text-align:center;}
   .hdWxTop b{font-family:'Cairo'; font-weight:800; font-size:2.3rem; line-height:1.1; color:var(--gold-light);}
@@ -8340,6 +8357,21 @@ const WEATHER_CODES = {
   95:['⛈️','عاصفة رعدية'], 96:['⛈️','عاصفة مع برد'], 99:['⛈️','عاصفة مع برد شديد'],
 };
 
+// إخفاء بطاقة الطقس اختيار المعلم ويُحفظ: لوحة الأطلس تأخذ مكانها فتكبر الصورة.
+// وإن تعذّر جلب الطقس أصلاً تكبر اللوحة كذلك، ولا يظهر زر الإظهار (لا شيء يُعرض)
+let wxLoaded = false;
+function wxIsHidden(){ try{ return localStorage.getItem('rahhala_wx_hidden') === '1'; }catch(e){ return false; } }
+function wxSetHidden(v){ try{ localStorage.setItem('rahhala_wx_hidden', v ? '1' : '0'); }catch(e){} wxApply(); }
+function wxApply(){
+  const card = document.getElementById('hdWeather'), art = card && card.closest('.heroIntroArt');
+  if(!card) return;
+  const off = !wxLoaded || wxIsHidden();
+  card.hidden = off;
+  if(art) art.classList.toggle('wxOff', off);
+  const btn = document.getElementById('hpWxShow');
+  if(btn) btn.hidden = !(wxLoaded && wxIsHidden());
+}
+
 // جلبة واحدة تملأ بطاقة الطقس بالصفحة الرئيسية والشريط الرفيع بباقي الصفحات
 async function initWeatherBar(){
   const bar = document.getElementById('weatherBar');
@@ -8373,8 +8405,9 @@ async function initWeatherBar(){
       // بلا <p>: البطاقة داخل .hero وقاعدة «.hero p» العامة تكبّر خطها وتزيحها
       card.innerHTML = `<div class="hdWxTop">` + (t !== null ? `<b dir="ltr">${t}°</b>` : '') + `<span>${icon} ${esc(desc)}</span></div>` +
         `<div class="hdWxInfo"><div class="hdWxHead">طقس الدوحة الآن</div><div class="hdWxList">${items}</div>` +
-        `<div class="hdWxNote">📚 سابع: عناصر المناخ · ثامن: الغلاف الجوي</div></div>`;
-      card.hidden = false;
+        `<div class="hdWxNote">📚 سابع: عناصر المناخ · ثامن: الغلاف الجوي</div></div>` +
+        `<button class="hdWxClose" type="button" onclick="wxSetHidden(true)" title="إخفاء الطقس (تكبر الصورة)" aria-label="إخفاء بطاقة الطقس">✕</button>`;
+      wxLoaded = true; wxApply();
     }
     // الشريط: لو أغلقه اليوم، ما نزعجه مرة ثانية
     if(bar && localStorage.getItem('rahhala_weather_dismissed') !== new Date().toISOString().slice(0,10)){
@@ -8474,25 +8507,18 @@ const S_CLIM = 'أقرب فئات تصنيف كوبن-جايجر للإقليم�
 const HERO_PLATES = [   // الكرة الأرضية ليست هنا: صارت ثابتة بالواجهة نفسها
   { id:'pop', img:'maps/pop.webp', title:'أين يعيش سكان العالم؟',
     alt:'خريطة العالم تُظهر تجمعات السكان: أكثفها في جنوب آسيا وشرقها وأوروبا',
-    labels:[['شرق آسيا',79.01,25.33],['جنوب آسيا',70.81,42.61],['أوروبا',53.17,16.27],
-            ['الصحراء الكبرى',52.13,37.73,'dim'],['سيبيريا',71.08,8.62,'dim minor'],['شرق أمريكا الشمالية',30.52,23.14,'minor']],
     ramp:['تخلخل','تركّز'],
     note:'كل بقعة مضيئة تجمّع سكاني: أكثفها في جنوب آسيا وشرقها وأوروبا، وأخلاها الصحاري والمناطق شديدة البرودة.',
     unit:'📚 سابع: التوزيع الجغرافي للسكان · ثامن: مناطق التركز السكاني',
     src:'البيانات: مدن وبلدات العالم بعدد سكانها — GeoNames (CC BY 4.0)' },
   { id:'deserts', img:'maps/deserts.webp', title:'صحاري العالم',
     alt:'خريطة صحاري العالم الحارة والباردة',
-    labels:[['الصحراء الكبرى',50.6,36.13],['الربع الخالي',63.36,41.6],['صحراء غوبي',74.83,21.01],['كالاهاري',55.55,73.97,'minor'],
-            ['الصحراء الأسترالية',83.58,75.56],['أتاكاما',31.57,74.76,'minor']],
-    qatar:true,
     legend:[['#e39a45','صحراء حارة'],['#e6c276','صحراء باردة'],['rgba(228,183,93,.55)','شبه جافة']],
     note:'تمتد أوسع الصحاري الحارة حول دائرتي عرض 18° و30° تقريباً — ودولة قطر ضمن الإقليم الصحراوي.',
     unit:'📚 سابع: الأقاليم المناخية — الإقليم الصحراوي',
     src:HP_KOPPEN },
   { id:'rain', img:'maps/rain.webp', title:'الأمطار حول العالم',
     alt:'خريطة أنظمة الأمطار في العالم',
-    labels:[['حوض الأمازون',32.99,58.38,'minor'],['حوض الكونغو',56.04,55.88,'minor']],
-    qatar:true,
     legend:[['#12804f','غزيرة (استوائية)'],['#4a9fd6','على مدار العام'],['#8cc46c','موسم ممطر وموسم جاف'],
             ['#c9bb57','شتاء ممطر وصيف جاف'],['#ebc87f','شبه جافة'],['#e39a45','جافة (صحراوية)'],['#e8f0f3','ثلوج وجليد']],
     note:'أغزر الأمطار قرب خط الاستواء، وأقلها في الصحاري — ولإقليم البحر المتوسط شتاء ممطر وصيف جاف.',
@@ -8500,14 +8526,11 @@ const HERO_PLATES = [   // الكرة الأرضية ليست هنا: صارت �
     src:HP_KOPPEN },
   { id:'seas', img:'maps/seas.webp', title:'محيطات العالم وبحاره',
     alt:'خريطة المحيطات والبحار',
-    labels:[['المحيط الهادئ',10.35,48.38,'sea'],['المحيط الأطلسي',39.8,40.16,'sea'],['المحيط الهندي',70.54,71.56,'sea'],
-            ['البحر المتوسط',54.26,26.82,'sea minor'],['البحر الأحمر',60.14,38.54,'sea minor'],['الخليج العربي',63.38,32.57,'sea']],
     note:'يغطي الماء معظم سطح الأرض: ثلاثة محيطات كبرى، وبحار قريبة منا كالخليج العربي والبحر الأحمر والبحر المتوسط.',
     unit:'📚 ثامن: أغلفة الأرض — الغلاف المائي',
     src:'حدود اليابس والماء: Natural Earth' },
   { id:'zones', img:'maps/zones.webp', title:'المناطق الحرارية',
     alt:'خريطة المناطق الحرارية الأربع حسب دوائر العرض',
-    labels:[['خط الاستواء 0°',8.79,55.05,'dim'],['30°',8.88,30.63,'dim'],['40°',11.53,23.14,'dim'],['66.5°',20.97,6.88,'dim minor']],
     legend:[['#d9663d','الحارة (0°–30°)'],['#e7af3b','المعتدلة الدافئة (30°–40°)'],['#4f9f86','المعتدلة الباردة (40°–66.5°)'],['#cfe6ee','الباردة القطبية (66.5°–90°)']],
     note:'قسّم العلماء سطح الأرض إلى أربع مناطق حرارية حسب دوائر العرض — أكبرها امتداداً المنطقة الحارة.',
     unit:'📚 سابع: عناصر المناخ — الحرارة',
@@ -8516,25 +8539,18 @@ const HERO_PLATES = [   // الكرة الأرضية ليست هنا: صارت �
     note:'ترتفع الحرارة كلما اتجهنا نحو المركز، ويبقى باطن الأرض صلباً بسبب الضغط الهائل الواقع عليه.' },
 
   // ═══ خرائط إقليمية وعالمية (maps/build/render-maps.mjs — الأنهار والحدود من Natural Earth) ═══
-  { id:'rafidain', img:'maps/rafidain.webp', w:1100, h:678, title:'بلاد الرافدين بين دجلة والفرات',
+  { id:'rafidain', img:'maps/rafidain.webp', title:'بلاد الرافدين بين دجلة والفرات',
     alt:'خريطة بلاد الرافدين: نهرا دجلة والفرات يجريان إلى الخليج العربي، ومواقع أور وبابل ونينوى',
-    labels:[['نهر الفرات',35.61,22.26],['نهر دجلة',61.95,26.64],['الخليج العربي',88.78,94.59,'sea'],
-            ['البحر المتوسط',6.83,45.8,'sea minor'],['العراق حالياً',46.83,54.28,'land']],
-    pins:[['أور',68.8,67.65],['بابل',60.59,53],['نينوى',54.4,16.3]],
-    legend:[['#59a5c4','نهرا دجلة والفرات'],['#ebc87f','العراق حالياً'],['#ebc578','عاصمة تاريخية']],
+    legend:[['#59a5c4','نهرا دجلة والفرات'],['#ebc87f','العراق حالياً']],
     note:'بلاد الرافدين هي المنطقة الواقعة بين نهري دجلة والفرات، وتقع ضمن حدود جمهورية العراق حالياً.',
     unit:'📚 سابع: حضارة بلاد الرافدين', src:'الأنهار والحدود: Natural Earth · المدن من الكتاب' },
-  { id:'nile', img:'maps/nile.webp', w:1100, h:687, title:'مصر ونهر النيل',
+  { id:'nile', img:'maps/nile.webp', title:'مصر ونهر النيل',
     alt:'خريطة مصر يجري فيها نهر النيل من الجنوب إلى البحر المتوسط، والبحر الأحمر شرقها',
-    labels:[['نهر النيل',41.11,57.87],['البحر المتوسط',24.44,7.69,'sea'],['البحر الأحمر',71.56,92.38,'sea'],['مصر',31.11,73.71,'land']],
     legend:[['#59a5c4','نهر النيل'],['#ebc87f','مصر حالياً']],
     note:'ساعد نهر النيل على استقرار المصريين القدماء وقيام الزراعة ووفرة المحاصيل.',
     unit:'📚 ثامن: الحضارة المصرية', src:'الأنهار والحدود: Natural Earth' },
   { id:'census', img:'maps/census.webp', title:'متى تُجري الدول تعدادها السكاني؟',
     alt:'خريطة العالم تُلوّن دولاً حسب فترات إجراء التعداد السكاني فيها',
-    labels:[['الولايات المتحدة',25.74,23.87],['البرازيل',35.82,63.37],['فنزويلا',31.94,48.8,'minor'],['فرنسا',50.58,18.59],
-            ['الدانمارك',52.04,12.41,'minor'],['مصر',57.27,36.13],['الهند',71.12,40.97],['اليابان',84.44,25.7]],
-    qatar:true,
     legend:[['#4a9fd6','كل خمس سنوات'],['#e39a45','كل عشر سنوات'],['#8cc46c','فترات غير منتظمة']],
     note:'قطر من الدول التي تُجري تعدادها على فترات غير منتظمة، مثل البرازيل وفنزويلا.',
     unit:'📚 ثامن: مصادر البيانات السكانية', src:'الحدود: Natural Earth · الفترات من الكتاب' },
@@ -8800,16 +8816,11 @@ function hpBody(pl){
       <li><i style="background:#f6d99d"></i><span><b>٤ النواة الداخلية:</b> صلبة، تصل إلى 5500°م</span></li>
     </ol></div>`;
   }
-  const lbl = (pl.labels || []).map(([t,x,y,cls]) =>
-    `<span class="hpLbl ${cls || ''}" style="left:${x}%;top:${y}%">${esc(t)}</span>`).join('');
-  const qatar = pl.qatar ? `<span class="hpQatar" style="left:63.42%;top:34.3%"><i></i><b>قطر</b></span>` : '';
-  // مواقع مدن تاريخية بنقطة واسم (الخرائط الإقليمية) — محسوبة بإسقاط خريطتها
-  const pins = (pl.pins || []).map(([t,x,y]) => `<span class="hpPin" style="left:${x}%;top:${y}%"><i></i><b>${esc(t)}</b></span>`).join('');
-  const w = pl.w || 1100, h = pl.h || 488;
+  // خرائط البيانات تُعرض كصور المعرض: بلا أسماء فوق الصورة (طلب المالك: الكتابة تغطي الصورة وتزعج العين)
   const legend = pl.legend ? `<div class="hpLegend">${pl.legend.map(([c,t]) => `<span><i style="background:${c}"></i>${esc(t)}</span>`).join('')}</div>` : '';
   const ramp = pl.ramp ? `<div class="hpRamp"><span>${esc(pl.ramp[0])}</span><i></i><span>${esc(pl.ramp[1])}</span></div>` : '';
-  return `<div class="hpMap" style="aspect-ratio:${w}/${h}; width:min(100%, calc(var(--mapH, 999px) * ${(w / h).toFixed(4)}))"><img src="${pl.img}" alt="${esc(pl.alt)}" width="${w}" height="${h}" decoding="async"
-      onerror="renderHeroPlate(HP_NO_IMG)">${lbl}${pins}${qatar}</div>${legend}${ramp}`;
+  return `<div class="hpPhoto fit"><img src="${pl.img}" alt="${esc(pl.alt)}" decoding="async"
+      onerror="renderHeroPlate(HP_NO_IMG)"></div>${legend}${ramp}`;
 }
 
 let hpCurrent = -1;
@@ -8841,9 +8852,10 @@ function renderHeroPlate(idx){
   const pl = HERO_PLATES[idx];
   try{ localStorage.setItem('rahhala_hero_plate', pl.id); }catch(e){}
   const next = `<button class="hpNext" type="button" onclick="renderHeroPlate()" title="لوحة أخرى" aria-label="عرض لوحة أخرى">↻</button>`;
+  const wxBtn = `<button class="hpNext" id="hpWxShow" type="button" onclick="wxSetHidden(false)" title="إظهار طقس الدوحة" aria-label="إظهار بطاقة الطقس" ${wxLoaded && wxIsHidden() ? '' : 'hidden'}>☀️</button>`;
   box.style.animation = 'none'; void box.offsetWidth; box.style.animation = '';   // إعادة حركة الظهور
   box.innerHTML = `
-    <div class="hpHead"><div><div class="hpEyebrow">🧭 من أطلس رحّالة</div><h3 class="hpTitle">${esc(pl.title)}</h3></div>${next}</div>
+    <div class="hpHead"><h3 class="hpTitle"><span class="hpEyebrow" title="من أطلس رحّالة">🧭</span> ${esc(pl.title)}</h3><div class="hpBtns">${wxBtn}${next}</div></div>
     <div class="hpBodyWrap">${hpBody(pl)}</div>
     <p class="hpNote">${esc(pl.note)}</p>
     <div class="hpFoot"><span class="hpUnit">${esc(pl.unit)}</span><span class="hpSrc">${esc(pl.src)}</span></div>`;
