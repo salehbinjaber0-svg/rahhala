@@ -1717,6 +1717,17 @@
   section{padding:70px 0;}
   .eyebrow-free h2{font-size:2.1rem; margin-bottom:10px;}
   .lead{color:#3f262e; max-width:60ch; margin-bottom:36px;}
+  /* حصة اليوم أكثف (طلب المالك: المسافات كبيرة) — بعد قاعدتي section و.lead العامتين كي لا تُلغى */
+  #lessonToday{padding:26px 0 40px;}
+  #lessonToday .lead{margin-bottom:16px;}
+  #lessonToday .actTabs{margin-top:14px;}
+  #lessonToday .actBody{padding-top:14px;}
+  #lessonToday .actSec{margin-bottom:18px;}
+  #lessonToday .actSec.special{padding:12px 16px 12px;}
+  #lessonToday .actSecHead{margin-bottom:8px;}
+  #lessonToday .actNone{padding:2px;}
+  #lessonToday .actArchive summary:focus{outline:none;}
+  #lessonToday .actArchive summary:focus-visible{outline:2px solid var(--gold); outline-offset:2px; border-radius:8px;}
 
   /* cards grid */
   .grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:20px;}
