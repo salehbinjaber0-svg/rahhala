@@ -7539,7 +7539,7 @@ const QUESTION_WORDS = new Set(['ليش','ليه','لماذا','كيف','وين'
   // صيغ طلب لا تحمل موضوعاً: «فايدتهم» «أمثلة» «ليش يسمى» «من اخترع» «وش يصير لما…» — كانت تُحسب
   // كلمات بلا تفسير فيُوسم الجواب الصحيح «📌 أقرب ما لقيته»
   'فايده','فائده','فوائد','فايدته','فايدتها','فايدتهم','امثله','مثال','يسمي','تسمي','سمي','سميت','يسمونه',
-  'اخترع','اخترعوا','يصير','تصير','لما']
+  'اخترع','اخترعوا','يصير','تصير','لما','معناه','معناها','تدل','يدل']
   .map(w => stripPrefix(normalizeArabic(w))));
 // كلمات «جوانب» عامة تُسأل عن أي مفهوم (سقوط، أسباب، أنواع…) — ليست موضوعاً منافساً
 // حتى لو كانت مفتاحاً بوحدة أخرى: «سبب سقوط الدولة البابلية» سؤال عن البابليين لا عن العباسيين
@@ -8081,6 +8081,20 @@ function matchKnowledgeIn(query){
       lastTopic = shortMatch;
       contextTokens = shortMatch.k.flatMap(k => tokenize(k)).filter(t => t.length >= 3).slice(0, 4);
       return { text: shortMatch.a + pageRef(shortMatch.unit), chips: [] };
+    }
+  }
+
+  // مفهوم واحد يذكر نصُّه كل كلمات السؤال المضمونية: «ليش يقل الضغط في الجبال» لا يطابق مفتاحاً
+  // كاملاً («الضغط» مفتاح مفهوم و«الجبال» مفتاح آخر فيتنازعان)، لكن نص «الارتفاع عن سطح البحر» يذكرهما
+  // معاً. نشترط كلمتين فأكثر وأن يكون المفهوم وحيداً — مفهومان يغطيان السؤال = لا نخمّن بينهما
+  const contentToks = qTokens.filter(t => t.length >= 3 && !STOPWORDS.has(t) && !QUESTION_WORDS.has(t) && !NUMBER_WORDS.has(t));
+  if(contentToks.length >= 2){
+    const covering = KB_ACTIVE.filter(e => contentToks.every(t => ownHas(e, t)));
+    if(covering.length === 1){
+      const e = covering[0];
+      lastTopic = e;
+      contextTokens = e.k.flatMap(k => tokenize(k)).filter(t => t.length >= 3).slice(0, 4);
+      return { text: (cheer ? 'ولا يهمك 💙 خلّني أوضحها لك:\n' : '') + e.a + pageRef(e.unit), chips: [] };
     }
   }
 
