@@ -1718,10 +1718,22 @@
   .eyebrow-free h2{font-size:2.1rem; margin-bottom:10px;}
   .lead{color:#3f262e; max-width:60ch; margin-bottom:36px;}
   /* حصة اليوم أكثف (طلب المالك: المسافات كبيرة) — بعد قاعدتي section و.lead العامتين كي لا تُلغى */
-  #lessonToday{padding:26px 0 40px;}
-  #lessonToday .lead{margin-bottom:16px;}
-  #lessonToday .actTabs{margin-top:14px;}
-  #lessonToday .actBody{padding-top:14px;}
+  #lessonToday{padding:14px 0 40px;}
+  #lessonToday h2{margin-bottom:4px;}
+  #lessonToday .lead{margin-bottom:10px;}
+  #lessonToday .statsBox{margin-top:0; padding:10px 16px;}
+  #lessonToday .actTabs{margin-top:10px; align-items:flex-end;}
+  #lessonToday .actBody{padding-top:12px;}
+  /* خانة الأنشطة الخاصة الصغيرة بسطر التبويبين — في الطرف المقابل */
+  .actSpMini{margin-inline-start:auto; align-self:center; display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    background:#f9f7f6; border:1.5px solid var(--gold); border-radius:12px; padding:6px 12px; margin-bottom:6px;
+    color:#5e3844; font-size:.85rem; font-weight:600;}
+  .actSpMini b{color:var(--navy);}
+  .actSpPast{background:transparent; border:1px solid #ebc578; border-radius:9px; padding:3px 10px; cursor:pointer;
+    font-family:'Tajawal'; font-weight:800; font-size:.82rem; color:var(--gold-deep);}
+  .actSpPast.on, .actSpPast:hover{background:#fbedcf;}
+  #lessonToday .actSec.special.mini{padding:12px;}
+  @media(max-width:620px){ #lessonToday .actTabs{flex-wrap:wrap;} .actSpMini{order:-1; flex-basis:100%; margin:0 0 6px; justify-content:space-between;} }
   #lessonToday .actSec{margin-bottom:18px;}
   #lessonToday .actSec.special{padding:12px 16px 12px;}
   #lessonToday .actSecHead{margin-bottom:8px;}
@@ -4572,6 +4584,7 @@ function fmtActDate(iso){
 
 // تبويب الصف المعروض — يُتذكّر، إلا إن كان لصف آخر نشاط خاص اليوم وليس لهذا
 let actGrade = null;
+let actShowPast = false;   // الأنشطة الخاصة السابقة مطوية
 function setActGrade(g){
   actGrade = g;
   try{ localStorage.setItem('rahhala_act_grade', String(g)); }catch(e){}
@@ -4630,7 +4643,15 @@ function renderActivities(){
   const upcoming = specials.filter(a => (a.date || '') >= today).sort((x, y) => (x.date || '').localeCompare(y.date || ''));
   const past = specials.filter(a => (a.date || '') < today).sort((x, y) => (y.date || '').localeCompare(x.date || ''));
 
-  const specialHtml = `
+  // بلا نشاط خاص قادم: خانة صغيرة بسطر التبويبين (مقابل السابع والثامن) بدل صندوق كامل فارغ — طلب المالك.
+  // السابقة تُفتح بزرها تحت التبويبين
+  if(!upcoming.length){
+    tabs.insertAdjacentHTML('beforeend', `<div class="actSpMini"><span>📌 أنشطة خاصة: <b>لا نشاط قادم</b></span>${past.length
+      ? `<button type="button" class="actSpPast${actShowPast ? ' on' : ''}" onclick="actShowPast=!actShowPast; renderActivities()">📁 السابقة (${past.length}) ${actShowPast ? '▴' : '▾'}</button>` : ''}</div>`);
+  }
+  const specialHtml = !upcoming.length
+    ? (actShowPast && past.length ? `<div class="actSec special mini"><div class="actGrid wide">${past.map(a => actCardHtml(a, today)).join('')}</div></div>` : '')
+    : `
     <div class="actSec special">
       <div class="actSecHead"><h3>📌 أنشطة خاصة</h3><span>لحصص محددة بشروط خاصة</span></div>
       ${upcoming.length
