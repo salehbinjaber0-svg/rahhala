@@ -1629,6 +1629,20 @@
   /* بلا طقس: اللوحة تأخذ مكان البطاقة (ارتفاعها + الفجوة) فتكبر الصورة */
   .heroIntroArt.wxOff{--plateH:550px;}
   .hpBtns{display:flex; gap:6px; flex:0 0 auto;}
+  /* عرض بملء الشاشة: خلفية سوداء كفضاء الصور، والنص تحت الصورة */
+  #hpFull{position:fixed; inset:0; z-index:9000; background:#000000; display:flex; flex-direction:column;}
+  #hpFull[hidden]{display:none;}
+  #hpFull .hfImg{flex:1; min-height:0; display:flex; align-items:center; justify-content:center;}
+  #hpFull .hfImg img{max-width:100%; max-height:100%; object-fit:contain; display:block;}
+  #hpFull .hfBar{display:flex; align-items:center; gap:16px; padding:12px 28px 16px; background:linear-gradient(160deg, #881438, #4f0c20); border-top:1px solid rgba(220,167,58,.4);}
+  #hpFull .hfText{flex:1; min-width:0; text-align:start;}
+  #hpFull .hfTitle{font-family:'Aref Ruqaa'; color:var(--gold-light); font-size:1.7rem; margin:0; line-height:1.4;}
+  #hpFull .hfNote{color:#ffffff; font-family:'Cairo'; font-size:1.25rem; line-height:1.7; margin:2px 0;}
+  #hpFull .hfSrc{color:#ebded4; font-size:.75rem;}
+  #hpFull .hfBtns{display:flex; gap:10px;}
+  #hpFull .hfBtns button{width:52px; height:52px; border-radius:50%; border:1px solid rgba(220,167,58,.5); background:rgba(0,0,0,.2);
+    color:var(--gold-light); font-size:1.3rem; cursor:pointer;}
+  @media(max-width:760px){ #hpFull .hfTitle{font-size:1.2rem;} #hpFull .hfNote{font-size:.95rem;} #hpFull .hfBar{padding:10px 14px;} }
   .hpBtns [hidden]{display:none;}
   .hpHead{align-items:center;}
   .hpBodyWrap{overflow:hidden;}
@@ -8828,6 +8842,8 @@ let hpCurrent = -1;
 const HP_NO_IMG = HERO_PLATES.findIndex(p => p.id === 'layers');
 // «مجموعة أوراق» مخلوطة محفوظة: كل لوحة تظهر مرة واحدة قبل أن تتكرر أي لوحة، والترتيب يتغيّر
 // كل جولة فلا يُحفظ تسلسل ثابت. بالمعرّفات لا الأرقام، فإضافة لوحة لاحقاً لا تُربك الدور المحفوظ
+// صور الفضاء: الكرة من الفضاء والمدار والليل (كرة وعن قرب) والشمس والفصول والإحداثيات
+const hpIsSpace = (id) => /^(g|o|n|nr|s|gr)-/.test(id);
 function hpNextIdx(){
   const ids = HERO_PLATES.map(p => p.id);
   let deck = [], last = null;
@@ -8835,9 +8851,15 @@ function hpNextIdx(){
   if(!Array.isArray(deck)) deck = [];
   deck = deck.filter(id => ids.includes(id));        // لوحة حُذفت من القائمة
   if(!deck.length){
-    deck = ids.slice();
+    // الصور الفضائية (طلب المالك: تظهر أكثر من غيرها) مرتان بكل جولة، والبقية مرة — ولا تتجاور النسختان
+    deck = ids.concat(ids.filter(hpIsSpace));
     for(let i = deck.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [deck[i], deck[j]] = [deck[j], deck[i]]; }
-    if(deck[0] === last && deck.length > 1) [deck[0], deck[1]] = [deck[1], deck[0]];   // لا تبدأ الجولة بآخر لوحة ظهرت
+    for(let pass = 0; pass < 4; pass++) for(let i = 1; i < deck.length; i++){
+      if(deck[i] !== deck[i-1]) continue;
+      const j = deck.findIndex((x, k) => x !== deck[i] && deck[k-1] !== deck[i] && deck[k+1] !== deck[i] && Math.abs(k - i) > 1);
+      if(j >= 0) [deck[i], deck[j]] = [deck[j], deck[i]];
+    }
+    if(deck[0] === last && deck.length > 1){ const j = deck.findIndex(x => x !== last); [deck[0], deck[j]] = [deck[j], deck[0]]; }   // لا تبدأ الجولة بآخر لوحة ظهرت
   }
   const id = deck.shift();
   try{ localStorage.setItem('rahhala_plate_deck', JSON.stringify(deck)); }catch(e){}
@@ -8852,14 +8874,55 @@ function renderHeroPlate(idx){
   const pl = HERO_PLATES[idx];
   try{ localStorage.setItem('rahhala_hero_plate', pl.id); }catch(e){}
   const next = `<button class="hpNext" type="button" onclick="renderHeroPlate()" title="لوحة أخرى" aria-label="عرض لوحة أخرى">↻</button>`;
+  const fullBtn = (pl.photo || pl.img) ? `<button class="hpNext hpFullBtn" type="button" onclick="hpFullOpen()" title="ملء الشاشة" aria-label="عرض الصورة بملء الشاشة">⛶</button>` : '';
   const wxBtn = `<button class="hpNext" id="hpWxShow" type="button" onclick="wxSetHidden(false)" title="إظهار طقس الدوحة" aria-label="إظهار بطاقة الطقس" ${wxLoaded && wxIsHidden() ? '' : 'hidden'}>☀️</button>`;
   box.style.animation = 'none'; void box.offsetWidth; box.style.animation = '';   // إعادة حركة الظهور
   box.innerHTML = `
-    <div class="hpHead"><h3 class="hpTitle"><span class="hpEyebrow" title="من أطلس رحّالة">🧭</span> ${esc(pl.title)}</h3><div class="hpBtns">${wxBtn}${next}</div></div>
+    <div class="hpHead"><h3 class="hpTitle"><span class="hpEyebrow" title="من أطلس رحّالة">🧭</span> ${esc(pl.title)}</h3><div class="hpBtns">${fullBtn}${wxBtn}${next}</div></div>
     <div class="hpBodyWrap">${hpBody(pl)}</div>
     <p class="hpNote">${esc(pl.note)}</p>
     <div class="hpFoot"><span class="hpUnit">${esc(pl.unit)}</span><span class="hpSrc">${esc(pl.src)}</span></div>`;
 }
+
+// ---------- عرض صورة الأطلس بملء الشاشة (للسبورة) ----------
+// طبقة تُنشأ وقت التشغيل (#hpFull): الصورة كاملة بلا قص، والعنوان والمعلومة تحتها لا فوقها.
+// ← / → / مسافة: صورة أخرى · Esc: خروج. تطلب ملء الشاشة الحقيقي إن سمح المتصفح.
+function hpFullRender(){
+  const ov = document.getElementById('hpFull'), pl = HERO_PLATES[hpCurrent];
+  if(!ov || !pl) return;
+  const src = pl.photo || pl.img;
+  if(!src){ renderHeroPlate(); return hpFullRender(); }   // لوحة بلا صورة (طبقات الأرض): التالية
+  ov.querySelector('.hfImg').innerHTML = `<img src="${src}" alt="${esc(pl.alt)}" decoding="async">`;
+  ov.querySelector('.hfTitle').textContent = pl.title;
+  ov.querySelector('.hfNote').textContent = pl.note;
+  ov.querySelector('.hfSrc').textContent = pl.src;
+}
+function hpFullOpen(){
+  let ov = document.getElementById('hpFull');
+  if(!ov){
+    ov = document.createElement('div'); ov.id = 'hpFull'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', 'صورة الأطلس بملء الشاشة');
+    ov.innerHTML = `<div class="hfImg"></div>
+      <div class="hfBar"><div class="hfText"><h3 class="hfTitle"></h3><p class="hfNote"></p><small class="hfSrc"></small></div>
+        <div class="hfBtns"><button type="button" onclick="hpFullNext()" title="صورة أخرى (←)" aria-label="صورة أخرى">↻</button>
+        <button type="button" onclick="hpFullClose()" title="خروج (Esc)" aria-label="إغلاق">✕</button></div></div>`;
+    document.body.appendChild(ov);
+    document.addEventListener('keydown', hpFullKeys);
+  }
+  ov.hidden = false; hpFullRender();
+  try{ if(ov.requestFullscreen && !document.fullscreenElement) ov.requestFullscreen().catch(() => {}); }catch(e){}
+}
+function hpFullNext(){ renderHeroPlate(); hpFullRender(); }
+function hpFullClose(){
+  const ov = document.getElementById('hpFull'); if(ov) ov.hidden = true;
+  try{ if(document.fullscreenElement) document.exitFullscreen().catch(() => {}); }catch(e){}
+}
+function hpFullKeys(e){
+  const ov = document.getElementById('hpFull'); if(!ov || ov.hidden) return;
+  if(e.key === 'Escape'){ hpFullClose(); }
+  else if(e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === ' '){ e.preventDefault(); hpFullNext(); }
+}
+// خروج المتصفح من ملء الشاشة (Esc الخاص به) يغلق الطبقة أيضاً
+document.addEventListener('fullscreenchange', () => { const ov = document.getElementById('hpFull'); if(ov && !ov.hidden && !document.fullscreenElement) ov.hidden = true; });
 
 // ---------- جملة تحفيزية بشارة الواجهة ----------
 // تتغيّر مع الدخول فقط إذا مرّت أكثر من ساعة على آخر تغيير — فالتحديث المتكرر لا يبدّلها

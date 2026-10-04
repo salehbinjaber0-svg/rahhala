@@ -81,7 +81,7 @@ else ok('لا متغيرات مكررة');
 // ═══════════════════════════════════════════
 // 3) الترابط — كل مرجع يشير لشيء موجود
 // ═══════════════════════════════════════════
-const DYNAMIC_IDS = ['typingIndicator']; // تُنشأ وقت التشغيل
+const DYNAMIC_IDS = ['typingIndicator', 'hpFull']; // تُنشأ وقت التشغيل (hpFull: عرض الأطلس بملء الشاشة)
 const refs = [...new Set([...site.matchAll(/getElementById\('([^']+)'\)/g)].map(m => m[1]))];
 const missingRefs = refs.filter(id =>
   !site.includes(`id="${id}"`) && !DYNAMIC_IDS.includes(id) && !id.startsWith('note-')
