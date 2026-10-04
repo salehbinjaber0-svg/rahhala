@@ -477,6 +477,13 @@
     border-bottom:1.5px solid #e7d9ce; color:var(--navy); font-weight:800; font-size:1rem;
   }
   .actUnitHead:first-of-type{margin-top:4px;}
+  /* أنشطة الوحدات: ثلاث بطاقات بالسطر على الشاشات العريضة، اثنتان على المتوسطة، واحدة على الجوال */
+  .actGrid.units{grid-template-columns:repeat(3, minmax(0, 1fr));}
+  @media(max-width:1000px){ .actGrid.units{grid-template-columns:repeat(2, minmax(0, 1fr));} }
+  @media(max-width:620px){ .actGrid.units{grid-template-columns:1fr;} }
+  .actUnitTag{display:flex; flex-wrap:wrap; align-items:center; gap:4px 8px; padding-bottom:10px; border-bottom:1.5px solid #e7d9ce;
+    color:var(--navy); font-weight:800; font-size:.9rem;}
+  .actUnitName{min-width:0;}
   .actUnitNum{background:var(--navy); color:var(--gold-light); border-radius:9px; padding:2px 10px; font-size:.85rem;}
   .actUnitSub{color:#673e4b; font-weight:600; font-size:.82rem;}
   .actCard.special{border-color:#ebc578;}
@@ -4565,7 +4572,7 @@ function actClsLabel(cls){
   return b ? b.textContent.trim() : cls;
 }
 
-function actCardHtml(a, today){
+function actCardHtml(a, today, unitTag = ''){
   const sp = a.special;
   const isToday = a.date === today;
   const chips = sp ? `<div class="actChips">
@@ -4575,6 +4582,7 @@ function actCardHtml(a, today){
   return `
     <div class="actCard${sp ? ' special' : ''}${isToday ? (sp ? ' isToday' : ' isNew') : ''}">
       ${!sp && isToday ? '<span class="actNew">جديد اليوم</span>' : ''}
+      ${unitTag}
       ${chips}
       <div class="actIcon">${a.icon}</div>
       <div class="actTitle">${esc(a.title)}</div>
@@ -4626,12 +4634,13 @@ function renderActivities(){
   const unitsHtml = `
     <div class="actSec">
       <div class="actSecHead"><h3>📚 أنشطة الوحدات</h3><span>مرتّبة حسب وحدات المنهج</span></div>
-      ${units.length ? units.map(n => {
+      ${units.length ? `<div class="actGrid units">${units.map(n => {
+        // شبكة واحدة (ثلاث بطاقات بالسطر — طلب المالك) بدل عنوان وسطر لكل وحدة؛ رقم الوحدة شارة داخل البطاقة
         const u = U[n];
-        const list = regular.filter(a => a.unit === n).sort((x, y) => (y.date || '').localeCompare(x.date || ''));
-        return `<div class="actUnitHead"><span class="actUnitNum">الوحدة ${n}</span>${u ? esc(u.title) : ''}${u ? `<span class="actUnitSub">· ${esc(u.subject)}</span>` : ''}</div>
-          <div class="actGrid wide">${list.map(a => actCardHtml(a, today)).join('')}</div>`;
-      }).join('') : '<div class="actEmpty">ما فيه أنشطة بعد لهذا الصف.</div>'}
+        const tag = `<div class="actUnitTag"><span class="actUnitNum">الوحدة ${n}</span>${u ? `<span class="actUnitName">${esc(u.title)}</span><span class="actUnitSub">· ${esc(u.subject)}</span>` : ''}</div>`;
+        return regular.filter(a => a.unit === n).sort((x, y) => (y.date || '').localeCompare(x.date || ''))
+          .map(a => actCardHtml(a, today, tag)).join('');
+      }).join('')}</div>` : '<div class="actEmpty">ما فيه أنشطة بعد لهذا الصف.</div>'}
     </div>`;
 
   body.innerHTML = specialHtml + unitsHtml;
