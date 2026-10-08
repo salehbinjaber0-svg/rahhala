@@ -4041,7 +4041,7 @@ function answer(i, correctIdx, btn, box, questionId){
   const isCorrect = (i === correctIdx);
   if(isCorrect){
     btn.classList.add('correct');
-    fb.textContent = '✅ إجابة صحيحة! +10 نقاط، +1 طاقة';
+    fb.textContent = `${lsCheerText()} · +10 نقاط، +1 طاقة`;   // عبارات التعزيز الموحّدة (LS_CHEERS)
     fb.style.color = '#6fd3b8';
     state.points += 10;
     state.energy += 1;
@@ -4050,7 +4050,7 @@ function answer(i, correctIdx, btn, box, questionId){
   } else {
     btn.classList.add('wrong');
     box.children[correctIdx].classList.add('correct');
-    fb.textContent = '❌ حاول مرة أخرى في السؤال القادم';
+    fb.textContent = lsOopsText();
     fb.style.color = '#e39b9b';
     playSound('wrong');
     if(questionId) missedQuestionIds.add(questionId); // يرجع يُعاد عليه أكثر لحد ما يتقنه
@@ -4212,7 +4212,7 @@ function checkOrder(){
 
   if(correctCount === total){
     state.points += 20;
-    status.textContent = '🎉 ممتاز! الترتيب صحيح بالكامل — +20 نقطة';
+    status.textContent = `${lsCheerText()} · +20 نقطة`;
     if(turnOpen('game')) turnAward();
     status.style.color = 'var(--teal)';
     playSound('correct');
@@ -4221,7 +4221,7 @@ function checkOrder(){
     if(newly.length) celebrateBadges(newly);
     orderCurrent = null; // نمنع تكرار النقاط لنفس الجولة
   } else {
-    status.textContent = `${correctCount} من ${total} في مكانها الصحيح — الأخضر صح والأحمر يحتاج تعديل`;
+    status.textContent = `${lsOopsText()} · ${correctCount} من ${total} في مكانها الصحيح`;
     status.style.color = 'var(--maroon)';
     playSound('wrong');
   }
@@ -4294,7 +4294,7 @@ function flipMatchCard(i){
 
 function finishMatchGame(){
   state.points += 15;
-  document.getElementById('matchStatus').textContent = '🎉 ممتاز! طابقت كل الأزواج! +15 نقطة';
+  document.getElementById('matchStatus').textContent = `${lsCheerText()} · +15 نقطة`;
   const newly = checkBadges();
   persist();
   if(newly.length) celebrateBadges(newly);
@@ -4808,7 +4808,8 @@ let lsCurrentAct = null;      // النشاط المعروض — لربط الإ
 let lsWrongHere = new Set();  // الفقرات التي أخطأ فيها الصف بهذا العرض
 
 // عبارات التعزيز — قصيرة وبالفصحى بطلب المالك (أكتوبر ٢٠٢٦): الصحيح «إجابة صحيحة» أو «ممتاز»،
-// والخطأ «خطأ» أو «حاول مرة أخرى» فقط. الشرح (q.a) يبقى تحتها كما هو
+// والخطأ «خطأ» أو «حاول مرة أخرى» فقط. موحّدة بالموقع كله: حصة اليوم والمراجعة السريعة ورتّب الأحداث
+// والمطابقة (تُلحق بها النقاط فقط). الشرح (q.a) يبقى تحتها كما هو
 const LS_CHEERS = ['✅ إجابة صحيحة', '⭐ ممتاز'];
 const LS_OOPS = ['❌ خطأ', '🔄 حاول مرة أخرى'];
 function lsOopsText(){ return LS_OOPS[Math.floor(Math.random() * LS_OOPS.length)]; }
