@@ -520,14 +520,25 @@
   .lqCh{font-size:.85rem; color:#492c35;}
   .lqCh.ok{color:var(--teal); font-weight:700;}
   /* عرض الاختياري على البروجكتر */
-  .lsChoices{display:flex; flex-direction:column; gap:11px; width:100%; max-width:820px;}
+  /* بطاقات كبيرة بعمودين (تصميم المالك، نوفمبر ٢٠٢٦): خياران متقابلان، والفردي الأخير يمتد بعرض السطر */
+  .lsChoices{display:grid; grid-template-columns:1fr 1fr; gap:14px; width:100%; max-width:1040px;}
+  .lsCh:last-child:nth-child(odd){grid-column:1 / -1;}
+  /* ثلاثة خيارات قصيرة: صف واحد بثلاثة أعمدة (يضبطها renderLessonShow) */
+  .lsChoices.cols3{grid-template-columns:repeat(3, 1fr);}
+  .lsChoices.cols3 .lsCh:last-child{grid-column:auto;}
+  /* بعد ظهور الإجابة: البطاقات تنكمش لتفسح للتعزيز والشرح بلا تمرير */
+  .lsChoices:has(.lsCh.correct) .lsCh{min-height:0; padding-block:9px;}
+  /* lsScrollEnd يضيف tight حين لا يتّسع المسرح: يبقى الخيار الصحيح وحده */
+  .lsChoices.tight{grid-template-columns:1fr;}
+  .lsChoices.tight .lsCh:not(.correct){display:none;}
+  @media (max-width:700px){ .lsChoices, .lsChoices.cols3{grid-template-columns:1fr;} }
   .lsCh{
-    display:flex; align-items:center; gap:14px; padding:13px 22px; border-radius:14px;
+    display:flex; align-items:center; justify-content:center; gap:16px; padding:18px 24px; border-radius:18px; min-height:84px;
     /* خلفية صلبة لا شفافة: الشفافية تذوب على سبورة الصف مهما رُفعت */
     background:#ffffff; border:3px solid var(--navy); font-family:'Cairo', 'Tajawal', sans-serif;
-    font-size:clamp(1.05rem, 2.1vw, 1.6rem); color:var(--navy-deep); text-align:start; font-weight:700;
+    font-size:clamp(1.1rem, 2.2vw, 2rem); color:var(--navy-deep); text-align:start; font-weight:800;
     box-shadow:0 3px 10px rgba(79,12,32,.13);
-    transition:background .3s, border-color .3s;
+    transition:background .3s, border-color .3s, transform .15s, box-shadow .15s;
   }
   .lsCh .lsChKey{
     min-width:48px; height:48px; border-radius:50%; background:var(--navy); color:#ffffff; font-size:1.15em;
@@ -540,16 +551,19 @@
   }
   .lsCh.correct .lsChKey{background:#ffffff; color:#0d5c39;}
   .lsCard{
-    display:flex; flex-direction:column; align-items:center; gap:18px;
-    padding:44px 40px; border-radius:26px; max-width:900px;
+    display:flex; flex-direction:column; align-items:center; gap:12px;
+    padding:26px 36px; border-radius:26px; max-width:900px;
   }
+  /* عنوان البطاقة يرث .lsQ: بلا خلفيتها البيضاء ولا تثبيتها */
+  .lsCard .lsQ{position:static; background:none; padding:0;}
+  .lsQ:empty{display:none;}
   .lsCard.game{background:#f2ebfa; border:3px solid #6b3fa0; color:#4a2775;}
   .lsCard.reward{background:#f3ece7; border:3px solid var(--gold-deep); color:#7d5a13;}
   .lsCard.break{background:var(--cream); border:3px solid var(--navy); color:var(--navy-deep);}
-  .lsCardIcon{font-size:clamp(3rem, 7vw, 5rem); line-height:1;}
+  .lsCardIcon{font-size:clamp(2.6rem, 5vw, 4.2rem); line-height:1;}
   /* رسالة تشجيع عند الإجابة الصحيحة */
   .lsCh.pick{cursor:pointer;}
-  .lsCh.pick:hover{background:var(--cream); border-color:var(--gold-deep);}
+  .lsCh.pick:hover{background:var(--cream); border-color:var(--gold-deep); transform:translateY(-2px); box-shadow:0 8px 18px rgba(79,12,32,.18);}
   .lsCh.wrong{
     background:#fde5d6; border-color:#c2410c; color:#7c2d12;
     animation:shake .42s ease;
@@ -562,17 +576,16 @@
   /* رسالة الاستغراب: شريط عائم ثابت فوق أزرار التنقّل — كانت تُضاف
      أسفل الخيارات فتُقطع خلف النقاط والأزرار */
   .lsOops{
-    position:fixed; inset-inline:0; bottom:104px; z-index:6;
+    position:sticky; bottom:0; z-index:6; width:100%; margin-top:10px; border-radius:14px;
     font-family:'Cairo', 'Tajawal', sans-serif; font-weight:700; font-size:clamp(1.05rem,2.1vw,1.6rem);
-    color:#7c2d12; background:#fde5d6; border-top:2px solid #c2410c;
-    border-bottom:2px solid #c2410c; padding:10px 20px; text-align:center;
+    color:#7c2d12; background:#fde5d6; border:2px solid #c2410c; padding:10px 20px; text-align:center;
     animation:cheerPop .45s ease-out;
   }
   /* التعزيز يجب أن يُرى من آخر الصف: شريط صلب لا نص عارٍ يذوب بالخلفية */
   .lsCheer{
     font-family:'Cairo', 'Tajawal', sans-serif; font-weight:800; font-size:clamp(1.5rem,3.2vw,2.6rem);
     color:#ffffff; background:#0f7646; border:3px solid #0d5c39;
-    border-radius:16px; padding:12px 34px; margin-top:12px;
+    border-radius:16px; padding:8px 30px;
     box-shadow:0 6px 20px rgba(15,118,70,.35);
     animation:cheerPop .55s ease-out;
   }
@@ -587,12 +600,16 @@
     100%{opacity:0; transform:translateY(104vh) rotate(540deg);}
   }
   /* مؤقّت التفكير */
+  /* كبسولة المؤقّت أعلى بطاقة السؤال: الزر فاتح والعدّاد عنابي — يُقرأ من آخر الصف */
+  .lsClock{display:flex; align-items:center; flex-shrink:0; background:#f1e8e1; border-radius:999px; padding-inline-start:4px;}
+  .lsClockBtn{background:none; border:none; cursor:pointer; padding:8px 14px; font-family:'Tajawal'; font-weight:700; font-size:.95rem; color:#492c35;}
+  .lsClockBtn:hover{color:var(--navy);}
   .lsTimer{
-    font-weight:700; font-size:1.3rem; color:var(--navy-deep);
-    min-width:64px; text-align:center;
+    font-family:'Cairo', 'Tajawal', sans-serif; font-weight:800; font-size:1.25rem; color:#ffffff; background:var(--navy);
+    min-width:92px; text-align:center; padding:6px 16px; border-radius:999px; direction:ltr;
   }
-  .lsTimer.warn{color:#ffa578; animation:tick .6s ease-in-out infinite;}
-  .lsTimer.done{color:#ff6b6b;}
+  .lsTimer.warn{background:var(--maroon); animation:tick .6s ease-in-out infinite;}
+  .lsTimer.done{background:var(--maroon); font-size:1rem;}
   @keyframes tick{50%{transform:scale(1.14);}}
   .lsTimerBtn{
     background:rgba(0,0,0,.2); color:var(--gold-light); cursor:pointer;
@@ -613,7 +630,7 @@
     display:none; position:fixed; inset:0; z-index:430;
     /* خلفية فاتحة: البروجكتر على السبورة البيضاء يطرح الضوء، فالداكن
        يظهر رمادياً باهتاً بينما الفاتح يبقى ساطعاً وعالي التباين */
-    background:#fcfbfb; color:var(--navy-deep); overflow-y:auto;
+    background:#f5efea; color:var(--navy-deep); overflow-y:auto;
   }
   #lessonShow.show{display:flex; flex-direction:column;}
   /* خلفية النشاط: رسم متجهي مضمّن (لا صورة خارجية) بشفافية منخفضة
@@ -635,29 +652,69 @@
   #lessonShow.bg-rafidain > *{position:relative; z-index:1;}
 
   .lsHead{
-    background:var(--grad-navy); padding:15px 20px; border-bottom:2px solid var(--gold);
+    background:var(--grad-navy); padding:10px 20px; border-bottom:4px solid var(--gold); flex-shrink:0;
     display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
   }
-  .lsCount{color:var(--gold-light); font-weight:700; font-size:1rem;}
+  .lsBrand{display:flex; align-items:center; gap:10px; color:var(--gold-light);}
+  .lsBrandMark{width:44px; height:44px; border-radius:50%; border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:1.4rem; background:rgba(0,0,0,.2);}
+  .lsBrandTxt{display:flex; flex-direction:column; line-height:1.25;}
+  .lsBrandTxt b{font-family:'Aref Ruqaa'; font-size:1.5rem; color:var(--gold-light);}
+  .lsBrandTxt small{font-size:.74rem; color:#ffffff;}
+  .lsHeadMid{display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:center;}
+  .lsHead .fmTitle{font-family:'Cairo', 'Tajawal', sans-serif; font-weight:800; font-size:1.6rem; color:#ffffff;}
+  .lsHeadActs{display:flex; align-items:center; gap:9px; flex-wrap:wrap;}
+  #lessonShow.withWheel .lsLuckyBtn{display:none;}   /* زر المحظوظ داخل بطاقة العجلة حين تكون ظاهرة */
+  @media (max-width:900px){ .lsBrand{display:none;} }
+  /* الجسم: بطاقة السؤال + بطاقة العجلة متجاورتان بارتفاع واحد */
+  .lsBody{flex:1; min-height:0; display:flex; align-items:stretch; gap:18px; padding:16px 18px;}
+  .lsPanel{
+    position:relative; flex:1; min-width:0; display:flex; flex-direction:column; overflow:hidden;
+    background:#ffffff; border:1.5px solid #e2d0c2; border-radius:24px; box-shadow:0 10px 30px rgba(79,12,32,.1);
+  }
+  /* بوصلة باهتة بركن البطاقة — زخرفة لا نص. فوق المحتوى (z-index) لأن خلفية السؤال المثبّت البيضاء كانت تقصّها */
+  .lsPanel::after{
+    content:''; z-index:4; position:absolute; top:64px; inset-inline-end:-46px; width:230px; height:230px; pointer-events:none; opacity:.06;
+    background:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-50 -50 100 100'%3E%3Ccircle r='46' fill='none' stroke='%237a1232' stroke-width='2'/%3E%3Ccircle r='38' fill='none' stroke='%237a1232' stroke-width='1'/%3E%3Cpath d='M0-44 L7-7 L44 0 L7 7 L0 44 L-7 7 L-44 0 L-7-7 Z' fill='%237a1232'/%3E%3Cpath d='M26-26 L6 0 L26 26 L0 6 L-26 26 L-6 0 L-26-26 L0-6 Z' fill='%23dca73a'/%3E%3C/svg%3E") no-repeat center/contain;
+  }
+  .lsPanel > *{position:relative;}
+  /* التوسيط الرأسي بهوامش تلقائية لا بـjustify-content: المحتوى الطويل يبدأ من الأعلى ويُمرَّر كاملاً */
+  .lsStage > .lsQ{margin-top:auto;}
+  .lsStage > #lsAWrap{margin-bottom:auto; width:100%; display:flex; flex-direction:column; align-items:center; gap:14px;}
+  .lsTop{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:14px 20px 0; flex-shrink:0;}
+  .lsKind{
+    font-family:'Cairo', 'Tajawal', sans-serif; font-weight:800; font-size:clamp(.95rem, 1.5vw, 1.2rem);
+    color:var(--navy); background:#ffffff; border:2px solid var(--navy); border-radius:999px; padding:5px 22px;
+  }
+  .lsFoot{flex-shrink:0; border-top:2px solid #e2d0c2; margin:0 20px; padding:10px 0 14px;}
+  .lsProg{display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; padding-bottom:10px;}
+  .lsCount{color:var(--navy-deep); font-family:'Cairo', 'Tajawal', sans-serif; font-weight:800; font-size:1.05rem;}
   /* المسرح يتمدد ويمرّر عند الحاجة، فلا يزيح أزرار التنقّل خارج الشاشة */
   .lsStage{
-    flex:1; min-height:0; overflow-y:auto;
+    flex:1; min-height:0; overflow-y:auto; scroll-behavior:smooth;
     display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
-    gap:14px; padding:16px 28px 18px; text-align:center;
+    gap:16px; padding:0 28px 18px; text-align:center;
   }
+  /* الخيارات تدخل متتابعة — حركة قصيرة تشدّ الانتباه للسؤال الجديد */
+  .lsChoices .lsCh{animation:lsFade .35s ease-out backwards;}
+  .lsChoices .lsCh:nth-child(2){animation-delay:.07s;}
+  .lsChoices .lsCh:nth-child(3){animation-delay:.14s;}
+  .lsChoices .lsCh:nth-child(4){animation-delay:.21s;}
+  @media (prefers-reduced-motion: reduce){ .lsChoices .lsCh{animation:none;} }
   /* السؤال يبقى مرئياً أعلى المسرح مهما طال ما تحته */
-  .lsQ{position:sticky; top:0; background:#fcfbfb; padding:6px 0 10px; z-index:3; width:100%;}
+  .lsQ{position:sticky; top:0; background:#ffffff; padding:12px 0 10px; z-index:3; width:100%;}
   /* خط القاهرة بشاشتي العرض: الرقعة الزخرفية كانت صعبة القراءة على البروجكتر من آخر الصف */
   .lsQ{
-    font-family:'Cairo', 'Tajawal', sans-serif; font-weight:700; font-size:clamp(1.4rem, 3.4vw, 2.6rem); line-height:1.55;
+    font-family:'Cairo', 'Tajawal', sans-serif; font-weight:800; font-size:clamp(1.4rem, 3vw, 3.2rem); line-height:1.5;
     color:var(--navy-deep); max-width:1100px;
   }
+  /* سؤال طويل (أكثر من ٨٠ حرفاً): خط أصغر كي تبقى الخيارات ظاهرة بلا تمرير */
+  .lsQ.long{font-size:clamp(1.2rem, 2.25vw, 2.4rem);}
   /* شارة المرجع: رقم الصفحة والسؤال والفرع — الطالب متوسط المستوى
      يضيع بين كتابه والشاشة، فالمرجع أمام عينه يوفّر وقت البحث. */
   .lsRef{
     font-family:'Tajawal'; font-weight:700;
     font-size:clamp(.82rem, 1.5vw, 1.12rem); letter-spacing:.3px;
-    display:inline-block; margin-bottom:10px; padding:5px 18px;
+    display:block; width:fit-content; margin:0 auto 10px; padding:5px 18px;
     color:#7a1232; background:#ebded4; border:2px solid #dca73a; border-radius:999px;
   }
   .lsA{
@@ -677,28 +734,30 @@
   }
 
   /* شريط التنقّل ثابت أسفل الشاشة ولا ينكمش مهما طال السؤال */
-  .lsNav{
-    display:flex; align-items:center; justify-content:center; gap:14px;
-    padding:13px 20px 16px; flex-wrap:wrap;
-    flex-shrink:0; background:#fcfbfb;
-    border-top:2px solid #e2d0c2;
-  }
-  .lsDots{flex-shrink:0; padding-bottom:4px;}
+  .lsNav{display:flex; align-items:stretch; justify-content:center; gap:14px; flex-wrap:wrap;}
   .lsNavBtn{
-    padding:14px 30px; border-radius:14px; cursor:pointer; font-family:'Tajawal';
-    font-weight:700; font-size:1rem; background:#ffffff;
+    flex:1 1 150px; max-width:260px; padding:13px 26px; border-radius:16px; cursor:pointer; font-family:'Cairo', 'Tajawal', sans-serif;
+    font-weight:800; font-size:1.1rem; background:#ffffff;
     color:var(--navy-deep); border:2.5px solid var(--navy);
   }
+  .lsNavBtn.next{background:var(--grad-navy); color:#ffffff; border-color:var(--navy-deep); box-shadow:0 5px 14px rgba(79,12,32,.25);}
+  .lsNavBtn.next:hover:not(:disabled){background:var(--navy-deep);}
   .lsNavBtn:hover:not(:disabled){background:var(--cream);}
   .lsNavBtn:disabled{opacity:.25; cursor:not-allowed;}
-  .lsNavBtn.reveal{background:var(--grad-gold); color:var(--navy-deep); border:none;}
-  .lsDots{display:flex; gap:7px; justify-content:center; flex-wrap:wrap; padding:0 20px 8px;}
+  .lsNavBtn.reveal{flex:1.6 1 220px; max-width:420px; background:var(--grad-gold); color:var(--navy-deep); border:none; box-shadow:0 5px 14px rgba(220,167,58,.35);}
+  .lsDots{display:flex; gap:9px; justify-content:center; flex-wrap:wrap;}
   .lsDot{
-    width:12px; height:12px; border-radius:50%; background:#d5c5b8;
+    width:14px; height:14px; border-radius:50%; background:#d5c5b8;
     cursor:pointer; border:none; padding:0;
   }
   .lsDot.on{background:var(--gold); transform:scale(1.3);}
   .lsDot.done{background:#0f7646;}
+  /* جوال: بعد القواعد العامة أعلاه كي لا تُلغى */
+  @media (max-width:700px){
+    .lsBody{padding:10px;}
+    .lsNav{gap:8px; flex-wrap:nowrap;}
+    .lsNavBtn, .lsNavBtn.reveal{flex:1 1 0; min-width:0; padding:10px 6px; font-size:.92rem;}
+  }
   /* ===== نقطة مشاركة من حصة اليوم إلى صفوفي ===== */
   .lsClsSel{
     padding:7px 12px; border-radius:10px; font-family:'Tajawal'; font-weight:700; font-size:.9rem;
@@ -838,24 +897,51 @@
   @media (prefers-reduced-motion: reduce){
     #wheelModal *, #wheelModal.spinning .whBulb{animation:none !important;}
   }
-  /* ===== العجلة المثبّتة في حصة اليوم: صغيرة يسار الشاشة، والسؤال يقابلها ===== */
-  .whDockX{display:none;}
-  /* تكبر مع الشاشة: ٢١٠ على شاشة ٦٢٠ بكسل، و٣٠٠ على السبورة ١٠٨٠ */
-  #wheelModal.docked{inset:auto; left:16px; top:calc(50% + 30px); transform:translateY(-50%); width:calc(min(300px, 34vh) + 56px);
-    padding:0; background:none; backdrop-filter:none; overflow:visible; z-index:440; --whS:min(300px, 34vh);}
-  #wheelModal.docked .whBox{position:relative; overflow:visible; box-shadow:0 12px 30px rgba(0,0,0,.35);}
+  /* ===== العجلة المثبّتة في حصة اليوم: بطاقة فاتحة «عجلة المشاركة» بجانب بطاقة السؤال =====
+     openWheel ينقل #wheelModal إلى .lsBody فتصير عنصراً مرناً بارتفاع البطاقة — بلا position:fixed ولا حشوات تعويض */
+  .whDockX, .whDockHead, .whDockActs{display:none;}
+  #wheelModal.docked{
+    position:relative; inset:auto; z-index:auto; flex:0 0 clamp(290px, 29vw, 430px); display:flex; align-items:stretch;
+    padding:0; background:none; backdrop-filter:none; overflow:visible;
+    --whS:min(clamp(290px, 29vw, 430px) - 44px, 100vh - 450px);
+  }
+  #wheelModal.docked .whBox{
+    position:relative; width:100%; overflow-y:auto; background:#ffffff; color:var(--navy-deep);
+    border:1.5px solid #e2d0c2; border-radius:24px; box-shadow:0 10px 30px rgba(79,12,32,.1);
+  }
   #wheelModal.docked .whHead{display:none;}
-  #wheelModal.docked .whStage{padding:16px 12px 12px; gap:8px;}
-  #wheelModal.docked .whResult{min-height:96px; gap:6px;}
-  #wheelModal.docked .whWinName{font-size:1.7rem; line-height:1.35;}
-  #wheelModal.docked .whHint{font-size:.82rem; line-height:1.6;}
-  #wheelModal.docked .whWinLbl{font-size:.9rem;}
-  #wheelModal.docked .tnBtn{font-size:.85rem; padding:5px 12px;}
-  #wheelModal.docked .whDockX{display:block; position:absolute; top:6px; left:8px; z-index:2; background:rgba(0,0,0,.2);
-    border:1px solid rgba(220,167,58,.5); color:var(--gold-light); width:26px; height:26px; border-radius:50%; cursor:pointer; font-size:.8rem;}
-  /* المسرح والتنقل يفسحان لها يساراً (الصفحة RTL: اليسار نهاية السطر) */
-  #lessonShow.withWheel .lsStage{padding-left:calc(min(300px, 34vh) + 96px);}
-  #lessonShow.withWheel .lsNav, #lessonShow.withWheel .lsDots{padding-left:calc(min(300px, 34vh) + 86px);}
+  #wheelModal.docked .whDockHead{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; padding:16px 18px 0 46px;}
+  .whDockTtl{display:flex; flex-direction:column; border-inline-start:5px solid var(--gold); padding-inline-start:10px; line-height:1.4;}
+  .whDockTtl b{font-family:'Cairo', 'Tajawal', sans-serif; font-weight:800; font-size:clamp(1.05rem, 1.7vw, 1.3rem); color:var(--navy-deep); white-space:nowrap;}
+  .whDockTtl small{font-size:clamp(.72rem, 1.1vw, .86rem); color:#492c35; white-space:nowrap;}
+  .whDockCount{flex-shrink:0; font-weight:800; font-size:.9rem; color:var(--gold-deep); background:#f5efea; border:1.5px solid var(--gold); border-radius:999px; padding:4px 12px; white-space:nowrap;}
+  #wheelModal.docked .whStage{flex:1; justify-content:center; padding:12px 16px 16px; gap:10px;}
+  #wheelModal.docked .whWheel svg{filter:drop-shadow(0 10px 18px rgba(79,12,32,.3));}
+  #wheelModal.docked .whResult{min-height:74px; gap:6px; width:100%;}
+  #wheelModal.docked .whWinLbl{font-size:.95rem; font-weight:800; color:var(--gold-deep);}
+  #wheelModal.docked .whWinName{font-family:'Cairo', 'Tajawal', sans-serif; font-weight:800; font-size:1.7rem; line-height:1.35; color:var(--navy); text-shadow:none;}
+  #wheelModal.docked .whHint{width:100%; font-size:.9rem; line-height:1.6; color:#492c35; background:#f5efea; border-radius:12px; padding:8px 10px;}
+  #wheelModal.docked .whHint b{color:var(--navy);}
+  #wheelModal.docked .whErr{color:var(--maroon);}
+  #wheelModal.docked .tnBtn{font-size:.9rem; padding:6px 13px;}
+  #wheelModal.docked .tnBtn.ghost, #wheelModal.docked .whGhost{background:#ffffff; color:var(--navy); border:1.5px solid var(--navy);}
+  #wheelModal.docked .whGhost{padding:7px 14px; font-size:.88rem;}
+  #wheelModal.docked .whPt{padding:8px 16px; font-size:.92rem;}
+  #wheelModal.docked .whPtDone{color:var(--gold-deep); background:#f5efea;}
+  #wheelModal.docked .whDockActs{display:flex; flex-direction:column; align-items:center; gap:9px; width:100%;}
+  .whDockSpin{
+    width:100%; padding:12px 18px; border:none; border-radius:14px; cursor:pointer; font-family:'Cairo', 'Tajawal', sans-serif; font-weight:800;
+    font-size:1.15rem; background:var(--grad-gold); color:var(--navy-deep); box-shadow:0 5px 14px rgba(220,167,58,.35);
+  }
+  .whDockSpin:disabled{cursor:default; background:#e2d0c2; box-shadow:none;}
+  #wheelModal.spinning .whDockSpin{cursor:wait;}
+  .whDockLucky{
+    padding:7px 22px; border-radius:999px; cursor:pointer; font-family:'Tajawal'; font-weight:800; font-size:.95rem;
+    background:#ffffff; color:var(--navy); border:2px solid var(--navy);
+  }
+  .whDockLucky:hover{background:var(--cream);}
+  #wheelModal.docked .whDockX{display:block; position:absolute; top:10px; left:10px; z-index:2; background:#ffffff;
+    border:1.5px solid #cfbeb0; color:#492c35; width:28px; height:28px; border-radius:50%; cursor:pointer; font-size:.8rem;}
   /* ===== الطالب المحظوظ — يستعير إطار نافذة العجلة (whModal/whBox/whHead) ===== */
   .lkCard{
     position:relative; width:min(560px, 100%); min-height:270px; border-radius:26px; padding:26px 22px;
@@ -1564,14 +1650,33 @@
     .lsClsSel{padding:4px 8px;}
     .lsHead .tnMsg{font-size:1rem;}
     .lsHead .tnBtn{padding:3px 10px; font-size:.8rem;}
-    .lsStage{padding:8px 24px; gap:8px;}
-    .lsQ{font-size:clamp(1.25rem, 2.8vw, 2rem); line-height:1.45; padding:2px 0 6px;}
+    .lsStage{padding:0 24px 8px; gap:8px;}
+    .lsQ{font-size:clamp(1.25rem, 2.8vw, 2rem); line-height:1.45; padding:8px 0 6px;}
+    .lsQ.long{font-size:clamp(1.1rem, 2.1vw, 1.6rem);}
     .lsRef{margin-bottom:4px; padding:3px 14px;}
     .lsChoices{gap:7px;}
-    .lsCh{padding:6px 18px;}
+    .lsCh{padding:8px 18px; min-height:60px;}
     .lsCh .lsChKey{min-width:38px; height:38px;}
-    .lsNav{padding:7px 16px 9px;}
-    .lsNavBtn{padding:8px 24px;}
+    .lsNavBtn{padding:8px 24px; font-size:1rem;}
+    .lsBody{padding:10px 12px; gap:12px;}
+    .lsTop{padding:9px 16px 0;}
+    .lsFoot{padding:7px 0 9px; margin:0 16px;}
+    .lsProg{padding-bottom:6px;}
+    .lsBrandMark{width:36px; height:36px; font-size:1.15rem;}
+    .lsBrandTxt b{font-size:1.25rem;}
+    .lsHead .fmTitle{font-size:1.3rem;}
+    #wheelModal.docked{--whS:min(clamp(290px, 29vw, 430px) - 44px, 100vh - 330px);}
+    /* شاشة قصيرة: زرّا العجلة في صف واحد، والتعزيز أصغر ليبقى الخيار الصحيح والشرح معاً بلا تمرير */
+    #wheelModal.docked .whDockActs{flex-direction:row;}
+    .whDockLucky{flex-shrink:0; padding:7px 14px; white-space:nowrap;}
+    .lsCheer{font-size:clamp(1.15rem, 2.2vw, 1.6rem); padding:5px 24px;}
+    .lsA{padding:8px 18px; line-height:1.55;}
+    .lsStage > #lsAWrap{gap:8px;}
+    .lsChoices:has(.lsCh.correct) .lsCh{padding-block:5px;}
+    #wheelModal.docked .whDockHead{padding-top:10px;}
+    #wheelModal.docked .whStage{padding:8px 14px 10px; gap:7px;}
+    #wheelModal.docked .whResult{min-height:60px;}
+    .whDockSpin{padding:8px 16px; font-size:1.05rem;}
   }
   .gmTurnBar{display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:16px;}
   .gmTurnBar[hidden]{display:none;}
@@ -2443,28 +2548,43 @@
 
 <div id="lessonShow">
   <div class="lsHead">
-    <button class="fmExit" onclick="closeLessonShow()">✕ إنهاء العرض</button>
-    <div class="fmTitle">📝 حصة اليوم</div>
-    <!-- «الدور على…» داخل الشريط مكان العنوان: لا يأخذ سطراً من مساحة السؤال -->
-    <div class="lsTurn" id="lsTurn" hidden></div>
-    <div style="display:flex; align-items:center; gap:11px; flex-wrap:wrap;">
+    <div class="lsBrand" aria-hidden="true"><span class="lsBrandMark">🧭</span><span class="lsBrandTxt"><b>رحّالة</b><small>منصة الدراسات الاجتماعية</small></span></div>
+    <div class="lsHeadMid">
+      <div class="fmTitle">حصة اليوم</div>
+      <!-- «الدور على…» داخل الشريط مكان العنوان: لا يأخذ سطراً من مساحة السؤال -->
+      <div class="lsTurn" id="lsTurn" hidden></div>
       <select class="lsClsSel" id="lsCls" onchange="lsSetCls(this.value)" title="الإجابة الصحيحة تمنح نقطة مشاركة لطالب من هذا الصف"></select>
-      <div class="lsTimer" id="lsTimer"></div>
+    </div>
+    <div class="lsHeadActs">
       <button class="lsTimerBtn" onclick="openWheel(lsCls, 'ls')" title="عجلة الأسماء: تختار طالباً ثم تعود للسؤال">🎡 العجلة</button>
-      <button class="lsTimerBtn" onclick="openLucky(lsCls)" title="الطالب المحظوظ">🍀 المحظوظ</button>
-      <button class="lsTimerBtn" id="lsTimerBtn" onclick="lsToggleTimer()">⏱️ ٣٠ ثانية</button>
-      <div class="lsCount" id="lsCount"></div>
+      <button class="lsTimerBtn lsLuckyBtn" onclick="openLucky(lsCls)" title="الطالب المحظوظ">🍀 المحظوظ</button>
+      <button class="lsTimerBtn" onclick="lsToggleFull()" title="ملء الشاشة" aria-label="ملء الشاشة">⛶</button>
+      <button class="fmExit" onclick="closeLessonShow()">✕ إنهاء العرض</button>
     </div>
   </div>
-  <div class="lsStage">
-    <div class="lsQ" id="lsQ"></div>
-    <div id="lsAWrap"></div>
-  </div>
-  <div class="lsDots" id="lsDots"></div>
-  <div class="lsNav">
-    <button class="lsNavBtn" id="lsPrevBtn" onclick="lsGo(-1)">→ السابق</button>
-    <button class="lsNavBtn reveal" id="lsRevealBtn" onclick="lsReveal()">💡 اكشف الإجابة</button>
-    <button class="lsNavBtn" id="lsNextBtn" onclick="lsGo(1)">التالي ←</button>
+  <!-- الجسم: بطاقة السؤال، وبجانبها (يساراً) بطاقة عجلة المشاركة حين تُثبَّت — openWheel ينقل #wheelModal إلى هنا -->
+  <div class="lsBody" id="lsBody">
+    <div class="lsPanel">
+      <div class="lsTop">
+        <div class="lsKind" id="lsKind"></div>
+        <div class="lsClock">
+          <button class="lsClockBtn" id="lsTimerBtn" onclick="lsToggleTimer()">⏱️ ٣٠ ثانية</button>
+          <div class="lsTimer" id="lsTimer">00:30</div>
+        </div>
+      </div>
+      <div class="lsStage">
+        <div class="lsQ" id="lsQ"></div>
+        <div id="lsAWrap"></div>
+      </div>
+      <div class="lsFoot">
+        <div class="lsProg"><div class="lsCount" id="lsCount"></div><div class="lsDots" id="lsDots"></div></div>
+        <div class="lsNav">
+          <button class="lsNavBtn" id="lsPrevBtn" onclick="lsGo(-1)">→ السابق</button>
+          <button class="lsNavBtn reveal" id="lsRevealBtn" onclick="lsReveal()">💡 اكشف الإجابة</button>
+          <button class="lsNavBtn next" id="lsNextBtn" onclick="lsGo(1)">التالي ←</button>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="lsPicker" id="lsPicker" hidden onclick="lsPickerBackdrop(event)">
     <div class="lsPickBox">
@@ -2477,6 +2597,11 @@
 <div class="whModal" id="wheelModal" hidden>
   <div class="whBox">
     <button class="whDockX" onclick="lsWheelOff = true; closeWheel()" title="إخفاء العجلة" aria-label="إخفاء العجلة">✕</button>
+    <!-- رأس البطاقة المثبّتة في حصة اليوم (يُخفى في النافذة المنبثقة) -->
+    <div class="whDockHead">
+      <div class="whDockTtl"><b>عجلة المشاركة</b><small>من سيكون صاحب الإجابة؟</small></div>
+      <span class="whDockCount" id="whDockCount"></span>
+    </div>
     <div class="whHead">
       <div class="whTitle">🎡 عجلة الأسماء</div>
       <select class="whSel" id="whCls" onchange="whSetCls(this.value)" title="الصف"></select>
@@ -2499,6 +2624,10 @@
         <button class="whHub" id="whHub" onclick="whSpin()">لِفّ</button>
       </div>
       <div class="whResult" id="whResult"></div>
+      <div class="whDockActs">
+        <button class="whDockSpin" id="whSpinBtn" onclick="whSpin()">🔄 تدوير العجلة</button>
+        <button class="whDockLucky" onclick="openLucky(lsCls)">🍀 المحظوظ</button>
+      </div>
     </div>
   </div>
 </div>
@@ -4857,6 +4986,7 @@ function lsPick(i){
     else lsStartAuto();
     const rv = document.getElementById('lsRevealBtn');
     if(rv) rv.style.display = 'none';
+    lsScrollEnd();
   } else {
     cell.classList.add('wrong');
     if(lsCurrentAct && !lsWrongHere.has(lsIndex)){
@@ -4872,6 +5002,15 @@ function lsPick(i){
   }
 }
 
+// بعد الإجابة: إن لم يتّسع المسرح للخيارات والتعزيز والشرح معاً تُطوى الخيارات الخاطئة ويبقى الصحيح،
+// ثم ينزل المسرح لآخره (السؤال مثبّت أعلاه فيبقى ظاهراً)
+function lsScrollEnd(){
+  const st = document.querySelector('#lessonShow .lsStage');
+  if(!st) return;
+  const ch = st.querySelector('.lsChoices');
+  if(ch && st.scrollHeight > st.clientHeight + 4) ch.classList.add('tight');
+  st.scrollTop = st.scrollHeight;
+}
 function lsCheerText(){ return LS_CHEERS[Math.floor(Math.random() * LS_CHEERS.length)]; }
 
 // قصاصات احتفال تتساقط على الشاشة
@@ -4912,13 +5051,20 @@ function lsStopTimer(){
   const b = document.getElementById('lsTimerBtn');
   if(b) b.textContent = '⏱️ ٣٠ ثانية';
   const t = document.getElementById('lsTimer');
-  if(t){ t.className = 'lsTimer'; t.textContent = ''; }
+  if(t){ t.className = 'lsTimer'; t.textContent = '00:30'; }
 }
 function lsPaintTimer(){
   const t = document.getElementById('lsTimer');
   if(!t) return;
   t.className = 'lsTimer' + (lsTimerLeft <= 10 ? ' warn' : '');
-  t.textContent = lsTimerLeft + 'ث';
+  t.textContent = '00:' + String(lsTimerLeft).padStart(2, '0');
+}
+
+// ملء الشاشة للعرض كله (البطاقة والعجلة معاً) — زر ⛶ بالشريط
+function lsToggleFull(){
+  const d = document;
+  if(d.fullscreenElement){ if(d.exitFullscreen) d.exitFullscreen().catch(()=>{}); }
+  else if(d.documentElement.requestFullscreen) d.documentElement.requestFullscreen().catch(()=>{});
 }
 
 function openLessonShow(){
@@ -4963,7 +5109,7 @@ function renderLessonShow(){
 
   if(kind === 'game' || kind === 'reward' || kind === 'break'){
     // بطاقة كاملة بدل صيغة سؤال/جواب
-    qEl.innerHTML = '';
+    qEl.innerHTML = ''; qEl.classList.remove('long');
     wrap.innerHTML = `
       <div class="lsCard ${kind}">
         <div class="lsCardIcon">${cfg.icon}</div>
@@ -4973,15 +5119,19 @@ function renderLessonShow(){
   } else {
     // المرجع يُعرض داخل #lsQ لا فوقه، ليبقى ملتصقاً بالسؤال عند التمرير
     qEl.innerHTML = (q.ref ? `<div class="lsRef">${esc(q.ref)}</div>` : '') + esc(q.q);
+    qEl.classList.toggle('long', String(q.q || '').length > 80);
     if(lsIsChoice(kind) && Array.isArray(q.choices)){
       const keys = ['أ','ب','ج','د'];
       wrap.innerHTML = `<div class="lsChoices">${q.choices.map((c, i)=>
         `<div class="lsCh pick" data-i="${i}" onclick="lsPick(${i})"><span class="lsChKey">${keys[i] || (i+1)}</span><span>${esc(c)}</span></div>`
       ).join('')}</div>`;
+      if(q.choices.length === 3 && q.choices.every(c => String(c).length <= 16)) wrap.firstElementChild.classList.add('cols3');
     }
   }
 
-  document.getElementById('lsCount').textContent = `${cfg.icon} ${lsIndex + 1} من ${lessonQs.length}`;
+  const isCard = kind === 'game' || kind === 'reward' || kind === 'break';
+  document.getElementById('lsCount').textContent = `${isCard ? 'الشريحة' : 'السؤال'} ${lsIndex + 1} من ${lessonQs.length}`;
+  document.getElementById('lsKind').textContent = cfg.label;
   const rv = document.getElementById('lsRevealBtn');
   const hasReveal = (lsIsChoice(kind) && Array.isArray(q.choices)) || (kind === 'essay' && q.a);
   rv.style.display = hasReveal ? '' : 'none';
@@ -5041,6 +5191,7 @@ function lsReveal(){
     const shown = wrap.querySelector('.lsCh.correct');
     if(shown){
       cells.forEach(c=>c.classList.remove('correct'));
+      const grid = wrap.querySelector('.lsChoices'); if(grid) grid.classList.remove('tight');
       wrap.querySelectorAll('.lsA, .lsCheer, .lsWrite').forEach(e=>e.remove());
       rv.textContent = '💡 اكشف الإجابة';
       return;
@@ -5051,6 +5202,7 @@ function lsReveal(){
     if(q.a) wrap.insertAdjacentHTML('beforeend', `<div class="lsA">${esc(q.a)}</div>`);
     lsShowAward();
     lsWriteCue();
+    lsScrollEnd();
     rv.textContent = '🙈 أخفِ الإجابة';
     lsConfetti(14);
     lsStopTimer();
@@ -5252,6 +5404,8 @@ function openWheel(cls, ctx){
   const wm = document.getElementById('wheelModal');
   const dock = ctx === 'ls' && window.innerWidth >= WH_DOCK_MIN;
   wm.classList.toggle('docked', dock);
+  // المثبّتة بطاقة داخل جسم العرض بجانب بطاقة السؤال (ارتفاعهما واحد بلا حساب مواضع)، والمنبثقة تعود لـbody
+  (dock ? document.getElementById('lsBody') : document.body).appendChild(wm);
   document.getElementById('lessonShow').classList.toggle('withWheel', dock);
   if(dock) lsWheelOff = false;
   wm.hidden = false;
@@ -5269,6 +5423,7 @@ function closeWheel(){
   const m = document.getElementById('wheelModal');
   const wasDocked = m.classList.contains('docked');
   m.classList.remove('full', 'spinning', 'docked');
+  if(m.parentNode !== document.body) document.body.appendChild(m);
   document.getElementById('lessonShow').classList.remove('withWheel');
   m.hidden = true;
   if(wasDocked){ wh.ctx = ''; wh.winner = null; const pill = turn.ctx === 'ls' && turn.id != null; if(pill) turnRender(); }
@@ -5368,6 +5523,8 @@ function whPaint(){
   }
   document.getElementById('whRot').innerHTML = svg;
   document.getElementById('whHub').disabled = !n;
+  document.getElementById('whSpinBtn').disabled = !n;
+  document.getElementById('whDockCount').textContent = '👥 ' + n + (n >= 3 && n <= 10 ? ' طلاب' : ' طالباً');
   whResult();
 }
 
