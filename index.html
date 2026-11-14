@@ -581,6 +581,102 @@
   .lsVideo video:fullscreen{max-height:none; width:100%; height:100%; border-radius:0; object-fit:contain;}
   .lsVideo video:-webkit-full-screen{max-height:none; width:100%; height:100%; border-radius:0; object-fit:contain;}
   .lsVidNote{font-size:clamp(1rem, 1.8vw, 1.35rem); color:var(--navy-deep); font-weight:700;}
+  /* ═══ الشرائح الذكية (kind:'slide') — عرض بوربوينت بطابع المنصة: ظهور بالنقر مثل البوربوينت ═══ */
+  .lsQ.slide{font-size:clamp(1.25rem, 2.3vw, 2.3rem);}
+  .lsSlide{width:100%; max-width:1150px; display:flex; flex-direction:column; gap:12px; text-align:start;
+    font-family:'Cairo', 'Tajawal', sans-serif; color:var(--navy-deep); cursor:default;}
+  .lsSlide [data-step]{transition:opacity .35s ease, transform .35s ease;}
+  .lsSlide [data-step]:not(.on){visibility:hidden; opacity:0; transform:translateY(8px);}
+  .slRow{display:flex; gap:18px; align-items:flex-start;}
+  .slRow > *{flex:1; min-width:0;}
+  .slRow > .slImgBox{flex:0 0 40%;}
+  @media (max-width:760px){ .slRow{flex-direction:column;} .slRow > .slImgBox{flex-basis:auto;} }
+  .slText{font-size:clamp(1rem, 1.7vw, 1.45rem); line-height:1.7; font-weight:700;}
+  .slText.big{font-size:clamp(1.3rem, 2.6vw, 2.5rem); line-height:1.5; font-weight:800; color:var(--navy); text-align:center;}
+  .slText.center{text-align:center;}
+  .slText.note{font-size:clamp(.9rem, 1.3vw, 1.1rem); color:#5e3844; font-weight:600; text-align:center;}
+  .slText.box{background:var(--cream); border:2px solid #ebc578; border-radius:16px; padding:12px 18px;}
+  .slText.value{background:#fbedcf; border:2px solid var(--gold); border-radius:16px; padding:10px 18px; text-align:center;}
+  .slText.hl, .slHl{background:var(--gold-light); color:var(--ink); border-radius:10px; padding:4px 12px;}
+  .slImgBox{display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .slImgBox img{max-width:100%; max-height:calc(85vh - 400px); min-height:120px; object-fit:contain; border-radius:14px;
+    border:2px solid #ebc578; background:#ffffff;}
+  .slImgBox.plain img{border:none; background:none;}
+  .slImgBox.sm img{max-height:calc(60vh - 250px);}
+  .slCap{font-size:clamp(.85rem, 1.2vw, 1rem); color:#5e3844; font-weight:600; text-align:center;}
+  .slQa{display:flex; flex-direction:column; gap:8px;}
+  .slQ{background:#ffffff; border:2px solid #ebc578; border-radius:14px; padding:8px 14px;
+    font-size:clamp(1rem, 1.7vw, 1.45rem); font-weight:800; display:flex; gap:10px; align-items:flex-start;}
+  .slNum{flex-shrink:0; min-width:1.9em; height:1.9em; border-radius:50%; background:var(--navy); color:#ffffff;
+    display:inline-flex; align-items:center; justify-content:center; font-size:.85em;}
+  .slA{margin-top:4px; margin-inline-start:2.6em; font-size:clamp(.95rem, 1.55vw, 1.3rem); font-weight:700;}
+  .slA span{background:var(--gold-light); color:var(--ink); border-radius:8px; padding:2px 10px; line-height:1.9;
+    box-decoration-break:clone; -webkit-box-decoration-break:clone;}
+  .slCards{display:grid; grid-template-columns:repeat(var(--n, 3), minmax(0, 1fr)); gap:12px;}
+  @media (max-width:760px){ .slCards{grid-template-columns:1fr 1fr;} }
+  .slCard{background:#ffffff; border:2px solid #ebc578; border-radius:16px; padding:12px; display:flex; flex-direction:column;
+    align-items:center; gap:6px; text-align:center;}
+  .slCard.wide{flex-direction:row; text-align:start; align-items:center;}
+  .slCard img{width:100%; max-height:calc(60vh - 230px); object-fit:contain; border-radius:12px;}
+  .slCard.wide img{width:clamp(70px, 9vw, 120px); flex-shrink:0;}
+  .slCard.wide .slNum{font-size:1.1rem;}
+  .slCardIcon{font-size:clamp(1.6rem, 2.6vw, 2.4rem); line-height:1;}
+  .slCardTitle{font-weight:800; font-size:clamp(1rem, 1.6vw, 1.35rem); color:var(--navy);}
+  .slCardText{font-weight:700; font-size:clamp(.92rem, 1.45vw, 1.2rem); line-height:1.6;}
+  .slCols{display:grid; grid-template-columns:repeat(var(--n, 4), minmax(0, 1fr)); gap:10px;}
+  .slCol{background:var(--cream); border:2px solid #ebc578; border-radius:16px; overflow:hidden;}
+  .slCol h4{margin:0; background:var(--navy); color:#ffffff; text-align:center; padding:8px; font-size:clamp(1rem, 1.6vw, 1.35rem);}
+  .slCol.hot h4{background:var(--gold); color:var(--navy-deep);}
+  .slCol ul{margin:0; padding:10px 14px 12px; padding-inline-start:28px; font-weight:700; font-size:clamp(.92rem, 1.45vw, 1.2rem); line-height:1.7;}
+  .slLevels{display:flex; flex-direction:column; gap:8px;}
+  .slLv{display:flex; gap:12px; align-items:stretch; background:#ffffff; border:2px solid #ebc578; border-radius:14px; padding:8px 12px;}
+  .slLvTag{flex:0 0 7.5em; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    font-weight:800; font-size:clamp(.85rem, 1.25vw, 1.05rem); text-align:center; padding:4px;}
+  .slLvTag.l3{background:var(--navy); color:#ffffff;}
+  .slLvTag.l2{background:var(--gold); color:var(--navy-deep);}
+  .slLvTag.l1{background:var(--cream); color:var(--navy); border:2px solid var(--navy);}
+  .slLvBody{flex:1; min-width:0; display:flex; flex-direction:column; gap:6px;}
+  .slLvQ{font-weight:800; font-size:clamp(1rem, 1.6vw, 1.4rem);}
+  .slChs{display:flex; gap:10px; flex-wrap:wrap;}
+  .slChs .lsCh{min-height:0; padding:8px 26px; font-size:clamp(1rem, 1.6vw, 1.4rem); flex:1; max-width:280px;}
+  .slFb{font-weight:800; font-size:clamp(1rem, 1.6vw, 1.35rem); color:var(--navy);}
+  .slVenn{display:grid; grid-template-columns:1fr .8fr 1fr; gap:10px;}
+  .slVennG{border-radius:22px; padding:10px; display:flex; flex-direction:column; gap:7px; align-items:center; min-height:200px;}
+  .slVennG.g0{background:#eaf4f1; border:2px solid var(--teal);}
+  .slVennG.g1{background:#f3ece7; border:2px solid var(--gold-deep);}
+  .slVennG.g2{background:#fbedcf; border:2px solid var(--gold);}
+  .slVennG h4{margin:0 0 4px; color:var(--navy); font-size:clamp(1rem, 1.6vw, 1.35rem);}
+  .slChip{background:#ffffff; border:1.5px solid var(--navy); border-radius:10px; padding:4px 10px; font-weight:800;
+    font-size:clamp(.85rem, 1.3vw, 1.1rem); text-align:center; width:100%;}
+  .slHex{display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); grid-template-rows:repeat(4, auto); gap:10px; align-items:center;}
+  .slHexItem{background:var(--cream); border:2px solid var(--gold); padding:14px 10px; text-align:center; font-weight:800;
+    font-size:clamp(.95rem, 1.5vw, 1.25rem); clip-path:polygon(12% 0, 88% 0, 100% 50%, 88% 100%, 12% 100%, 0 50%);}
+  .slHexCenter{grid-column:2; grid-row:2 / span 2; background:var(--navy); color:#ffffff; border-radius:50%; aspect-ratio:1; max-width:220px;
+    justify-self:center; display:flex; align-items:center; justify-content:center; text-align:center; padding:14px;
+    font-weight:800; font-size:clamp(.95rem, 1.5vw, 1.25rem);}
+  .slList{display:flex; flex-direction:column; gap:8px;}
+  .slList .slQ{font-weight:700;}
+  .slBtn{background:var(--navy); color:#ffffff; border:none; border-radius:14px; padding:10px 22px; font:inherit;
+    font-size:clamp(1rem, 1.6vw, 1.3rem); font-weight:800; cursor:pointer; align-self:center;}
+  .slBtn.gold{background:var(--gold); color:var(--navy-deep);}
+  .slTitleSlide{align-items:center; text-align:center; gap:8px;}
+  .slTitleSlide img{max-height:calc(50vh - 150px); min-height:90px;}
+  /* شاشات قصيرة (لابتوب ٧٦٨): الشريحة كاملة بلا تمرير قدر الإمكان */
+  @media (max-height:820px){
+    .lsQ.slide{font-size:clamp(1.1rem, 1.9vw, 1.7rem);}
+    .lsSlide{gap:8px;}
+    .slText{font-size:clamp(.95rem, 1.4vw, 1.2rem); line-height:1.55;}
+    .slText.big{font-size:clamp(1.15rem, 2.1vw, 1.9rem);}
+    .slText.box, .slText.value{padding:8px 14px;}
+    .slImgBox img{max-height:calc(85vh - 420px); min-height:100px;}
+    .slCard{padding:8px;}
+    .slCard img{max-height:calc(60vh - 250px);}
+    .slHex{gap:6px;}
+    .slHexItem{padding:9px 10px; font-size:clamp(.9rem, 1.3vw, 1.1rem);}
+    .slHexCenter{max-width:170px;}
+    .slVennG{min-height:150px; padding:8px; gap:5px;}
+    .slQa{gap:5px;}
+  }
   .lsVidFull{background:var(--navy); color:#ffffff; border:none; border-radius:14px; padding:10px 26px;
     font:inherit; font-size:clamp(1rem, 1.7vw, 1.25rem); font-weight:700; cursor:pointer;}
   /* رسالة تشجيع عند الإجابة الصحيحة */
@@ -4709,7 +4805,8 @@ const LQ_KINDS = {
   game:   {label:'🎮 لعبة',         icon:'🎮'},
   reward: {label:'🎁 مكافأة',       icon:'🎁'},
   break:  {label:'⏸️ فاصل',         icon:'⏸️'},
-  video:  {label:'🎬 فيديو',        icon:'🎬'}
+  video:  {label:'🎬 فيديو',        icon:'🎬'},
+  slide:  {label:'🖥️ شريحة',       icon:'🖥️'}
 };
 
 
@@ -4985,8 +5082,10 @@ function lsOopsText(){ return LS_OOPS[Math.floor(Math.random() * LS_OOPS.length)
 // plain:true على النشاط (طلب المالك، نوفمبر ٢٠٢٦): الشاشة لا تكتب إلا «ممتاز» للصحيح و«حاول مرة أخرى» للخطأ —
 // بلا شرح ولا «اكتبوا الآن». النجوم تبقى بيد المعلم من قائمة الصف («بدون نقاط» يوقفها)
 function lsPlain(){ const a = lsCurrentAct && ACTIVITIES.find(x => x.id === lsCurrentAct); return !!(a && a.plain); }
-function lsShowCheer(){ return lsPlain() ? '⭐ ممتاز' : lsCheerText(); }
-function lsShowOops(){ return lsPlain() ? '🔄 حاول مرة أخرى' : lsOopsText(); }
+function lsActFb(){ const a = lsCurrentAct && ACTIVITIES.find(x => x.id === lsCurrentAct); return (a && a.fb) || null; }
+// fb:{ok, no} على النشاط = عبارتا التغذية الراجعة كما في عرض المعلم (تتقدّم على plain)
+function lsShowCheer(){ const f = lsActFb(); return f && f.ok ? f.ok : lsPlain() ? '⭐ ممتاز' : lsCheerText(); }
+function lsShowOops(){ const f = lsActFb(); return f && f.no ? f.no : lsPlain() ? '🔄 حاول مرة أخرى' : lsOopsText(); }
 
 // اختيار خيار: الصحيح يحتفل، والخطأ يهتزّ ويعطي فرصة جديدة
 // انتقال تلقائي صامت للفقرة التالية بعد الإجابة الصحيحة بخمس ثوانٍ.
@@ -5016,6 +5115,7 @@ function lsPick(i){
       if(c !== cell) c.classList.add('dim');
     });
     cell.classList.add('correct');
+    lsFbSound(true);
     wrap.insertAdjacentHTML('beforeend', `<div class="lsCheer">${lsShowCheer()}</div>`);
     if(q.a && !lsPlain()) wrap.insertAdjacentHTML('beforeend', `<div class="lsA">${esc(q.a)}</div>`);
     lsWriteCue();
@@ -5034,6 +5134,7 @@ function lsPick(i){
     lsScrollEnd();
   } else {
     cell.classList.add('wrong');
+    lsFbSound(false);
     if(lsCurrentAct && !lsWrongHere.has(lsIndex)){
       lsWrongHere.add(lsIndex);
       lsStatAnswer(lsCurrentAct, lsIndex, 'wrong');
@@ -5131,6 +5232,11 @@ function closeLessonShow(){
   document.getElementById('lessonShow').classList.remove('show');
   document.body.style.overflow = '';
   document.removeEventListener('keydown', lsKeys);
+  // نشاط فُتح من زر داخل شريحة: إغلاقه يعيد العرض لنفس الشريحة كاملة
+  if(lsReturn){
+    const r = lsReturn; lsReturn = null;
+    if(r.id && r.id !== lsCurrentAct){ startActivity(r.id); lsShowAllSteps = true; lsJump(r.idx); }
+  }
 }
 
 function lsKeys(e){
@@ -5144,6 +5250,8 @@ function lsKeys(e){
     e.preventDefault();
     const v = document.getElementById('lsVid');   // بفقرة الفيديو: المسافة تشغّل/توقف بدل كشف الإجابة
     if(v){ v.paused ? v.play().catch(()=>{}) : v.pause(); return; }
+    const cq = lessonQs[lsIndex];
+    if(cq && cq.kind === 'slide'){ lsGo(1); return; }
     lsReveal();
   }
   else if((e.key === 'f' || e.key === 'F') && document.getElementById('lsVid')) lsVidFull();
@@ -5168,15 +5276,19 @@ function renderLessonShow(){
         <div class="lsQ">${esc(q.q)}</div>
         ${q.a ? `<div class="lsCardTxt">${esc(q.a)}</div>` : ''}
       </div>`;
+  } else if(kind === 'slide'){
+    qEl.innerHTML = (q.ref ? `<div class="lsRef">${esc(q.ref)}</div>` : '') + esc(q.q || '');
+    qEl.classList.remove('long'); qEl.classList.add('slide');
+    const sl = lsSlideHtml(q);
+    wrap.innerHTML = sl.html;
+    lsStepMax = sl.steps;
+    lsStepNow = lsShowAllSteps ? sl.steps : 0;
+    lsShowAllSteps = false;
   } else if(kind === 'video'){
     // فيديو: العنوان مكان السؤال، والمشغّل تحته. التكبير شاشة كاملة حقيقية للفيديو وحده (طلب المالك)
     qEl.innerHTML = (q.ref ? `<div class="lsRef">${esc(q.ref)}</div>` : '') + esc(q.q);
     qEl.classList.remove('long');
-    wrap.innerHTML = `<div class="lsVideo">
-        <div class="lsVidBar">${q.a ? `<span class="lsVidNote">${esc(q.a)}</span>` : ''}
-          <button type="button" class="lsVidFull" onclick="lsVidFull()">⛶ شاشة كاملة</button></div>
-        <video id="lsVid" controls playsinline preload="metadata" src="${esc(q.src || '')}" ondblclick="lsVidFull()"></video>
-      </div>`;
+    wrap.innerHTML = lsVideoHtml(q.src, q.a);
   } else {
     // المرجع يُعرض داخل #lsQ لا فوقه، ليبقى ملتصقاً بالسؤال عند التمرير
     qEl.innerHTML = (q.ref ? `<div class="lsRef">${esc(q.ref)}</div>` : '') + esc(q.q);
@@ -5190,15 +5302,17 @@ function renderLessonShow(){
     }
   }
 
-  const isCard = kind === 'game' || kind === 'reward' || kind === 'break' || kind === 'video';
+  if(kind !== 'slide'){ qEl.classList.remove('slide'); lsStepNow = lsStepMax = 0; }
+  const isCard = kind === 'game' || kind === 'reward' || kind === 'break' || kind === 'video' || kind === 'slide';
   document.getElementById('lsCount').textContent = `${isCard ? 'الشريحة' : 'السؤال'} ${lsIndex + 1} من ${lessonQs.length}`;
-  document.getElementById('lsKind').textContent = cfg.label;
+  document.getElementById('lsKind').textContent = kind === 'slide' && q.goal ? `🎯 الهدف ${['', 'الأول', 'الثاني', 'الثالث'][q.goal] || q.goal}` : cfg.label;
   const rv = document.getElementById('lsRevealBtn');
   const hasReveal = (lsIsChoice(kind) && Array.isArray(q.choices)) || (kind === 'essay' && q.a);
   rv.style.display = hasReveal ? '' : 'none';
   rv.textContent = '💡 اكشف الإجابة';
   document.getElementById('lsPrevBtn').disabled = lsIndex === 0;
   document.getElementById('lsNextBtn').disabled = lsIndex === lessonQs.length - 1;
+  if(kind === 'slide') lsSlApply();
   renderLessonShowDots();
 
   // autoReveal: تكشف الإجابة مع ظهور الشريحة. متاحة للأنشطة التي تطلبها،
@@ -5211,7 +5325,120 @@ function renderLessonShow(){
 
 // إشارة «اكتبوا الآن»: تظهر مع الإجابة لا قبلها، فلا يكتب الطالب خطأً
 // في كتابه ثم يشطبه. تُطلب بالفقرة عبر writeCue.
+// ═══════ الشرائح الذكية (kind:'slide') — بوربوينت المعلم بطابع المنصة (طلب المالك، نوفمبر ٢٠٢٦) ═══════
+// الشريحة: {kind:'slide', q:'العنوان', ref:'شريط صغير فوقه', goal:1..3, blocks:[...]}
+// كل عنصر يظهر بنقرة (مثل حركات البوربوينت) إلا ما عليه with:true (يظهر مع سابقه) أو show:true (ظاهر من البداية).
+// النقر/المسافة/السهم يكشف الخطوة التالية، وبعد آخر خطوة ينتقل للشريحة التالية. الرجوع يعرض الشريحة كاملة.
+let lsStepNow = 0, lsStepMax = 0;
+let lsReturn = null;   // فتح نشاط من داخل العرض (زر رحّالة) ← إغلاقه يعيدك لنفس الشريحة
+
+function lsSlideHtml(q){
+  let n = 0;
+  const st = (o, always) => {
+    if(always || (o && o.show)) return '';
+    if(o && o.with && n > 0) return ` data-step="${n}"`;
+    return ` data-step="${++n}"`;
+  };
+  const txt = s => esc(s || '');
+  const block = b => {
+    switch(b.t){
+      case 'row': return `<div class="slRow">${(b.blocks || []).map(block).join('')}</div>`;
+      case 'col': return `<div class="slQa">${(b.blocks || []).map(block).join('')}</div>`;
+      case 'text': return `<div class="slText ${txt(b.cls)}"${st(b, !b.step)}>${txt(b.text)}</div>`;
+      case 'img': return `<div class="slImgBox ${txt(b.cls)}"${st(b, !b.step)}><img src="${txt(b.src)}" alt="${txt(b.cap || '')}" loading="lazy">${b.cap ? `<div class="slCap">${txt(b.cap)}</div>` : ''}</div>`;
+      case 'qa': return `<div class="slQa">${(b.items || []).map((it, i) => `<div class="slQ"><span class="slNum">${it.n || (i + 1)}</span><div style="flex:1">
+          <div>${txt(it.q)}</div>${it.a ? `<div class="slA"${st(it)}><span>${txt(it.a)}</span></div>` : ''}</div></div>`).join('')}</div>`;
+      case 'list': return `<div class="slList">${(b.items || []).map(it => `<div class="slQ"${st(null, b.static)}>${txt(it)}</div>`).join('')}</div>`;
+      case 'cards': return `<div class="slCards" style="--n:${b.n || (b.items || []).length}">${(b.items || []).map(it => `<div class="slCard ${txt(b.cls)}"${st(it, b.static)}>
+          ${it.img ? `<img src="${txt(it.img)}" alt="${txt(it.title)}">` : ''}${it.icon ? `<div class="slCardIcon">${txt(it.icon)}</div>` : ''}
+          ${it.num ? `<span class="slNum">${txt(it.num)}</span>` : ''}<div>${it.title ? `<div class="slCardTitle">${txt(it.title)}</div>` : ''}${it.text ? `<div class="slCardText">${txt(it.text)}</div>` : ''}</div></div>`).join('')}</div>`;
+      case 'cols': return `<div class="slCols" style="--n:${(b.items || []).length}">${(b.items || []).map(it => `<div class="slCol${it.hot ? ' hot' : ''}"${st(it, b.static)}>
+          <h4>${txt(it.title)}</h4><ul>${(it.list || []).map(li => `<li>${txt(li)}</li>`).join('')}</ul></div>`).join('')}</div>`;
+      case 'levels': return `<div class="slLevels">${(b.items || []).map((it, i) => {
+          const lv = it.lv || (3 - i), tag = ['', '★<br>دون المتوسط', '★★<br>المتوسط', '★★★<br>فوق المتوسط'][lv];
+          const body = it.choices
+            ? `<div class="slChs">${it.choices.map((c, j) => `<button type="button" class="lsCh pick" onclick="lsSlPick(this, ${j === it.correct ? 1 : 0})">${txt(c)}</button>`).join('')}</div><div class="slFb"></div>`
+            : (it.a ? `<div class="slA" style="margin-inline-start:0"${st(it)}><span>${txt(it.a)}</span></div>` : '');
+          return `<div class="slLv"><div class="slLvTag l${lv}">${tag}</div><div class="slLvBody"><div class="slLvQ">${txt(it.q)}</div>${body}</div></div>`;
+        }).join('')}</div>`;
+      case 'venn': {
+        // المجموعات بترتيب العرض (يمين ← يسار)، والظهور بترتيب order (مثل البوربوينت)
+        const groups = b.groups || [], steps = {};
+        (b.order || groups.map((_, i) => i)).forEach(gi => (groups[gi].items || []).forEach((_, k) => { steps[gi + ':' + k] = ++n; }));
+        return `<div class="slVenn">${groups.map((g, gi) => `<div class="slVennG g${gi}"><h4>${txt(g.title)}</h4>
+          ${(g.items || []).map((c, k) => `<div class="slChip" data-step="${steps[gi + ':' + k]}">${txt(c)}</div>`).join('')}</div>`).join('')}</div>`;
+      }
+      case 'hex': {
+        // سداسي حول المركز بترتيب عقارب الساعة من الأعلى (العمود ١ = اليمين بالعربية)
+        const cells = [[1,2],[2,1],[3,1],[4,2],[3,3],[2,3]];
+        return `<div class="slHex"><div class="slHexCenter">${txt(b.center)}</div>${(b.items || []).slice(0, 6).map((it, i) => {
+          const c = cells[i]; return `<div class="slHexItem" style="grid-row:${c[0]}; grid-column:${c[1]}"${st(null, b.static)}>${txt(it)}</div>`; }).join('')}</div>`;
+      }
+      case 'video': return lsVideoHtml(b.src, b.a, 'margin:0 auto');
+      case 'link': return `<button type="button" class="slBtn ${txt(b.cls)}"${st(b, !b.step)} onclick="lsOpenAct('${txt(b.act)}')">${txt(b.label)}</button>`;
+      default: return '';
+    }
+  };
+  const html = `<div class="lsSlide ${txt(q.cls)}" onclick="lsSlClick(event)">${(q.blocks || []).map(block).join('')}</div>`;
+  return {html, steps: n};
+}
+
+function lsSlApply(scroll){
+  document.querySelectorAll('#lsAWrap .lsSlide [data-step]').forEach(e => e.classList.toggle('on', +e.dataset.step <= lsStepNow));
+  const nb = document.getElementById('lsNextBtn');
+  if(nb) nb.disabled = lsIndex === lessonQs.length - 1 && lsStepNow >= lsStepMax;
+  // على الشاشات القصيرة: ما ظهر بالنقرة الأخيرة يُمرَّر إليه كي لا يظهر تحت الحافة دون أن يُرى
+  if(scroll && lsStepNow > 0){
+    const last = [...document.querySelectorAll('#lsAWrap .lsSlide [data-step="' + lsStepNow + '"]')].pop();
+    if(last && last.scrollIntoView) last.scrollIntoView({block:'nearest', behavior:'smooth'});
+  }
+}
+// نقرة على الشريحة نفسها = نقرة البوربوينت (لا على زر أو فيديو أو خيار)
+function lsSlClick(e){
+  if(e.target.closest('button, video, a, input, select')) return;
+  lsGo(1);
+}
+// خيار داخل شريحة (سؤال دون المتوسط): نفس تغذية النشاط الراجعة وصوتها
+function lsSlPick(btn, ok){
+  const box = btn.closest('.slLvBody'), fb = box && box.querySelector('.slFb');
+  if(!box || btn.classList.contains('wrong') || box.querySelector('.lsCh.correct')) return;
+  lsFbSound(!!ok);
+  if(ok){
+    box.querySelectorAll('.lsCh').forEach(b => { b.classList.remove('pick'); if(b !== btn) b.classList.add('dim'); });
+    btn.classList.add('correct');
+    if(fb) fb.textContent = lsShowCheer();
+    lsConfetti(12);
+    lsShowAward();
+  } else {
+    btn.classList.add('wrong');
+    if(fb){ fb.textContent = lsShowOops(); setTimeout(() => { if(!box.querySelector('.lsCh.correct')) fb.textContent = ''; }, 2600); }
+  }
+}
+// صوت التغذية الراجعة: fb.sndOk / fb.sndNo على النشاط (اختياري)
+function lsFbSound(ok){
+  const a = lsCurrentAct && ACTIVITIES.find(x => x.id === lsCurrentAct);
+  const src = a && a.fb && (ok ? a.fb.sndOk : a.fb.sndNo);
+  if(!src) return;
+  try{ const s = new Audio(src); s.play().catch(() => {}); }catch(e){}
+}
+// زر داخل الشريحة يفتح نشاطاً آخر (مثل صورة رحّالة في البوربوينت)، وإغلاقه يعيد لنفس الشريحة
+function lsOpenAct(id){
+  if(!ACTIVITIES.some(a => a.id === id)) return;
+  const back = {id: lsCurrentAct, idx: lsIndex};
+  closeLessonShow();
+  lsReturn = back;
+  startActivity(id);
+}
+
 // الفيديو يملأ الشاشة كلها (لا النافذة): requestFullscreen للعنصر نفسه، وآيباد/آيفون بـwebkitEnterFullscreen
+// مشغّل الفيديو — قالب واحد لنوع «فيديو» ولكتلة الفيديو داخل الشريحة الذكية (المعرّف lsVid مرة واحدة)
+function lsVideoHtml(src, note, style){
+  return `<div class="lsVideo"${style ? ` style="${esc(style)}"` : ''}>
+      <div class="lsVidBar">${note ? `<span class="lsVidNote">${esc(note)}</span>` : ''}
+        <button type="button" class="lsVidFull" onclick="lsVidFull()">⛶ شاشة كاملة</button></div>
+      <video id="lsVid" controls playsinline preload="metadata" src="${esc(src || '')}" ondblclick="lsVidFull()"></video>
+    </div>`;
+}
 function lsVidFull(){
   const v = document.getElementById('lsVid');
   if(!v) return;
@@ -5235,11 +5462,15 @@ function lsWriteCue(){
   aw ? w.insertBefore(cue, aw) : w.appendChild(cue);
 }
 
+let lsShowAllSteps = false;   // الرجوع لشريحة سابقة يعرضها كاملة (كالبوربوينت)
 function lsGo(dir){
   lsCancelAuto();
+  const cur = lessonQs[lsIndex];
+  if(dir > 0 && cur && cur.kind === 'slide' && lsStepNow < lsStepMax){ lsStepNow++; lsSlApply(true); return; }
   lsVidPause();
   const n = lsIndex + dir;
   if(n < 0 || n >= lessonQs.length) return;
+  if(dir < 0) lsShowAllSteps = true;
   lsSeen.add(lsIndex);
   lsIndex = n;
   renderLessonShow();
@@ -5248,7 +5479,7 @@ function lsGo(dir){
 function lsJump(i){
   lsCancelAuto();
   lsVidPause();
-  if(i < 0 || i >= lessonQs.length) return;
+  if(i < 0 || i >= lessonQs.length){ lsShowAllSteps = false; return; }
   lsSeen.add(lsIndex);
   lsIndex = i;
   renderLessonShow();
