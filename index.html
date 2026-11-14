@@ -4942,6 +4942,11 @@ let lsWrongHere = new Set();  // الفقرات التي أخطأ فيها ال�
 const LS_CHEERS = ['✅ إجابة صحيحة', '⭐ ممتاز'];
 const LS_OOPS = ['❌ خطأ', '🔄 حاول مرة أخرى'];
 function lsOopsText(){ return LS_OOPS[Math.floor(Math.random() * LS_OOPS.length)]; }
+// plain:true على النشاط (طلب المالك، نوفمبر ٢٠٢٦): الشاشة لا تكتب إلا «ممتاز» للصحيح و«حاول مرة أخرى» للخطأ —
+// بلا شرح ولا «اكتبوا الآن». النجوم تبقى بيد المعلم من قائمة الصف («بدون نقاط» يوقفها)
+function lsPlain(){ const a = lsCurrentAct && ACTIVITIES.find(x => x.id === lsCurrentAct); return !!(a && a.plain); }
+function lsShowCheer(){ return lsPlain() ? '⭐ ممتاز' : lsCheerText(); }
+function lsShowOops(){ return lsPlain() ? '🔄 حاول مرة أخرى' : lsOopsText(); }
 
 // اختيار خيار: الصحيح يحتفل، والخطأ يهتزّ ويعطي فرصة جديدة
 // انتقال تلقائي صامت للفقرة التالية بعد الإجابة الصحيحة بخمس ثوانٍ.
@@ -4971,8 +4976,8 @@ function lsPick(i){
       if(c !== cell) c.classList.add('dim');
     });
     cell.classList.add('correct');
-    wrap.insertAdjacentHTML('beforeend', `<div class="lsCheer">${lsCheerText()}</div>`);
-    if(q.a) wrap.insertAdjacentHTML('beforeend', `<div class="lsA">${esc(q.a)}</div>`);
+    wrap.insertAdjacentHTML('beforeend', `<div class="lsCheer">${lsShowCheer()}</div>`);
+    if(q.a && !lsPlain()) wrap.insertAdjacentHTML('beforeend', `<div class="lsA">${esc(q.a)}</div>`);
     lsWriteCue();
     lsConfetti(16);
     lsStopTimer();
@@ -4994,7 +4999,7 @@ function lsPick(i){
       lsStatAnswer(lsCurrentAct, lsIndex, 'wrong');
     }
     if(turnOpen('ls') && turn.idx === lsIndex) turnMiss();   // طالب العجلة أخطأ: لا نجمة، والمعلم يلفّ لغيره
-    wrap.insertAdjacentHTML('beforeend', `<div class="lsOops">${lsOopsText()}</div>`);
+    wrap.insertAdjacentHTML('beforeend', `<div class="lsOops">${lsShowOops()}</div>`);
     setTimeout(()=>{
       const o = wrap.querySelector('.lsOops');
       if(o) o.remove();
@@ -5152,7 +5157,7 @@ function renderLessonShow(){
 // في كتابه ثم يشطبه. تُطلب بالفقرة عبر writeCue.
 function lsWriteCue(){
   const q = lessonQs[lsIndex];
-  if(!q || !q.writeCue) return;
+  if(!q || !q.writeCue || lsPlain()) return;
   const w = document.getElementById('lsAWrap');
   if(!w || w.querySelector('.lsWrite')) return;
   const cue = document.createElement('div');
@@ -5198,8 +5203,8 @@ function lsReveal(){
     }
     const ok = wrap.querySelector(`.lsCh[data-i="${q.correct_index}"]`);
     if(ok) ok.classList.add('correct');
-    wrap.insertAdjacentHTML('beforeend', `<div class="lsCheer">${lsCheerText()}</div>`);
-    if(q.a) wrap.insertAdjacentHTML('beforeend', `<div class="lsA">${esc(q.a)}</div>`);
+    wrap.insertAdjacentHTML('beforeend', `<div class="lsCheer">${lsShowCheer()}</div>`);
+    if(q.a && !lsPlain()) wrap.insertAdjacentHTML('beforeend', `<div class="lsA">${esc(q.a)}</div>`);
     lsShowAward();
     lsWriteCue();
     lsScrollEnd();
