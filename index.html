@@ -561,6 +561,15 @@
   .lsCard.reward{background:#f3ece7; border:3px solid var(--gold-deep); color:#7d5a13;}
   .lsCard.break{background:var(--cream); border:3px solid var(--navy); color:var(--navy-deep);}
   .lsCardIcon{font-size:clamp(2.6rem, 5vw, 4.2rem); line-height:1;}
+  /* فقرة فيديو بحصة اليوم (kind:'video') — الملف على نطاق الموقع نفسه فلا تحجبه شبكة المدرسة */
+  .lsVideo{width:min(100%, 1100px); display:flex; flex-direction:column; align-items:center; gap:10px;}
+  .lsVidBar{display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap;}
+  .lsVideo video{width:100%; max-height:calc(85vh - 365px); min-height:200px; background:var(--ink); border-radius:18px; display:block;}
+  .lsVideo video:fullscreen{max-height:none; width:100%; height:100%; border-radius:0; object-fit:contain;}
+  .lsVideo video:-webkit-full-screen{max-height:none; width:100%; height:100%; border-radius:0; object-fit:contain;}
+  .lsVidNote{font-size:clamp(1rem, 1.8vw, 1.35rem); color:var(--navy-deep); font-weight:700;}
+  .lsVidFull{background:var(--navy); color:#ffffff; border:none; border-radius:14px; padding:10px 26px;
+    font:inherit; font-size:clamp(1rem, 1.7vw, 1.25rem); font-weight:700; cursor:pointer;}
   /* رسالة تشجيع عند الإجابة الصحيحة */
   .lsCh.pick{cursor:pointer;}
   .lsCh.pick:hover{background:var(--cream); border-color:var(--gold-deep); transform:translateY(-2px); box-shadow:0 8px 18px rgba(79,12,32,.18);}
@@ -4686,7 +4695,8 @@ const LQ_KINDS = {
   essay:  {label:'📝 سؤال مقالي',   icon:'📝'},
   game:   {label:'🎮 لعبة',         icon:'🎮'},
   reward: {label:'🎁 مكافأة',       icon:'🎁'},
-  break:  {label:'⏸️ فاصل',         icon:'⏸️'}
+  break:  {label:'⏸️ فاصل',         icon:'⏸️'},
+  video:  {label:'🎬 فيديو',        icon:'🎬'}
 };
 
 
@@ -5087,6 +5097,7 @@ function closeLessonShow(){
   lsClosePicker();
   lsStopTimer();
   lsCancelAuto();
+  lsVidPause();
   document.getElementById('lessonShow').classList.remove('show');
   document.body.style.overflow = '';
   document.removeEventListener('keydown', lsKeys);
@@ -5099,7 +5110,13 @@ function lsKeys(e){
   if(e.key === 'Escape') closeLessonShow();
   else if(e.key === 'ArrowLeft') lsGo(1);      // بالعربية: يسار = التالي
   else if(e.key === 'ArrowRight') lsGo(-1);
-  else if(e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); lsReveal(); }
+  else if(e.key === ' ' || e.key === 'Enter'){
+    e.preventDefault();
+    const v = document.getElementById('lsVid');   // بفقرة الفيديو: المسافة تشغّل/توقف بدل كشف الإجابة
+    if(v){ v.paused ? v.play().catch(()=>{}) : v.pause(); return; }
+    lsReveal();
+  }
+  else if((e.key === 'f' || e.key === 'F') && document.getElementById('lsVid')) lsVidFull();
 }
 
 function renderLessonShow(){
@@ -5121,6 +5138,15 @@ function renderLessonShow(){
         <div class="lsQ">${esc(q.q)}</div>
         ${q.a ? `<div class="lsCardTxt">${esc(q.a)}</div>` : ''}
       </div>`;
+  } else if(kind === 'video'){
+    // فيديو: العنوان مكان السؤال، والمشغّل تحته. التكبير شاشة كاملة حقيقية للفيديو وحده (طلب المالك)
+    qEl.innerHTML = (q.ref ? `<div class="lsRef">${esc(q.ref)}</div>` : '') + esc(q.q);
+    qEl.classList.remove('long');
+    wrap.innerHTML = `<div class="lsVideo">
+        <div class="lsVidBar">${q.a ? `<span class="lsVidNote">${esc(q.a)}</span>` : ''}
+          <button type="button" class="lsVidFull" onclick="lsVidFull()">⛶ شاشة كاملة</button></div>
+        <video id="lsVid" controls playsinline preload="metadata" src="${esc(q.src || '')}" ondblclick="lsVidFull()"></video>
+      </div>`;
   } else {
     // المرجع يُعرض داخل #lsQ لا فوقه، ليبقى ملتصقاً بالسؤال عند التمرير
     qEl.innerHTML = (q.ref ? `<div class="lsRef">${esc(q.ref)}</div>` : '') + esc(q.q);
@@ -5134,7 +5160,7 @@ function renderLessonShow(){
     }
   }
 
-  const isCard = kind === 'game' || kind === 'reward' || kind === 'break';
+  const isCard = kind === 'game' || kind === 'reward' || kind === 'break' || kind === 'video';
   document.getElementById('lsCount').textContent = `${isCard ? 'الشريحة' : 'السؤال'} ${lsIndex + 1} من ${lessonQs.length}`;
   document.getElementById('lsKind').textContent = cfg.label;
   const rv = document.getElementById('lsRevealBtn');
@@ -5155,6 +5181,18 @@ function renderLessonShow(){
 
 // إشارة «اكتبوا الآن»: تظهر مع الإجابة لا قبلها، فلا يكتب الطالب خطأً
 // في كتابه ثم يشطبه. تُطلب بالفقرة عبر writeCue.
+// الفيديو يملأ الشاشة كلها (لا النافذة): requestFullscreen للعنصر نفسه، وآيباد/آيفون بـwebkitEnterFullscreen
+function lsVidFull(){
+  const v = document.getElementById('lsVid');
+  if(!v) return;
+  const d = document;
+  if(d.fullscreenElement === v){ d.exitFullscreen().catch(()=>{}); return; }
+  if(v.requestFullscreen) v.requestFullscreen().catch(()=>{});
+  else if(v.webkitRequestFullscreen) v.webkitRequestFullscreen();
+  else if(v.webkitEnterFullscreen) v.webkitEnterFullscreen();
+}
+function lsVidPause(){ document.querySelectorAll('#lessonShow video').forEach(v => { try{ v.pause(); }catch(e){} }); }
+
 function lsWriteCue(){
   const q = lessonQs[lsIndex];
   if(!q || !q.writeCue || lsPlain()) return;
@@ -5169,6 +5207,7 @@ function lsWriteCue(){
 
 function lsGo(dir){
   lsCancelAuto();
+  lsVidPause();
   const n = lsIndex + dir;
   if(n < 0 || n >= lessonQs.length) return;
   lsSeen.add(lsIndex);
@@ -5178,6 +5217,7 @@ function lsGo(dir){
 
 function lsJump(i){
   lsCancelAuto();
+  lsVidPause();
   if(i < 0 || i >= lessonQs.length) return;
   lsSeen.add(lsIndex);
   lsIndex = i;
