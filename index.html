@@ -829,6 +829,17 @@
   #lessonShow.isEmbed .lsStage{overflow:hidden; padding:0 14px 10px;}
   #lessonShow.isEmbed .lsQ, #lessonShow.isEmbed .lsPanel::after{display:none;}
   #lessonShow.embedOnly .lsFoot{display:none;}   /* لعبة وحدها بالنشاط: لا سابق/تالٍ، فالمساحة كلها للعبة */
+  /* ملء الشاشة للعبة (طلب المعلم): اللعبة تملأ الشاشة، والعجلة تحلّ مكان أسهمها (#wheelSlot) — lsEmbedPlace يضعها فوقه */
+  #lessonShow.embedFull .lsHead, #lessonShow.embedFull .lsTop, #lessonShow.embedFull .lsFoot{display:none;}
+  #lessonShow.embedFull .lsBody{padding:0; gap:0;}
+  #lessonShow.embedFull .lsPanel{border:0; border-radius:0; box-shadow:none;}
+  #lessonShow.embedFull .lsStage{padding:0;}
+  #lessonShow.embedFull .lsEmbed{border-radius:0;}
+  #lessonShow.embedFull #wheelModal.docked{position:fixed; z-index:5; flex:none; --whS:var(--slotS, 260px);}
+  #lessonShow.embedFull #wheelModal.docked .whDockHead{padding:12px 14px 0 42px;}
+  #lessonShow.embedFull #wheelModal.docked .whStage{padding:8px 12px 12px; gap:8px;}
+  #lessonShow.embedFull #wheelModal.docked .whResult{min-height:0;}
+  #lessonShow.embedFull #wheelModal.docked.slim .whDockHead{display:none;}   /* شاشة قصيرة: العنوان يُترك لتكبر العجلة */
   #lessonShow.isEmbed #lsAWrap{flex:1; min-height:0; margin:0;}
   .lsEmbed{display:block; flex:1; width:100%; min-height:0; border:0; border-radius:16px; background:#ffffff;}
   /* سؤال طويل (أكثر من ٨٠ حرفاً): خط أصغر كي تبقى الخيارات ظاهرة بلا تمرير */
@@ -5216,9 +5227,66 @@ function lsPaintTimer(){
 // ملء الشاشة للعرض كله (البطاقة والعجلة معاً) — زر ⛶ بالشريط
 function lsToggleFull(){
   const d = document;
+  const cq = lessonQs[lsIndex];
+  if(cq && cq.kind === 'embed' && !d.fullscreenElement){ lsEmbedFull(); return; }
   if(d.fullscreenElement){ if(d.exitFullscreen) d.exitFullscreen().catch(()=>{}); }
   else if(d.documentElement.requestFullscreen) d.documentElement.requestFullscreen().catch(()=>{});
 }
+
+function lsEmbedLoaded(f){
+  try{
+    f.contentDocument.documentElement.classList.add('embedded');   // أسهم الشاشة مخفية داخل رحّالة
+    f.contentWindow.addEventListener('resize', lsEmbedPlaceSoon);
+    f.contentWindow.focus();
+  }catch(e){}
+}
+// ═══════ لعبة مضمّنة بملء الشاشة (طلب المعلم، نوفمبر ٢٠٢٦) ═══════
+// زر ⛶ داخل اللعبة كان يكبّر صفحتها وحدها فتختفي العجلة. الآن يكبّر الصفحة كلها: اللعبة تملأ الشاشة
+// وأسهمها مخفية، والعجلة المثبّتة توضع فوق الفراغ الذي تتركه اللعبة لها (#wheelSlot بعمودها الجانبي).
+function lsEmbedFrame(){ return document.querySelector('#lessonShow iframe.lsEmbed'); }
+function lsEmbedDoc(){ const f = lsEmbedFrame(); try{ return f && f.contentDocument; }catch(e){ return null; } }
+function lsEmbedFull(){
+  const d = document;
+  if(d.fullscreenElement){ d.exitFullscreen().catch(()=>{}); return; }
+  const show = d.getElementById('lessonShow');
+  show.classList.add('embedFull');
+  if(!whDocked() && !lsWheelOff && dbReady) openWheel(lsCls, 'ls');
+  const gd = lsEmbedDoc();
+  if(gd) gd.documentElement.classList.toggle('hostWheel', whDocked());
+  if(d.documentElement.requestFullscreen) d.documentElement.requestFullscreen().catch(()=>{});
+  lsEmbedPlaceSoon();
+}
+function lsEmbedExit(){
+  const show = document.getElementById('lessonShow');
+  if(!show.classList.contains('embedFull')) return;
+  show.classList.remove('embedFull');
+  const gd = lsEmbedDoc();
+  if(gd) gd.documentElement.classList.remove('hostWheel');
+  const wm = document.getElementById('wheelModal');
+  ['left', 'top', 'width', 'height', '--slotS'].forEach(k => wm.style.removeProperty(k));
+  wm.classList.remove('slim');
+}
+// العجلة فوق مكان الأسهم: إحداثيات #wheelSlot داخل اللعبة + موضع الإطار بالصفحة
+function lsEmbedPlace(){
+  const show = document.getElementById('lessonShow');
+  if(!show.classList.contains('embedFull') || !whDocked()) return;
+  const f = lsEmbedFrame(), gd = lsEmbedDoc();
+  const slot = gd && gd.querySelector('#wheelSlot');   // بمستند اللعبة لا بالصفحة
+  if(!f || !slot) return;
+  const fr = f.getBoundingClientRect(), sr = slot.getBoundingClientRect();
+  const wm = document.getElementById('wheelModal');
+  wm.style.left = (fr.left + sr.left) + 'px';
+  wm.style.top = (fr.top + sr.top) + 'px';
+  wm.style.width = sr.width + 'px';
+  wm.style.height = sr.height + 'px';
+  // قطر العجلة: عرض الخانة، على ألا يزاحم العنوان والاسم والأزرار تحته (≈٢٣٠ بكسل، و١٩٥ بلا عنوان بالشاشة القصيرة)
+  const slim = sr.height < 560;
+  wm.classList.toggle('slim', slim);
+  wm.style.setProperty('--slotS', Math.max(150, Math.min(sr.width - 40, sr.height - (slim ? 195 : 230))) + 'px');
+}
+function lsEmbedPlaceSoon(){ [60, 250, 600].forEach(t => setTimeout(lsEmbedPlace, t)); }
+document.addEventListener('fullscreenchange', () => { if(!document.fullscreenElement) lsEmbedExit(); lsEmbedPlaceSoon(); });
+window.addEventListener('resize', lsEmbedPlaceSoon);
 
 function openLessonShow(){
   if(!isAdmin || !lessonQs.length) return;
@@ -5237,6 +5305,7 @@ function closeLessonShow(){
   lsCancelAuto();
   lsVidPause();
   // اللعبة المضمّنة تُزال عند الإغلاق كي لا يبقى صوتها ومؤقتها يعملان خلف الصفحة
+  lsEmbedExit();
   document.querySelectorAll('#lessonShow iframe.lsEmbed').forEach(f => f.remove());
   document.getElementById('lessonShow').classList.remove('show');
   document.body.style.overflow = '';
@@ -5283,7 +5352,7 @@ function renderLessonShow(){
     // لعبة HTML كاملة كما سلّمها المعلم (ملف مستقل بـgames/ لا يُعدَّل) داخل بطاقة السؤال؛ التركيز ينتقل
     // إليها عند التحميل فتعمل أسهمها مباشرة، وأسهم العرض تعود حين يُنقر خارجها
     qEl.innerHTML = ''; qEl.classList.remove('long');
-    wrap.innerHTML = `<iframe class="lsEmbed" src="${esc(q.src || '')}" title="${esc(q.q || '')}" allow="fullscreen; autoplay" allowfullscreen onload="try{ this.contentWindow.focus(); }catch(e){}"></iframe>`;
+    wrap.innerHTML = `<iframe class="lsEmbed" src="${esc(q.src || '')}" title="${esc(q.q || '')}" allow="fullscreen; autoplay" allowfullscreen onload="lsEmbedLoaded(this)"></iframe>`;
   } else if(kind === 'game' || kind === 'reward' || kind === 'break'){
     // بطاقة كاملة بدل صيغة سؤال/جواب
     qEl.innerHTML = ''; qEl.classList.remove('long');

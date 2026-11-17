@@ -28,6 +28,14 @@
     box-shadow:0 6px 0 #22695f;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:none}
   .arrow:active,.arrow.pressed{transform:translateY(4px);box-shadow:0 2px 0 #22695f}
   .blank{visibility:hidden}
+  /* داخل رحّالة (طلب المعلم): لا أسهم على الشاشة — لوحة المفاتيح تكفي — ومكانها لعجلة المشاركة بملء الشاشة */
+  html.embedded .grid{display:none}
+  #wheelSlot{display:none}
+  html.hostWheel #pad{width:clamp(300px,24vw,440px);justify-content:flex-start}
+  html.hostWheel #wheelSlot{display:block;flex:1;width:100%;min-height:0}
+  /* النوافذ (السؤال والبداية والنهاية) تُعرض يمين العمود فلا تغطيها العجلة ولا تغطيها */
+  html.hostWheel .overlay{left:calc(clamp(300px,24vw,440px) + 28px)}
+  html.hostWheel .card{width:min(920px,100%)}
   .progress{background:var(--panel);border-radius:14px;padding:10px 12px;box-shadow:var(--shadow);width:100%;text-align:center;font-size:clamp(14px,1.5vw,18px);line-height:1.6}
   .progress b{color:var(--accent);font-size:1.25em}
   .who{background:var(--panel);border-radius:14px;padding:8px 10px;box-shadow:var(--shadow);width:100%;display:flex;align-items:center;gap:10px;justify-content:center;font-size:clamp(14px,1.5vw,18px);font-weight:700}
@@ -113,6 +121,7 @@
         <button class="arrow" data-dir="down" aria-label="أسفل">▼</button>
         <span class="blank"></span>
       </div>
+      <div id="wheelSlot"></div>
       <button class="iconbtn" id="newBtn" style="width:auto;padding:0 16px;font-size:17px;font-weight:700">متاهة جديدة ↻</button>
     </div>
   </main>
@@ -808,7 +817,7 @@ function confetti(){
 }
 
 $("soundBtn").onclick = ()=>{ soundOn=!soundOn; $("soundBtn").textContent = soundOn?"🔊":"🔇"; };
-$("fsBtn").onclick = ()=>{ if(!document.fullscreenElement) document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen(); else document.exitFullscreen(); };
+$("fsBtn").onclick = ()=>{ if(window.parent !== window && window.parent.lsEmbedFull){ window.parent.lsEmbedFull(); return; } if(!document.fullscreenElement) document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen(); else document.exitFullscreen(); };
 document.addEventListener("fullscreenchange", ()=>setTimeout(resize,100));
 
 newGame(); requestAnimationFrame(loop);
