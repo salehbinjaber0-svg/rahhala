@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>فرقعة البالونات - نشأة الدولة العثمانية وتطوّرها</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=Cairo:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* لعبة «فرقعة البالونات» — رحّالة، الصف الثامن، الوحدة الخامسة (ص115–118).
+     بالونات تطير وعلى كل منها إجابة؛ لمسة واحدة على الصحيحة تفرقعها. الهوية: عنابي #7a1232 وذهبي رملي */
+  :root{
+    --navy:#7a1232; --navy-deep:#420a1c; --gold:#dba73c; --gold-light:#f6dc96; --gold-deep:#68430b;
+    --cream:#f8f3ef; --ink:#1f1216; --muted:#594a50; --good:#12804f; --bad:#8a2c0e;
+    --shadow:0 6px 18px rgba(66,10,28,.14);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none}
+  html,body{margin:0;height:100%;background:var(--cream);color:var(--ink);overflow:hidden;
+    font-family:"Cairo","Tajawal","Segoe UI","Noto Kufi Arabic",Tahoma,Arial,sans-serif}
+  #app{display:flex;flex-direction:column;height:100%;padding:10px 14px;gap:10px}
+  header{display:flex;align-items:center;gap:12px;background:var(--navy);color:#fff;border-radius:16px;padding:8px 16px;box-shadow:var(--shadow)}
+  header h1{margin:0;font-family:"Aref Ruqaa","Cairo",serif;font-size:clamp(20px,2.6vw,34px);line-height:1.2;flex:1}
+  header h1 small{display:block;font-family:"Cairo",sans-serif;font-size:.5em;font-weight:600;color:var(--gold-light)}
+  .iconbtn{border:0;background:rgba(0,0,0,.2);color:#fff;border-radius:12px;width:46px;height:46px;font-size:22px;cursor:pointer;font-family:inherit}
+  .iconbtn:hover{background:rgba(0,0,0,.32)}
+  main{flex:1;display:flex;gap:14px;min-height:0}
+  #stageWrap{flex:1;display:flex;flex-direction:column;gap:10px;min-width:0;position:relative}
+  #qbar{display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;padding:10px 16px;box-shadow:var(--shadow);border-right:8px solid var(--gold)}
+  #qnum{background:var(--navy);color:#fff;border-radius:12px;padding:4px 12px;font-weight:800;font-size:clamp(15px,1.6vw,22px);white-space:nowrap}
+  #qtext{flex:1;font-weight:800;font-size:clamp(20px,2.6vw,38px);line-height:1.45;color:var(--navy-deep)}
+  #sky{flex:1;position:relative;min-height:0;border-radius:18px;overflow:hidden;box-shadow:var(--shadow);
+    background:linear-gradient(#cfe6ee, #e7f3f8 60%, #f8f3ef)}
+  /* مآذن وقباب إسلامبول في الأفق */
+  #city{position:absolute;left:0;bottom:0;width:100%;height:22%;pointer-events:none}
+  .cloud{position:absolute;background:#fff;border-radius:999px;opacity:.9;pointer-events:none}
+  .cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+  .cloud::before{width:55%;height:160%;top:-70%;right:15%}
+  .cloud::after{width:40%;height:120%;top:-45%;left:12%}
+
+  .balloon{position:absolute;left:0;top:0;cursor:pointer;touch-action:manipulation;will-change:transform}
+  .balloon .body{position:relative;border-radius:50% 50% 48% 48% / 55% 55% 45% 45%;display:flex;align-items:center;justify-content:center;
+    text-align:center;padding:12%;color:#fff;font-weight:800;line-height:1.3;
+    box-shadow:inset -14px -18px 0 rgba(0,0,0,.14), 0 10px 22px rgba(31,18,22,.18)}
+  .balloon .body::before{content:"";position:absolute;top:12%;right:20%;width:16%;height:22%;border-radius:50%;background:rgba(255,255,255,.45);transform:rotate(25deg)}
+  .balloon .body::after{content:"";position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);border:10px solid transparent;border-bottom:0;border-top:12px solid var(--knot)}
+  .balloon .str{position:absolute;left:50%;width:2px;height:60px;background:#594a50;transform-origin:top}
+  .balloon:hover .body{filter:brightness(1.06)}
+  .balloon.out{pointer-events:none}
+  .balloon.out .body{background:#b0a398 !important;--knot:#b0a398 !important}
+  .balloon.out .body span{text-decoration:line-through}
+  .c0 .body{background:#a71944;--knot:#a71944} .c1 .body{background:#175a4a;--knot:#175a4a}
+  .c2 .body{background:#2f6fa8;--knot:#2f6fa8} .c3 .body{background:#6b3fa0;--knot:#6b3fa0}
+
+  .burst{position:absolute;width:12px;height:12px;border-radius:3px;pointer-events:none}
+  .pop{position:absolute;pointer-events:none;font-weight:800;font-size:clamp(30px,4vw,60px);transform:translate(-50%,-50%);animation:popTxt .9s ease forwards}
+  @keyframes popTxt{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}30%{opacity:1;transform:translate(-50%,-60%) scale(1.15)}100%{opacity:0;transform:translate(-50%,-120%) scale(1)}}
+  #toast{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);padding:10px 22px;border-radius:999px;font-weight:800;
+    font-size:clamp(16px,1.9vw,26px);color:#fff;background:var(--bad);opacity:0;transition:opacity .35s;pointer-events:none;white-space:nowrap;max-width:94%;overflow:hidden;text-overflow:ellipsis}
+  #toast.show{opacity:1}
+
+  #pad{width:clamp(190px,19vw,270px);display:flex;flex-direction:column;gap:10px}
+  .box{background:#fff;border-radius:14px;padding:10px 12px;box-shadow:var(--shadow);text-align:center;font-size:clamp(14px,1.4vw,18px);font-weight:700;line-height:1.5}
+  .box b{color:var(--navy);font-size:1.7em}
+  .dots{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin-top:6px}
+  .dots i{width:14px;height:14px;border-radius:50%;background:#eee3db}
+  .dots i.ok{background:var(--good)} .dots i.now{background:var(--gold)}
+  .btn{border:0;border-radius:12px;padding:10px 14px;font-family:inherit;font-weight:800;font-size:clamp(14px,1.4vw,18px);cursor:pointer;background:#eee3db;color:var(--navy-deep)}
+  .btn:hover{background:#e4d4c8}
+  .btn.main{background:var(--navy);color:#fff;font-size:clamp(18px,2vw,26px);padding:12px 28px;box-shadow:0 5px 0 var(--navy-deep)}
+  .btn.main:active{transform:translateY(3px);box-shadow:0 2px 0 var(--navy-deep)}
+  .spacer{flex:1}
+  .stats,.btns{display:flex;flex-direction:column;gap:10px}
+  html.embedded #pad{width:clamp(170px,16vw,240px)}
+  /* داخل رحّالة بملء الشاشة: خانة #wheelSlot تضع رحّالة عجلة المشاركة فوقها */
+  #wheelSlot{display:none}
+  html.hostWheel #pad{width:clamp(300px,24vw,440px)}
+  html.hostWheel #wheelSlot{display:block;flex:1;width:100%;min-height:0}
+  html.hostWheel #pad .spacer{display:none}
+  html.hostWheel .stats, html.hostWheel .btns{flex-direction:row}
+  html.hostWheel .stats .box, html.hostWheel .btns .btn{flex:1;min-width:0}
+  html.hostWheel .stats .box{padding:6px 8px;font-size:clamp(13px,1.1vw,16px)}
+  html.hostWheel .stats .box b{font-size:1.4em}
+  html.hostWheel .btns .btn{padding:8px 6px;font-size:clamp(13px,1.1vw,16px)}
+
+  .overlay{position:absolute;inset:0;background:rgba(31,18,22,.55);display:none;align-items:center;justify-content:center;z-index:10;padding:16px;border-radius:18px}
+  .overlay.show{display:flex}
+  .card{background:#fff;border-radius:24px;padding:24px 30px;width:min(860px,100%);max-height:100%;overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.25);animation:pop .35s ease;text-align:center}
+  @keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+  .card h2{margin:0 0 8px;font-family:"Aref Ruqaa","Cairo",serif;color:var(--navy);font-size:clamp(30px,3.8vw,52px);line-height:1.3}
+  .card .sub{color:var(--gold-deep);font-weight:800;font-size:clamp(17px,2vw,26px);margin-bottom:14px;line-height:1.6}
+  .verdict{font-weight:800;font-size:clamp(26px,3.2vw,44px);margin-bottom:6px;color:var(--good)}
+  .verdict.skip{color:var(--gold-deep)}
+  .ans{display:inline-block;background:#eaf7f0;color:var(--good);border:3px solid var(--good);border-radius:14px;padding:6px 18px;font-weight:800;font-size:clamp(20px,2.4vw,32px);margin:6px 0 12px}
+  .ex{font-weight:700;font-size:clamp(18px,2.1vw,28px);line-height:1.65;color:var(--ink);margin:0 0 16px}
+  .ex::before{content:"💡 "}
+  .stars{font-size:clamp(34px,4.4vw,60px);letter-spacing:4px;margin:4px 0 10px}
+  .bigb{font-size:clamp(60px,9vw,120px);line-height:1;margin-bottom:6px;animation:float 2.4s ease-in-out infinite}
+  @keyframes float{50%{transform:translateY(-10px)}}
+  @media (max-width:760px){ main{flex-direction:column} #pad{width:100%;flex-direction:row;flex-wrap:wrap} }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>فرقعة البالونات<small>نشأة الدولة العثمانية وتطوّرها · ص 115 – 118</small></h1>
+    <button class="iconbtn" id="soundBtn" title="الصوت" aria-label="الصوت">🔊</button>
+    <button class="iconbtn" id="fsBtn" title="ملء الشاشة" aria-label="ملء الشاشة">⛶</button>
+  </header>
+  <main>
+    <section id="stageWrap">
+      <div id="qbar"><span id="qnum">1 / 10</span><div id="qtext">فرقع البالون الذي يحمل الإجابة الصحيحة</div></div>
+      <div id="sky">
+        <svg id="city" viewBox="0 0 1000 200" preserveAspectRatio="none" aria-hidden="true">
+          <g fill="#d5c5b8">
+            <rect x="0" y="150" width="1000" height="50"/>
+            <path d="M120 150 Q120 95 175 95 Q230 95 230 150Z"/><rect x="95" y="55" width="10" height="95"/><path d="M93 58 L100 35 L107 58Z"/>
+            <rect x="245" y="70" width="10" height="80"/><path d="M243 73 L250 50 L257 73Z"/>
+            <path d="M420 150 Q420 70 500 70 Q580 70 580 150Z"/><path d="M470 75 Q500 40 530 75Z"/>
+            <rect x="395" y="40" width="12" height="110"/><path d="M393 43 L401 15 L409 43Z"/>
+            <rect x="593" y="40" width="12" height="110"/><path d="M591 43 L599 15 L607 43Z"/>
+            <path d="M760 150 Q760 105 810 105 Q860 105 860 150Z"/><rect x="880" y="65" width="10" height="85"/><path d="M878 68 L885 45 L892 68Z"/>
+          </g>
+          <rect y="185" width="1000" height="15" fill="#a8c8e0"/>
+        </svg>
+        <div id="toast"></div>
+      </div>
+
+      <div class="overlay show" id="startOv"><div class="card">
+        <div class="bigb">🎈</div>
+        <h2>فرقعة البالونات</h2>
+        <div class="sub">اقرأ السؤال… ثم المس البالون الذي يحمل الإجابة الصحيحة ليفرقع!<br>المحاولة الأولى ٣ نجوم ⭐</div>
+        <button class="btn main" id="startBtn">ابدأ 🎈</button>
+      </div></div>
+
+      <div class="overlay" id="resOv"><div class="card">
+        <div class="verdict" id="resVerdict"></div>
+        <div class="stars" id="resStars"></div>
+        <div class="ans" id="resAns"></div>
+        <p class="ex" id="resEx"></p>
+        <button class="btn main" id="nextBtn">السؤال التالي ←</button>
+      </div></div>
+
+      <div class="overlay" id="endOv"><div class="card">
+        <div class="bigb">🏆</div>
+        <h2>أحسنتم!</h2>
+        <div class="stars" id="endStars"></div>
+        <div class="sub" id="endMsg"></div>
+        <button class="btn main" id="againBtn">جولة جديدة ↻</button>
+      </div></div>
+    </section>
+
+    <aside id="pad">
+      <div class="stats">
+        <div class="box">النجوم<br>⭐ <b id="starsTxt">0</b></div>
+        <div class="box">الأسئلة<div class="dots" id="dots"></div></div>
+      </div>
+      <div id="wheelSlot"></div>
+      <div class="spacer"></div>
+      <div class="btns">
+        <button class="btn" id="skipBtn">أظهر الإجابة 👁</button>
+        <button class="btn" id="newBtn">جولة جديدة ↻</button>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<script>
+// ═══════ الأسئلة — من نص الكتاب ص115–118 (فتح القسطنطينية، سليم الأول وسليمان القانوني، عوامل التوسّع) ═══════
+// c = الإجابة الصحيحة، w = المشتتات، ex = معلومة تُضاف بعد الإجابة الصحيحة
+const QUESTIONS = [
+  {q:'لُقِّب السلطان محمد الثاني بـ:', c:'الفاتح', w:['القانوني','المؤسِّس'],
+   ex:'لُقّب بالفاتح لأنه فتح القسطنطينية، وحكم بين 1451م و1481م. أمّا «القانوني» فلقب سليمان الأول.'},
+  {q:'فُتحت القسطنطينية عام:', c:'1453م', w:['1299م','1520م'],
+   ex:'فُتحت في مايو 1453م. أمّا 1299م فبداية حكم عثمان الأول، و1520م بداية حكم سليمان القانوني.'},
+  {q:'أطلق محمد الفاتح على القسطنطينية اسم:', c:'إسلامبول', w:['أسكي شهر','بغداد'],
+   ex:'سمّاها «إسلامبول» واتخذها عاصمة للدولة العثمانية. أمّا أسكي شهر فكانت عاصمة عثمان الأول في الأناضول.'},
+  {q:'كانت القسطنطينية عاصمة الإمبراطورية:', c:'البيزنطية', w:['المملوكية','الصفوية'],
+   ex:'بُنيت بأمر الإمبراطور قسطنطين، وصمدت أمام إحدى عشرة محاولة إسلامية لفتحها حتى فتحها محمد الفاتح.'},
+  {q:'من أسباب فتح القسطنطينية أنها كانت:', c:'مركز المؤامرات ضد الدولة', w:['قريبة من مكة المكرمة','عاصمة دولة المماليك'],
+   ex:'وفتحها يؤمّن طرق المواصلات بين أملاك الدولة العثمانية في آسيا وأوروبا.'},
+  {q:'من استعدادات محمد الفاتح لفتح القسطنطينية:', c:'بناء أسطول بحري قوي', w:['تقليل عدد الجيش','نقل العاصمة إلى بغداد'],
+   ex:'واستعدّ أيضاً بهدنة ثلاث سنوات، وبناء حصن وصنع مدافع ضخمة، والاستعانة بالعلماء لتقوية عزائم الجيش.'},
+  {q:'من نتائج فتح القسطنطينية:', c:'توحيد أراضي الدولة في آسيا وأوروبا', w:['ضعف الدولة العثمانية','انتقال العاصمة إلى بغداد'],
+   ex:'وأصبحت الدولة العثمانية بعد الفتح قوة بحرية هائلة ومركزاً تجارياً هاماً.'},
+  {q:'شكّل فتح القسطنطينية الحدّ التاريخي الفاصل بين:', c:'العصور الوسطى والحديثة', w:['العصور القديمة والوسطى','الدولتين الأموية والعباسية'],
+   ex:'ومن نتائج الفتح أيضاً توحيد أراضي الدولة العثمانية في آسيا وأوروبا، واتخاذ المدينة عاصمة لها باسم «إسلامبول».'},
+  {q:'«القضاء على المماليك وضمّ مكة المكرمة والمدينة المنورة» من إنجازات:', c:'سليم الأول', w:['سليمان القانوني','محمد الفاتح'],
+   ex:'وبذلك انتقلت الدولة العثمانية إلى مرحلة الخلافة الإسلامية في عهده (1512م – 1520م).'},
+  {q:'لُقِّب سليمان الأول بـ«القانوني» لأنه:', c:'وضع القوانين ونظّم شؤون الحياة', w:['فتح القسطنطينية','أسّس الدولة العثمانية'],
+   ex:'حكم 46 سنة (1520م – 1566م)، ويُعدّ عصره العصر الذهبي للدولة العثمانية.'},
+  {q:'بلغت جيوش سليمان القانوني أسوار مدينة:', c:'فيينا', w:['القاهرة','القسطنطينية'],
+   ex:'بعد أن هزم ملك المجر، وسيطرت الدولة في عهده على البحر المتوسط وبلغت أقصى اتساعها.'},
+  {q:'الجيش النظامي الذي أنشأه السلطان أورخان عُرف باسم:', c:'الإنكشارية', w:['المماليك','الصفويين'],
+   ex:'«الإنكشارية» تعني الجنود الجدد، وقوة هذا الجيش من أهم عوامل توسّع الدولة العثمانية.'},
+  {q:'أيّ مما يلي من عوامل توسّع الدولة العثمانية؟', c:'ضعف الدولة البيزنطية', w:['قوة الدولة البيزنطية','قلة عدد الجيش'],
+   ex:'ومن العوامل أيضاً: نشر الإسلام، ووجود سلاطين أقوياء، والإمكانيات المادية والمعنوية، والتنظيم السياسي والعسكري.'},
+  {q:'امتدت الدولة العثمانية في أقصى اتساع لها في قارات:', c:'أوروبا وآسيا وإفريقيا', w:['آسيا فقط','أوروبا وآسيا'],
+   ex:'وخضعت لها مدن عربية كبرى، مثل: مكة المكرمة والقاهرة وبغداد.'}
+];
+const ROUND = 10;
+
+const $ = id => document.getElementById(id);
+const sky = $('sky');
+let round = [], qi = 0, stars = 0, tries = 0, phase = 'start', balloons = [], soundOn = true, last = performance.now(), toastTimer = 0, done = [];
+
+// ═══════ الأصوات — مولّدة بالمتصفح، بلا ملفات ═══════
+let AC = null;
+function audio(){ if(!AC){ try{ AC = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){} } if(AC && AC.state === 'suspended') AC.resume(); return AC; }
+function tone(freq, dur, type, vol, delay, slide){
+  const a = soundOn && audio(); if(!a) return;
+  const t = a.currentTime + (delay || 0), o = a.createOscillator(), g = a.createGain();
+  o.type = type || 'sine'; o.frequency.setValueAtTime(freq, t);
+  if(slide) o.frequency.exponentialRampToValueAtTime(slide, t + dur);
+  g.gain.setValueAtTime(vol || .2, t); g.gain.exponentialRampToValueAtTime(.001, t + dur);
+  o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur + .02);
+}
+function popSound(){
+  const a = soundOn && audio(); if(!a) return;
+  const n = a.sampleRate * .12, b = a.createBuffer(1, n, a.sampleRate), d = b.getChannelData(0);
+  for(let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3);
+  const s = a.createBufferSource(), g = a.createGain(); s.buffer = b; g.gain.value = .8; s.connect(g).connect(a.destination); s.start();
+}
+const sfx = {
+  good(){ popSound(); [523, 659, 784, 1046].forEach((f, i) => tone(f, .28, 'triangle', .18, .08 + i * .08)); },
+  bad(){ popSound(); tone(240, .35, 'sawtooth', .1, .05, 120); },
+  win(){ [523, 659, 784, 659, 784, 1046].forEach((f, i) => tone(f, .35, 'triangle', .2, i * .15)); }
+};
+
+const shuffle = a => { a = a.slice(); for(let i = a.length - 1; i > 0; i--){ const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+function toast(msg){ const t = $('toast'); t.textContent = msg; t.className = 'show'; clearTimeout(toastTimer); toastTimer = setTimeout(() => t.className = '', 2000); }
+
+// ═══════ البالونات ═══════
+// كل بالون في عمود خاص به كي لا تتداخل، ويطير للأعلى بتمايل خفيف؛ إن خرج من الأعلى عاد من الأسفل
+function makeBalloons(q){
+  balloons.forEach(b => b.el.remove());
+  const labels = shuffle([q.c, ...q.w]), n = labels.length, colors = shuffle([0, 1, 2, 3]);
+  const W = sky.clientWidth, H = sky.clientHeight;
+  const size = Math.min(W / n * .82, H * .46, 330);
+  balloons = labels.map((label, i) => {
+    const el = document.createElement('div');
+    el.className = 'balloon c' + colors[i];
+    el.innerHTML = `<div class="body"><span></span></div><div class="str"></div>`;
+    el.querySelector('span').textContent = label;
+    const body = el.querySelector('.body');
+    body.style.width = size + 'px'; body.style.height = size * 1.18 + 'px';
+    body.style.fontSize = Math.max(15, Math.min(size * (label.length > 18 ? .105 : label.length > 10 ? .13 : .16), 40)) + 'px';
+    el.querySelector('.str').style.top = size * 1.18 + 10 + 'px';
+    sky.appendChild(el);
+    const b = {el, label, correct: label === q.c, alive: true, size,
+      x: W * (i + .5) / n - size / 2, y: H * (.3 + Math.random() * .25),   // تبدأ ظاهرة بالنصف السفلي ثم تطير
+      speed: H * (.09 + qi * .006) * (.85 + Math.random() * .3), ph: Math.random() * 6.28};
+    el.addEventListener('pointerdown', e => { e.preventDefault(); tap(b, e); });
+    return b;
+  });
+  place();
+}
+function place(){
+  const t = performance.now() / 1000;
+  balloons.forEach(b => {
+    const sway = Math.sin(t * 1.3 + b.ph) * b.size * .08;
+    b.el.style.transform = `translate(${b.x + sway}px, ${b.y}px) rotate(${Math.sin(t * 1.3 + b.ph) * 4}deg)`;
+  });
+}
+function loop(now){
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  if(phase === 'play'){
+    const H = sky.clientHeight;
+    balloons.forEach(b => {
+      if(!b.alive) return;
+      b.y -= b.speed * dt;
+      // إن خرجت من الأعلى تعود من الأسفل
+      if(b.y < -b.size * 1.5) b.y = H + 20;
+    });
+  }
+  place();
+  requestAnimationFrame(loop);
+}
+
+// ═══════ اللمس ═══════
+function tap(b, e){
+  if(phase !== 'play' || !b.alive) return;
+  audio();
+  const r = sky.getBoundingClientRect(), br = b.el.querySelector('.body').getBoundingClientRect();
+  const cx = br.left + br.width / 2 - r.left, cy = br.top + br.height / 2 - r.top;
+  tries++;
+  if(b.correct){
+    b.alive = false; b.el.remove();
+    const got = tries === 1 ? 3 : tries === 2 ? 2 : 1;
+    stars += got; done[qi] = true; updatePad();
+    sfx.good(); burst(cx, cy, getComputedStyle(b.el.querySelector('.body')).backgroundColor, 40);
+    floatText(cx, cy, '+' + got + ' ⭐', '#12804f');
+    phase = 'wait'; setTimeout(() => showResult(true, got), 900);
+  } else {
+    b.alive = false; b.el.classList.add('out'); sfx.bad();
+    floatText(cx, cy, '✗', '#8a2c0e');
+    toast('ليست الإجابة الصحيحة… حاول مرة أخرى');
+    // البالون الخاطئ يسقط ويختفي
+    const fall = () => { b.y += sky.clientHeight * .02; b.el.style.opacity = Math.max(0, parseFloat(b.el.style.opacity || 1) - .04);
+      if(parseFloat(b.el.style.opacity) > 0) requestAnimationFrame(fall); else b.el.remove(); };
+    requestAnimationFrame(fall);
+  }
+}
+function burst(x, y, color, n){
+  const cols = [color, '#dba73c', '#f6dc96', '#ffffff'];
+  for(let i = 0; i < n; i++){
+    const p = document.createElement('div'); p.className = 'burst';
+    p.style.left = x + 'px'; p.style.top = y + 'px'; p.style.background = cols[i % cols.length];
+    sky.appendChild(p);
+    const a = Math.random() * 6.28, d = 60 + Math.random() * 140;
+    p.animate([{transform: 'translate(0,0) rotate(0)', opacity: 1}, {transform: `translate(${Math.cos(a) * d}px, ${Math.sin(a) * d + 60}px) rotate(${Math.random() * 360}deg)`, opacity: 0}],
+      {duration: 700 + Math.random() * 400, easing: 'cubic-bezier(.2,.8,.4,1)'}).onfinish = () => p.remove();
+  }
+}
+function floatText(x, y, txt, color){
+  const el = document.createElement('div'); el.className = 'pop'; el.textContent = txt; el.style.color = color;
+  el.style.left = x + 'px'; el.style.top = y + 'px'; sky.appendChild(el); setTimeout(() => el.remove(), 950);
+}
+function confetti(){
+  const W = sky.clientWidth;
+  for(let i = 0; i < 90; i++){
+    const p = document.createElement('div'); p.className = 'burst';
+    p.style.left = Math.random() * W + 'px'; p.style.top = '-20px';
+    p.style.background = ['#7a1232', '#dba73c', '#12804f', '#2f6fa8', '#6b3fa0'][i % 5]; sky.appendChild(p);
+    p.animate([{transform: 'translateY(0) rotate(0)'}, {transform: `translate(${(Math.random() - .5) * 120}px, ${sky.clientHeight + 40}px) rotate(${Math.random() * 720}deg)`}],
+      {duration: 1800 + Math.random() * 1500, delay: Math.random() * 600}).onfinish = () => p.remove();
+  }
+}
+
+// ═══════ مجرى اللعبة ═══════
+function newRound(){
+  round = shuffle(QUESTIONS).slice(0, ROUND); qi = 0; stars = 0; done = [];
+  hideAll(); loadQ();
+}
+function loadQ(){
+  const q = round[qi]; tries = 0;
+  $('qnum').textContent = `${qi + 1} / ${round.length}`; $('qtext').textContent = q.q;
+  makeBalloons(q); updatePad(); phase = 'play';
+}
+function updatePad(){
+  $('starsTxt').textContent = stars;
+  $('dots').innerHTML = Array.from({length: ROUND}, (_, i) => `<i class="${done[i] ? 'ok' : i === qi && phase !== 'end' ? 'now' : ''}"></i>`).join('');
+}
+function hideAll(){ document.querySelectorAll('.overlay').forEach(o => o.classList.remove('show')); }
+function showResult(good, got){
+  const q = round[qi];
+  $('resVerdict').className = 'verdict' + (good ? '' : ' skip');
+  $('resVerdict').textContent = good ? (got === 3 ? '🎉 ممتاز! من أول محاولة' : '✓ إجابة صحيحة') : '👁 الإجابة الصحيحة';
+  $('resStars').textContent = good ? '⭐'.repeat(got) : ''; $('resStars').style.display = good ? '' : 'none';
+  $('resAns').textContent = q.c; $('resEx').textContent = q.ex;
+  $('nextBtn').textContent = qi + 1 < round.length ? 'السؤال التالي ←' : 'النتيجة 🏆';
+  $('resOv').classList.add('show'); phase = 'result';
+  setTimeout(() => $('nextBtn').focus(), 50);
+}
+function next(){
+  if(phase !== 'result') return;   // Enter على الزر المركّز يطلق click وkeydown معاً — مرة واحدة فقط
+  hideAll();
+  if(qi + 1 < round.length){ qi++; loadQ(); return; }
+  phase = 'end'; balloons.forEach(b => b.el.remove()); balloons = []; updatePad(); sfx.win(); confetti();
+  $('endStars').textContent = `⭐ ${stars} من ${round.length * 3}`;
+  const p = stars / (round.length * 3);
+  $('endMsg').textContent = p >= .85 ? 'صفّ بطل! تعرفون درس الدولة العثمانية جيداً 🏆' : p >= .6 ? 'نتيجة جميلة… أحسنتم 👏' : 'بداية طيبة… والجولة القادمة أفضل 💪';
+  $('endOv').classList.add('show'); setTimeout(() => $('againBtn').focus(), 50);
+}
+function reveal(){
+  if(phase !== 'play') return;
+  phase = 'wait';
+  balloons.forEach(b => { if(!b.correct && b.alive){ b.alive = false; b.el.classList.add('out'); } });
+  setTimeout(() => showResult(false), 700);
+}
+
+$('startBtn').onclick = () => { audio(); hideAll(); newRound(); };
+$('nextBtn').onclick = next;
+$('againBtn').onclick = newRound;
+$('newBtn').onclick = newRound;
+$('skipBtn').onclick = reveal;
+$('soundBtn').onclick = () => { soundOn = !soundOn; $('soundBtn').textContent = soundOn ? '🔊' : '🔇'; };
+// داخل رحّالة: ⛶ يكبّر الصفحة كلها (اللعبة + عجلة المشاركة) لا اللعبة وحدها
+$('fsBtn').onclick = () => {
+  try{ if(window.parent !== window && window.parent.lsEmbedFull){ window.parent.lsEmbedFull(); return; } }catch(e){}
+  if(!document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); else document.exitFullscreen();
+};
+window.addEventListener('keydown', e => {
+  if(e.key !== ' ' && e.key !== 'Enter') return;
+  e.preventDefault(); if(e.repeat) return;
+  if(phase === 'result') next(); else if(phase === 'end') newRound(); else if(phase === 'start'){ hideAll(); newRound(); }
+});
+document.querySelectorAll('.btn, .iconbtn').forEach(b => b.addEventListener('mouseup', () => b.blur()));
+// تغيّر المقاس (ملء الشاشة): البالونات تُعاد بمقاس جديد للسؤال نفسه
+let rsT = 0;
+new ResizeObserver(() => { clearTimeout(rsT); rsT = setTimeout(() => { if(phase === 'play'){ const alive = new Set(balloons.filter(b => b.alive).map(b => b.label)); makeBalloons(round[qi]);
+  balloons.forEach(b => { if(!alive.has(b.label)){ b.alive = false; b.el.remove(); } }); } }, 150); }).observe(sky);
+
+for(let i = 0; i < 4; i++){
+  const c = document.createElement('div'); c.className = 'cloud';
+  const w = 90 + Math.random() * 90; c.style.width = w + 'px'; c.style.height = w * .32 + 'px';
+  c.style.top = (6 + Math.random() * 40) + '%'; c.style.right = (i * 26 + Math.random() * 8) + '%';
+  sky.insertBefore(c, $('toast'));
+}
+updatePad();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
