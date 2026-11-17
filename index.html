@@ -825,6 +825,12 @@
     font-family:'Cairo', 'Tajawal', sans-serif; font-weight:800; font-size:clamp(1.4rem, 3vw, 3.2rem); line-height:1.5;
     color:var(--navy-deep); max-width:1100px;
   }
+  /* لعبة HTML مضمّنة (kind:'embed'): تملأ بطاقة السؤال كلها، وعجلة المشاركة يسارها كالمعتاد */
+  #lessonShow.isEmbed .lsStage{overflow:hidden; padding:0 14px 10px;}
+  #lessonShow.isEmbed .lsQ, #lessonShow.isEmbed .lsPanel::after{display:none;}
+  #lessonShow.embedOnly .lsFoot{display:none;}   /* لعبة وحدها بالنشاط: لا سابق/تالٍ، فالمساحة كلها للعبة */
+  #lessonShow.isEmbed #lsAWrap{flex:1; min-height:0; margin:0;}
+  .lsEmbed{display:block; flex:1; width:100%; min-height:0; border:0; border-radius:16px; background:#ffffff;}
   /* سؤال طويل (أكثر من ٨٠ حرفاً): خط أصغر كي تبقى الخيارات ظاهرة بلا تمرير */
   .lsQ.long{font-size:clamp(1.2rem, 2.25vw, 2.4rem);}
   /* شارة المرجع: رقم الصفحة والسؤال والفرع — الطالب متوسط المستوى
@@ -4806,6 +4812,7 @@ const LQ_KINDS = {
   reward: {label:'🎁 مكافأة',       icon:'🎁'},
   break:  {label:'⏸️ فاصل',         icon:'⏸️'},
   video:  {label:'🎬 فيديو',        icon:'🎬'},
+  embed:  {label:'🎮 لعبة',         icon:'🎮'},
   slide:  {label:'🖥️ شريحة',       icon:'🖥️'}
 };
 
@@ -5229,6 +5236,8 @@ function closeLessonShow(){
   lsStopTimer();
   lsCancelAuto();
   lsVidPause();
+  // اللعبة المضمّنة تُزال عند الإغلاق كي لا يبقى صوتها ومؤقتها يعملان خلف الصفحة
+  document.querySelectorAll('#lessonShow iframe.lsEmbed').forEach(f => f.remove());
   document.getElementById('lessonShow').classList.remove('show');
   document.body.style.overflow = '';
   document.removeEventListener('keydown', lsKeys);
@@ -5252,6 +5261,7 @@ function lsKeys(e){
     if(v){ v.paused ? v.play().catch(()=>{}) : v.pause(); return; }
     const cq = lessonQs[lsIndex];
     if(cq && cq.kind === 'slide'){ lsGo(1); return; }
+    if(cq && cq.kind === 'embed') return;   // اللعبة تستقبل مفاتيحها بنفسها
     lsReveal();
   }
   else if((e.key === 'f' || e.key === 'F') && document.getElementById('lsVid')) lsVidFull();
@@ -5266,8 +5276,15 @@ function renderLessonShow(){
   const qEl = document.getElementById('lsQ');
   const wrap = document.getElementById('lsAWrap');
   wrap.innerHTML = '';
+  document.getElementById('lessonShow').classList.toggle('isEmbed', kind === 'embed');
+  document.getElementById('lessonShow').classList.toggle('embedOnly', kind === 'embed' && lessonQs.length === 1);
 
-  if(kind === 'game' || kind === 'reward' || kind === 'break'){
+  if(kind === 'embed'){
+    // لعبة HTML كاملة كما سلّمها المعلم (ملف مستقل بـgames/ لا يُعدَّل) داخل بطاقة السؤال؛ التركيز ينتقل
+    // إليها عند التحميل فتعمل أسهمها مباشرة، وأسهم العرض تعود حين يُنقر خارجها
+    qEl.innerHTML = ''; qEl.classList.remove('long');
+    wrap.innerHTML = `<iframe class="lsEmbed" src="${esc(q.src || '')}" title="${esc(q.q || '')}" allow="fullscreen; autoplay" allowfullscreen onload="try{ this.contentWindow.focus(); }catch(e){}"></iframe>`;
+  } else if(kind === 'game' || kind === 'reward' || kind === 'break'){
     // بطاقة كاملة بدل صيغة سؤال/جواب
     qEl.innerHTML = ''; qEl.classList.remove('long');
     wrap.innerHTML = `
@@ -5303,7 +5320,7 @@ function renderLessonShow(){
   }
 
   if(kind !== 'slide'){ qEl.classList.remove('slide'); lsStepNow = lsStepMax = 0; }
-  const isCard = kind === 'game' || kind === 'reward' || kind === 'break' || kind === 'video' || kind === 'slide';
+  const isCard = kind === 'game' || kind === 'reward' || kind === 'break' || kind === 'video' || kind === 'slide' || kind === 'embed';
   document.getElementById('lsCount').textContent = `${isCard ? 'الشريحة' : 'السؤال'} ${lsIndex + 1} من ${lessonQs.length}`;
   document.getElementById('lsKind').textContent = kind === 'slide' && q.goal ? `🎯 الهدف ${['', 'الأول', 'الثاني', 'الثالث'][q.goal] || q.goal}` : cfg.label;
   const rv = document.getElementById('lsRevealBtn');
