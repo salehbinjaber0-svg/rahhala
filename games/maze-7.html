@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>متاهة المفاجآت - مراجعة الوحدتين الرابعة والخامسة</title>
+<style>
+  :root{
+    --bg:#eef3f1; --panel:#ffffff; --ink:#24403a; --muted:#6b8580;
+    --wall:#3f6f66; --floor:#f7faf8; --accent:#2f8f83; --accent2:#e3a83b;
+    --good:#3a9d5d; --bad:#c9573f; --shadow:0 6px 18px rgba(36,64,58,.12);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none}
+  html,body{margin:0;height:100%;background:var(--bg);transition:background .7s;color:var(--ink);
+    font-family:"Segoe UI","Noto Kufi Arabic","Noto Sans Arabic",Tahoma,Arial,sans-serif;overflow:hidden}
+  #app{display:flex;flex-direction:column;height:100%;padding:10px 14px;gap:10px}
+  header{display:flex;align-items:center;gap:12px;background:var(--panel);border-radius:16px;padding:8px 16px;box-shadow:var(--shadow)}
+  header h1{margin:0;font-size:clamp(16px,2.2vw,26px);flex:1}
+  header h1 small{display:block;font-size:.55em;color:var(--muted);font-weight:500}
+  .value{background:#e5f1ee;color:var(--accent);padding:6px 14px;border-radius:999px;font-weight:700;font-size:clamp(13px,1.5vw,18px);white-space:nowrap}
+  .iconbtn{border:0;background:#e5f1ee;color:var(--accent);border-radius:12px;width:46px;height:46px;font-size:22px;cursor:pointer;font-family:inherit}
+  main{flex:1;display:flex;gap:14px;min-height:0}
+  #stageWrap{flex:1;display:flex;align-items:center;justify-content:center;min-width:0;position:relative}
+  #cv{background:var(--panel);border-radius:18px;box-shadow:var(--shadow);touch-action:none}
+  #pad{width:clamp(200px,20vw,280px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%}
+  .arrow{aspect-ratio:1;border:0;border-radius:20px;background:var(--accent);color:#fff;font-size:clamp(30px,3.6vw,52px);
+    box-shadow:0 6px 0 #22695f;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:none}
+  .arrow:active,.arrow.pressed{transform:translateY(4px);box-shadow:0 2px 0 #22695f}
+  .blank{visibility:hidden}
+  .progress{background:var(--panel);border-radius:14px;padding:10px 12px;box-shadow:var(--shadow);width:100%;text-align:center;font-size:clamp(14px,1.5vw,18px);line-height:1.6}
+  .progress b{color:var(--accent);font-size:1.25em}
+  .who{background:var(--panel);border-radius:14px;padding:8px 10px;box-shadow:var(--shadow);width:100%;display:flex;align-items:center;gap:10px;justify-content:center;font-size:clamp(14px,1.5vw,18px);font-weight:700}
+  .who .em{font-size:clamp(30px,3.4vw,44px)}
+  .who button{border:0;background:#e5f1ee;color:var(--accent);border-radius:10px;padding:6px 10px;font-size:clamp(13px,1.3vw,16px);font-weight:700;cursor:pointer;font-family:inherit}
+  #hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:rgba(36,64,58,.88);color:#fff;
+    padding:10px 20px;border-radius:999px;font-size:clamp(14px,1.6vw,20px);transition:opacity .5s;pointer-events:none;white-space:nowrap;max-width:96%;overflow:hidden;text-overflow:ellipsis}
+  .overlay{position:fixed;inset:0;background:rgba(30,50,46,.55);display:none;align-items:center;justify-content:center;z-index:10;padding:16px}
+  .overlay.show{display:flex}
+  .card{background:var(--panel);border-radius:24px;padding:26px 30px;width:min(920px,96vw);max-height:94vh;overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.25);animation:pop .35s ease}
+  @keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+  .qhead{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+  .badge{background:var(--accent2);color:#fff;border-radius:12px;padding:6px 14px;font-weight:800;font-size:clamp(16px,1.8vw,22px)}
+  .qtype{color:var(--muted);font-size:clamp(14px,1.5vw,18px)}
+  .unitTag{background:#e5f1ee;color:var(--accent);border-radius:999px;padding:4px 12px;font-size:clamp(13px,1.4vw,16px);font-weight:700}
+  .picked{background:#fdf1dc;color:#9a6a12;border-radius:999px;padding:4px 12px;font-size:clamp(14px,1.5vw,18px);font-weight:800}
+  .qtext{font-size:clamp(22px,2.8vw,36px);font-weight:700;line-height:1.6;margin:8px 0 18px}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .opt{border:3px solid #cfe0dc;background:#f7faf8;border-radius:16px;padding:16px;font-size:clamp(19px,2.2vw,28px);font-weight:700;color:var(--ink);cursor:pointer;font-family:inherit;transition:background .2s,border-color .2s;text-align:right}
+  .opt:hover{border-color:var(--accent)}
+  .opt.correct{background:#e3f4e8;border-color:var(--good);color:#1f6b3a}
+  .opt.wrong{background:#fbe9e5;border-color:var(--bad);color:#8f3524}
+  .opt:disabled{cursor:default}
+  .feedback{min-height:44px;margin-top:16px;font-size:clamp(18px,2vw,25px);font-weight:700;text-align:center;line-height:1.6}
+  .feedback.good{color:var(--good)} .feedback.bad{color:var(--bad)}
+  .model{display:none;background:#f1f7f5;border-right:6px solid var(--accent);border-radius:12px;padding:14px 18px;font-size:clamp(18px,2.1vw,26px);line-height:1.8;margin-top:6px}
+  .model.show{display:block;animation:pop .3s ease}
+  .model h4{margin:0 0 6px;color:var(--accent);font-size:.85em}
+  .model ul{margin:0;padding-inline-start:26px}
+  .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+  .btn{border:0;border-radius:14px;padding:14px 26px;font-size:clamp(18px,2vw,24px);font-weight:700;font-family:inherit;cursor:pointer;color:#fff;background:var(--accent);box-shadow:0 4px 0 #22695f}
+  .btn:active{transform:translateY(3px);box-shadow:0 1px 0 #22695f}
+  .btn.gold{background:var(--accent2);box-shadow:0 4px 0 #b07f22}
+  .btn.good{background:var(--good);box-shadow:0 4px 0 #2a7444}
+  .btn.soft{background:#e5f1ee;color:var(--accent);box-shadow:0 4px 0 #c2d8d2}
+  .hidden{display:none!important}
+  .think{font-size:clamp(16px,1.8vw,22px);color:var(--muted);text-align:center}
+  .fun{text-align:center}
+  .fun .big{font-size:clamp(80px,12vw,140px);line-height:1.1;animation:spin .9s ease}
+  @keyframes spin{from{transform:rotate(-200deg) scale(.3)}to{transform:rotate(0) scale(1)}}
+  .fun h2{font-size:clamp(32px,4.5vw,58px);margin:6px 0}
+  .fun p{font-size:clamp(19px,2.2vw,28px);color:var(--muted);margin:6px 0;line-height:1.7}
+  .end h2{font-size:clamp(28px,3.6vw,46px);text-align:center;margin:6px 0}
+  .end .stars{font-size:clamp(46px,7vw,90px);text-align:center;letter-spacing:6px;color:var(--accent2)}
+  .end p{text-align:center;font-size:clamp(18px,2.1vw,26px);line-height:1.7;margin:8px 0}
+  .start h2{font-size:clamp(28px,3.6vw,46px);text-align:center;margin:4px 0 6px}
+  .start p{text-align:center;font-size:clamp(16px,1.8vw,22px);color:var(--muted);margin:4px 0;line-height:1.6}
+  .legend{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+  .legend div{background:#f4f8f6;border-radius:14px;padding:6px 8px;text-align:center;font-size:clamp(15px,1.6vw,20px);font-weight:700}
+  .legend span{display:block;font-size:clamp(26px,3vw,36px)}
+  .sizes{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .sizes .btn.sel{outline:4px solid var(--accent2)}
+  .charRow{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;font-size:clamp(24px,2.6vw,34px);margin:4px 0}
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:20}
+  @media (max-width:760px){ main{flex-direction:column} #pad{width:100%;flex-direction:row;flex-wrap:wrap} .grid{width:200px} .value{display:none} .opts{grid-template-columns:1fr} .legend{grid-template-columns:repeat(2,1fr)} }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>متاهة المفاجآت
+      <small>مراجعة الوحدتين الرابعة والخامسة · الصف السابع</small></h1>
+    <div class="value">القيمة: التسامح</div>
+    <button class="iconbtn" id="soundBtn" title="الصوت">🔊</button>
+    <button class="iconbtn" id="fsBtn" title="ملء الشاشة">⛶</button>
+  </header>
+  <main>
+    <div id="stageWrap">
+      <canvas id="cv"></canvas>
+      <div id="hint">حرّك الشخصية بالأسهم، أو المس أي مكان في المتاهة لتمشي إليه</div>
+    </div>
+    <div id="pad">
+      <div class="who"><span class="em" id="whoEm">👽</span><span id="whoName">الفضائي</span><button id="swapBtn" title="غيّر الشخصية">🎲 غيّر</button></div>
+      <div class="progress">الصناديق المفتوحة: <b id="openedCount">0</b> من <span id="totalCount">0</span><br>الإجابات الصحيحة: <b id="scoreCount">0</b></div>
+      <div class="grid">
+        <span class="blank"></span>
+        <button class="arrow" data-dir="up" aria-label="أعلى">▲</button>
+        <span class="blank"></span>
+        <button class="arrow" data-dir="right" aria-label="يمين">▶</button>
+        <span class="blank"></span>
+        <button class="arrow" data-dir="left" aria-label="يسار">◀</button>
+        <span class="blank"></span>
+        <button class="arrow" data-dir="down" aria-label="أسفل">▼</button>
+        <span class="blank"></span>
+      </div>
+      <button class="iconbtn" id="newBtn" style="width:auto;padding:0 16px;font-size:17px;font-weight:700">متاهة جديدة ↻</button>
+    </div>
+  </main>
+</div>
+
+<!-- شاشة البداية -->
+<div class="overlay show" id="startOverlay">
+  <div class="card start">
+    <h2>🎁 متاهة المفاجآت 🎁</h2>
+    <p>مراجعة الوحدتين الرابعة والخامسة · الصف السابع</p>
+    <p>كل صندوق مغلق فيه مفاجأة… قد يكون سؤالاً، وقد يكون شيئاً آخر!</p>
+    <div class="legend">
+      <div><span>❓</span>سؤال اختياري</div>
+      <div><span>✍️</span>سؤال مقالي</div>
+      <div><span>🍀</span>حظاً أوفر</div>
+      <div><span>👉</span>اختر زميلاً يجيب بعدك</div>
+      <div><span>💧</span>استراحة ماء</div>
+      <div><span>😂</span>قل نكتة</div>
+    </div>
+    <p>وشخصيتك تتغير بعد كل صندوق… ومعها يتغير العالم: غابة، حديقة، الدوحة، القطب، الفضاء، الصحراء، البحر، السماء!</p>
+    <div class="charRow" id="charRow"></div>
+    <p><b>اختر عدد الصناديق:</b></p>
+    <div class="sizes">
+      <button class="btn soft" data-n="12">قصيرة · 12</button>
+      <button class="btn soft sel" data-n="20">متوسطة · 20</button>
+      <button class="btn soft" data-n="28">طويلة · 28</button>
+    </div>
+    <div class="actions"><button class="btn gold" id="startBtn">ابدأ اللعب ←</button></div>
+  </div>
+</div>
+
+<!-- بطاقة الصندوق -->
+<div class="overlay" id="qOverlay">
+  <div class="card">
+    <div id="funPane" class="fun hidden">
+      <div class="big" id="funEm"></div>
+      <h2 id="funTitle"></h2>
+      <p id="funText"></p>
+    </div>
+    <div id="qPane">
+      <div class="qhead"><span class="badge" id="qBadge">الصندوق 1</span><span class="qtype" id="qType"></span><span class="unitTag" id="qUnit"></span><span class="picked hidden" id="qPicked">👉 يجيب الزميل الذي تم اختياره</span></div>
+      <div class="qtext" id="qText"></div>
+      <div class="opts" id="qOpts"></div>
+      <div id="essayBox" class="hidden">
+        <div class="think">🗣️ يجيب الطالب شفهياً، ثم يُظهر المعلم الإجابة النموذجية</div>
+        <div class="model" id="qModel"></div>
+      </div>
+      <div class="feedback" id="qFeedback"></div>
+    </div>
+    <div class="actions">
+      <button class="btn gold hidden" id="revealBtn">إظهار الإجابة النموذجية</button>
+      <button class="btn good hidden" id="markGood">✓ إجابة صحيحة</button>
+      <button class="btn soft hidden" id="markPart">إجابة ناقصة</button>
+      <button class="btn hidden" id="continueBtn">متابعة اللعب ←</button>
+    </div>
+  </div>
+</div>
+
+<!-- النهاية -->
+<div class="overlay" id="endOverlay">
+  <div class="card end">
+    <h2>أحسنتم! فتحتم كل الصناديق 🎉</h2>
+    <div class="stars" id="endStars"></div>
+    <p id="endScore"></p>
+    <p>تذكّر قيمة اليوم <b>التسامح</b>: تكفّل الإسلام بحرية العقيدة لغير المسلمين وعدم إكراه أحد على الدخول فيه، ونحن نتقبّل زملاءنا ونحترم إجاباتهم حتى لو أخطؤوا.</p>
+    <div class="actions"><button class="btn" id="againBtn">متاهة جديدة ↻</button></div>
+  </div>
+</div>
+<canvas id="confetti"></canvas>
+
+<script>
+(function(){
+"use strict";
+/* ===== بنك الأسئلة: من نص كتاب الصف السابع ===== */
+/* الإجابة الصحيحة هي الخيار الأول دائماً في البيانات، وتُخلط الخيارات تلقائياً أثناء اللعب */
+const MCQ = [
+ {u:4, p:"84", t:"أكثر قارات العالم من حيث عدد السكان:", o:["آسيا","إفريقيا","أوروبا","أمريكا الشمالية"], n:"تتركز النسبة الكبرى من السكان في قارة آسيا، تليها قارة إفريقيا."},
+ {u:4, p:"84", t:"وجود السكان بنسبة كبيرة في مناطق جغرافية معينة دون أخرى يُسمّى:", o:["التركز السكاني","التخلخل السكاني","الهجرة القسرية","النشاط الاقتصادي"], n:"التركز السكاني: وجود السكان بنسبة كبيرة في مناطق جغرافية معينة دون أخرى."},
+ {u:4, p:"84", t:"قلة أو ندرة وجود السكان في مناطق جغرافية معينة تُسمّى:", o:["التخلخل السكاني","التركز السكاني","الكثافة المرتفعة","التنمية المستدامة"], n:"التخلخل السكاني: قلة أو ندرة وجود السكان في مناطق جغرافية معينة."},
+ {u:4, p:"90", t:"من العوامل الطبيعية المؤثرة في توزيع السكان:", o:["الثروات المعدنية","النقل والمواصلات","الزراعة","الأحداث السياسية"], n:"العوامل الطبيعية: التضاريس، والمناخ، والثروات المعدنية ومصادر الطاقة."},
+ {u:4, p:"86", t:"أفضل وأنسب أنواع السطح للتركز البشري:", o:["السهول","المناطق الجبلية","الصحاري الحارة","مناطق التندرا"], n:"تُعد السهول من أفضل وأنسب أنواع السطح للتركز البشري."},
+ {u:4, p:"87", t:"يقلّ السكان في المناطق شديدة البرودة مثل:", o:["منطقة سيبيريا","حوض الأمازون","الصحاري العربية","حوض الكونغو"], n:"منطقة سيبيريا بروسيا الاتحادية من أقل مناطق العالم سكاناً لشدة البرودة."},
+ {u:4, p:"86", t:"من المناطق الجبلية التي يتركز فيها السكان بسبب اعتدال المناخ وخصوبة التربة:", o:["مرتفعات اليمن","جبال البحر الأحمر","منطقة سيبيريا","حوض الأمازون"], n:"يتركز السكان في مرتفعات اليمن ومرتفعات أثيوبيا لاعتدال المناخ وخصوبة التربة."},
+ {u:4, p:"87", t:"الأقاليم المعتدلة الممتدة بين دائرتي عرض 30° و 60° شمالاً وجنوباً تضم:", o:["نصف سكان العالم","ربع سكان العالم","1.4% من سكان العالم","3% من سكان العالم"], n:"تضم الأقاليم المعتدلة نصف سكان العالم لاعتدال الحرارة ومناسبة الأمطار."},
+ {u:4, p:"88", t:"مناطق الصحاري الحارة لا تضم سوى ……… من جملة سكان العالم:", o:["1.4%","3%","25%","50%"], n:"الصحاري الحارة لا تضم سوى 1.4%، ومنطقة التندرا لا يقطنها سوى 3% من سكان العالم."},
+ {u:4, p:"88", t:"ترتبط الكثافة السكانية المرتفعة في جنوب شرقي آسيا بـ:", o:["الأمطار الغزيرة (الموسمية)","الثروات المعدنية","شدة البرودة","الحروب والمشكلات السياسية"], n:"الكثافة السكانية المرتفعة في جنوب شرقي آسيا لها علاقة بالأمطار الغزيرة (الموسمية)."},
+ {u:4, p:"88", t:"تنخفض الكثافة السكانية في حوض الكونغو وحوض الأمازون رغم غزارة الأمطار لأنها:", o:["تتحول إلى مستنقعات تكثر بها الحشرات الضارة","مناطق شديدة البرودة","مناطق جبلية وعرة","خالية من المياه"], n:"المناطق الاستوائية غزيرة المطر تتحول إلى مستنقعات تكثر بها الحشرات الضارة."},
+ {u:4, p:"89", t:"ميناء رأس تنورة الذي نشأ بسبب ظهور النفط يقع في:", o:["السعودية","قطر","الكويت","مصر"], n:"من المدن والموانئ التي نشأت بسبب النفط: مسيعيد في قطر، ورأس تنورة في السعودية، والأحمدي في الكويت."},
+ {u:4, p:"93", t:"من العوامل البشرية المؤثرة في توزيع سكان العالم:", o:["النشاط الاقتصادي","معدلات الأمطار","مصادر الطاقة","التضاريس"], n:"العوامل البشرية: الأنشطة الاقتصادية، والنقل والمواصلات، والحروب والمشكلات السياسية."},
+ {u:4, p:"95", t:"من المدن الصناعية التي تشهد تركزاً سكانياً بدولة قطر:", o:["مدينة مسيعيد","مدينة الشمال","مدينة الشيحانية","مدينة أم صلال"], n:"مسيعيد ورأس لفان مدن صناعية في قطر تجذب السكان لتوافر فرص العمل."},
+ {u:4, p:"94", t:"الحرفة التي لا تحتاج لأعداد كبيرة من السكان:", o:["الرعي","الزراعة","الصناعة","التجارة"], n:"حرفة الرعي لا تحتاج أعداداً كبيرة من السكان."},
+ {u:4, p:"94", t:"تجتذب الزراعة أعداداً قليلة من الأيدي العاملة في الدول المتقدمة بسبب:", o:["استخدام الآلات الزراعية","قلة الأمطار","كثرة الحروب","شدة البرودة"], n:"تقل الأيدي العاملة في الزراعة بالدول المتقدمة لاستخدام الآلات الزراعية."},
+ {u:4, p:"95", t:"ساعدت شبكة النقل الحديثة في دولة قطر على تركز السكان على:", o:["الساحل الشرقي وجانبي طرق النقل","الساحل الغربي فقط","المناطق الصحراوية الوسطى","الجزر البعيدة"], n:"ساعدت شبكة النقل الكبيرة والحديثة على تركز السكان على الساحل الشرقي وعلى جانبي طرق النقل."},
+ {u:4, p:"95", t:"ساهمت الطرق والسكك الحديدية في جذب السكان والعمران في:", o:["غرب الولايات المتحدة الأمريكية","منطقة سيبيريا","حوض الأمازون","الصحراء الكبرى"], n:"ساهمت الطرق والسكك الحديدية في جذب السكان والعمران في غرب الولايات المتحدة الأمريكية."},
+ {u:4, p:"96", t:"تؤدي الحروب والمشكلات السياسية إلى:", o:["هجرة قسرية للسكان نحو مناطق آمنة ومستقرة","زيادة الأنشطة الزراعية","تعمير المناطق النائية","زيادة استخدام الآلات"], n:"مثال ذلك ما حدث في فلسطين بعد الاحتلال الإسرائيلي عام 1948م، فلجأ أهلها إلى الدول العربية المجاورة."},
+ {u:4, p:"96", t:"لجأ كثير من أهل فلسطين إلى الدول العربية المجاورة بعد الاحتلال الإسرائيلي عام:", o:["1948م","1882م","1970م","2015م"], n:"الهجرة القسرية بعد الاحتلال الإسرائيلي لفلسطين عام 1948م."},
+ {u:5, p:"106", t:"ينتسب العباسيون إلى:", o:["العباس بن عبد المطلب عم الرسول ﷺ","معاوية بن أبي سفيان","هارون الرشيد","أبي جعفر المنصور"], n:"ينتسب العباسيون إلى العباس بن عبد المطلب بن هاشم، عم الرسول ﷺ."},
+ {u:5, p:"106", t:"أعلن العباسيون الثورة على الدولة الأموية من منطقة:", o:["خراسان","بغداد","دمشق","عمورية"], n:"أعلن العباسيون الثورة من خراسان، وقضوا على جيش الأمويين في معركة الزاب الكبير."},
+ {u:5, p:"106", t:"انتصر العباسيون على جيش الدولة الأموية في معركة الزاب الكبير سنة:", o:["132هـ","145هـ","223هـ","656هـ"], n:"معركة الزاب الكبير بالعراق سنة 132هـ، وأصبح أبو العباس أول خليفة عباسي."},
+ {u:5, p:"112", t:"أول خلفاء الدولة العباسية:", o:["أبو العباس","الأمين","هارون الرشيد","المأمون"], n:"أبو العباس أول خليفة عباسي (132 – 136هـ)."},
+ {u:5, p:"107", t:"العصر العباسي الأول (عصر القوة) امتد بين عامي:", o:["132 – 232هـ","232 – 656هـ","40 – 132هـ","11 – 40هـ"], n:"العصر العباسي الأول (132 – 232هـ)، والعصر العباسي الثاني (232 – 656هـ)."},
+ {u:5, p:"109", t:"يوصف بأنه المؤسس الحقيقي للدولة العباسية:", o:["أبو جعفر المنصور","أبو العباس","المأمون","المعتصم بالله"], n:"أبو جعفر المنصور ثبّت أركان الدولة وأنشأ جهازاً إدارياً محكماً وبنى بغداد."},
+ {u:5, p:"109", t:"بنى أبو جعفر المنصور مدينة بغداد واتخذها عاصمة سنة:", o:["145هـ","132هـ","193هـ","223هـ"], n:"بنى المنصور مدينة بغداد سنة 145هـ واتخذها عاصمة للدولة العباسية."},
+ {u:5, p:"110", t:"الخليفة الذي أنشأ مكتبة بيت الحكمة في بغداد:", o:["هارون الرشيد","أبو العباس","المعتصم بالله","الواثق بالله"], n:"شجّع هارون الرشيد الحركة العلمية والأدبية وأنشأ بيت الحكمة."},
+ {u:5, p:"110", t:"يُعدّ عصره أزهى عصور الدولة العباسية:", o:["هارون الرشيد","الواثق بالله","أبو العباس","المهدي"], n:"هارون الرشيد خامس الخلفاء وأكثرهم شهرة، وعصره أزهى عصور الدولة العباسية."},
+ {u:5, p:"110", t:"قيل عنه: «لو لم يكن خليفة لكان عالماً بارزاً»:", o:["المأمون","أبو جعفر المنصور","المعتصم بالله","هارون الرشيد"], n:"اهتم المأمون بالعلم والعلماء وازدهرت في عهده الترجمة والنهضة العلمية."},
+ {u:5, p:"110", t:"كان المأمون يعطي المترجم وزن الكتاب الذي ترجمه:", o:["ذهباً","فضة","قمحاً","حريراً"], n:"نشطت حركة الترجمة في عهد المأمون حتى كان يعطي المترجم وزن الكتاب ذهباً."},
+ {u:5, p:"117", t:"فُتحت مدينة عمورية عام 223هـ على يد الخليفة:", o:["المعتصم بالله","المأمون","المنصور","الواثق بالله"], n:"فتح المعتصم بالله عمورية، إحدى أقوى حصون الدولة البيزنطية."},
+ {u:5, p:"116", t:"الدولة البيزنطية هي:", o:["الدولة الرومانية الشرقية","الدولة الأموية","دولة المغول","الدولة العثمانية"], n:"الدولة البيزنطية هي الدولة الرومانية الشرقية، ويطلق على شعبها اسم الروم."},
+ {u:5, p:"118", t:"بدأ منصب الخلافة العباسية يضعف مع وفاة الخليفة:", o:["الواثق بالله","المعتصم بالله","المأمون","المهدي"], n:"بدأ منصب الخلافة يضعف مع وفاة الواثق بالله عام 232هـ."},
+ {u:5, p:"119", t:"سقطت الدولة العباسية ودخل المغول بغداد عام:", o:["656هـ","232هـ","132هـ","223هـ"], n:"تمكن المغول من دخول بغداد عام 656هـ والقضاء على الخلافة العباسية."},
+ {u:5, p:"119", t:"من أسباب سقوط الدولة العباسية:", o:["تزايد الأطماع الخارجية في الدولة","وحدة البيت العباسي","الاهتمام بالزراعة والصناعة","وجود خلفاء قادرين على إدارة الدولة"], n:"من أسباب السقوط: تولي خلفاء ضعفاء، وإهمال الزراعة والصناعة والتجارة، وتزايد الأطماع الخارجية."},
+ {u:5, p:"119", t:"الخطر الذي هدد الدولة العباسية من جهة الشرق:", o:["الخطر المغولي","القوى الصليبية","الدولة البيزنطية","الدولة الأموية"], n:"الخطر المغولي من جهة الشرق، والقوى الصليبية من جهة الغرب."},
+ {u:5, p:"118", t:"من مظاهر ضعف الدولة العباسية في العصر العباسي الثاني:", o:["التفكك والانقسام إلى دويلات مستقلة","بناء مدينة بغداد","إنشاء بيت الحكمة","فتح عمورية"], n:"مظاهر الضعف: التفكك والانقسام، وتردي الأوضاع الاقتصادية والاجتماعية، وتراجع النشاط العسكري."}
+];
+const ESSAY = [
+ {u:4, p:"86", t:"فسّر: تُعدّ السهول من أفضل وأنسب أنواع السطح للتركز البشري.", m:["سهولة مدّ الطرق وخطوط السكك الحديدية.","إمكانية إقامة كافة المنشآت العمرانية والصناعية.","سهولة ممارسة الأنشطة الزراعية بسبب خصوبة التربة ووفرة المياه."]},
+ {u:4, p:"86", t:"علّل: يقلّ التركز السكاني في المناطق الجبلية.", m:["وعورة وتعرّج السطح.","تعرّض التربة للتعرية.","صعوبة التنقل والحركة."]},
+ {u:4, p:"86", t:"دلّل على صحة العبارة: ليست جميع المناطق المرتفعة طاردة للسكان.", m:["توجد مناطق جبلية يتركز فيها السكان مثل مرتفعات اليمن ومرتفعات أثيوبيا.","بسبب اعتدال المناخ وخصوبة التربة."]},
+ {u:4, p:"89", t:"ما النتائج المترتبة على ظهور النفط والغاز في دول الخليج العربي؟", m:["جذب السكان وممارسة نشاط التعدين.","نشأة العديد من المدن وموانئ التصدير مثل: مسيعيد في قطر، ورأس تنورة في السعودية، والأحمدي في الكويت."]},
+ {u:4, p:"95", t:"اذكر أثر النقل والمواصلات في توزيع السكان.", m:["تعمير المناطق.","جذب السكان للمناطق النائية.","استغلال الموارد الاقتصادية."]},
+ {u:4, p:"95", t:"فسّر: تركّز السكان في غرب أوروبا.", m:["نشاط الصناعة يؤدي إلى جذب السكان بأعداد كبيرة وتركزهم في تجمعات كبرى في المدن الصناعية.","وذلك بسبب توافر فرص العمل."]},
+ {u:5, p:"106", t:"فسّر: نجاح العباسيين في إسقاط الدولة الأموية.", m:["مرّت الدولة الأموية في أواخر عهدها بحالة من الضعف والتفكك وتردي الأوضاع الاقتصادية.","استغل العباسيون ذلك وأعلنوا الثورة من منطقة خراسان.","قضوا على جيش الدولة الأموية في معركة الزاب الكبير سنة 132هـ."]},
+ {u:5, p:"107", t:"اذكر سمات العصر العباسي الأول (عصر القوة).", m:["قوة الخلافة واستقلالها التام لتركّز السلطة بيد الخليفة.","تمسّك الخلفاء بإحياء السنة وإقامة العدل والمساواة بين الناس.","ازدهار الحضارة الإسلامية في كافة المجالات."]},
+ {u:5, p:"109", t:"علّل: يُعدّ أبو جعفر المنصور المؤسس الحقيقي للدولة العباسية.", m:["ثبّت أركان الدولة وقضى على الثورات التي قامت ضدها.","أنشأ جهازاً إدارياً محكماً لمراقبة موظفي الدولة ومحاسبتهم.","حمى الدولة وحصّن حدودها الشمالية مع الدولة البيزنطية.","بنى مدينة بغداد سنة 145هـ واتخذها عاصمة."]},
+ {u:5, p:"117", t:"فسّر قيام معركة عمورية.", m:["اعتدى الإمبراطور البيزنطي على بعض الثغور والحصون على حدود الدولة الإسلامية.","صاحت امرأة مسلمة وقعت في أسر الروم: «وامعتصماه».","طالب المعتصم الإمبراطور بإخراج المرأة من السجن فلم يستجب.","فخرج المعتصم بنفسه على رأس جيش كبير وفتح عمورية."]},
+ {u:5, p:"118", t:"اذكر مظاهر ضعف الدولة العباسية في العصر العباسي الثاني.", m:["التفكك والانقسام.","تردي الأوضاع الاقتصادية والاجتماعية.","تراجع النشاط العسكري."]},
+ {u:5, p:"119", t:"ما أسباب سقوط الدولة العباسية؟", m:["تولي الخلافة عدد من الخلفاء الضعفاء.","سيطرة عناصر غير مخلصة على نظم الجيش والإدارة.","اتساع رقعة الدولة وقيام دويلات مستقلة عنها.","إهمال الزراعة والصناعة والتجارة.","تزايد الأطماع الخارجية، وأخطرها الغزو الصليبي والغزو المغولي."]}
+];
+
+
+/* ===== الشخصيات: تتغير بعد كل صندوق ===== */
+const CHARS = [
+  {name:"الفضائي", em:"👽", c:"#d8f3dc", th:"space"}, {name:"الصاروخ", em:"🚀", c:"#e3e8f6", th:"space"},
+  {name:"الحصان", em:"🐎", c:"#f3e3cf", th:"forest"}, {name:"الفأر", em:"🐭", c:"#ece7f3", th:"forest"},
+  {name:"الديناصور", em:"🦖", c:"#e1f2dc", th:"forest"}, {name:"الأسد", em:"🦁", c:"#fbedd2", th:"forest"},
+  {name:"الثعلب", em:"🦊", c:"#fbe3d2", th:"forest"}, {name:"الأرنب", em:"🐰", c:"#f8e6ee", th:"park"},
+  {name:"الدراجة", em:"🚲", c:"#dcecf7", th:"park"}, {name:"السكوتر", em:"🛴", c:"#e2f0e6", th:"park"},
+  {name:"السيارة", em:"🚗", c:"#fde2df", th:"city"}, {name:"الدراجة النارية", em:"🏍️", c:"#e6e6ee", th:"city"},
+  {name:"الروبوت", em:"🤖", c:"#e3e9ee", th:"city"}, {name:"الحافلة", em:"🚌", c:"#fdf0cf", th:"city"},
+  {name:"الدب القطبي", em:"🐻‍❄️", c:"#eef6fb", th:"polar"}, {name:"البطريق", em:"🐧", c:"#e4eef3", th:"polar"},
+  {name:"الجمل", em:"🐪", c:"#f6ead5", th:"desert"}, {name:"الصقر", em:"🦅", c:"#efe6dc", th:"sky"},
+  {name:"الطائرة", em:"✈️", c:"#e0eef8", th:"sky"}, {name:"الأخطبوط", em:"🐙", c:"#f6e0ea", th:"sea"},
+  {name:"السلحفاة", em:"🐢", c:"#dff2e3", th:"sea"}, {name:"الحوت", em:"🐳", c:"#dcefff", th:"sea"},
+  {name:"القارب", em:"⛵", c:"#e8f4fb", th:"sea"}
+];
+
+/* ===== صناديق المفاجآت ===== */
+const FUN = {
+  luck:  {em:"🍀", title:"حظاً أوفر!", text:"هذا الصندوق فارغ… الدور ينتقل إلى زميلك، والمرة القادمة لك بإذن الله.", sound:"luck", mark:"🍀"},
+  pick:  {em:"👉", title:"اختر زميلاً!", text:"أنت من يختار: سمِّ زميلاً ليجيب عن السؤال التالي بدلاً منك.", sound:"open", mark:"👉"},
+  water: {em:"💧", title:"استراحة ماء!", text:"تستطيع الذهاب لشرب الماء ثم العودة إلى مكانك بهدوء 🥤", sound:"good", mark:"💧"},
+  joke:  {em:"😂", title:"قل نكتة!", text:"أضحك زملاءك بنكتة لطيفة ومحترمة… ونتقبّل بعضنا بروح التسامح 😄", sound:"good", mark:"😂"}
+};
+// توزيع الصناديق حسب طول اللعبة (والباقي أسئلة: الاختياري أكثر من المقالي)
+const PLAN = {
+  12:{luck:1,pick:1,water:1,joke:1,essay:2},
+  20:{luck:2,pick:1,water:1,joke:1,essay:4},
+  28:{luck:2,pick:2,water:1,joke:2,essay:5}
+};
+const SIZE = {12:[15,8],20:[18,10],28:[20,11]};
+
+/* ===== أدوات ===== */
+const $ = id=>document.getElementById(id);
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const LET = ["أ","ب","ج","د"];
+// مجموعات سحب لا تتكرر حتى تنتهي كل الأسئلة
+let mcqDeck=[], essDeck=[];
+function drawMcq(){ if(!mcqDeck.length) mcqDeck=shuffle(MCQ); return mcqDeck.pop(); }
+function drawEss(){ if(!essDeck.length) essDeck=shuffle(ESSAY); return essDeck.pop(); }
+
+/* ===== أصوات ===== */
+let soundOn = true, actx = null;
+function tone(freq, dur, type, vol, delay){
+  if(!soundOn) return;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const t = actx.currentTime + (delay||0);
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = type||"sine"; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol||0.12, t); g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+    o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t+dur);
+  }catch(e){}
+}
+const sfx = {
+  step(){ tone(420,0.05,"triangle",0.04); },
+  bump(){ tone(140,0.08,"square",0.04); },
+  open(){ [523,659,784].forEach((f,i)=>tone(f,0.18,"triangle",0.1,i*0.08)); },
+  good(){ [659,784,1047].forEach((f,i)=>tone(f,0.2,"sine",0.12,i*0.1)); },
+  luck(){ [523,415,330,262].forEach((f,i)=>tone(f,0.22,"triangle",0.09,i*0.14)); },
+  bad(){ tone(260,0.18,"sawtooth",0.06); tone(200,0.25,"sawtooth",0.06,0.15); },
+  swap(){ tone(880,0.12,"sine",0.1); tone(1320,0.15,"sine",0.08,0.1); },
+  win(){ [523,659,784,1047,784,1047].forEach((f,i)=>tone(f,0.22,"triangle",0.11,i*0.13)); }
+};
+
+/* ===== المتاهة ===== */
+let COLS = 14, ROWS = 8, N = 20;
+let maze, chests, player, opened, score, asked, locked = true, pickNext = false;
+
+function genMaze(){
+  const cells = [];
+  for(let y=0;y<ROWS;y++){ cells.push([]); for(let x=0;x<COLS;x++) cells[y].push({n:1,s:1,e:1,w:1,v:0}); }
+  const stack = [[COLS-1,0]]; cells[0][COLS-1].v = 1;
+  const dirs = [[0,-1,"n","s"],[0,1,"s","n"],[1,0,"e","w"],[-1,0,"w","e"]];
+  while(stack.length){
+    const [x,y] = stack[stack.length-1];
+    const nb = dirs.filter(([dx,dy])=>{const nx=x+dx,ny=y+dy;return nx>=0&&ny>=0&&nx<COLS&&ny<ROWS&&!cells[ny][nx].v;});
+    if(!nb.length){ stack.pop(); continue; }
+    const [dx,dy,a,b] = nb[Math.floor(Math.random()*nb.length)];
+    cells[y][x][a]=0; cells[y+dy][x+dx][b]=0; cells[y+dy][x+dx].v=1; stack.push([x+dx,y+dy]);
+  }
+  // طرق بديلة لتسهيل اللعب على السبورة
+  let extra = Math.round(COLS*ROWS*0.03);
+  while(extra>0){
+    const x = Math.floor(Math.random()*(COLS-1)), y = Math.floor(Math.random()*ROWS);
+    if(Math.random()<0.5){ if(cells[y][x].e){ cells[y][x].e=0; cells[y][x+1].w=0; extra--; } }
+    else if(y<ROWS-1 && cells[y][x].s){ cells[y][x].s=0; cells[y+1][x].n=0; extra--; }
+  }
+  return cells;
+}
+function canMove(x,y,dir){ const c = maze[y][x]; return {up:!c.n, down:!c.s, right:!c.e, left:!c.w}[dir]; }
+function bfs(sx,sy){
+  const d = Array.from({length:ROWS},()=>Array(COLS).fill(-1)); d[sy][sx]=0; const q=[[sx,sy]];
+  while(q.length){ const [x,y]=q.shift(); for(const k in DIRV){ if(canMove(x,y,k)){ const nx=x+DIRV[k][0],ny=y+DIRV[k][1]; if(d[ny][nx]<0){d[ny][nx]=d[y][x]+1;q.push([nx,ny]);} } } }
+  return d;
+}
+function placeChests(sx,sy){
+  const d = bfs(sx,sy), cand = [];
+  for(let y=0;y<ROWS;y++) for(let x=0;x<COLS;x++){
+    if(d[y][x] < 2) continue;
+    const c = maze[y][x];
+    cand.push({x,y,dist:d[y][x],dead:(c.n+c.s+c.e+c.w)===3});
+  }
+  const chosen = [];
+  const spread = p => Math.min(Math.abs(p.x-sx)+Math.abs(p.y-sy), ...chosen.map(c=>Math.abs(c.x-p.x)+Math.abs(c.y-p.y)));
+  while(chosen.length<N){
+    let best=null, bs=-1;
+    for(const p of cand){ if(chosen.includes(p)) continue; const s = Math.min(spread(p),4)*2 + (p.dead?3:0) + Math.random()*2; if(s>bs){bs=s;best=p;} }
+    chosen.push(best);
+  }
+  // أنواع الصناديق مخلوطة عشوائياً
+  const pl = PLAN[N], types = [];
+  ["luck","pick","water","joke"].forEach(k=>{ for(let i=0;i<pl[k];i++) types.push(k); });
+  for(let i=0;i<pl.essay;i++) types.push("essay");
+  while(types.length<N) types.push("mcq");
+  const mix = shuffle(types);
+  chosen.sort((a,b)=>a.dist-b.dist);
+  return chosen.map((c,i)=>({x:c.x,y:c.y,n:i+1,type:mix[i],state:"closed",lid:0,result:null}));
+}
+
+function newGame(){
+  [COLS,ROWS] = SIZE[N];
+  maze = genMaze();
+  player = {x:COLS-1,y:0,fx:COLS-1,fy:0,t:1,face:"left",moving:false,ch:Math.floor(Math.random()*CHARS.length),swap:0};
+  setTheme(CHARS[player.ch].th); sceneFade = 0;
+  autoPath=[]; target=null;
+  chests = placeChests(player.x,player.y);
+  opened = 0; score = 0; asked = 0; parts = []; pickNext = false;
+  $("totalCount").textContent = N;
+  updateHud(); updateWho(); resize();
+  $("endOverlay").classList.remove("show");
+}
+
+/* ===== الرسم ===== */
+const cv = $("cv"), ctx = cv.getContext("2d");
+let cell = 60, ox = 10, oy = 10, dpr = 1;
+function resize(){
+  const wrap = $("stageWrap");
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+  cell = Math.max(20, Math.floor(Math.min((W-20)/COLS,(H-20)/ROWS)));
+  const w = cell*COLS+20, h = cell*ROWS+20;
+  dpr = window.devicePixelRatio||1;
+  cv.style.width = w+"px"; cv.style.height = h+"px";
+  cv.width = w*dpr; cv.height = h*dpr; ox = 10; oy = 10;
+}
+window.addEventListener("resize", resize);
+function rr(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+const EMOJI_FONT = '"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';
+/* ===== العوالم: الخلفية تتغير حسب الشخصية ===== */
+function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function lin(g,h,stops){ const gr=g.createLinearGradient(0,0,0,h); stops.forEach((c,i)=>gr.addColorStop(i/(stops.length-1),c)); return gr; }
+function blob(g,x,y,r,col){ g.fillStyle=col; g.beginPath(); g.arc(x,y,r,0,7); g.fill(); }
+function cloud(g,x,y,s,col){ g.fillStyle=col; g.beginPath(); g.arc(x,y,s*0.5,0,7); g.arc(x+s*0.45,y-s*0.2,s*0.55,0,7); g.arc(x+s*0.95,y,s*0.45,0,7); g.rect(x,y-s*0.05,s*0.95,s*0.5); g.fill(); }
+function tree(g,x,y,s,R){
+  g.fillStyle="#7a5432"; g.fillRect(x-s*0.08,y-s*0.3,s*0.16,s*0.5);
+  const greens=["#2f6b34","#3d8040","#4f9a4a","#6bb35b"];
+  for(let i=0;i<4;i++) blob(g,x+(R()-0.5)*s*0.5,y-s*0.45-R()*s*0.35,s*(0.28+R()*0.12),greens[Math.floor(R()*4)]);
+}
+function palm(g,x,y,s){
+  g.strokeStyle="#8a6236"; g.lineWidth=s*0.08; g.lineCap="round"; g.beginPath(); g.moveTo(x,y); g.quadraticCurveTo(x+s*0.12,y-s*0.5,x+s*0.05,y-s); g.stroke();
+  g.strokeStyle="#3f8a3a"; g.lineWidth=s*0.07;
+  for(const a of [-2.6,-2.0,-1.2,-0.6,0.1]){ g.beginPath(); g.moveTo(x+s*0.05,y-s); g.quadraticCurveTo(x+s*0.05+Math.cos(a)*s*0.4,y-s+Math.sin(a)*s*0.4-s*0.1,x+s*0.05+Math.cos(a)*s*0.6,y-s+Math.sin(a)*s*0.2+s*0.2); g.stroke(); }
+}
+function fish(g,x,y,s,col,dir){
+  g.fillStyle=col; g.beginPath(); g.ellipse(x,y,s,s*0.55,0,0,7); g.fill();
+  g.beginPath(); g.moveTo(x-dir*s*0.85,y); g.lineTo(x-dir*s*1.5,y-s*0.5); g.lineTo(x-dir*s*1.5,y+s*0.5); g.closePath(); g.fill();
+  blob(g,x+dir*s*0.5,y-s*0.12,s*0.12,"#fff"); blob(g,x+dir*s*0.53,y-s*0.12,s*0.06,"#123");
+}
+
+const THEMES = {
+  forest:{name:"الغابة", page:"#e3efdc", wall:"#4b3621", floor:"rgba(244,250,238,0.5)", alt:"rgba(228,242,218,0.5)", fx:"leaves",
+    draw(g,w,h,R){ g.fillStyle=lin(g,h,["#cfe9c4","#93c785","#6aa860"]); g.fillRect(0,0,w,h);
+      for(let i=0;i<w/18;i++) blob(g,R()*w,h*0.2+R()*h,8+R()*18,["#5c9b52","#79b46a","#4c8a46"][i%3]);
+      for(let i=0;i<w/28;i++) tree(g,R()*w,h*0.15+R()*h*0.95,40+R()*50,R);
+      for(let i=0;i<w/30;i++){ const x=R()*w,y=R()*h; g.fillStyle="#d9483b"; g.beginPath(); g.arc(x,y,6,Math.PI,0); g.fill(); g.fillStyle="#f2e6cf"; g.fillRect(x-2,y,4,6); } }},
+  park:{name:"الحديقة", page:"#e6f3dc", wall:"#2f6b3a", floor:"rgba(248,252,240,0.48)", alt:"rgba(234,246,222,0.48)", fx:"butterflies",
+    draw(g,w,h,R){ g.fillStyle=lin(g,h,["#c9ecb0","#a9dc8a"]); g.fillRect(0,0,w,h);
+      g.strokeStyle="#e8d6ad"; g.lineWidth=Math.max(24,h*0.07); g.lineCap="round";
+      g.beginPath(); g.moveTo(-20,h*0.3); g.bezierCurveTo(w*0.3,h*0.05,w*0.5,h*0.95,w+20,h*0.6); g.stroke();
+      g.beginPath(); g.moveTo(w*0.2,h+20); g.bezierCurveTo(w*0.3,h*0.6,w*0.7,h*0.4,w*0.75,-20); g.stroke();
+      blob(g,w*0.5,h*0.5,h*0.12,"#cfd8dc"); blob(g,w*0.5,h*0.5,h*0.1,"#7fc8e8"); blob(g,w*0.5,h*0.5,h*0.03,"#e9f6fb");
+      for(let i=0;i<w/40;i++) tree(g,R()*w,R()*h,34+R()*30,R);
+      const fl=["#f28ab2","#f7d046","#ffffff","#b48cf2","#f39b5c"];
+      for(let i=0;i<w*0.5;i++){ const x=R()*w,y=R()*h,c=fl[i%5]; for(let k=0;k<5;k++){ const a=k*1.256; blob(g,x+Math.cos(a)*3.5,y+Math.sin(a)*3.5,3,c);} blob(g,x,y,2.2,"#f2b632"); }
+      for(let i=0;i<4;i++){ const x=R()*w,y=R()*h; g.fillStyle="#8a5a33"; g.fillRect(x,y,34,6); g.fillRect(x,y-10,34,4); g.fillRect(x+3,y+6,3,7); g.fillRect(x+28,y+6,3,7); } }},
+  city:{name:"مدينة الدوحة", page:"#dfe4f0", wall:"#1f2b46", floor:"rgba(246,248,252,0.48)", alt:"rgba(230,236,246,0.48)", fx:"lights",
+    draw(g,w,h,R){ const hz=h*0.62;
+      g.fillStyle=lin(g,hz,["#26355e","#5b4f86","#e99a5c","#f6c98a"]); g.fillRect(0,0,w,hz);
+      g.fillStyle="#f8f3d8"; g.beginPath(); g.arc(w*0.12,h*0.13,h*0.05,0,7); g.fill(); g.fillStyle="#3a3f6c"; g.beginPath(); g.arc(w*0.12+h*0.02,h*0.12,h*0.045,0,7); g.fill();
+      // صف خلفي من الأبراج
+      for(let x=0;x<w;){ const bw=18+R()*30, bh=h*(0.12+R()*0.22); g.fillStyle="#4a4f78"; g.fillRect(x,hz-bh,bw,bh); x+=bw+2; }
+      // أبراج أمامية بأشكال مختلفة
+      for(let x=10;x<w;){ const bw=26+R()*34, bh=h*(0.2+R()*0.36), k=Math.floor(R()*4), top=hz-bh;
+        g.fillStyle=["#2c3358","#353d6a","#2a4a6a","#3b3560"][k];
+        if(k===0){ g.fillRect(x,top,bw,bh); g.beginPath(); g.moveTo(x+bw*0.5,top-bh*0.18); g.lineTo(x+bw*0.15,top); g.lineTo(x+bw*0.85,top); g.fill(); }
+        else if(k===1){ g.fillRect(x,top+bw*0.5,bw,bh-bw*0.5); g.beginPath(); g.arc(x+bw/2,top+bw*0.5,bw/2,Math.PI,0); g.fill(); g.fillRect(x+bw*0.47,top-bh*0.12,bw*0.06,bh*0.14); }
+        else if(k===2){ g.beginPath(); g.moveTo(x,hz); g.lineTo(x+bw*0.15,top); g.lineTo(x+bw*0.85,top); g.lineTo(x+bw,hz); g.fill(); }
+        else { g.fillRect(x+bw*0.3,top+bh*0.15,bw*0.4,bh*0.85); g.beginPath(); g.moveTo(x+bw*0.1,top); g.lineTo(x+bw*0.9,top); g.lineTo(x+bw*0.7,top+bh*0.18); g.lineTo(x+bw*0.3,top+bh*0.18); g.fill(); g.fillStyle="#f3b04a"; g.beginPath(); g.ellipse(x+bw/2,top-4,bw*0.12,8,0,0,7); g.fill(); }
+        g.fillStyle="rgba(255,214,120,.85)";
+        for(let wy=top+12;wy<hz-6;wy+=10) for(let wx=x+5;wx<x+bw-5;wx+=8) if(R()<0.45) g.fillRect(wx,wy,3,4);
+        x+=bw+6+R()*14; }
+      g.fillStyle=lin(g,h,["#1d6f8a","#1d6f8a","#2f8fa6","#4fb0c2"]); g.fillRect(0,hz,w,h-hz);
+      g.fillStyle="rgba(255,214,120,.25)"; for(let i=0;i<w/6;i++) g.fillRect(R()*w,hz+R()*(h-hz)*0.5,10+R()*20,2);
+      // قارب شراعي تقليدي
+      const bx=w*0.62, by=hz+(h-hz)*0.55; g.fillStyle="#7a4a24"; g.beginPath(); g.moveTo(bx-60,by); g.lineTo(bx+60,by); g.lineTo(bx+40,by+18); g.lineTo(bx-45,by+18); g.fill();
+      g.fillStyle="#f5ecd6"; g.beginPath(); g.moveTo(bx,by-80); g.lineTo(bx+45,by-6); g.lineTo(bx-30,by-6); g.fill(); g.fillStyle="#5a3a1c"; g.fillRect(bx-2,by-82,4,82);
+      g.fillStyle="#d8c79a"; g.fillRect(0,h-14,w,14); }},
+  polar:{name:"القطب المتجمد", page:"#e3f1f8", wall:"#2c5f86", floor:"rgba(250,253,255,0.43)", alt:"rgba(232,245,252,0.43)", fx:"snow",
+    draw(g,w,h,R){ g.fillStyle=lin(g,h,["#1f3d66","#4e7fae","#bfe2f3","#eaf7fd"]); g.fillRect(0,0,w,h);
+      for(const [c,y] of [["rgba(110,240,170,.35)",0.1],["rgba(140,200,255,.3)",0.18]]){ g.strokeStyle=c; g.lineWidth=h*0.05; g.beginPath(); for(let x=0;x<=w;x+=20) g.lineTo(x,h*y+Math.sin(x/90)*h*0.04); g.stroke(); }
+      for(let i=0;i<w/60;i++){ const x=R()*w, b=h*(0.45+R()*0.25), s=60+R()*90; g.fillStyle=["#ffffff","#e2f3fb","#cbe8f6"][i%3]; g.beginPath(); g.moveTo(x-s,b+s*0.5); g.lineTo(x-s*0.3,b-s*0.4); g.lineTo(x,b-s*0.2); g.lineTo(x+s*0.4,b-s*0.6); g.lineTo(x+s,b+s*0.5); g.fill(); }
+      for(let i=0;i<w/40;i++) { g.fillStyle="#f7fcff"; g.beginPath(); g.ellipse(R()*w,h*(0.7+R()*0.3),40+R()*80,14+R()*20,0,0,7); g.fill(); }
+      g.fillStyle="#9fd3ea"; for(let i=0;i<w/80;i++){ g.beginPath(); g.ellipse(R()*w,h*(0.75+R()*0.25),30+R()*40,6,0,0,7); g.fill(); } }},
+  space:{name:"الفضاء والكرة الأرضية", page:"#d9def0", wall:"#9fdcff", floor:"rgba(12,22,56,.55)", alt:"rgba(22,34,76,.55)", fx:"stars", dark:true,
+    draw(g,w,h,R){ g.fillStyle=lin(g,h,["#070b1f","#141f4a","#22164a"]); g.fillRect(0,0,w,h);
+      for(let i=0;i<w*0.6;i++) blob(g,R()*w,R()*h,R()*1.6+0.3,`rgba(255,255,255,${0.3+R()*0.7})`);
+      const gl=g.createRadialGradient(w*0.82,h*0.2,0,w*0.82,h*0.2,h*0.45); gl.addColorStop(0,"rgba(160,90,220,.35)"); gl.addColorStop(1,"rgba(160,90,220,0)"); g.fillStyle=gl; g.fillRect(0,0,w,h);
+      // الكرة الأرضية
+      const ex=w*0.16, ey=h*0.78, er=h*0.36;
+      const at=g.createRadialGradient(ex,ey,er*0.9,ex,ey,er*1.15); at.addColorStop(0,"rgba(120,190,255,.6)"); at.addColorStop(1,"rgba(120,190,255,0)"); g.fillStyle=at; g.beginPath(); g.arc(ex,ey,er*1.15,0,7); g.fill();
+      g.save(); g.beginPath(); g.arc(ex,ey,er,0,7); g.clip(); g.fillStyle="#2f7fd0"; g.fillRect(ex-er,ey-er,er*2,er*2);
+      for(let i=0;i<9;i++) blob(g,ex+(R()-0.5)*er*1.6,ey+(R()-0.5)*er*1.6,er*(0.12+R()*0.18),i%3?"#4caf5c":"#d9c27a");
+      for(let i=0;i<7;i++){ g.fillStyle="rgba(255,255,255,0.43)"; g.beginPath(); g.ellipse(ex+(R()-0.5)*er*1.4,ey+(R()-0.5)*er*1.4,er*0.14,er*0.025,R(),0,7); g.fill(); }
+      const sh=g.createLinearGradient(ex-er,ey,ex+er,ey); sh.addColorStop(0,"rgba(0,0,0,0)"); sh.addColorStop(1,"rgba(0,0,20,.55)"); g.fillStyle=sh; g.fillRect(ex-er,ey-er,er*2,er*2); g.restore();
+      // القمر وكوكب بحلقة
+      blob(g,w*0.4,h*0.2,h*0.05,"#cfd3dc"); blob(g,w*0.39,h*0.19,h*0.012,"#a9aebb"); blob(g,w*0.41,h*0.22,h*0.009,"#a9aebb");
+      const px=w*0.85,py=h*0.7; blob(g,px,py,h*0.08,"#e3a55a"); g.strokeStyle="#f3d9a4"; g.lineWidth=4; g.beginPath(); g.ellipse(px,py,h*0.14,h*0.035,-0.3,0,7); g.stroke(); }},
+  sky:{name:"السماء", page:"#e0f1fb", wall:"#2f6f9e", floor:"rgba(255,255,255,0.4)", alt:"rgba(236,247,255,0.4)", fx:"clouds",
+    draw(g,w,h,R){ g.fillStyle=lin(g,h,["#5fb6ec","#9fd6f5","#e2f4fd"]); g.fillRect(0,0,w,h);
+      const sg=g.createRadialGradient(w*0.88,h*0.15,0,w*0.88,h*0.15,h*0.3); sg.addColorStop(0,"rgba(255,236,150,1)"); sg.addColorStop(0.3,"rgba(255,226,120,.8)"); sg.addColorStop(1,"rgba(255,226,120,0)"); g.fillStyle=sg; g.fillRect(0,0,w,h);
+      for(let i=0;i<w/45;i++) cloud(g,R()*w,R()*h,50+R()*90,"rgba(255,255,255,0.78)");
+      g.strokeStyle="#4b5a6a"; g.lineWidth=2; for(let i=0;i<6;i++){ const x=R()*w,y=R()*h*0.6; g.beginPath(); g.moveTo(x-8,y); g.quadraticCurveTo(x-4,y-5,x,y); g.quadraticCurveTo(x+4,y-5,x+8,y); g.stroke(); } }},
+  desert:{name:"الصحراء", page:"#f6ead2", wall:"#7a4b1f", floor:"rgba(255,250,238,0.43)", alt:"rgba(250,238,214,0.43)", fx:"heat",
+    draw(g,w,h,R){ g.fillStyle=lin(g,h,["#ffd9a0","#ffe9c4","#f3d39a"]); g.fillRect(0,0,w,h);
+      blob(g,w*0.8,h*0.15,h*0.08,"#ffb547");
+      const cols=["#ecc685","#e2b46a","#d6a257","#c98f45"];
+      cols.forEach((c,i)=>{ const base=h*(0.3+i*0.2); g.fillStyle=c; g.beginPath(); g.moveTo(0,h); g.lineTo(0,base); const ph=R()*6;
+        for(let x=0;x<=w;x+=10) g.lineTo(x,base+Math.sin(x/(120+i*40)+ph)*h*0.05); g.lineTo(w,h); g.fill(); });
+      for(let i=0;i<w/120;i++) palm(g,R()*w,h*(0.35+R()*0.6),50+R()*40);
+      for(let i=0;i<w/25;i++) blob(g,R()*w,R()*h,1.5,"rgba(160,110,50,.4)"); }},
+  sea:{name:"البحر", page:"#dcf0f5", wall:"#0d4d6b", floor:"rgba(240,252,255,0.4)", alt:"rgba(220,244,250,0.4)", fx:"bubbles",
+    draw(g,w,h,R){ g.fillStyle=lin(g,h,["#8fdcec","#3fa9c9","#1d6f99","#16507a"]); g.fillRect(0,0,w,h);
+      g.fillStyle="rgba(255,255,255,0.4)"; for(let i=0;i<6;i++){ const x=R()*w; g.beginPath(); g.moveTo(x,0); g.lineTo(x+40,0); g.lineTo(x+140,h); g.lineTo(x+60,h); g.fill(); }
+      g.fillStyle="#e7d29b"; g.beginPath(); g.moveTo(0,h); for(let x=0;x<=w;x+=10) g.lineTo(x,h*0.9+Math.sin(x/70)*8); g.lineTo(w,h); g.fill();
+      for(let i=0;i<w/30;i++){ const x=R()*w, s=40+R()*70; g.strokeStyle=["#2f9b5a","#3cb06a","#27804b"][i%3]; g.lineWidth=5; g.beginPath(); g.moveTo(x,h); g.bezierCurveTo(x-15,h-s*0.4,x+15,h-s*0.7,x,h-s); g.stroke(); }
+      for(let i=0;i<w/50;i++){ const x=R()*w; blob(g,x,h*0.93,10+R()*12,["#f27a7a","#f5a25d","#e86fb0"][i%3]); }
+      for(let i=0;i<w/45;i++) fish(g,R()*w,R()*h*0.85,8+R()*10,["#f6c445","#f28b54","#7fd1f0","#f7f7f7","#b48cf2"][i%5],R()<0.5?1:-1); }}
+};
+
+let theme = "forest", sceneCache = {}, prevTheme = null, sceneFade = 0, fxParts = [];
+function sceneFor(key){
+  const w = cv.width/dpr, h = cv.height/dpr, id = key+"|"+w+"|"+h+"|"+dpr;
+  if(sceneCache[key] && sceneCache[key].id===id) return sceneCache[key].c;
+  const c = document.createElement("canvas"); c.width = cv.width; c.height = cv.height;
+  const g = c.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0);
+  THEMES[key].draw(g,w,h,rng(key.length*997+7));
+  sceneCache[key] = {id,c}; return c;
+}
+function setTheme(key){
+  document.body.style.background = THEMES[key].page;
+  if(key===theme) return;
+  prevTheme = theme; theme = key; sceneFade = 1; fxParts = [];
+}
+function drawScene(now,dt){
+  const w = cv.width/dpr, h = cv.height/dpr;
+  ctx.save(); rr(0,0,w,h,18); ctx.clip();
+  ctx.drawImage(sceneFor(theme),0,0,w,h);
+  if(sceneFade>0 && prevTheme){ ctx.globalAlpha = sceneFade; ctx.drawImage(sceneFor(prevTheme),0,0,w,h); ctx.globalAlpha = 1; sceneFade = Math.max(0,sceneFade-dt/700); }
+  ctx.restore();
+}
+function drawFx(now,dt){
+  const w = cv.width/dpr, h = cv.height/dpr, fx = THEMES[theme].fx;
+  ctx.save(); rr(0,0,w,h,18); ctx.clip();
+  if(fxParts.length<(fx==="clouds"?5:40) && Math.random()<(fx==="clouds"?0.01:0.25)){
+    const p = {x:Math.random()*w, y:Math.random()*h, t:0, life:3000+Math.random()*4000, s:Math.random()};
+    if(fx==="snow"||fx==="leaves") p.y = -10;
+    if(fx==="bubbles") p.y = h+10;
+    if(fx==="clouds"){ p.x = -160; p.y = Math.random()*h; }
+    fxParts.push(p);
+  }
+  fxParts = fxParts.filter(p=>p.t<p.life && p.x<w+200);
+  for(const p of fxParts){
+    p.t += dt; const k = p.t/p.life, fade = Math.min(1,Math.min(k,1-k)*5);
+    ctx.globalAlpha = Math.max(0,fade);
+    if(fx==="snow"){ p.y += dt*0.04*(0.6+p.s); p.x += Math.sin(p.t/500+p.s*6)*0.4; blob(ctx,p.x,p.y,2+p.s*3,"#fff"); }
+    else if(fx==="leaves"){ p.y += dt*0.035; p.x += Math.sin(p.t/400+p.s*6)*0.8; ctx.fillStyle=["#e0a23a","#c9662e","#8fbf4a"][Math.floor(p.s*3)]; ctx.beginPath(); ctx.ellipse(p.x,p.y,6,3,p.t/300,0,7); ctx.fill(); }
+    else if(fx==="bubbles"){ p.y -= dt*0.05*(0.6+p.s); p.x += Math.sin(p.t/300+p.s*6)*0.5; ctx.strokeStyle="rgba(255,255,255,0.73)"; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(p.x,p.y,3+p.s*5,0,7); ctx.stroke(); }
+    else if(fx==="stars"){ const a=Math.abs(Math.sin(p.t/300)); ctx.globalAlpha=a*fade; ctx.fillStyle="#fff"; ctx.font=`${10+p.s*12}px Tahoma`; ctx.textAlign="center"; ctx.fillText("✦",p.x,p.y); }
+    else if(fx==="clouds"){ p.life=1e9; p.x += dt*0.03*(0.5+p.s); ctx.globalAlpha=0.75; cloud(ctx,p.x,p.y,60+p.s*60,"#fff"); }
+    else if(fx==="butterflies"){ p.x += Math.sin(p.t/700+p.s*6)*1.2; p.y += Math.cos(p.t/900+p.s*4)*0.8; const f=Math.abs(Math.sin(p.t/90))*6+2; ctx.fillStyle=["#f28ab2","#f7d046","#9b7bf2"][Math.floor(p.s*3)]; ctx.beginPath(); ctx.ellipse(p.x-f/2,p.y,f/2+1,5,0,0,7); ctx.ellipse(p.x+f/2,p.y,f/2+1,5,0,0,7); ctx.fill(); }
+    else if(fx==="lights"){ ctx.globalAlpha=Math.abs(Math.sin(p.t/400))*fade; blob(ctx,p.x,p.y*0.62,2.5,"#ffe08a"); }
+    else if(fx==="heat"){ ctx.globalAlpha=0.25*fade; ctx.strokeStyle="#fff"; ctx.lineWidth=2; ctx.beginPath(); for(let i=0;i<30;i++) ctx.lineTo(p.x+i*3,p.y+Math.sin(i/3+p.t/200)*3); ctx.stroke(); }
+  }
+  ctx.globalAlpha = 1; ctx.restore();
+}
+
+
+function drawMaze(){
+  const T = THEMES[theme];
+  for(let y=0;y<ROWS;y++) for(let x=0;x<COLS;x++){
+    ctx.fillStyle = (x+y)%2 ? T.alt : T.floor; ctx.fillRect(ox+x*cell,oy+y*cell,cell,cell);
+  }
+  ctx.fillStyle = T.dark ? "rgba(159,220,255,.35)" : "rgba(220,239,233,0.73)"; rr(ox+(COLS-1)*cell+4,oy+4,cell-8,cell-8,10); ctx.fill();
+  ctx.strokeStyle = T.wall; ctx.lineWidth = Math.max(3,cell*0.09); ctx.lineCap="round";
+  ctx.beginPath();
+  for(let y=0;y<ROWS;y++) for(let x=0;x<COLS;x++){
+    const c = maze[y][x], X=ox+x*cell, Y=oy+y*cell;
+    if(c.n){ctx.moveTo(X,Y);ctx.lineTo(X+cell,Y);}
+    if(c.w){ctx.moveTo(X,Y);ctx.lineTo(X,Y+cell);}
+    if(y===ROWS-1&&c.s){ctx.moveTo(X,Y+cell);ctx.lineTo(X+cell,Y+cell);}
+    if(x===COLS-1&&c.e){ctx.moveTo(X+cell,Y);ctx.lineTo(X+cell,Y+cell);}
+  }
+  ctx.stroke();
+}
+
+function drawChest(c, time){
+  const X = ox+c.x*cell+cell/2, Y = oy+c.y*cell+cell/2, s = cell*0.34;
+  ctx.fillStyle="rgba(0,0,0,.10)"; ctx.beginPath(); ctx.ellipse(X,Y+s*0.95,s*1.05,s*0.22,0,0,7); ctx.fill();
+  if(c.state==="closed"){
+    const p = 0.5+0.5*Math.sin(time/400+c.n);
+    ctx.fillStyle = `rgba(227,168,59,${0.10+0.12*p})`; ctx.beginPath(); ctx.arc(X,Y,s*1.45,0,7); ctx.fill();
+  }
+  ctx.fillStyle="#a8703f"; rr(X-s,Y-s*0.15,s*2,s*1.05,s*0.18); ctx.fill();
+  ctx.fillStyle="#e3a83b"; ctx.fillRect(X-s,Y+s*0.15,s*2,s*0.14);
+  ctx.save(); ctx.translate(X - c.lid*s*0.25, Y-s*0.15 - c.lid*s*0.55); ctx.rotate(-c.lid*0.35);
+  ctx.fillStyle = "#bf8550"; rr(-s, -s*0.62, s*2, s*0.62, s*0.25); ctx.fill();
+  ctx.fillStyle = "#e3a83b"; ctx.fillRect(-s*0.16,-s*0.62,s*0.32,s*0.62);
+  ctx.restore();
+  if(c.lid>0){ ctx.fillStyle=`rgba(255,220,120,${0.85*c.lid})`; ctx.fillRect(X-s*0.85,Y-s*0.2,s*1.7,s*0.12); }
+  ctx.fillStyle="#fff"; ctx.strokeStyle="#7a4d26"; ctx.lineWidth=s*0.08;
+  ctx.beginPath(); ctx.arc(X, Y+s*0.42, s*0.4, 0, 7); ctx.fill(); ctx.stroke();
+  ctx.fillStyle="#5a3a1c"; ctx.font=`800 ${Math.round(s*(c.n>9?0.48:0.56))}px Tahoma, Arial`; ctx.textAlign="center"; ctx.textBaseline="middle";
+  ctx.fillText(String(c.n), X, Y+s*0.45);
+  if(c.result){
+    const col = {good:"#3a9d5d", part:"#e3a83b", fun:"#ffffff"}[c.result];
+    ctx.fillStyle = col; ctx.beginPath(); ctx.arc(X+s*0.95,Y-s*0.85,s*0.42,0,7); ctx.fill();
+    if(c.result==="fun"){ ctx.strokeStyle="#cfe0dc"; ctx.lineWidth=s*0.06; ctx.stroke(); ctx.font=`${Math.round(s*0.5)}px ${EMOJI_FONT}`; ctx.fillText(FUN[c.type].mark, X+s*0.95, Y-s*0.82); }
+    else { ctx.fillStyle="#fff"; ctx.font=`800 ${Math.round(s*0.5)}px Tahoma, Arial`; ctx.fillText(c.result==="good"?"✓":"!", X+s*0.95, Y-s*0.82); }
+  }
+}
+
+function easeInOut(t){ return t<.5? 2*t*t : 1-Math.pow(-2*t+2,2)/2; }
+function drawPlayer(time){
+  const p = player, ch = CHARS[p.ch], k = easeInOut(p.t);
+  const gx = p.fx + (p.x-p.fx)*k, gy = p.fy + (p.y-p.fy)*k;
+  const X = ox+gx*cell+cell/2, baseY = oy+gy*cell+cell/2;
+  const bob = p.moving ? Math.abs(Math.sin(p.t*Math.PI))*cell*0.1 : Math.sin(time/450)*cell*0.025;
+  const sw = p.swap>0 ? 1 + Math.sin((1-p.swap)*Math.PI)*0.45 : 1;
+  const r = cell*0.4*sw, Y = baseY - bob;
+  ctx.fillStyle="rgba(0,0,0,.13)"; ctx.beginPath(); ctx.ellipse(X,baseY+cell*0.36,cell*0.3,cell*0.08,0,0,7); ctx.fill();
+  ctx.fillStyle = ch.c; ctx.strokeStyle = "#2f8f83"; ctx.lineWidth = Math.max(2,cell*0.05);
+  ctx.beginPath(); ctx.arc(X,Y,r,0,7); ctx.fill(); ctx.stroke();
+  const tilt = p.moving ? Math.sin(p.t*Math.PI*2)*0.12 : Math.sin(time/700)*0.05;
+  ctx.save(); ctx.translate(X,Y); ctx.rotate(tilt);
+  ctx.font = `${Math.round(r*1.35)}px ${EMOJI_FONT}`; ctx.textAlign="center"; ctx.textBaseline="middle";
+  ctx.fillText(ch.em, 0, r*0.08);
+  ctx.restore();
+}
+
+/* جزيئات */
+let parts = [];
+function burst(cx,cy){
+  for(let i=0;i<26;i++){ const a=Math.random()*Math.PI*2, v=(0.5+Math.random())*cell*0.06;
+    parts.push({x:ox+cx*cell+cell/2,y:oy+cy*cell+cell/2,vx:Math.cos(a)*v,vy:Math.sin(a)*v-cell*0.04,life:1,c:["#e3a83b","#5fc2b4","#f2d16b","#ffffff"][i%4]}); }
+}
+function drawParts(){
+  parts = parts.filter(p=>p.life>0);
+  for(const p of parts){ p.x+=p.vx; p.y+=p.vy; p.vy+=cell*0.003; p.life-=0.02;
+    ctx.globalAlpha=Math.max(0,p.life); ctx.fillStyle=p.c; ctx.beginPath(); ctx.arc(p.x,p.y,cell*0.05,0,7); ctx.fill(); ctx.globalAlpha=1; }
+}
+
+/* ===== الحركة ===== */
+const MOVE_MS = 140;
+let held = null, pending = null, autoPath = [], target = null, lastTime = performance.now(), hintShown = true;
+const DIRV = {up:[0,-1],down:[0,1],right:[1,0],left:[-1,0]};
+function tryMove(dir){
+  if(locked || player.moving) return;
+  player.face = dir;
+  if(!canMove(player.x,player.y,dir)){ sfx.bump(); autoPath=[]; target=null; return; }
+  if(hintShown){ hintShown=false; $("hint").style.opacity=0; }
+  player.fx = player.x; player.fy = player.y;
+  player.x += DIRV[dir][0]; player.y += DIRV[dir][1];
+  player.t = 0; player.moving = true; sfx.step();
+}
+function arrive(){
+  player.moving = false;
+  const c = chests.find(c=>c.x===player.x&&c.y===player.y&&c.state==="closed");
+  // عند المشي بالنقر: لا يُفتح إلا الصندوق المختار، وتمرّ الشخصية فوق غيره
+  if(c && target && !(target.x===c.x && target.y===c.y)) return;
+  if(c){ autoPath=[]; target=null; openChest(c); }
+}
+function loop(now){
+  const dt = Math.min(50, now-lastTime); lastTime = now;
+  if(maze){
+    if(player.moving){ player.t += dt/MOVE_MS; if(player.t>=1){ player.t=1; arrive(); } }
+    if(!player.moving && !locked){
+      if(pending){ const d=pending; pending=null; autoPath=[]; target=null; tryMove(d); }
+      else if(held){ autoPath=[]; target=null; tryMove(held); }
+      else if(autoPath.length){ tryMove(autoPath.shift()); if(!autoPath.length) target=null; }
+    }
+    if(player.swap>0) player.swap=Math.max(0,player.swap-dt/600);
+    for(const c of chests){ if(c.state!=="closed" && c.lid<1) c.lid = Math.min(1,c.lid+dt/350); }
+    ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,cv.width,cv.height);
+    drawScene(now,dt); drawMaze(); drawFx(now,dt);
+    if(target){ const tx=ox+target.x*cell+cell/2, ty=oy+target.y*cell+cell/2, pr=0.5+0.5*Math.sin(now/180);
+      ctx.strokeStyle=`rgba(47,143,131,${0.4+0.4*pr})`; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(tx,ty,cell*(0.25+0.08*pr),0,7); ctx.stroke(); }
+    for(const c of chests) drawChest(c, now);
+    drawPlayer(now);
+    drawParts();
+  }
+  requestAnimationFrame(loop);
+}
+
+/* لوحة المفاتيح */
+const KEYMAP = {ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right"};
+window.addEventListener("keydown", e=>{
+  const d = KEYMAP[e.key]; if(!d) return; e.preventDefault();
+  if(locked) return;
+  if(!e.repeat) pending = d; held = d;
+});
+window.addEventListener("keyup", e=>{ const d = KEYMAP[e.key]; if(d && held===d) held=null; });
+document.querySelectorAll(".arrow").forEach(b=>{
+  const d = b.dataset.dir;
+  const down = e=>{ e.preventDefault(); b.classList.add("pressed"); pending = d; held = d; try{b.setPointerCapture(e.pointerId);}catch(_){} };
+  const up = ()=>{ b.classList.remove("pressed"); if(held===d) held=null; };
+  b.addEventListener("pointerdown", down);
+  b.addEventListener("pointerup", up); b.addEventListener("pointercancel", up); b.addEventListener("lostpointercapture", up);
+});
+let swp = null;
+cv.addEventListener("pointerdown", e=>{ swp = {x:e.clientX,y:e.clientY}; });
+cv.addEventListener("pointerup", e=>{
+  if(!swp) return; const dx=e.clientX-swp.x, dy=e.clientY-swp.y; swp=null;
+  if(Math.max(Math.abs(dx),Math.abs(dy))<25){ tapMove(e); return; }
+  pending = Math.abs(dx)>Math.abs(dy) ? (dx>0?"right":"left") : (dy>0?"down":"up");
+});
+function tapMove(e){
+  if(locked) return;
+  const rect = cv.getBoundingClientRect();
+  const cx = Math.floor((e.clientX-rect.left-ox)/cell), cy = Math.floor((e.clientY-rect.top-oy)/cell);
+  if(cx<0||cy<0||cx>=COLS||cy>=ROWS) return;
+  const sx = player.x, sy = player.y;
+  if(cx===sx && cy===sy) return;
+  const prev = {}, key=(x,y)=>x+","+y, q=[[sx,sy]]; prev[key(sx,sy)] = null;
+  while(q.length){
+    const [x,y] = q.shift(); if(x===cx&&y===cy) break;
+    for(const d in DIRV){
+      if(!canMove(x,y,d)) continue;
+      const nx=x+DIRV[d][0], ny=y+DIRV[d][1];
+      if(key(nx,ny) in prev) continue;
+      prev[key(nx,ny)] = [x,y,d]; q.push([nx,ny]);
+    }
+  }
+  if(!(key(cx,cy) in prev)) { sfx.bump(); return; }
+  const path=[]; let cur=key(cx,cy);
+  while(prev[cur]){ const [x,y,d]=prev[cur]; path.unshift(d); cur=key(x,y); }
+  autoPath = path; target = {x:cx,y:cy};
+}
+
+/* ===== الصناديق ===== */
+let current = null;
+function hideBtns(){ ["revealBtn","markGood","markPart","continueBtn"].forEach(id=>$(id).classList.add("hidden")); }
+function openChest(c){
+  locked = true; held = null; pending = null;
+  c.state = "opening"; sfx.open(); burst(c.x,c.y);
+  setTimeout(()=>showChest(c), 650);
+}
+function showChest(c){
+  current = c; hideBtns();
+  if(FUN[c.type]){
+    const f = FUN[c.type];
+    $("qPane").classList.add("hidden"); $("funPane").classList.remove("hidden");
+    $("funEm").textContent = f.em; $("funTitle").textContent = f.title; $("funText").textContent = f.text;
+    $("funTitle").style.color = c.type==="luck" ? "var(--bad)" : "var(--accent)";
+    const b = $("funEm"); b.style.animation="none"; void b.offsetWidth; b.style.animation="";
+    $("qOverlay").classList.add("show"); sfx[f.sound]();
+    if(c.type==="pick") pickNext = true;
+    finishChest("fun"); return;
+  }
+  $("qPane").classList.remove("hidden"); $("funPane").classList.add("hidden");
+  const q = c.q = c.type==="mcq" ? drawMcq() : drawEss();
+  asked++;
+  $("qBadge").textContent = "الصندوق " + c.n;
+  $("qType").textContent = c.type==="mcq" ? "❓ اختيار من متعدد" : "✍️ سؤال مقالي";
+  $("qUnit").textContent = q.u===4 ? "الوحدة الرابعة" : "الوحدة الخامسة";
+  $("qPicked").classList.toggle("hidden", !pickNext); pickNext = false;
+  $("qText").textContent = q.t;
+  $("qFeedback").textContent = ""; $("qFeedback").className = "feedback";
+  const opts = $("qOpts"); opts.innerHTML = "";
+  if(c.type==="mcq"){
+    opts.classList.remove("hidden"); $("essayBox").classList.add("hidden");
+    const order = shuffle([0,1,2,3]);
+    order.forEach((oi,pos)=>{
+      const b = document.createElement("button"); b.className="opt"; b.textContent = LET[pos]+") "+q.o[oi];
+      b.dataset.ok = oi===0 ? "1" : "";
+      b.onclick = ()=>answerMcq(b); opts.appendChild(b);
+    });
+  } else {
+    opts.classList.add("hidden"); $("essayBox").classList.remove("hidden");
+    $("qModel").classList.remove("show");
+    $("qModel").innerHTML = "<h4>الإجابة النموذجية (من الكتاب):</h4><ul>" + q.m.map(m=>"<li>"+m+"</li>").join("") + "</ul>";
+    $("revealBtn").classList.remove("hidden");
+  }
+  $("qOverlay").classList.add("show");
+}
+function answerMcq(btn){
+  const q = current.q, all = [...$("qOpts").children];
+  all.forEach(b=>{ b.disabled=true; if(b.dataset.ok) b.classList.add("correct"); });
+  if(btn.dataset.ok){ $("qFeedback").textContent = "إجابة صحيحة، أحسنت! ⭐ " + q.n; $("qFeedback").className="feedback good"; sfx.good(); finishChest(true); }
+  else { btn.classList.add("wrong"); $("qFeedback").textContent = "لا بأس، تعلّمنا معلومة جديدة: " + q.n; $("qFeedback").className="feedback bad"; sfx.bad(); finishChest(false); }
+}
+$("revealBtn").onclick = ()=>{ $("qModel").classList.add("show"); $("revealBtn").classList.add("hidden"); $("markGood").classList.remove("hidden"); $("markPart").classList.remove("hidden"); };
+$("markGood").onclick = ()=>{ sfx.good(); $("qFeedback").textContent="إجابة صحيحة، أحسنت! ⭐"; $("qFeedback").className="feedback good"; hideMarks(); finishChest(true); };
+$("markPart").onclick = ()=>{ $("qFeedback").textContent="إجابة ناقصة، راجع الإجابة النموذجية."; $("qFeedback").className="feedback bad"; hideMarks(); finishChest(false); };
+function hideMarks(){ $("markGood").classList.add("hidden"); $("markPart").classList.add("hidden"); }
+function finishChest(ok){
+  current.result = ok==="fun" ? "fun" : ok ? "good" : "part"; current.state="open";
+  opened++; if(ok===true) score++;
+  updateHud();
+  $("continueBtn").textContent = opened===N ? "عرض النتيجة 🏆" : "متابعة اللعب ←";
+  $("continueBtn").classList.remove("hidden");
+}
+$("continueBtn").onclick = ()=>{
+  $("qOverlay").classList.remove("show");
+  changeCharacter();
+  if(opened===N) setTimeout(showEnd, 900); else locked = false;
+};
+
+/* ===== تغيير الشخصية ===== */
+let toastTimer = null;
+function changeCharacter(){
+  let n; do{ n = Math.floor(Math.random()*CHARS.length); } while(n===player.ch);
+  player.ch = n; player.swap = 1; burst(player.x, player.y); sfx.swap(); updateWho(); setTheme(CHARS[n].th);
+  const h = $("hint"); h.textContent = "شخصية جديدة: " + CHARS[n].name + " " + CHARS[n].em + " · إلى " + THEMES[CHARS[n].th].name; h.style.opacity = 1;
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>{ h.style.opacity = 0; }, 2200);
+}
+function updateWho(){ $("whoEm").textContent = CHARS[player.ch].em; $("whoName").innerHTML = CHARS[player.ch].name + "<br><small style='color:var(--muted);font-weight:600'>" + THEMES[CHARS[player.ch].th].name + "</small>"; }
+$("swapBtn").onclick = ()=>{ if(maze) changeCharacter(); };
+
+function updateHud(){ $("openedCount").textContent = opened; $("scoreCount").textContent = score; }
+function showEnd(){
+  const st = asked ? Math.round(score/asked*5) : 0;
+  $("endStars").textContent = "★".repeat(st) + "☆".repeat(5-st);
+  $("endScore").textContent = "الإجابات الصحيحة: " + score + " من " + asked + " سؤالاً";
+  $("endOverlay").classList.add("show"); sfx.win(); confetti();
+}
+function restart(){ newGame(); locked=false; hintShown=true; $("hint").textContent="حرّك الشخصية بالأسهم، أو المس أي مكان في المتاهة لتمشي إليه"; $("hint").style.opacity=1; }
+$("againBtn").onclick = ()=>{ $("endOverlay").classList.remove("show"); $("startOverlay").classList.add("show"); locked=true; };
+$("newBtn").onclick = ()=>{ if($("qOverlay").classList.contains("show")) return; $("startOverlay").classList.add("show"); locked=true; };
+
+/* ===== شاشة البداية ===== */
+$("charRow").textContent = CHARS.map(c=>c.em).join(" ");
+document.querySelectorAll(".sizes .btn").forEach(b=>b.onclick=()=>{ document.querySelectorAll(".sizes .btn").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); N = +b.dataset.n; });
+$("startBtn").onclick = ()=>{ $("startOverlay").classList.remove("show"); restart(); };
+
+/* ===== احتفال ===== */
+function confetti(){
+  const c = $("confetti"), x = c.getContext("2d"); c.width=innerWidth; c.height=innerHeight;
+  const cols = ["#2f8f83","#e3a83b","#5fc2b4","#f2d16b","#c9573f"];
+  const ps = Array.from({length:140},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*0.5,vy:2+Math.random()*3,vx:-1+Math.random()*2,r:Math.random()*6.28,s:6+Math.random()*8,col:cols[Math.floor(Math.random()*cols.length)]}));
+  let f=0; (function step(){ x.clearRect(0,0,c.width,c.height);
+    for(const p of ps){ p.y+=p.vy; p.x+=p.vx; p.r+=0.1; x.save(); x.translate(p.x,p.y); x.rotate(p.r); x.fillStyle=p.col; x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2); x.restore(); }
+    if(++f<260) requestAnimationFrame(step); else x.clearRect(0,0,c.width,c.height); })();
+}
+
+$("soundBtn").onclick = ()=>{ soundOn=!soundOn; $("soundBtn").textContent = soundOn?"🔊":"🔇"; };
+$("fsBtn").onclick = ()=>{ if(!document.fullscreenElement) document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen(); else document.exitFullscreen(); };
+document.addEventListener("fullscreenchange", ()=>setTimeout(resize,100));
+
+newGame(); requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
