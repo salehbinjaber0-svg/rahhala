@@ -30,27 +30,39 @@
   .flip{position:relative;perspective:1600px;cursor:pointer;min-height:0;border:0;padding:0;background:none;font-family:inherit;color:inherit;
     width:100%;max-width:1000px;animation:slideIn .45s cubic-bezier(.3,1.2,.5,1) both}
   @keyframes slideIn{from{opacity:0;transform:translateX(-60px) scale(.96)}to{opacity:1;transform:none}}
-  .flip:focus-visible{outline:4px solid var(--gold);outline-offset:4px;border-radius:24px}
-  .inner{position:absolute;inset:0;transition:transform .7s cubic-bezier(.3,1.3,.5,1);transform-style:preserve-3d}
+  .flip:focus-visible{outline:4px solid var(--gold);outline-offset:6px;border-radius:18px}
+  .inner{position:absolute;inset:0 0 0 10px;transition:transform .7s cubic-bezier(.3,1.3,.5,1);transform-style:preserve-3d}
   .flip.open .inner{transform:rotateY(180deg)}
-  .face{position:absolute;inset:0;border-radius:24px;backface-visibility:hidden;-webkit-backface-visibility:hidden;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(10px,2vh,26px);
-    padding:clamp(12px,1.6vw,26px);text-align:center;box-shadow:var(--shadow);border:2px solid rgba(31,18,22,.08)}
-  .front{background:var(--bg)}
-  .flip:hover .front{filter:brightness(.98)}
-  .qmark{width:clamp(64px,8vw,120px);height:clamp(64px,8vw,120px);border-radius:50%;background:var(--deep);color:#fff;
-    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(34px,4.4vw,70px);flex:none;
-    box-shadow:0 5px 0 rgba(0,0,0,.2)}
-  .clue{font-weight:800;font-size:clamp(22px,3vw,48px);line-height:1.6;color:var(--ink);max-width:24em}
-  .tap{font-weight:700;font-size:clamp(14px,1.3vw,20px);color:var(--muted)}
-  .back{transform:rotateY(180deg);background:var(--deep);color:#fff}
-  .back .ico{font-size:clamp(60px,8vw,140px);line-height:1;animation:none}
+  /* ═══ صفحة كتاب (طلب المالك، ٢٤ نوفمبر ٢٠٢٦: «وكأنك كاتبها على كتاب») ═══
+     ورق عاجي وكعب الكتاب يميناً (الكتاب العربي يُفتح من اليمين) وحافة أوراق يساراً،
+     والكتابة بخط الرقعة على أسطر مسطّرة. قلب البطاقة = قلب الصفحة */
+  .face{position:absolute;inset:0;border-radius:6px 18px 18px 6px;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,2vh,24px);
+    padding:clamp(18px,3vw,56px) clamp(40px,5vw,90px) clamp(18px,3vw,56px) clamp(28px,4vw,70px);text-align:center;
+    background:
+      linear-gradient(to left, rgba(66,10,28,.20) 0, rgba(66,10,28,.06) 4%, transparent 11%),   /* ظل الكعب */
+      radial-gradient(ellipse at 50% 40%, #fffaf0 0%, #f7eedb 70%, #efe2c6 100%);              /* الورق */
+    color:var(--ink);font-family:"Aref Ruqaa","Cairo",serif;
+    box-shadow:-1px 0 0 #e6d8bb, -4px 0 0 #fbf5e7, -5px 0 0 #e6d8bb, -8px 0 0 #fbf5e7, -9px 0 0 #dccaa6,   /* حافة الأوراق */
+      0 14px 28px rgba(66,10,28,.22)}
+  .face::before{content:"";position:absolute;top:0;bottom:0;right:clamp(14px,2vw,30px);width:3px;
+    border-right:1px solid rgba(122,18,50,.28);border-left:1px solid rgba(122,18,50,.28)}   /* خط الهامش */
+  .flip:hover .front{filter:brightness(.99)}
+  .pgHead{font-size:clamp(26px,3.4vw,56px);line-height:1.2;color:var(--deep);padding:0 .6em .1em;
+    border-bottom:3px double var(--gold-deep)}
+  .clue{font-size:clamp(26px,3.5vw,58px);line-height:1.85;color:var(--ink);max-width:22em;
+    background:linear-gradient(transparent calc(100% - 2px), rgba(104,67,11,.28) 0);background-size:100% 1.85em}   /* أسطر الدفتر */
+  .tap{font-family:"Cairo",sans-serif;font-weight:700;font-size:clamp(13px,1.2vw,18px);color:var(--muted)}
+  .pgNum{position:absolute;bottom:clamp(8px,1.4vw,18px);left:0;right:0;font-size:clamp(16px,1.5vw,24px);color:var(--gold-deep)}
+  .back{transform:rotateY(180deg)}
+  .back .ico{font-size:clamp(54px,7vw,120px);line-height:1;animation:none}
   .flip.open .back .ico{animation:bounce .8s .35s ease both}
   @keyframes bounce{0%{transform:scale(.3)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
-  .back .ansLbl{font-weight:700;font-size:clamp(16px,1.7vw,26px);color:var(--gold-light)}
-  .back .ans{font-family:"Aref Ruqaa","Cairo",serif;font-size:clamp(38px,5.4vw,90px);line-height:1.25;
-    background:rgba(0,0,0,.2);border-radius:18px;padding:6px 18px}
-  .back .mini{font-weight:600;font-size:clamp(16px,1.8vw,28px);line-height:1.6}
+  .back .ansLbl{font-size:clamp(22px,2.4vw,38px);color:var(--gold-deep)}
+  .back .ans{font-size:clamp(44px,6vw,100px);line-height:1.25;color:var(--deep);padding:0 .3em;
+    background:linear-gradient(transparent 62%, var(--bg) 0)}   /* كأنها مظلّلة بقلم */
+  .back .mini{font-size:clamp(22px,2.6vw,42px);line-height:1.85;
+    background:linear-gradient(transparent calc(100% - 2px), rgba(104,67,11,.28) 0);background-size:100% 1.85em}
   .k0{--bg:#d9ede3;--deep:#175a4a}   /* العسكري — أخضر */
   .k1{--bg:#e7dcef;--deep:#6b3fa0}   /* السياسي — بنفسجي */
   .k2{--bg:#f4d9e3;--deep:#a71944}   /* الاقتصادي — وردي */
@@ -159,8 +171,8 @@ function show(i){
   b.type = 'button'; b.className = 'flip k' + c.k;
   b.setAttribute('aria-label', 'البطاقة ' + (i + 1) + ': ' + c.clue);
   b.innerHTML = `<div class="inner">
-      <div class="face front"><div class="qmark">؟</div><div class="clue"></div><div class="tap">👆 انقر لتظهر الإجابة</div></div>
-      <div class="face back"><div class="ico">${c.ico}</div><div class="ansLbl">أنا…</div><div class="ans"></div><div class="mini"></div></div>
+      <div class="face front"><div class="pgHead">مَن أنا؟</div><div class="clue"></div><div class="tap">👆 انقر لتظهر الإجابة</div><div class="pgNum">— ${'١٢٣٤'[i]} —</div></div>
+      <div class="face back"><div class="ico">${c.ico}</div><div class="ansLbl">أنا…</div><div class="ans"></div><div class="mini"></div><div class="pgNum">— ${'١٢٣٤'[i]} —</div></div>
     </div>`;
   b.querySelector('.clue').textContent = c.clue;
   b.querySelector('.ans').textContent = c.a;
