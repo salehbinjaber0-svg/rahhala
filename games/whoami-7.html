@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=Cairo:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
   /* لعبة «مَن أنا؟» — رحّالة، الصف السابع، تهيئة حصة مراجعة الوحدة الخامسة (٢٤ نوفمبر ٢٠٢٦).
-     أربع بطاقات مقلوبة: على وجهها المعلومة، ولمسة تقلبها فتظهر البُعد (ص129–131، نص الكتاب في UNITS_DATA[6]).
+     أربع بطاقات تُعرض واحدة تلو الأخرى: على وجهها المعلومة، ولمسة تقلبها فتظهر البُعد، والتالية بعدها (ص129–131، نص الكتاب في UNITS_DATA[6]).
      الهوية: عنابي #7a1232 وذهبي رملي — والبطاقات بألوان هادئة كتصميم المعلم */
   :root{
     --navy:#7a1232; --navy-deep:#420a1c; --gold:#dba73c; --gold-light:#f6dc96; --gold-deep:#68430b;
@@ -19,21 +19,17 @@
   html,body{margin:0;height:100%;background:var(--cream);color:var(--ink);overflow:hidden;
     font-family:"Cairo","Tajawal","Segoe UI","Noto Kufi Arabic",Tahoma,Arial,sans-serif}
   #app{display:flex;flex-direction:column;height:100%;padding:10px 14px;gap:10px}
-  header{display:flex;align-items:center;gap:12px;background:var(--navy);color:#fff;border-radius:16px;padding:8px 16px;box-shadow:var(--shadow)}
-  header h1{margin:0;font-family:"Aref Ruqaa","Cairo",serif;font-size:clamp(20px,2.6vw,34px);line-height:1.2;flex:1}
-  header h1 small{display:block;font-family:"Cairo",sans-serif;font-size:.5em;font-weight:600;color:var(--gold-light)}
-  .iconbtn{border:0;background:rgba(0,0,0,.2);color:#fff;border-radius:12px;width:46px;height:46px;font-size:22px;cursor:pointer;font-family:inherit}
-  .iconbtn:hover{background:rgba(0,0,0,.32)}
+  .iconbtn{border:0;background:#eee3db;color:var(--navy-deep);border-radius:12px;height:46px;font-size:20px;cursor:pointer;font-family:inherit;flex:1}
+  .iconbtn:hover{background:#e4d4c8}
   main{flex:1;display:flex;gap:14px;min-height:0}
   #stageWrap{flex:1;display:flex;flex-direction:column;gap:10px;min-width:0}
-  #qbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border-radius:16px;padding:10px 16px;box-shadow:var(--shadow);border-right:8px solid var(--gold)}
-  #qtext{flex:1;min-width:240px;font-weight:800;font-size:clamp(18px,2.2vw,32px);line-height:1.45;color:var(--navy-deep)}
-  .chips{display:flex;gap:6px;flex-wrap:wrap}
-  .chip{background:#eee3db;color:var(--navy-deep);border-radius:999px;padding:3px 12px;font-weight:700;font-size:clamp(12px,1.1vw,15px);white-space:nowrap}
 
   /* ═══ البطاقات المقلوبة ═══ */
-  #cards{flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.4vw,22px)}
-  .flip{position:relative;perspective:1400px;cursor:pointer;min-height:0;border:0;padding:0;background:none;font-family:inherit;color:inherit}
+  /* بطاقة واحدة في كل مرة (طلب المالك، ٢٤ نوفمبر ٢٠٢٦): تُقلب فتظهر الإجابة، ثم تنتقل للتالية */
+  #cards{flex:1;min-height:0;display:flex;align-items:stretch;justify-content:center}
+  .flip{position:relative;perspective:1600px;cursor:pointer;min-height:0;border:0;padding:0;background:none;font-family:inherit;color:inherit;
+    width:100%;max-width:1000px;animation:slideIn .45s cubic-bezier(.3,1.2,.5,1) both}
+  @keyframes slideIn{from{opacity:0;transform:translateX(-60px) scale(.96)}to{opacity:1;transform:none}}
   .flip:focus-visible{outline:4px solid var(--gold);outline-offset:4px;border-radius:24px}
   .inner{position:absolute;inset:0;transition:transform .7s cubic-bezier(.3,1.3,.5,1);transform-style:preserve-3d}
   .flip.open .inner{transform:rotateY(180deg)}
@@ -42,19 +38,19 @@
     padding:clamp(12px,1.6vw,26px);text-align:center;box-shadow:var(--shadow);border:2px solid rgba(31,18,22,.08)}
   .front{background:var(--bg)}
   .flip:hover .front{filter:brightness(.98)}
-  .qmark{width:clamp(52px,6vw,92px);height:clamp(52px,6vw,92px);border-radius:50%;background:var(--deep);color:#fff;
-    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(28px,3.4vw,54px);flex:none;
+  .qmark{width:clamp(64px,8vw,120px);height:clamp(64px,8vw,120px);border-radius:50%;background:var(--deep);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(34px,4.4vw,70px);flex:none;
     box-shadow:0 5px 0 rgba(0,0,0,.2)}
-  .clue{font-weight:800;font-size:clamp(17px,1.95vw,32px);line-height:1.65;color:var(--ink)}
-  .tap{font-weight:700;font-size:clamp(12px,1.05vw,16px);color:var(--muted)}
+  .clue{font-weight:800;font-size:clamp(22px,3vw,48px);line-height:1.6;color:var(--ink);max-width:24em}
+  .tap{font-weight:700;font-size:clamp(14px,1.3vw,20px);color:var(--muted)}
   .back{transform:rotateY(180deg);background:var(--deep);color:#fff}
-  .back .ico{font-size:clamp(48px,6.5vw,110px);line-height:1;animation:none}
+  .back .ico{font-size:clamp(60px,8vw,140px);line-height:1;animation:none}
   .flip.open .back .ico{animation:bounce .8s .35s ease both}
   @keyframes bounce{0%{transform:scale(.3)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
-  .back .ansLbl{font-weight:700;font-size:clamp(14px,1.3vw,20px);color:var(--gold-light)}
-  .back .ans{font-family:"Aref Ruqaa","Cairo",serif;font-size:clamp(30px,3.7vw,62px);line-height:1.25;
+  .back .ansLbl{font-weight:700;font-size:clamp(16px,1.7vw,26px);color:var(--gold-light)}
+  .back .ans{font-family:"Aref Ruqaa","Cairo",serif;font-size:clamp(38px,5.4vw,90px);line-height:1.25;
     background:rgba(0,0,0,.2);border-radius:18px;padding:6px 18px}
-  .back .mini{font-weight:600;font-size:clamp(13px,1.2vw,19px);line-height:1.6}
+  .back .mini{font-weight:600;font-size:clamp(16px,1.8vw,28px);line-height:1.6}
   .k0{--bg:#d9ede3;--deep:#175a4a}   /* العسكري — أخضر */
   .k1{--bg:#e7dcef;--deep:#6b3fa0}   /* السياسي — بنفسجي */
   .k2{--bg:#f4d9e3;--deep:#a71944}   /* الاقتصادي — وردي */
@@ -69,6 +65,11 @@
   .dots i.ok{background:var(--good)}
   .btn{border:0;border-radius:12px;padding:10px 14px;font-family:inherit;font-weight:800;font-size:clamp(14px,1.4vw,18px);cursor:pointer;background:#eee3db;color:var(--navy-deep)}
   .btn:hover{background:#e4d4c8}
+  .btn:disabled{cursor:default;color:var(--muted)}
+  .btn.main{background:var(--navy);color:#fff;font-size:clamp(16px,1.7vw,22px);padding:14px}
+  .btn.main:hover{background:var(--navy-deep)}
+  .row{display:flex;gap:8px}
+  .row .btn{flex:1;min-width:0}
   .spacer{flex:1}
   .stats,.btns{display:flex;flex-direction:column;gap:10px}
   html.embedded #pad{width:clamp(170px,16vw,240px)}
@@ -77,44 +78,42 @@
   html.hostWheel #pad{width:clamp(300px,24vw,440px)}
   html.hostWheel #wheelSlot{display:block;flex:1;width:100%;min-height:0}
   html.hostWheel #pad .spacer{display:none}
-  html.hostWheel .stats, html.hostWheel .btns{flex-direction:row}
-  html.hostWheel .stats .box, html.hostWheel .btns .btn{flex:1;min-width:0}
+  html.hostWheel .stats{flex-direction:row}
+  html.hostWheel .btns{gap:6px}
+  html.hostWheel .stats .box{flex:1;min-width:0}
   html.hostWheel .stats .box{padding:6px 8px;font-size:clamp(13px,1.1vw,16px)}
   html.hostWheel .stats .box b{font-size:1.4em}
   html.hostWheel .btns .btn{padding:8px 6px;font-size:clamp(13px,1.1vw,16px)}
-  html.hostWheel #cards{grid-template-columns:repeat(2,1fr)}   /* مساحة أضيق بجانب العجلة: بطاقتان بالسطر */
+  html.hostWheel .iconbtn{height:40px}
 
   .conf{position:fixed;top:-20px;width:12px;height:12px;border-radius:3px;pointer-events:none;z-index:20;animation:fall linear forwards}
   @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
-  @media (max-width:1000px){ #cards{grid-template-columns:repeat(2,1fr)} }
-  @media (max-width:760px){ main{flex-direction:column} #pad{width:100%;flex-direction:row;flex-wrap:wrap} #cards{min-height:520px} body{overflow:auto} }
+  @media (max-width:760px){ main{flex-direction:column} #pad{width:100%;flex-direction:row;flex-wrap:wrap} #cards{min-height:460px} body{overflow:auto} }
 </style>
 </head>
 <body>
 <div id="app">
-  <header>
-    <h1>التهيئة: لعبة «مَن أنا؟» — أبعاد الأمن الوطني<small>مراجعة الوحدة الخامسة – الخلافة العباسية (أنشطة ومراجعة) · ص 129 – 131</small></h1>
-    <button class="iconbtn" id="soundBtn" title="الصوت" aria-label="الصوت">🔊</button>
-    <button class="iconbtn" id="fsBtn" title="ملء الشاشة" aria-label="ملء الشاشة">⛶</button>
-  </header>
   <main>
     <section id="stageWrap">
-      <div id="qbar">
-        <div id="qtext">اقرأ المعلومة وأجب: مَن أنا؟ ثم انقر على البطاقة لتتحقق</div>
-        <div class="chips"><span class="chip">👤 فردي</span><span class="chip">🎲 الألعاب التربوية</span><span class="chip">⏱️ 5 دقائق</span><span class="chip">🤝 القيمة: التسامح</span></div>
-      </div>
       <div id="cards"></div>
     </section>
 
     <aside id="pad">
       <div class="stats">
-        <div class="box">كُشف<br><b id="cnt">0</b> / 4<div class="dots" id="dots"></div></div>
+        <div class="box">البطاقة<br><b id="cnt">1</b> / 4<div class="dots" id="dots"></div></div>
       </div>
       <div id="wheelSlot"></div>
       <div class="spacer"></div>
       <div class="btns">
-        <button class="btn" id="allBtn">اكشف الكل 👁</button>
-        <button class="btn" id="newBtn">من جديد ↻</button>
+        <button class="btn main" id="goBtn">اكشف الإجابة 👁</button>
+        <div class="row">
+          <button class="btn" id="prevBtn" title="البطاقة السابقة">→ السابقة</button>
+          <button class="btn" id="newBtn" title="من جديد">↻</button>
+        </div>
+        <div class="row">
+          <button class="iconbtn" id="soundBtn" title="الصوت" aria-label="الصوت">🔊</button>
+          <button class="iconbtn" id="fsBtn" title="ملء الشاشة" aria-label="ملء الشاشة">⛶</button>
+        </div>
       </div>
     </aside>
   </main>
@@ -135,7 +134,7 @@ const CARDS = [
 ];
 
 const $ = id => document.getElementById(id);
-let soundOn = true, opened = new Set();
+let soundOn = true, cur = 0, shown = false, done = false;
 
 // ═══════ الأصوات — مولّدة بالمتصفح، بلا ملفات ═══════
 let AC = null;
@@ -153,33 +152,41 @@ const sfx = {
   win(){ [523, 659, 784, 659, 784, 1046].forEach((f, i) => tone(f, .35, 'triangle', .2, i * .15)); }
 };
 
-function build(){
-  $('cards').innerHTML = '';
-  CARDS.forEach((c, i) => {
-    const b = document.createElement('button');
-    b.type = 'button'; b.className = 'flip k' + c.k; b.dataset.i = i;
-    b.setAttribute('aria-label', 'البطاقة ' + (i + 1) + ': ' + c.clue);
-    b.innerHTML = `<div class="inner">
-      <div class="face front"><div class="qmark">؟</div><div class="clue"></div><div class="tap">👆 انقر للتحقق</div></div>
+// بطاقة واحدة على السبورة: النقرة الأولى تقلبها فتظهر الإجابة، والثانية تنقل للبطاقة التالية
+function show(i){
+  cur = i; shown = false;
+  const c = CARDS[i], b = document.createElement('button');
+  b.type = 'button'; b.className = 'flip k' + c.k;
+  b.setAttribute('aria-label', 'البطاقة ' + (i + 1) + ': ' + c.clue);
+  b.innerHTML = `<div class="inner">
+      <div class="face front"><div class="qmark">؟</div><div class="clue"></div><div class="tap">👆 انقر لتظهر الإجابة</div></div>
       <div class="face back"><div class="ico">${c.ico}</div><div class="ansLbl">أنا…</div><div class="ans"></div><div class="mini"></div></div>
     </div>`;
-    b.querySelector('.clue').textContent = c.clue;
-    b.querySelector('.ans').textContent = c.a;
-    b.querySelector('.mini').textContent = c.more;
-    b.onclick = () => toggle(i);
-    $('cards').appendChild(b);
-  });
+  b.querySelector('.clue').textContent = c.clue;
+  b.querySelector('.ans').textContent = c.a;
+  b.querySelector('.mini').textContent = c.more;
+  b.onclick = step;
+  $('cards').replaceChildren(b);
   update();
 }
-function toggle(i){
-  const el = $('cards').children[i];
-  if(opened.has(i)){ opened.delete(i); el.classList.remove('open'); sfx.back(); }
-  else{ opened.add(i); el.classList.add('open'); sfx.flip(); if(opened.size === CARDS.length) setTimeout(celebrate, 600); }
+function reveal(){
+  shown = true; $('cards').firstChild.classList.add('open'); sfx.flip();
+  if(cur === CARDS.length - 1 && !done){ done = true; setTimeout(celebrate, 600); }
   update();
 }
+// الخطوة التالية: اكشف الإجابة، أو انتقل للبطاقة التالية، أو ابدأ من جديد بعد الأخيرة
+function step(){
+  if(!shown) reveal();
+  else if(cur < CARDS.length - 1) show(cur + 1);
+  else restart();
+}
+function prev(){ if(cur > 0){ show(cur - 1); sfx.back(); } }
+function restart(){ done = false; show(0); sfx.back(); }
 function update(){
-  $('cnt').textContent = opened.size;
-  $('dots').innerHTML = CARDS.map((c, i) => `<i class="${opened.has(i) ? 'ok' : ''}"></i>`).join('');
+  $('cnt').textContent = cur + 1;
+  $('dots').innerHTML = CARDS.map((c, i) => `<i class="${i < cur || (i === cur && shown) ? 'ok' : ''}"></i>`).join('');
+  $('goBtn').textContent = !shown ? 'اكشف الإجابة 👁' : cur < CARDS.length - 1 ? 'البطاقة التالية ←' : 'من جديد ↻';
+  $('prevBtn').disabled = cur === 0;
 }
 function celebrate(){
   sfx.win();
@@ -191,22 +198,23 @@ function celebrate(){
     document.body.appendChild(d); setTimeout(() => d.remove(), 4200);
   }
 }
-$('allBtn').onclick = () => { const was = opened.size; CARDS.forEach((c, i) => { opened.add(i); $('cards').children[i].classList.add('open'); }); update(); sfx.flip(); if(was < CARDS.length) setTimeout(celebrate, 600); };
-$('newBtn').onclick = () => { opened.clear(); [...$('cards').children].forEach(el => el.classList.remove('open')); update(); sfx.back(); };
+$('goBtn').onclick = step;
+$('prevBtn').onclick = prev;
+$('newBtn').onclick = restart;
 $('soundBtn').onclick = () => { soundOn = !soundOn; $('soundBtn').textContent = soundOn ? '🔊' : '🔇'; };
 // داخل رحّالة: ⛶ يكبّر الصفحة كلها (البطاقات + عجلة المشاركة) لا اللعبة وحدها
 $('fsBtn').onclick = () => {
   try{ if(window.parent !== window && window.parent.lsEmbedFull){ window.parent.lsEmbedFull(); return; } }catch(e){}
   if(!document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); else document.exitFullscreen();
 };
-// المفاتيح ١–٤ تقلب البطاقة، و F لملء الشاشة
+// المسافة/Enter/السهم الأيسر = الخطوة التالية، والسهم الأيمن = السابقة، و F لملء الشاشة
 window.addEventListener('keydown', e => {
-  const n = '1234١٢٣٤'.indexOf(e.key);
-  if(n >= 0){ e.preventDefault(); toggle(n % 4); }
+  if(e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowLeft'){ e.preventDefault(); step(); }
+  else if(e.key === 'ArrowRight'){ e.preventDefault(); prev(); }
   else if(e.key === 'f' || e.key === 'F') $('fsBtn').onclick();
 });
 document.querySelectorAll('.btn, .iconbtn').forEach(b => b.addEventListener('mouseup', () => b.blur()));
-build();
+show(0);
 </script>
 </body>
 </html>
