@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>مَن أنا؟ - أبعاد الأمن الوطني</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=Cairo:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* لعبة «مَن أنا؟» — رحّالة، الصف السابع، تهيئة حصة مراجعة الوحدة الخامسة (٢٤ نوفمبر ٢٠٢٦).
+     أربع بطاقات مقلوبة: على وجهها المعلومة، ولمسة تقلبها فتظهر البُعد (ص129–131، نص الكتاب في UNITS_DATA[6]).
+     الهوية: عنابي #7a1232 وذهبي رملي — والبطاقات بألوان هادئة كتصميم المعلم */
+  :root{
+    --navy:#7a1232; --navy-deep:#420a1c; --gold:#dba73c; --gold-light:#f6dc96; --gold-deep:#68430b;
+    --cream:#f8f3ef; --ink:#1f1216; --muted:#594a50; --good:#12804f;
+    --shadow:0 6px 18px rgba(66,10,28,.14);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none}
+  html,body{margin:0;height:100%;background:var(--cream);color:var(--ink);overflow:hidden;
+    font-family:"Cairo","Tajawal","Segoe UI","Noto Kufi Arabic",Tahoma,Arial,sans-serif}
+  #app{display:flex;flex-direction:column;height:100%;padding:10px 14px;gap:10px}
+  header{display:flex;align-items:center;gap:12px;background:var(--navy);color:#fff;border-radius:16px;padding:8px 16px;box-shadow:var(--shadow)}
+  header h1{margin:0;font-family:"Aref Ruqaa","Cairo",serif;font-size:clamp(20px,2.6vw,34px);line-height:1.2;flex:1}
+  header h1 small{display:block;font-family:"Cairo",sans-serif;font-size:.5em;font-weight:600;color:var(--gold-light)}
+  .iconbtn{border:0;background:rgba(0,0,0,.2);color:#fff;border-radius:12px;width:46px;height:46px;font-size:22px;cursor:pointer;font-family:inherit}
+  .iconbtn:hover{background:rgba(0,0,0,.32)}
+  main{flex:1;display:flex;gap:14px;min-height:0}
+  #stageWrap{flex:1;display:flex;flex-direction:column;gap:10px;min-width:0}
+  #qbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border-radius:16px;padding:10px 16px;box-shadow:var(--shadow);border-right:8px solid var(--gold)}
+  #qtext{flex:1;min-width:240px;font-weight:800;font-size:clamp(18px,2.2vw,32px);line-height:1.45;color:var(--navy-deep)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{background:#eee3db;color:var(--navy-deep);border-radius:999px;padding:3px 12px;font-weight:700;font-size:clamp(12px,1.1vw,15px);white-space:nowrap}
+
+  /* ═══ البطاقات المقلوبة ═══ */
+  #cards{flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.4vw,22px)}
+  .flip{position:relative;perspective:1400px;cursor:pointer;min-height:0;border:0;padding:0;background:none;font-family:inherit;color:inherit}
+  .flip:focus-visible{outline:4px solid var(--gold);outline-offset:4px;border-radius:24px}
+  .inner{position:absolute;inset:0;transition:transform .7s cubic-bezier(.3,1.3,.5,1);transform-style:preserve-3d}
+  .flip.open .inner{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;border-radius:24px;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(10px,2vh,26px);
+    padding:clamp(12px,1.6vw,26px);text-align:center;box-shadow:var(--shadow);border:2px solid rgba(31,18,22,.08)}
+  .front{background:var(--bg)}
+  .flip:hover .front{filter:brightness(.98)}
+  .qmark{width:clamp(52px,6vw,92px);height:clamp(52px,6vw,92px);border-radius:50%;background:var(--deep);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(28px,3.4vw,54px);flex:none;
+    box-shadow:0 5px 0 rgba(0,0,0,.2)}
+  .clue{font-weight:800;font-size:clamp(17px,1.95vw,32px);line-height:1.65;color:var(--ink)}
+  .tap{font-weight:700;font-size:clamp(12px,1.05vw,16px);color:var(--muted)}
+  .back{transform:rotateY(180deg);background:var(--deep);color:#fff}
+  .back .ico{font-size:clamp(48px,6.5vw,110px);line-height:1;animation:none}
+  .flip.open .back .ico{animation:bounce .8s .35s ease both}
+  @keyframes bounce{0%{transform:scale(.3)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+  .back .ansLbl{font-weight:700;font-size:clamp(14px,1.3vw,20px);color:var(--gold-light)}
+  .back .ans{font-family:"Aref Ruqaa","Cairo",serif;font-size:clamp(30px,3.7vw,62px);line-height:1.25;
+    background:rgba(0,0,0,.2);border-radius:18px;padding:6px 18px}
+  .back .mini{font-weight:600;font-size:clamp(13px,1.2vw,19px);line-height:1.6}
+  .k0{--bg:#d9ede3;--deep:#175a4a}   /* العسكري — أخضر */
+  .k1{--bg:#e7dcef;--deep:#6b3fa0}   /* السياسي — بنفسجي */
+  .k2{--bg:#f4d9e3;--deep:#a71944}   /* الاقتصادي — وردي */
+  .k3{--bg:#f6dfd2;--deep:#8a2c0e}   /* الاجتماعي — خوخي */
+
+  /* ═══ اللوحة الجانبية (يسار) ═══ */
+  #pad{width:clamp(190px,19vw,270px);display:flex;flex-direction:column;gap:10px}
+  .box{background:#fff;border-radius:14px;padding:10px 12px;box-shadow:var(--shadow);text-align:center;font-size:clamp(14px,1.4vw,18px);font-weight:700;line-height:1.5}
+  .box b{color:var(--navy);font-size:1.7em}
+  .dots{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:6px}
+  .dots i{width:16px;height:16px;border-radius:50%;background:#eee3db}
+  .dots i.ok{background:var(--good)}
+  .btn{border:0;border-radius:12px;padding:10px 14px;font-family:inherit;font-weight:800;font-size:clamp(14px,1.4vw,18px);cursor:pointer;background:#eee3db;color:var(--navy-deep)}
+  .btn:hover{background:#e4d4c8}
+  .spacer{flex:1}
+  .stats,.btns{display:flex;flex-direction:column;gap:10px}
+  html.embedded #pad{width:clamp(170px,16vw,240px)}
+  /* داخل رحّالة بملء الشاشة: خانة #wheelSlot تضع رحّالة عجلة المشاركة فوقها */
+  #wheelSlot{display:none}
+  html.hostWheel #pad{width:clamp(300px,24vw,440px)}
+  html.hostWheel #wheelSlot{display:block;flex:1;width:100%;min-height:0}
+  html.hostWheel #pad .spacer{display:none}
+  html.hostWheel .stats, html.hostWheel .btns{flex-direction:row}
+  html.hostWheel .stats .box, html.hostWheel .btns .btn{flex:1;min-width:0}
+  html.hostWheel .stats .box{padding:6px 8px;font-size:clamp(13px,1.1vw,16px)}
+  html.hostWheel .stats .box b{font-size:1.4em}
+  html.hostWheel .btns .btn{padding:8px 6px;font-size:clamp(13px,1.1vw,16px)}
+  html.hostWheel #cards{grid-template-columns:repeat(2,1fr)}   /* مساحة أضيق بجانب العجلة: بطاقتان بالسطر */
+
+  .conf{position:fixed;top:-20px;width:12px;height:12px;border-radius:3px;pointer-events:none;z-index:20;animation:fall linear forwards}
+  @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+  @media (max-width:1000px){ #cards{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:760px){ main{flex-direction:column} #pad{width:100%;flex-direction:row;flex-wrap:wrap} #cards{min-height:520px} body{overflow:auto} }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>التهيئة: لعبة «مَن أنا؟» — أبعاد الأمن الوطني<small>مراجعة الوحدة الخامسة – الخلافة العباسية (أنشطة ومراجعة) · ص 129 – 131</small></h1>
+    <button class="iconbtn" id="soundBtn" title="الصوت" aria-label="الصوت">🔊</button>
+    <button class="iconbtn" id="fsBtn" title="ملء الشاشة" aria-label="ملء الشاشة">⛶</button>
+  </header>
+  <main>
+    <section id="stageWrap">
+      <div id="qbar">
+        <div id="qtext">اقرأ المعلومة وأجب: مَن أنا؟ ثم انقر على البطاقة لتتحقق</div>
+        <div class="chips"><span class="chip">👤 فردي</span><span class="chip">🎲 الألعاب التربوية</span><span class="chip">⏱️ 5 دقائق</span><span class="chip">🤝 القيمة: التسامح</span></div>
+      </div>
+      <div id="cards"></div>
+    </section>
+
+    <aside id="pad">
+      <div class="stats">
+        <div class="box">كُشف<br><b id="cnt">0</b> / 4<div class="dots" id="dots"></div></div>
+      </div>
+      <div id="wheelSlot"></div>
+      <div class="spacer"></div>
+      <div class="btns">
+        <button class="btn" id="allBtn">اكشف الكل 👁</button>
+        <button class="btn" id="newBtn">من جديد ↻</button>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<script>
+// ═══════ البطاقات — المعلومات من تصميم المعلم، والأبعاد مطابقة لنص الكتاب (الدرس الأول: الأمن الوطني وأبعاده) ═══════
+// k = لون البطاقة، a = البُعد (الإجابة)، more = معلومة من الكتاب تظهر مع الإجابة
+const CARDS = [
+  {k:0, ico:'🛡️', clue:'أعزّز قدرة الدولة الدفاعية لمنع كل مَن تسوّل له نفسه النيل من أمن الوطن.', a:'الأمن العسكري',
+   more:'ويُخضع جميع الأفراد والجماعات لسلطة القانون.'},
+  {k:1, ico:'🏛️', clue:'أحمي البلاد من الفوضى والاضطراب، وأشمل الالتفاف حول أمير البلاد.', a:'الأمن السياسي',
+   more:'وهو يُكمّل الجانب العسكري.'},
+  {k:2, ico:'💰', clue:'أهدف إلى الاستغلال الأمثل للموارد وتحقيق الاكتفاء الذاتي.', a:'الأمن الاقتصادي',
+   more:'وإيجاد أسواق خارجية متعددة.'},
+  {k:3, ico:'🤝', clue:'أحافظ على استقرار المجتمع وتماسكه دون المساس بالدين واللغة والهوية.', a:'الأمن الاجتماعي',
+   more:'ويندرج ضمنه الأمن السيبراني.'}
+];
+
+const $ = id => document.getElementById(id);
+let soundOn = true, opened = new Set();
+
+// ═══════ الأصوات — مولّدة بالمتصفح، بلا ملفات ═══════
+let AC = null;
+function audio(){ if(!AC){ try{ AC = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){} } if(AC && AC.state === 'suspended') AC.resume(); return AC; }
+function tone(freq, dur, type, vol, delay){
+  const a = soundOn && audio(); if(!a) return;
+  const t = a.currentTime + (delay || 0), o = a.createOscillator(), g = a.createGain();
+  o.type = type || 'sine'; o.frequency.setValueAtTime(freq, t);
+  g.gain.setValueAtTime(vol || .2, t); g.gain.exponentialRampToValueAtTime(.001, t + dur);
+  o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur + .02);
+}
+const sfx = {
+  flip(){ [392, 523, 659].forEach((f, i) => tone(f, .25, 'triangle', .16, i * .07)); },
+  back(){ tone(330, .15, 'sine', .1); },
+  win(){ [523, 659, 784, 659, 784, 1046].forEach((f, i) => tone(f, .35, 'triangle', .2, i * .15)); }
+};
+
+function build(){
+  $('cards').innerHTML = '';
+  CARDS.forEach((c, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'flip k' + c.k; b.dataset.i = i;
+    b.setAttribute('aria-label', 'البطاقة ' + (i + 1) + ': ' + c.clue);
+    b.innerHTML = `<div class="inner">
+      <div class="face front"><div class="qmark">؟</div><div class="clue"></div><div class="tap">👆 انقر للتحقق</div></div>
+      <div class="face back"><div class="ico">${c.ico}</div><div class="ansLbl">أنا…</div><div class="ans"></div><div class="mini"></div></div>
+    </div>`;
+    b.querySelector('.clue').textContent = c.clue;
+    b.querySelector('.ans').textContent = c.a;
+    b.querySelector('.mini').textContent = c.more;
+    b.onclick = () => toggle(i);
+    $('cards').appendChild(b);
+  });
+  update();
+}
+function toggle(i){
+  const el = $('cards').children[i];
+  if(opened.has(i)){ opened.delete(i); el.classList.remove('open'); sfx.back(); }
+  else{ opened.add(i); el.classList.add('open'); sfx.flip(); if(opened.size === CARDS.length) setTimeout(celebrate, 600); }
+  update();
+}
+function update(){
+  $('cnt').textContent = opened.size;
+  $('dots').innerHTML = CARDS.map((c, i) => `<i class="${opened.has(i) ? 'ok' : ''}"></i>`).join('');
+}
+function celebrate(){
+  sfx.win();
+  const cols = ['#7a1232', '#dba73c', '#175a4a', '#6b3fa0', '#a71944'];
+  for(let i = 0; i < 70; i++){
+    const d = document.createElement('div'); d.className = 'conf';
+    d.style.left = Math.random() * 100 + 'vw'; d.style.background = cols[i % cols.length];
+    d.style.animationDuration = (1.8 + Math.random() * 1.6) + 's'; d.style.animationDelay = Math.random() * .5 + 's';
+    document.body.appendChild(d); setTimeout(() => d.remove(), 4200);
+  }
+}
+$('allBtn').onclick = () => { const was = opened.size; CARDS.forEach((c, i) => { opened.add(i); $('cards').children[i].classList.add('open'); }); update(); sfx.flip(); if(was < CARDS.length) setTimeout(celebrate, 600); };
+$('newBtn').onclick = () => { opened.clear(); [...$('cards').children].forEach(el => el.classList.remove('open')); update(); sfx.back(); };
+$('soundBtn').onclick = () => { soundOn = !soundOn; $('soundBtn').textContent = soundOn ? '🔊' : '🔇'; };
+// داخل رحّالة: ⛶ يكبّر الصفحة كلها (البطاقات + عجلة المشاركة) لا اللعبة وحدها
+$('fsBtn').onclick = () => {
+  try{ if(window.parent !== window && window.parent.lsEmbedFull){ window.parent.lsEmbedFull(); return; } }catch(e){}
+  if(!document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); else document.exitFullscreen();
+};
+// المفاتيح ١–٤ تقلب البطاقة، و F لملء الشاشة
+window.addEventListener('keydown', e => {
+  const n = '1234١٢٣٤'.indexOf(e.key);
+  if(n >= 0){ e.preventDefault(); toggle(n % 4); }
+  else if(e.key === 'f' || e.key === 'F') $('fsBtn').onclick();
+});
+document.querySelectorAll('.btn, .iconbtn').forEach(b => b.addEventListener('mouseup', () => b.blur()));
+build();
+</script>
+</body>
+</html>

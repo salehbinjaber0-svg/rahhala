@@ -507,6 +507,13 @@
     font-family:'Tajawal'; font-weight:800; font-size:.92rem; color:var(--gold-deep);}
   .actCrumb:hover{background:#fbedcf;}
   .actCrumbSep{color:var(--gold-deep); font-weight:800;}
+  /* المجلدان الرئيسيان: الأنشطة الحديثة والأرشيف — أكبر من مجلدات الدروس */
+  .actFolder.actZone{padding:18px 20px;}
+  .actFolder.actZone .actFolderIcon{font-size:2.6rem;}
+  .actFolder.actZone .actFolderName{font-size:1.25rem;}
+  .actFolder.actZone.recent{border-color:var(--gold); background:#fbedcf;}
+  .actRecentGroup + .actRecentGroup{margin-top:16px;}
+  .actRecentHead{color:var(--navy); font-weight:800; font-size:.98rem; margin:2px 0 10px; padding-bottom:6px; border-bottom:1.5px solid #e7d9ce;}
   .actArchive{margin-top:16px;}
   .actArchive summary{cursor:pointer; color:var(--gold-deep); font-weight:800; font-size:.92rem; padding:6px 2px;}
   .actArchive .actGrid{margin-top:10px;}
@@ -4851,11 +4858,24 @@ function fmtActDate(iso){
 
 // تبويب الصف المعروض — يُتذكّر، إلا إن كان لصف آخر نشاط خاص اليوم وليس لهذا
 let actGrade = null;
-let actFolder = null;      // مجلد الأنشطة الخاصة المفتوح (اسمه) — null = قائمة المجلدات
+// الأنشطة الخاصة بمجلدين (طلب المالك، ٢٤ نوفمبر ٢٠٢٦): «🆕 الأنشطة الحديثة» و«🗄️ الأرشيف».
+// النشاط ينتقل للأرشيف تلقائياً بتاريخه (a.date) متى مرّت عليه ACT_RECENT_DAYS أيام — بلا تدخل يدوي
+const ACT_RECENT_DAYS = 3;
+let actZone = null;        // المجلد الرئيسي المفتوح: 'recent' | 'archive' — null = المجلدان
+let actFolder = null;      // مجلد الدرس المفتوح داخل الأرشيف (اسمه) — null = قائمة مجلدات الدروس
 let actFolderList = [];
+function actOpenZone(z){ actZone = z || null; actFolder = null; renderActivities(); }
 function actOpenFolder(i){ actFolder = i >= 0 && actFolderList[i] ? actFolderList[i].name : null; renderActivities(); }
+// عمر النشاط بالأيام منذ تاريخه حتى اليوم (بتوقيت الجهاز): ٠ = اليوم. بلا تاريخ = قديم
+function actAgeDays(date, today){
+  if(!date) return Infinity;
+  const d = Date.parse(date + 'T00:00:00Z'), t = Date.parse(today + 'T00:00:00Z');
+  return isNaN(d) ? Infinity : Math.round((t - d) / 86400000);
+}
+function actIsRecent(a, today){ return actAgeDays(a.date, today) < ACT_RECENT_DAYS; }   // تاريخ مستقبلي = حديث
 function setActGrade(g){
   actGrade = g;
+  actZone = null;
   actFolder = null;
   try{ localStorage.setItem('rahhala_act_grade', String(g)); }catch(e){}
   renderActivities();
@@ -4909,40 +4929,69 @@ function renderActivities(){
   const mine = ACTIVITIES.filter(a => a.grade === actGrade);
   const specials = mine.filter(a => a.special);
   const regular = mine.filter(a => !a.special);
-  // الأنشطة الخاصة بمجلدات (طلب المالك، نوفمبر ٢٠٢٦): «📌 أنشطة خاصة» ← مجلد الدرس (مثل «الدولة العثمانية»)
-  // ← أنشطته بترتيب كتابتها (النشاط الأول ثم الثاني…). اسم المجلد = special.folder إن وُجد، وإلا عنوان الوحدة.
-  // المجلدات بالأحدث أولاً، ولا شيء يُخفى بمرور التاريخ
+  // الأنشطة الخاصة: «📌 أنشطة خاصة» ← مجلدان رئيسيان بالتاريخ ← «الأنشطة الحديثة» تعرض بطاقاتها مباشرة
+  // مجمّعة بدروسها (أسرع على السبورة)، و«الأرشيف» ← مجلد لكل درس (special.folder أو عنوان الوحدة) ← أنشطته
+  // بترتيب كتابتها. مجلدات الدروس بالأحدث أولاً
   const UF = actGrade === 8 ? UNITS_DATA_8 : UNITS_DATA;
   const folderOf = a => (a.special && a.special.folder) || (UF[a.unit] ? UF[a.unit].title : 'أنشطة أخرى');
-  const folders = [];
-  specials.forEach(a => {
-    const name = folderOf(a);
-    let f = folders.find(x => x.name === name);
-    if(!f){ f = {name, items: [], last: ''}; folders.push(f); }
-    f.items.push(a);
-    if((a.date || '') > f.last) f.last = a.date || '';
-  });
-  folders.sort((x, y) => y.last.localeCompare(x.last));
+  const groupFolders = list => {
+    const fs = [];
+    list.forEach(a => {
+      const name = folderOf(a);
+      let f = fs.find(x => x.name === name);
+      if(!f){ f = {name, items: [], last: ''}; fs.push(f); }
+      f.items.push(a);
+      if((a.date || '') > f.last) f.last = a.date || '';
+    });
+    return fs.sort((x, y) => y.last.localeCompare(x.last));
+  };
+  const recent = specials.filter(a => actIsRecent(a, today));
+  const archived = specials.filter(a => !actIsRecent(a, today));
+  const recentFolders = groupFolders(recent);
+  const folders = groupFolders(archived);
   actFolderList = folders;
-  const open = folders.find(f => f.name === actFolder);
+  if(actZone === 'archive' && !archived.length) actZone = null;
+  const open = actZone === 'archive' ? folders.find(f => f.name === actFolder) : null;
   if(!open) actFolder = null;
-  const cnt = n => n === 1 ? 'نشاط واحد' : n === 2 ? 'نشاطان' : `${n} أنشطة`;
-  const specialHtml = !folders.length ? '' : `
+  const cnt = n => n === 0 ? 'لا أنشطة' : n === 1 ? 'نشاط واحد' : n === 2 ? 'نشاطان' : n <= 10 ? `${n} أنشطة` : `${n} نشاطاً`;
+  const crumbRoot = `<button type="button" class="actCrumb" onclick="actOpenZone(null)">📌 أنشطة خاصة</button><span class="actCrumbSep">‹</span>`;
+  const zoneBtn = (z, icon, name, n, sub, hot) => `
+    <button type="button" class="actFolder actZone ${z}${hot ? ' isToday' : ''}" onclick="actOpenZone('${z}')">
+      <span class="actFolderIcon">${icon}</span>
+      <span class="actFolderName">${name}</span>
+      <span class="actFolderMeta">${cnt(n)} · ${sub}</span>
+      ${hot ? '<span class="actChip today">حصة اليوم</span>' : ''}
+    </button>`;
+  let head, inner;
+  if(actZone === 'recent'){
+    head = `${crumbRoot}<h3>🆕 الأنشطة الحديثة</h3><span>آخر ${ACT_RECENT_DAYS} أيام — بعدها تنتقل للأرشيف تلقائياً</span>`;
+    inner = recentFolders.length
+      ? recentFolders.map(f => `<div class="actRecentGroup"><div class="actRecentHead">📂 ${esc(f.name)}</div>
+          <div class="actGrid wide">${f.items.map(a => actCardHtml(a, today)).join('')}</div></div>`).join('')
+      : `<div class="actNone">لا أنشطة خاصة خلال آخر ${ACT_RECENT_DAYS} أيام — الأنشطة السابقة في «🗄️ الأرشيف».</div>`;
+  } else if(actZone === 'archive'){
+    head = open
+      ? `${crumbRoot}<button type="button" class="actCrumb" onclick="actOpenFolder(-1)">🗄️ الأرشيف</button><span class="actCrumbSep">‹</span><h3>📂 ${esc(open.name)}</h3>`
+      : `${crumbRoot}<h3>🗄️ الأرشيف</h3><span>مجلد لكل درس — افتحه لترى أنشطته</span>`;
+    inner = open
+      ? `<div class="actGrid wide">${open.items.map(a => actCardHtml(a, today)).join('')}</div>`
+      : `<div class="actFolders">${folders.map((f, i) => `
+          <button type="button" class="actFolder" onclick="actOpenFolder(${i})">
+            <span class="actFolderIcon">📁</span>
+            <span class="actFolderName">${esc(f.name)}</span>
+            <span class="actFolderMeta">${cnt(f.items.length)}${f.last ? ` · 📅 ${esc(fmtActDate(f.last))}` : ''}</span>
+          </button>`).join('')}</div>`;
+  } else {
+    head = '<h3>📌 أنشطة خاصة</h3><span>الحديثة في مجلد، وما مرّت عليه ' + ACT_RECENT_DAYS + ' أيام ينتقل للأرشيف تلقائياً</span>';
+    inner = `<div class="actFolders">
+      ${zoneBtn('recent', '🆕', 'الأنشطة الحديثة', recent.length, `آخر ${ACT_RECENT_DAYS} أيام`, recent.some(a => a.date === today))}
+      ${zoneBtn('archive', '🗄️', 'الأرشيف', archived.length, !folders.length ? 'فارغ' : folders.length === 1 ? 'مجلد واحد' : folders.length === 2 ? 'مجلدان' : folders.length <= 10 ? `${folders.length} مجلدات` : `${folders.length} مجلداً`, false)}
+    </div>`;
+  }
+  const specialHtml = !specials.length ? '' : `
     <div class="actSec special">
-      <div class="actSecHead">${open
-        ? `<button type="button" class="actCrumb" onclick="actOpenFolder(-1)">📌 أنشطة خاصة</button><span class="actCrumbSep">‹</span><h3>📂 ${esc(open.name)}</h3>`
-        : '<h3>📌 أنشطة خاصة</h3><span>مجلد لكل درس — افتحه لترى أنشطته</span>'}</div>
-      ${open
-        ? `<div class="actGrid wide">${open.items.map(a => actCardHtml(a, today)).join('')}</div>`
-        : `<div class="actFolders">${folders.map((f, i) => {
-            const hasToday = f.items.some(a => a.date === today);
-            return `<button type="button" class="actFolder${hasToday ? ' isToday' : ''}" onclick="actOpenFolder(${i})">
-              <span class="actFolderIcon">📁</span>
-              <span class="actFolderName">${esc(f.name)}</span>
-              <span class="actFolderMeta">${cnt(f.items.length)}${f.last ? ` · 📅 ${esc(fmtActDate(f.last))}` : ''}</span>
-              ${hasToday ? '<span class="actChip today">حصة اليوم</span>' : ''}
-            </button>`;
-          }).join('')}</div>`}
+      <div class="actSecHead">${head}</div>
+      ${inner}
     </div>`;
 
   const U = actGrade === 8 ? UNITS_DATA_8 : UNITS_DATA;
