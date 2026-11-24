@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>تكريم المتفوقين - اختبار منتصف الفصل الدراسي الأول</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=Cairo:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* شاشة «تكريم المتفوقين» — رحّالة (طلب المالك، ٢٤ نوفمبر ٢٠٢٦): خلفية احتفالية بملء الشاشة لحفل تكريم
+     المتفوقين في اختبار منتصف الفصل الأول. الصف من ?g=7 أو ?g=8. أسماء المتفوقين اختيارية (زر ✏️)
+     وتُحفظ بمتصفح المعلم فقط. الهوية: عنابي #7a1232 وذهبي رملي؛ النص الفاتح على العنابي بلا شفافية */
+  :root{
+    --navy:#7a1232; --navy-deep:#420a1c; --gold:#dba73c; --gold-light:#f6dc96; --gold-deep:#68430b;
+    --cream:#f8f3ef; --ink:#1f1216;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;overflow:hidden;color:#fff;
+    font-family:"Cairo","Tajawal","Segoe UI",Tahoma,Arial,sans-serif;
+    background:radial-gradient(ellipse at 50% 38%, #9e1a43 0%, var(--navy) 38%, var(--navy-deep) 100%)}
+  /* زخرفة هندسية: نجمة ثمانية خفيفة بالذهبي */
+  #pattern{position:fixed;inset:0;pointer-events:none;opacity:.10;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90'%3E%3Cg fill='none' stroke='%23dba73c' stroke-width='1.4'%3E%3Cpath d='M45 15 L53 37 L75 45 L53 53 L45 75 L37 53 L15 45 L37 37 Z'/%3E%3Crect x='29' y='29' width='32' height='32' transform='rotate(45 45 45)'/%3E%3Crect x='29' y='29' width='32' height='32'/%3E%3C/g%3E%3C/svg%3E");
+    background-size:90px 90px}
+  /* أشعة ذهبية تدور ببطء خلف الكأس */
+  #rays{position:fixed;left:50%;top:40%;width:170vmax;height:170vmax;transform:translate(-50%,-50%);pointer-events:none;
+    background:repeating-conic-gradient(from 0deg, rgba(219,167,60,.13) 0deg 7deg, rgba(219,167,60,0) 7deg 20deg);
+    -webkit-mask-image:radial-gradient(circle, #000 0%, transparent 55%); mask-image:radial-gradient(circle, #000 0%, transparent 55%);
+    animation:spin 90s linear infinite}
+  @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+  #confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:3}
+
+  /* إطار مزدوج ذهبي حول الشاشة */
+  #frame{position:fixed;inset:clamp(10px,1.6vw,24px);border:3px solid var(--gold);border-radius:22px;pointer-events:none;z-index:1}
+  #frame::after{content:"";position:absolute;inset:8px;border:1.5px solid var(--gold);border-radius:16px}
+  .corner{position:fixed;width:clamp(40px,5vw,78px);height:clamp(40px,5vw,78px);z-index:2;pointer-events:none}
+  .corner.tr{top:clamp(4px,1vw,14px);right:clamp(4px,1vw,14px)}
+  .corner.tl{top:clamp(4px,1vw,14px);left:clamp(4px,1vw,14px);transform:scaleX(-1)}
+  .corner.br{bottom:clamp(4px,1vw,14px);right:clamp(4px,1vw,14px);transform:scaleY(-1)}
+  .corner.bl{bottom:clamp(4px,1vw,14px);left:clamp(4px,1vw,14px);transform:scale(-1,-1)}
+
+  #stage{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:clamp(34px,5vh,70px) clamp(30px,5vw,90px);gap:clamp(6px,1.4vh,18px)}
+  #badge{font-weight:800;font-size:clamp(15px,1.7vw,26px);color:var(--navy-deep);background:var(--gold-light);
+    padding:6px 26px;border-radius:999px;box-shadow:0 4px 0 var(--gold-deep);animation:drop .8s .1s both}
+  #trophy{width:clamp(120px,19vh,250px);height:auto;filter:drop-shadow(0 10px 24px rgba(0,0,0,.35));animation:pop 1s .3s both, float 4s 1.3s ease-in-out infinite}
+  h1{margin:0;font-family:"Aref Ruqaa","Cairo",serif;font-weight:700;line-height:1.15;
+    font-size:clamp(48px,9.2vw,150px);color:var(--gold-light);
+    text-shadow:0 3px 0 var(--gold-deep), 0 8px 26px rgba(0,0,0,.4);animation:drop 1s .55s both}
+  h2{margin:0;font-weight:800;line-height:1.4;font-size:clamp(22px,3.5vw,58px);color:#fff;
+    text-shadow:0 3px 14px rgba(0,0,0,.35);animation:drop 1s .8s both}
+  .rule{display:flex;align-items:center;gap:14px;width:min(70vw,780px);color:var(--gold);font-size:clamp(16px,1.8vw,28px);animation:drop 1s 1s both}
+  .rule::before,.rule::after{content:"";flex:1;height:2px;background:linear-gradient(90deg, transparent, var(--gold), transparent)}
+  #names{display:none;flex-wrap:wrap;justify-content:center;gap:clamp(8px,1.2vw,16px);max-width:1500px}
+  #names.on{display:flex}
+  .name{font-weight:800;font-size:clamp(18px,2.3vw,38px);color:var(--navy-deep);
+    background:linear-gradient(180deg, #fbe9b6, var(--gold));padding:6px 22px 8px;border-radius:14px;
+    box-shadow:0 5px 0 var(--gold-deep), 0 10px 20px rgba(0,0,0,.25);opacity:0;animation:pop .7s both}
+  .name::before{content:"🏅 "}
+  #foot{font-weight:700;font-size:clamp(14px,1.5vw,24px);color:var(--gold-light);animation:drop 1s 1.2s both}
+  #foot b{color:#fff}
+  @keyframes drop{from{opacity:0;transform:translateY(-26px)}to{opacity:1;transform:none}}
+  @keyframes pop{0%{opacity:0;transform:scale(.3)}70%{opacity:1;transform:scale(1.08)}100%{opacity:1;transform:scale(1)}}
+  @keyframes float{50%{transform:translateY(-10px)}}
+
+  /* أزرار المعلم: تخفت حين يسكن المؤشر كي تبقى الشاشة نظيفة */
+  #tools{position:fixed;top:clamp(22px,3vw,40px);left:clamp(22px,3vw,40px);z-index:5;display:flex;gap:8px;transition:opacity .5s}
+  body.idle #tools{opacity:0}
+  .iconbtn{border:0;background:rgba(0,0,0,.25);color:#fff;border-radius:12px;width:48px;height:48px;font-size:22px;cursor:pointer;font-family:inherit}
+  .iconbtn:hover{background:rgba(0,0,0,.4)}
+  #editor{position:fixed;inset:0;z-index:6;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55)}
+  #editor.on{display:flex}
+  #editor .box{background:var(--cream);color:var(--ink);border-radius:18px;padding:22px;width:min(560px,92vw);border-top:8px solid var(--gold)}
+  #editor h3{margin:0 0 6px;color:var(--navy);font-size:22px}
+  #editor p{margin:0 0 10px;color:#594a50;font-size:15px}
+  #editor textarea{width:100%;height:240px;font:700 18px "Cairo",sans-serif;border:2px solid #ebc578;border-radius:12px;padding:10px;resize:vertical}
+  #editor .row{display:flex;gap:10px;margin-top:12px}
+  #editor button{flex:1;border:0;border-radius:12px;padding:10px;font:800 17px "Cairo",sans-serif;cursor:pointer}
+  #saveNames{background:var(--navy);color:#fff}
+  #cancelNames{background:#ebded4;color:var(--navy)}
+  @media (prefers-reduced-motion: reduce){ *{animation:none !important} }
+</style>
+</head>
+<body>
+<div id="pattern"></div>
+<div id="rays"></div>
+<div id="frame"></div>
+<svg class="corner tr" viewBox="0 0 80 80" aria-hidden="true"><path d="M78 4 H30 Q4 4 4 30 V78" fill="none" stroke="#dba73c" stroke-width="4"/><circle cx="20" cy="20" r="7" fill="#dba73c"/><path d="M40 14 L46 20 L40 26 L34 20Z M14 40 L20 46 L26 40 L20 34Z" fill="#f6dc96"/></svg>
+<svg class="corner tl" viewBox="0 0 80 80" aria-hidden="true"><path d="M78 4 H30 Q4 4 4 30 V78" fill="none" stroke="#dba73c" stroke-width="4"/><circle cx="20" cy="20" r="7" fill="#dba73c"/><path d="M40 14 L46 20 L40 26 L34 20Z M14 40 L20 46 L26 40 L20 34Z" fill="#f6dc96"/></svg>
+<svg class="corner br" viewBox="0 0 80 80" aria-hidden="true"><path d="M78 4 H30 Q4 4 4 30 V78" fill="none" stroke="#dba73c" stroke-width="4"/><circle cx="20" cy="20" r="7" fill="#dba73c"/><path d="M40 14 L46 20 L40 26 L34 20Z M14 40 L20 46 L26 40 L20 34Z" fill="#f6dc96"/></svg>
+<svg class="corner bl" viewBox="0 0 80 80" aria-hidden="true"><path d="M78 4 H30 Q4 4 4 30 V78" fill="none" stroke="#dba73c" stroke-width="4"/><circle cx="20" cy="20" r="7" fill="#dba73c"/><path d="M40 14 L46 20 L40 26 L34 20Z M14 40 L20 46 L26 40 L20 34Z" fill="#f6dc96"/></svg>
+<canvas id="confetti"></canvas>
+
+<div id="tools">
+  <button class="iconbtn" id="fsBtn" title="ملء الشاشة" aria-label="ملء الشاشة">⛶</button>
+  <button class="iconbtn" id="burstBtn" title="احتفال" aria-label="احتفال">🎉</button>
+  <button class="iconbtn" id="editBtn" title="أسماء المتفوقين" aria-label="أسماء المتفوقين">✏️</button>
+</div>
+
+<main id="stage">
+  <div id="badge">الدراسات الاجتماعية · <span id="grade">الصف السابع</span></div>
+  <svg id="trophy" viewBox="0 0 220 220" aria-hidden="true">
+    <defs>
+      <linearGradient id="gg" x1="0" x2="1"><stop offset="0" stop-color="#b9842a"/><stop offset=".45" stop-color="#f6dc96"/><stop offset="1" stop-color="#dba73c"/></linearGradient>
+    </defs>
+    <!-- إكليل الغار -->
+    <g fill="#dba73c">
+      <g id="leafL">
+        <ellipse cx="38" cy="150" rx="7" ry="15" transform="rotate(-35 38 150)"/>
+        <ellipse cx="28" cy="125" rx="7" ry="15" transform="rotate(-15 28 125)"/>
+        <ellipse cx="26" cy="99" rx="7" ry="15" transform="rotate(5 26 99)"/>
+        <ellipse cx="32" cy="73" rx="7" ry="15" transform="rotate(25 32 73)"/>
+        <ellipse cx="46" cy="50" rx="7" ry="14" transform="rotate(45 46 50)"/>
+        <ellipse cx="56" cy="168" rx="7" ry="15" transform="rotate(-60 56 168)"/>
+      </g>
+      <use href="#leafL" transform="translate(220 0) scale(-1 1)"/>
+    </g>
+    <!-- الكأس -->
+    <path d="M72 46 H148 V70 Q148 118 110 128 Q72 118 72 70 Z" fill="url(#gg)" stroke="#68430b" stroke-width="3"/>
+    <path d="M72 56 Q50 56 52 78 Q55 98 78 102" fill="none" stroke="#dba73c" stroke-width="7" stroke-linecap="round"/>
+    <path d="M148 56 Q170 56 168 78 Q165 98 142 102" fill="none" stroke="#dba73c" stroke-width="7" stroke-linecap="round"/>
+    <rect x="102" y="126" width="16" height="22" fill="#dba73c" stroke="#68430b" stroke-width="2"/>
+    <path d="M84 148 H136 L142 166 H78 Z" fill="url(#gg)" stroke="#68430b" stroke-width="3"/>
+    <rect x="72" y="166" width="76" height="14" rx="3" fill="#68430b"/>
+    <path d="M110 64 L115 76 L128 77 L118 85 L121 98 L110 91 L99 98 L102 85 L92 77 L105 76 Z" fill="#7a1232"/>
+    <!-- نجوم لامعة -->
+    <g fill="#fff"><path d="M60 26 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z"/><path d="M168 30 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2z"/><path d="M178 128 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z"/></g>
+  </svg>
+  <h1>تكريم المتفوقين</h1>
+  <h2>في اختبار منتصف الفصل الدراسي الأول</h2>
+  <div class="rule">✦ ✦ ✦</div>
+  <div id="names" aria-live="polite"></div>
+  <div id="foot">العام الدراسي <b>2026 – 2027</b> · مع خالص التهنئة والتقدير</div>
+</main>
+
+<div id="editor" role="dialog" aria-label="أسماء المتفوقين">
+  <div class="box">
+    <h3>🏅 أسماء المتفوقين</h3>
+    <p>اكتب اسماً في كل سطر (اختياري) — تظهر على الشاشة بلوحات ذهبية. اتركها فارغة لتبقى الخلفية وحدها.</p>
+    <textarea id="namesInput" dir="rtl"></textarea>
+    <div class="row"><button id="saveNames">عرض الأسماء</button><button id="cancelNames">إلغاء</button></div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const grade = new URLSearchParams(location.search).get('g') === '8' ? 8 : 7;
+$('grade').textContent = grade === 8 ? 'الصف الثامن' : 'الصف السابع';
+const KEY = 'rahhala_honor_names_' + grade;
+
+// ── أسماء المتفوقين (اختيارية، بمتصفح المعلم فقط) — textContent دائماً، فلا يُفسَّر الاسم كـHTML
+function loadNames(){ try{ return JSON.parse(localStorage.getItem(KEY) || '[]'); }catch(e){ return []; } }
+function renderNames(list){
+  const box = $('names');
+  box.textContent = '';
+  list.forEach((n, i) => {
+    const el = document.createElement('div');
+    el.className = 'name'; el.textContent = n;
+    el.style.animationDelay = (1.3 + i * .18) + 's';
+    box.appendChild(el);
+  });
+  box.classList.toggle('on', list.length > 0);
+  // أسماء كثيرة ← الكأس والعنوان يصغران قليلاً لتتسع الشاشة
+  $('trophy').style.width = list.length > 8 ? 'clamp(80px,12vh,160px)' : '';
+}
+renderNames(loadNames());
+$('editBtn').onclick = () => { $('namesInput').value = loadNames().join('\n'); $('editor').classList.add('on'); $('namesInput').focus(); };
+$('cancelNames').onclick = () => $('editor').classList.remove('on');
+$('saveNames').onclick = () => {
+  const list = $('namesInput').value.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 30);
+  try{ localStorage.setItem(KEY, JSON.stringify(list)); }catch(e){}
+  $('editor').classList.remove('on');
+  renderNames(list);
+  burst();
+};
+
+// ── قصاصات ملوّنة تتساقط باستمرار، ودفعة احتفال عند البدء وعند 🎉
+const cv = $('confetti'), cx = cv.getContext('2d');
+const COLORS = ['#dba73c', '#f6dc96', '#ffffff', '#ebc578', '#b9842a', '#c4325c'];
+let W = 0, H = 0, parts = [];
+function size(){ const r = window.devicePixelRatio || 1; W = innerWidth; H = innerHeight; cv.width = W * r; cv.height = H * r; cx.setTransform(r, 0, 0, r, 0, 0); }
+size(); addEventListener('resize', size);
+function piece(x, y, vx, vy){
+  return {x, y, vx, vy, w:6 + Math.random() * 8, h:8 + Math.random() * 10, a:Math.random() * 6.3, va:(Math.random() - .5) * .25,
+    c:COLORS[Math.random() * COLORS.length | 0], round:Math.random() < .3};
+}
+function rain(){ if(parts.length < 140) parts.push(piece(Math.random() * W, -20, (Math.random() - .5) * 1.2, 1.2 + Math.random() * 1.8)); }
+function burst(){
+  [W * .15, W * .85].forEach((x, k) => {
+    for(let i = 0; i < 90; i++){
+      const ang = -Math.PI / 2 + (k ? -1 : 1) * (.15 + Math.random() * .55);
+      const sp = 9 + Math.random() * 11;
+      parts.push(piece(x, H + 10, Math.cos(ang) * sp, Math.sin(ang) * sp));
+    }
+  });
+}
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function tick(){
+  cx.clearRect(0, 0, W, H);
+  if(Math.random() < .5) rain();
+  parts = parts.filter(p => p.y < H + 40);
+  parts.forEach(p => {
+    p.vy = Math.min(p.vy + .12, 3.2); p.vx *= .99;
+    p.x += p.vx + Math.sin(p.a) * .4; p.y += p.vy; p.a += p.va;
+    cx.save(); cx.translate(p.x, p.y); cx.rotate(p.a); cx.fillStyle = p.c;
+    if(p.round){ cx.beginPath(); cx.arc(0, 0, p.w / 2, 0, 6.3); cx.fill(); }
+    else cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.a)) + 2);
+    cx.restore();
+  });
+  requestAnimationFrame(tick);
+}
+if(!still){ tick(); setTimeout(burst, 900); }
+$('burstBtn').onclick = burst;
+
+// ── ⛶ داخل رحّالة يكبّر الصفحة كلها؛ وحدها تكبّر نفسها
+$('fsBtn').onclick = () => {
+  try{ if(window.parent !== window && window.parent.lsEmbedFull){ window.parent.lsEmbedFull(); return; } }catch(e){}
+  if(!document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); else document.exitFullscreen();
+};
+addEventListener('keydown', e => {
+  if($('editor').classList.contains('on')) return;
+  if(e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); burst(); }
+  else if(e.key === 'f' || e.key === 'F') $('fsBtn').onclick();
+});
+
+// الأزرار تختفي بعد ٣ ثوانٍ بلا حركة
+let idleT;
+function wake(){ document.body.classList.remove('idle'); clearTimeout(idleT); idleT = setTimeout(() => document.body.classList.add('idle'), 3000); }
+['mousemove', 'pointerdown', 'keydown'].forEach(ev => addEventListener(ev, wake)); wake();
+</script>
+</body>
+</html>

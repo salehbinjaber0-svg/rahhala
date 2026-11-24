@@ -5082,7 +5082,8 @@ function startActivity(id){
   lsSetupCls(act.grade);
   openLessonShow();
   // العجلة ثابتة يسار الشاشة مع كل نشاط — إلا إن أخفاها المعلم بهذه الجلسة
-  if(!lsWheelOff && window.innerWidth >= WH_DOCK_MIN && dbReady) openWheel(lsCls, 'ls');
+  // noWheel على النشاط (شاشة التكريم): لا عجلة مشاركة معه
+  if(!act.noWheel && !lsWheelOff && window.innerWidth >= WH_DOCK_MIN && dbReady) openWheel(lsCls, 'ls');
 }
 
 // ── وضع العرض على البروجكتر ──
@@ -5250,7 +5251,8 @@ function lsEmbedFull(){
   if(d.fullscreenElement){ d.exitFullscreen().catch(()=>{}); return; }
   const show = d.getElementById('lessonShow');
   show.classList.add('embedFull');
-  if(!whDocked() && !lsWheelOff && dbReady) openWheel(lsCls, 'ls');
+  const act = ACTIVITIES.find(a => a.id === lsCurrentAct);
+  if(!(act && act.noWheel) && !whDocked() && !lsWheelOff && dbReady) openWheel(lsCls, 'ls');
   const gd = lsEmbedDoc();
   if(gd) gd.documentElement.classList.toggle('hostWheel', whDocked());
   if(d.documentElement.requestFullscreen) d.documentElement.requestFullscreen().catch(()=>{});
